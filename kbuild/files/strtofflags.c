@@ -108,7 +108,7 @@ static struct {
  *	Convert file flags to a comma-separated string.  If no flags
  *	are set, return the empty string.
  */
-char *
+static inline char *
 fflagstostr(u_long flags)
 {
 	char *string;
@@ -150,7 +150,7 @@ out:
  *	success, 1 on failure.  On failure, stringp is set to point
  *	to the offending token.
  */
-int
+static inline int
 strtofflags(char **stringp, u_long *setp, u_long *clrp)
 {
 	u_long setf, clrf;

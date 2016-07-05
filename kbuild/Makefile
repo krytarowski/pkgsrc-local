@@ -21,6 +21,8 @@ LICENSE=	gnu-gpl-v3
 
 WRKSRC=		${WRKDIR}/${KBUILDNAME}
 
+MAKE_JOBS_SAFE=	no
+
 USE_TOOLS+=	pax lex gmake autoconf autoreconf automake
 
 KBUILD_VERSION_PATCH=	${KBUILDVERMAJ:E}
