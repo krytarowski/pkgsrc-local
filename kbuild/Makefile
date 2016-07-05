@@ -21,9 +21,40 @@ LICENSE=	gnu-gpl-v3
 
 WRKSRC=		${WRKDIR}/${KBUILDNAME}
 
-USE_TOOLS+=	pax gmake autoconf automake autoreconf perl flex bison
+USE_TOOLS+=	pax bash lex
+
+# We will use bash extension
+REPLACE_BASH+=	kBuild/env.sh
+
+KBUILD_VERSION_PATCH=	${KBUILDVERMAJ:E}
 
 post-extract:
-	${RUN}cd ${WRKDIR} && ${EXTRACTOR} ${KBUILDNAME}-r${KBUILDVERSVN}.tar.gz
+	${RUN} cd ${WRKDIR} && ${EXTRACTOR} ${KBUILDNAME}-r${KBUILDVERSVN}.tar.gz
+
+pre-build:
+# Remove prebuilt files
+	${RUN} cd ${WRKSRC} && rm -rf kBuild/bin/*
+
+do-build:
+	${RUN} cd ${WRKSRC} && \
+	./kBuild/env.sh \
+		--full-make -f bootstrap.gmk \
+		KBUILD_VERBOSE=2 \
+		KBUILD_VERSION_PATCH=${KBUILD_VERSION_PATCH} && \
+	./kBuild/env.sh kmk \
+		BUILD_TYPE=release \
+		MY_INST_MODE=0644 \
+		MY_INST_BIN_MODE=0755 \
+		rebuild
+
+do-install:
+	${RUN} cd ${WRKSRC} && \
+	KBUILD_VERBOSE=2 \
+		./kBuild/env.sh kmk \
+		BUILD_TYPE=release \
+		MY_INST_MODE=0644 \
+		MY_INST_BIN_MODE=0755 \
+		PATH_INS=${DESTDIR} \
+		install
 
 .include "../../mk/bsd.pkg.mk"
