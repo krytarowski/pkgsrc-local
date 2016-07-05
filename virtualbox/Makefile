@@ -25,18 +25,18 @@ USE_TOOLS+=	gtar pkg-config gmake
 WRKSRC=		${WRKDIR}/VirtualBox-${PKGVERSION_NOREV}
 
 HAS_CONFIGURE=		yes
-#CONFIGURE_ARGS+= --disable-java --passive-mesa
-#CONFIGURE_ARGS+= --with-gcc="${CC}" --with-g++="${CXX}"
-#GNU_CONFIGURE=	yes
 USE_LANGUAGES+=	c c++
 
-#SUBST_CLASSES+=		prefix
-#SUBST_FILES.prefix+=	configure
-#SUBST_FILES.prefix+=	src/VBox/Additions/x11/Installer/98vboxadd-xclient
-#SUBST_FILES.prefix+=	src/VBox/Installer/freebsd/VBox.sh
-#SUBST_FILES.prefix+=	src/VBox/Additions/x11/Installer/vboxclient.desktop
-#SUBST_FILES.prefix+=	kBuild/header.kmk
-#SUBST_FILES.prefix+=	Config.kmk
+SUBST_CLASSES+=		paths
+SUBST_MESSAGE.paths+=	Adjust paths for pkgsrc
+SUBST_STAGE.paths=	post-patch
+SUBST_FILES.paths+=	configure
+SUBST_SED.paths+=	-e 's,^INCX11=.*,INCX11="${X11BASE}/include",g'
+SUBST_SED.paths+=	-e 's,^LIBX11=.*,LIBX11="\${COMPILER_RPATH_FLAG}${X11BASE}/lib \-L${X11BASE}/lib \-lXext \-lX11",g'
+SUBST_SED.paths+=	-e 's,^INCZ=.*,INCZ="${BUILDLINK_PREFIX.zlib}/include",g'
+SUBST_SED.paths+=	-e 's,^LIBZ=.*,LIBZ="\${COMPILER_RPATH_FLAG}${BUILDLINK_PREFIX.zlib}/lib \-L${BUILDLINK_PREFIX.zlib}/lib \-lz",g'
+SUBST_SED.paths+=	-e 's,^INCCURL=.*,INCCURL="${BUILDLINK_PREFIX.curl}/include",g'
+SUBST_SED.paths+=	-e 's,^LIBCURL=.*,LIBCURL="\${COMPILER_RPATH_FLAG}${BUILDLINK_PREFIX.curl}/lib \-L${BUILDLINK_PREFIX.curl}/lib \-lcurl",g'
 
 .include "../../graphics/png/buildlink3.mk"
 .include "../../multimedia/libvpx/buildlink3.mk"
