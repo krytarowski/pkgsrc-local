@@ -20,7 +20,7 @@ DEPENDS+=	cdrtools-[0-9]*:../../sysutils/cdrtools
 BUILD_DEPENDS+=	yasm-[0-9]*:../../devel/yasm
 BUILD_DEPENDS+=	kBuild>=0.1.999:../../wip/kBuild-svn
 
-USE_TOOLS+=	gtar pkg-config gmake
+USE_TOOLS+=	gtar pkg-config
 
 WRKSRC=		${WRKDIR}/VirtualBox-${PKGVERSION_NOREV}
 
@@ -54,6 +54,9 @@ SUBST_SED.paths+=	-e 's!lib/x86_64-linux-gnu lib/i386-linux-gnu lib64 lib/64 lib
 SUBST_SED.paths+=	-e 's!SUPPYTHONLIBS=.*!SUPPYTHONLIBS="python${PYVERSSUFFIX}"!g'
 # Add needed rpath for testing execution of an application linked with libpython
 SUBST_SED.paths+=	-e 's!PYTHONLIBRPATH=.*!PYTHONLIBRPATH="${COMPILER_RPATH_FLAG}${PREFIX}/lib"!g'
+
+do-build:
+	${RUN} cd ${WRKSRC} && . ./env.sh && kmk all
 
 .include "../../audio/pulseaudio/buildlink3.mk"
 .include "../../multimedia/libvpx/buildlink3.mk"
