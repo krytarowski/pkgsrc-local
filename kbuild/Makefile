@@ -21,10 +21,7 @@ LICENSE=	gnu-gpl-v3
 
 WRKSRC=		${WRKDIR}/${KBUILDNAME}
 
-USE_TOOLS+=	pax bash lex
-
-# We will use bash extension
-REPLACE_BASH+=	kBuild/env.sh
+USE_TOOLS+=	pax lex
 
 KBUILD_VERSION_PATCH=	${KBUILDVERMAJ:E}
 
