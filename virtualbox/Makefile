@@ -53,7 +53,7 @@ SUBST_SED.paths+=	-e 's!lib/x86_64-linux-gnu lib/i386-linux-gnu lib64 lib/64 lib
 # Use pkgsrc provided Python version
 SUBST_SED.paths+=	-e 's!SUPPYTHONLIBS=.*!SUPPYTHONLIBS="python${PYVERSSUFFIX}"!g'
 # Add needed rpath for testing execution of an application linked with libpython
-SUBST_SED.paths+=	-e 's!PYTHONLIBRPATH=.*!PYTHONLIBRPATH="${COMPILER_RPATH_FLAG}${BUILDLINK_PREFIX.python}/lib"!g'
+SUBST_SED.paths+=	-e 's!PYTHONLIBRPATH=.*!PYTHONLIBRPATH="${COMPILER_RPATH_FLAG}${PREFIX}/lib"!g'
 
 .include "../../audio/pulseaudio/buildlink3.mk"
 .include "../../multimedia/libvpx/buildlink3.mk"
