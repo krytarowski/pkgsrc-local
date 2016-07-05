@@ -21,24 +21,27 @@ LICENSE=	gnu-gpl-v3
 
 WRKSRC=		${WRKDIR}/${KBUILDNAME}
 
-USE_TOOLS+=	pax lex
+USE_TOOLS+=	pax lex gmake autoconf autoreconf automake
 
 KBUILD_VERSION_PATCH=	${KBUILDVERMAJ:E}
 
+INSTALL_ENV+=	KBUILD_VERBOSE=2
+
 post-extract:
 	${RUN} cd ${WRKDIR} && ${EXTRACTOR} ${KBUILDNAME}-r${KBUILDVERSVN}.tar.gz
+	${RUN} ${CP} ${FILESDIR}/strtofflags.c ${WRKSRC}/src/kmk/strtofflags.c
 
 pre-build:
 # Remove prebuilt files
-	${RUN} cd ${WRKSRC} && rm -rf kBuild/bin/*
+#	${RUN} cd ${WRKSRC} && rm -rf kBuild/bin/*
 
 do-build:
 	${RUN} cd ${WRKSRC} && \
-	./kBuild/env.sh \
-		--full-make -f bootstrap.gmk \
+	${SETENV} ${MAKE_ENV} ./kBuild/env.sh \
+		--full ${GMAKE} -f bootstrap.gmk \
 		KBUILD_VERBOSE=2 \
 		KBUILD_VERSION_PATCH=${KBUILD_VERSION_PATCH} && \
-	./kBuild/env.sh kmk \
+	${SETENV} ${MAKE_ENV} ./kBuild/env.sh kmk \
 		BUILD_TYPE=release \
 		MY_INST_MODE=0644 \
 		MY_INST_BIN_MODE=0755 \
@@ -46,7 +49,7 @@ do-build:
 
 do-install:
 	${RUN} cd ${WRKSRC} && \
-	KBUILD_VERBOSE=2 \
+	${SETENV} ${INSTALL_ENV} \
 		./kBuild/env.sh kmk \
 		BUILD_TYPE=release \
 		MY_INST_MODE=0644 \
