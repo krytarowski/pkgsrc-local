@@ -1,0 +1,23 @@
+$NetBSD$
+
+--- kBuild/header.kmk.orig	2016-04-29 00:52:38.000000000 +0000
++++ kBuild/header.kmk
+@@ -610,10 +610,11 @@ SUFF_OBJ    := .o
+ SUFF_LIB    := .a
+ SUFF_DLL    := .so
+ SUFF_EXE    :=
+- if1of ($(KBUILD_TARGET), dragonfly freebsd linux netbsd openbsd) ## @todo check netbsd and openbsd.
++ if1of ($(KBUILD_TARGET), dragonfly freebsd linux)
+ SUFF_SYS    := .ko
++else ifeq ($(KBUILD_TARGET),netbsd)
+  else
+-SUFF_SYS    :=
++SUFF_SYS    := .kmod
+  endif
+ SUFF_RES    :=
+ endif
+@@ -1617,4 +1618,3 @@ endif
+ # end-of-file-content
+ __header_kmk__ := 1
+ endif # !__header_kmk__
+-
