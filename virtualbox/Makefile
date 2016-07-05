@@ -45,6 +45,13 @@ SUBST_SED.paths+=	-e 's!^INCPNG=.*!INCPNG="-I${BUILDLINK_PREFIX.png}/include"!g'
 SUBST_SED.paths+=	-e 's!^LIBPNG=.*!LIBPNG="${COMPILER_RPATH_FLAG}${BUILDLINK_PREFIX.png}/lib -L${BUILDLINK_PREFIX.png}/lib"!g'
 SUBST_SED.paths+=	-e 's!^INCVPX=.*!INCVPX="-I${BUILDLINK_PREFIX.libvpx}/include"!g'
 SUBST_SED.paths+=	-e 's!^LIBVPX=.*!LIBVPX="${COMPILER_RPATH_FLAG}${BUILDLINK_PREFIX.libvpx}/lib -L${BUILDLINK_PREFIX.libvpx}/lib -lvpx"!g'
+# These paths are used as a shell enumeration to check
+SUBST_SED.paths+=	-e 's!^PYTHONDIR=.*!PYTHONDIR="${PREFIX}"!g'
+SUBST_SED.paths+=	-e 's!^QT4DIR=.*!QT4DIR="${QTDIR}"!g'
+# Set proper path of Python libs under ${PREFIX}/lib..
+SUBST_SED.paths+=	-e 's!lib/x86_64-linux-gnu lib/i386-linux-gnu lib64 lib/64 lib!lib!g'
+# Use pkgsrc provided Python version
+SUBST_SED.paths+=	-e 's!SUPPYTHONLIBS=.*!SUPPYTHONLIBS="python${PYVERSSUFFIX}"!g'
 
 .include "../../audio/pulseaudio/buildlink3.mk"
 .include "../../multimedia/libvpx/buildlink3.mk"

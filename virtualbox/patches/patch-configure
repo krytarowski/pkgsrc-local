@@ -46,3 +46,17 @@ $NetBSD$
        else
          log_success "found version $cc_ver"
        fi
+@@ -1932,12 +1927,7 @@ extern "C" int main(void)
+ }
+ EOF
+   found=
+-# For Solaris we use libpython2.4 for compatibility with Solaris 10 and passing IPS pkg audit
+-  if [ "$OS" != "solaris" ]; then
+-    SUPPYTHONLIBS="python2.7 python2.6 python2.5 python2.4 python2.3"
+-  else
+-    SUPPYTHONLIBS="python2.4"
+-  fi
++SUPPYTHONLIBS="python2.7 python2.6 python2.5 python2.4 python2.3"
+   for p in $PYTHONDIR; do
+     for d in $SUPPYTHONLIBS; do
+       for b in lib/x86_64-linux-gnu lib/i386-linux-gnu lib64 lib/64 lib; do
