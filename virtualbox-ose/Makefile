@@ -3,7 +3,7 @@ DISTNAME=virtualbox-ose-${DISTVERSION}
 
 # FreeBSD ports in emulator category
 CATEGORIES=	devel
-DISTVERSION=	4.3.30
+DISTVERSION=	5.0.16
 MASTER_SITES=	http://download.virtualbox.org/virtualbox/${DISTVERSION}/ \
 	http://tmp.chruetertee.ch/ \
 	http://disasterarea.chruetertee.ch/ \
@@ -11,9 +11,6 @@ MASTER_SITES=	http://download.virtualbox.org/virtualbox/${DISTVERSION}/ \
 DISTFILES= VirtualBox-${DISTVERSION}${EXTRACT_SUFX} ${GADISTFILES}
 EXTRACT_ONLY= VirtualBox-${DISTVERSION}${EXTRACT_SUFX}
 EXTRACT_SUFX=	.tar.bz2
-
-# To try, disable following line, thanks
-BROKEN=		Package is not completed yet, sorry.
 
 MAINTAINER=	pkgsrc-users@NetBSD.org
 COMMENT=	General-purpose full virtualizer for x86 hardware
