@@ -16,4 +16,6 @@ USE_TOOLS+=	pkg-config
 
 PKGCONFIG_OVERRIDE+=	ltc.pc.in
 
+TEST_TARGET=	check
+
 .include "../../mk/bsd.pkg.mk"
