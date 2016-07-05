@@ -23,32 +23,35 @@ WRKSRC=			${WRKDIR}/kBuild-0.1.5-p2
 
 USE_TOOLS+=	pax gmake autoconf automake autoreconf perl flex bison
 
-.include "../../mk/bsd.prefs.mk"
+#.include "../../mk/bsd.prefs.mk"
 
-KBUILD_PLATFORM=	${LOWER_OPSYS}.${MACHINE_ARCH:S/x86_64/amd64/:S/i386/x86/}
-KBUILD_BIN_PATH=	${WRKSRC}/kBuild/bin/${KBUILD_PLATFORM}
-MAKE_ENV+=		WRKSRC=${WRKSRC}
+#KBUILD_PLATFORM=	${LOWER_OPSYS}.${MACHINE_ARCH:S/x86_64/amd64/:S/i386/x86/}
+#KBUILD_BIN_PATH=	${WRKSRC}/kBuild/bin/${KBUILD_PLATFORM}
+#MAKE_ENV+=		WRKSRC=${WRKSRC}
 
-post-extract:
-.if ${OPSYS} == "NetBSD"
-	cp ${FILESDIR}/strtofflags.c ${WRKSRC}/src/kmk
-.endif
-	rm -rf ${WRKSRC}/kBuild/bin
-	mkdir -p ${KBUILD_BIN_PATH}
-	ln -s ${SH} ${KBUILD_BIN_PATH}/kmk_ash
+#do-extract:
+#	${RUN} 
 
-pre-build:
-	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} ${SH} ${FILESDIR}/bootstrap.sh
-
-do-build:
-	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} \
-	  `${SH} ${WRKSRC}/kBuild/env.sh --full --eval --set` kmk
-
-INSTALLATION_DIRS=	bin
-
-do-install:
-	for f in ${WRKSRC}/out/${KBUILD_PLATFORM}/release/kBuild/bin/${KBUILD_PLATFORM}/*; do	\
-	  ${INSTALL_PROGRAM} $${f} ${DESTDIR}${PREFIX}/bin;	\
-	done
+#post-extract:
+#.if ${OPSYS} == "NetBSD"
+#	cp ${FILESDIR}/strtofflags.c ${WRKSRC}/src/kmk
+#;2B#;2B.endif
+#	rm -rf ${WRKSRC}/kBuild/bin
+#	mkdir -p ${KBUILD_BIN_PATH}
+#	ln -s ${SH} ${KBUILD_BIN_PATH}/kmk_ash
+#
+#pre-build:
+#	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} ${SH} ${FILESDIR}/bootstrap.sh
+#
+#do-build:
+##;2B#;2B	cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} \
+#	  `${SH} ${WRKSRC}/kBuild/env.sh --full --eval --set` kmk
+#
+#INSTALLATION_DIRS=	bin
+#
+#do-install:
+#	for f in ${WRKSRC}/out/${KBUILD_PLATFORM}/release/kBuild/bin/${KBUILD_PLATFORM}/*; do	\
+#	  ${INSTALL_PROGRAM} $${f} ${DESTDIR}${PREFIX}/bin;	\
+#	done
 
 .include "../../mk/bsd.pkg.mk"
