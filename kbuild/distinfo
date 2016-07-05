@@ -11,5 +11,6 @@ SHA1 (patch-src_kmk_Makefile.kmk) = d5f19634de28444d806a7730969346874604118c
 SHA1 (patch-src_kmk_kmkbuiltin_install.c) = c31233aa414cd340f8e9dc6e96352213f4883652
 SHA1 (patch-src_kmk_kmkbuiltin_osdep.c) = a0f4e6f22d1d35cb9016621480325ccdea05c897
 SHA1 (patch-src_kmk_kmkbuiltin_rm.c) = e81d0f2a53b8608c8c9baece4421425e4f84fdfa
+SHA1 (patch-src_lib_md5.c) = aeef0866d2e3470df8f517f42a3a42a61659d5af
 SHA1 (patch-src_sed_Makefile.kmk) = f62c885b89bc5deef6dc95997c8a8395acaca1fa
 SHA1 (patch-src_sed_lib_utils.c) = 9e36987c11889a542281978cfab63289fd5e4c72
