@@ -31,13 +31,23 @@ SUBST_CLASSES+=		paths
 SUBST_MESSAGE.paths+=	Adjust paths for pkgsrc
 SUBST_STAGE.paths=	post-patch
 SUBST_FILES.paths+=	configure
-SUBST_SED.paths+=	-e 's,^INCX11=.*,INCX11="${X11BASE}/include",g'
-SUBST_SED.paths+=	-e 's,^LIBX11=.*,LIBX11="\${COMPILER_RPATH_FLAG}${X11BASE}/lib \-L${X11BASE}/lib \-lXext \-lX11",g'
-SUBST_SED.paths+=	-e 's,^INCZ=.*,INCZ="${BUILDLINK_PREFIX.zlib}/include",g'
-SUBST_SED.paths+=	-e 's,^LIBZ=.*,LIBZ="\${COMPILER_RPATH_FLAG}${BUILDLINK_PREFIX.zlib}/lib \-L${BUILDLINK_PREFIX.zlib}/lib \-lz",g'
-SUBST_SED.paths+=	-e 's,^INCCURL=.*,INCCURL="${BUILDLINK_PREFIX.curl}/include",g'
-SUBST_SED.paths+=	-e 's,^LIBCURL=.*,LIBCURL="\${COMPILER_RPATH_FLAG}${BUILDLINK_PREFIX.curl}/lib \-L${BUILDLINK_PREFIX.curl}/lib \-lcurl",g'
+SUBST_SED.paths+=	-e 's!^INCCRYPTO=.*!INCCRYPTO="${BUILDLINK_PREFIX.openssl}/include"!g'
+SUBST_SED.paths+=	-e 's!^LIBCRYPTO=.*!LIBCRYPTO="${COMPILER_RPATH_FLAG}${BUILDLINK_PREFIX.openssl}/lib -L${BUILDLINK_PREFIX.openssl}/lib -lssl -lcrypto"!g'
+SUBST_SED.paths+=	-e 's!^INCX11=.*!INCX11="${X11BASE}/include"!g'
+SUBST_SED.paths+=	-e 's!^LIBX11=.*!LIBX11="${COMPILER_RPATH_FLAG}${X11BASE}/lib -L${X11BASE}/lib -lXext -lX11"!g'
+SUBST_SED.paths+=	-e 's!^INCZ=.*!INCZ="${BUILDLINK_PREFIX.zlib}/include"!g'
+SUBST_SED.paths+=	-e 's!^LIBZ=.*!LIBZ="${COMPILER_RPATH_FLAG}${BUILDLINK_PREFIX.zlib}/lib -L${BUILDLINK_PREFIX.zlib}/lib -lz"!g'
+SUBST_SED.paths+=	-e 's!^INCCURL=.*!INCCURL="${BUILDLINK_PREFIX.curl}/include"!g'
+SUBST_SED.paths+=	-e 's!^LIBCURL=.*!LIBCURL="${COMPILER_RPATH_FLAG}${BUILDLINK_PREFIX.curl}/lib -L${BUILDLINK_PREFIX.curl}/lib -lcurl"!g'
+SUBST_SED.paths+=	-e 's!^INCPULSE=.*!INCPULSE="${BUILDLINK_PREFIX.pulseaudio}/include"!g'
+SUBST_SED.paths+=	-e 's!^LIBPULSE=.*!LIBPULSE="${COMPILER_RPATH_FLAG}${BUILDLINK_PREFIX.pulseaudio}/lib -L${BUILDLINK_PREFIX.pulseaudio}/lib"!g'
+SUBST_SED.paths+=	-e 's!^INCPNG=.*!INCPNG="${BUILDLINK_PREFIX.png}/include"!g'
+SUBST_SED.paths+=	-e 's!^LIBPNG=.*!LIBPNG="${COMPILER_RPATH_FLAG}${BUILDLINK_PREFIX.png}/lib -L${BUILDLINK_PREFIX.png}/lib"!g'
+SUBST_SED.paths+=	-e 's!^INCVPX=.*!INCVPX="${BUILDLINK_PREFIX.libvpx}/include"!g'
+SUBST_SED.paths+=	-e 's!^LIBVPX=.*!LIBVPX="${COMPILER_RPATH_FLAG}${BUILDLINK_PREFIX.libvpx}/lib -L${BUILDLINK_PREFIX.libvpx}/lib -lvpx"!g'
 
+.include "../../audio/pulseaudio/buildlink3.mk"
+.include "../../multimedia/libvpx/buildlink3.mk"
 .include "../../graphics/png/buildlink3.mk"
 .include "../../multimedia/libvpx/buildlink3.mk"
 .include "../../www/curl/buildlink3.mk"
