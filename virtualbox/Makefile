@@ -23,11 +23,8 @@ BUILD_DEPENDS+=	kBuild>=0.1.999:../../wip/kBuild-svn
 USE_TOOLS+=	gtar pkg-config gmake
 
 WRKSRC=		${WRKDIR}/VirtualBox-${PKGVERSION_NOREV}
-#ONLY_FOR_PLATFORM+= *-*-i386
-#ONLY_FOR_PLATFORM+= *-*-x86_64
 
 HAS_CONFIGURE=		yes
-#CONFIGURE_ARGS=	# empty
 #CONFIGURE_ARGS+= --disable-java --passive-mesa
 #CONFIGURE_ARGS+= --with-gcc="${CC}" --with-g++="${CXX}"
 #GNU_CONFIGURE=	yes
