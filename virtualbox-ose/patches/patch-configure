@@ -1,0 +1,13 @@
+$NetBSD$
+
+--- configure.orig	2016-03-04 19:22:54.000000000 +0000
++++ configure
+@@ -51,6 +51,8 @@ case "$OS" in
+     ;;
+   freebsd)
+     ;;
++  netbsd)
++    ;;
+   sunos)
+     OS='solaris'
+     ;;
