@@ -9,5 +9,5 @@ SHA1 (patch-configure) = 4a8f5c5b34161a50c84b828bea7b9ffcabfae61d
 SHA1 (patch-include_iprt_string.h) = dd74a70d35be03f480bbb42db170cf7c5f583e4e
 SHA1 (patch-src_VBox_Installer_darwin_VirtualBox_postflight) = d2251d079cc9e683a6d0aeb8b5a43bd64b19f3a3
 SHA1 (patch-src_VBox_Installer_darwin_VirtualBox_preflight) = b8918b156eafb5febce4be1c2f28f576b949a47f
-SHA1 (patch-src_VBox_Runtime_VBox_log-vbox.cpp) = 5ce5b4ae462bdc43625a3fc79defc2f8fd59eb87
+SHA1 (patch-src_VBox_Runtime_VBox_log-vbox.cpp) = b833b5e038652518f3c0ad74c699bc0ab57f56d5
 SHA1 (patch-src_VBox_VMM_testcase_mkdsk.sh) = b45e17ad1ea5ab524fd4e36448b29b5700e20fec

@@ -2,7 +2,19 @@ $NetBSD$
 
 --- src/VBox/Runtime/VBox/log-vbox.cpp.orig	2016-03-04 19:29:47.000000000 +0000
 +++ src/VBox/Runtime/VBox/log-vbox.cpp
-@@ -422,6 +422,40 @@ RTDECL(PRTLOGGER) RTLogDefaultInit(void)
+@@ -137,6 +137,11 @@
+ #  include <sys/user.h>
+ #  include <stdlib.h>
+ #  include <unistd.h>
++# elif defined(RT_OS_NETBSD)
++#  include <sys/param.h>
++#  include <sys/sysctl.h>
++#  include <stdlib.h>
++#  include <unistd.h>
+ # elif defined(RT_OS_HAIKU)
+ #  include <OS.h>
+ # elif defined(RT_OS_SOLARIS)
+@@ -422,6 +427,40 @@ RTDECL(PRTLOGGER) RTLogDefaultInit(void)
              }
          }
  
