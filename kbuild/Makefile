@@ -29,13 +29,15 @@ KBUILD_VERSION_PATCH=	${KBUILDVERMAJ:E}
 
 INSTALL_ENV+=	KBUILD_VERBOSE=2
 
+MAKE_FLAGS+=	KBUILD_LIB_SEARCH_ROOTS="/ /usr ${X11BASE} ${PREFIX}"
+
 post-extract:
 	${RUN} cd ${WRKDIR} && ${EXTRACTOR} ${KBUILDNAME}-r${KBUILDVERSVN}.tar.gz
 	${RUN} ${CP} ${FILESDIR}/strtofflags.c ${WRKSRC}/src/kmk/strtofflags.c
 
 pre-build:
 # Remove prebuilt files
-#	${RUN} cd ${WRKSRC} && rm -rf kBuild/bin/*
+	${RUN} cd ${WRKSRC} && rm -rf kBuild/bin/*
 
 do-build:
 	${RUN} cd ${WRKSRC} && \
