@@ -1,6 +1,6 @@
 $NetBSD$
 
---- src/VBox/Additions/common/VBoxGuest/netbsd/Makefile.orig	2016-07-06 19:33:42.486716496 +0000
+--- src/VBox/Additions/common/VBoxGuest/netbsd/Makefile.orig	2016-07-06 20:08:38.705500122 +0000
 +++ src/VBox/Additions/common/VBoxGuest/netbsd/Makefile
 @@ -0,0 +1,166 @@
 +#  Makefile $
@@ -21,7 +21,7 @@ $NetBSD$
 +#
 +KMOD = vboxguest
 +
-+CFLAGS += -DRT_OS_FREEBSD -DIN_RING0 -DIN_RT_R0 -DIN_SUP_R0 -DVBOX -DRT_WITH_VBOX -Iinclude -I. -Ir0drv -w -DVBGL_VBOXGUEST -DVBOX_WITH_HGCM -DVBOX_WITH_64_BITS_GUESTS
++CFLAGS += -DRT_OS_NETBSD -DIN_RING0 -DIN_RT_R0 -DIN_SUP_R0 -DVBOX -DRT_WITH_VBOX -Iinclude -I. -Ir0drv -w -DVBGL_VBOXGUEST -DVBOX_WITH_HGCM -DVBOX_WITH_64_BITS_GUESTS
 +
 +.if (${MACHINE_ARCH} == "i386")
 + CFLAGS += -DRT_ARCH_X86
@@ -31,7 +31,7 @@ $NetBSD$
 +
 +SRCS = \
 +	VBoxGuest.c \
-+	VBoxGuest-freebsd.c \
++	VBoxGuest-netbsd.c \
 +	GenericRequest.c \
 +	HGCMInternal.c \
 +	Init.c \
@@ -138,24 +138,24 @@ $NetBSD$
 +	memobj-r0drv.c \
 +	powernotification-r0drv.c
 +
-+.PATH:	${.CURDIR}/r0drv/freebsd
++.PATH:	${.CURDIR}/r0drv/netbsd
 +SRCS += \
-+	assert-r0drv-freebsd.c \
-+	alloc-r0drv-freebsd.c \
-+	initterm-r0drv-freebsd.c \
-+	memobj-r0drv-freebsd.c \
-+	memuserkernel-r0drv-freebsd.c \
-+	mp-r0drv-freebsd.c \
-+	process-r0drv-freebsd.c \
-+	semevent-r0drv-freebsd.c \
-+	semeventmulti-r0drv-freebsd.c \
-+	semfastmutex-r0drv-freebsd.c \
-+	semmutex-r0drv-freebsd.c \
-+	spinlock-r0drv-freebsd.c \
-+	thread-r0drv-freebsd.c \
-+	thread2-r0drv-freebsd.c \
-+	time-r0drv-freebsd.c \
-+	timer-r0drv-freebsd.c
++	assert-r0drv-netbsd.c \
++	alloc-r0drv-netbsd.c \
++	initterm-r0drv-netbsd.c \
++	memobj-r0drv-netbsd.c \
++	memuserkernel-r0drv-netbsd.c \
++	mp-r0drv-netbsd.c \
++	process-r0drv-netbsd.c \
++	semevent-r0drv-netbsd.c \
++	semeventmulti-r0drv-netbsd.c \
++	semfastmutex-r0drv-netbsd.c \
++	semmutex-r0drv-netbsd.c \
++	spinlock-r0drv-netbsd.c \
++	thread-r0drv-netbsd.c \
++	thread2-r0drv-netbsd.c \
++	time-r0drv-netbsd.c \
++	timer-r0drv-netbsd.c
 +
 +.PATH:	${.CURDIR}/r0drv/generic
 +SRCS += \
