@@ -6,6 +6,7 @@ SHA512 (VirtualBox-5.0.16.tar.bz2) = 3da3a227360fb50d299e99770378f65e8cb99525377
 Size (VirtualBox-5.0.16.tar.bz2) = 111062984 bytes
 SHA1 (patch-Config.kmk) = 136895de8ba926bad725f7f7cf084b25ffbf3152
 SHA1 (patch-configure) = 4a8f5c5b34161a50c84b828bea7b9ffcabfae61d
+SHA1 (patch-include_iprt_string.h) = dd74a70d35be03f480bbb42db170cf7c5f583e4e
 SHA1 (patch-src_VBox_Installer_darwin_VirtualBox_postflight) = d2251d079cc9e683a6d0aeb8b5a43bd64b19f3a3
 SHA1 (patch-src_VBox_Installer_darwin_VirtualBox_preflight) = b8918b156eafb5febce4be1c2f28f576b949a47f
 SHA1 (patch-src_VBox_VMM_testcase_mkdsk.sh) = b45e17ad1ea5ab524fd4e36448b29b5700e20fec
