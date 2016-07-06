@@ -1,0 +1,28 @@
+$NetBSD$
+
+--- Config.kmk.orig	2016-03-04 19:22:54.000000000 +0000
++++ Config.kmk
+@@ -1908,7 +1908,7 @@ VBOX_CHECK_IMPORTS ?= $(PATH_OBJ)/VBoxCh
+ # GNU tar if present.
+ if1of ($(KBUILD_TARGET), linux os2 win)
+  VBOX_GTAR ?= tar
+-else if1of ($(KBUILD_TARGET), freebsd solaris)
++else if1of ($(KBUILD_TARGET), freebsd netbsd solaris)
+  VBOX_GTAR ?= gtar
+ endif
+ 
+@@ -5710,7 +5710,7 @@ TEMPLATE_VBOXGUESTR3EXE_DEFS     := $(fi
+ TEMPLATE_VBOXGUESTR3EXE_DEFS.linux := $(TEMPLATE_VBOXR3EXE_DEFS.linux) LOG_USE_C99 RT_WITHOUT_EXEC_ALLOC
+ ifeq ($(KBUILD_TARGET),linux) # As few libs as possible on linux.
+  TEMPLATE_VBOXGUESTR3EXE_LIBS     = pthread rt m dl
+-else if1of ($(KBUILD_TARGET), darwin freebsd netbsd openbsd)
++else if1of ($(KBUILD_TARGET), darwin freebsd openbsd)
+  TEMPLATE_VBOXGUESTR3EXE_LIBS     = $(TEMPLATE_VBOXR3EXE_LIBS) iconv
+ else ifeq ($(KBUILD_TARGET), solaris)
+  TEMPLATE_VBOXGUESTR3EXE_LIBS     = $(TEMPLATE_VBOXR3EXE_LIBS) nsl
+@@ -6384,5 +6384,3 @@ st stat status:
+ 
+ quick:
+ 	$(MAKE) VBOX_QUICK=1
+-
+-
