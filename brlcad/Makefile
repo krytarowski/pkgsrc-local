@@ -10,6 +10,11 @@ HOMEPAGE=	http://brlcad.org/
 COMMENT=	Open source cross-platform solid modeling system
 #LICENSE=	# TODO: (see mk/license.mk)
 
-USE_LANGUAGES=	# none
+USE_LANGUAGES=	c c++
+USE_CMAKE=	yes
+#HAS_CONFIGURE=	yes
 
+.include "../../graphics/png/buildlink3.mk"
+.include "../../lang/tcl/buildlink3.mk"
+.include "../../x11/tk/buildlink3.mk"
 .include "../../mk/bsd.pkg.mk"

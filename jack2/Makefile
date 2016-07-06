@@ -14,10 +14,12 @@ COMMENT=	TODO: Short description of the package
 #LICENSE=	# TODO: (see mk/license.mk)
 
 WRKSRC=		${WRKDIR}/jack2-1.9.10
-USE_TOOLS+=	pkg-config
+USE_TOOLS+=	pkg-config bash
 USE_LANGUAGES=	c c++
 
 PKGCONFIG_OVERRIDE+=	jack.pc.in
+
+REPLACE_BASH+=	svnversion_regenerate.sh
 
 WAF_REPLACE_EXECUTABLE=	no
 
