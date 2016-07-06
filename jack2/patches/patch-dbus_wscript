@@ -1,0 +1,22 @@
+$NetBSD$
+
+--- dbus/wscript.orig	2016-07-06 14:01:32.093500104 +0000
++++ dbus/wscript
+@@ -43,6 +43,8 @@ def build(bld):
+     obj = bld(features = ['c', 'cprogram'], idx=17)
+     if bld.env['IS_LINUX']:
+         sysdeps_dbus_include = ['../linux', '../posix']
++    if bld.env['IS_NETBSD']:
++        sysdeps_dbus_include = ['../linux', '../posix']
+     if bld.env['IS_MACOSX']:
+         sysdeps_dbus_include = ['../macosx', '../posix']
+ 
+@@ -68,6 +70,8 @@ def build(bld):
+     obj.use = ['serverlib']
+     if bld.env['IS_LINUX']:
+         obj.use += ['PTHREAD', 'DL', 'RT', 'DBUS-1', 'EXPAT', 'STDC++']
++    if bld.env['IS_NETBSD']:
++        obj.use += ['PTHREAD', 'DL', 'RT', 'DBUS-1', 'EXPAT', 'STDC++']
+     if bld.env['IS_MACOSX']:
+         obj.use += ['PTHREAD', 'DL', 'DBUS-1', 'EXPAT']
+     obj.target = 'jackdbus'

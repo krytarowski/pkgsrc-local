@@ -1,0 +1,82 @@
+$NetBSD$
+
+--- wscript.orig	2016-07-06 14:01:32.089850289 +0000
++++ wscript
+@@ -96,6 +96,7 @@ def configure(conf):
+         platform = sys.platform
+         conf.env['IS_MACOSX'] = platform == 'darwin'
+         conf.env['IS_LINUX'] = platform == 'linux' or platform == 'linux2' or platform == 'linux3' or platform == 'posix'
++        conf.env['IS_NETBSD'] = platform.startswith('netbsd')
+         conf.env['IS_SUN'] = platform == 'sunos'
+         # GNU/kFreeBSD and GNU/Hurd are treated as Linux
+         if platform.startswith('gnu0') or platform.startswith('gnukfreebsd'):
+@@ -106,6 +107,9 @@ def configure(conf):
+     if conf.env['IS_LINUX']:
+         Logs.pprint('CYAN', "Linux detected")
+ 
++    if conf.env['IS_NETBSD']:
++        Logs.pprint('CYAN', "NetBSD detected")
++
+     if conf.env['IS_MACOSX']:
+         Logs.pprint('CYAN', "MacOS X detected")
+ 
+@@ -119,6 +123,10 @@ def configure(conf):
+         conf.check_tool('compiler_cxx')
+         conf.check_tool('compiler_cc')
+ 
++    if conf.env['IS_NETBSD']:
++        conf.check_tool('compiler_cxx')
++        conf.check_tool('compiler_cc')
++
+     if conf.env['IS_MACOSX']:
+         conf.check_tool('compiler_cxx')
+         conf.check_tool('compiler_cc')
+@@ -156,6 +164,20 @@ def configure(conf):
+         conf.env['BUILD_DRIVER_FFADO'] = Options.options.firewire
+         conf.env['BUILD_DRIVER_FREEBOB'] = Options.options.freebob
+         conf.env['BUILD_DRIVER_IIO'] = Options.options.iio
++    if conf.env['IS_NETBSD']:
++        conf.sub_config('linux')
++        if Options.options.alsa and not conf.env['BUILD_DRIVER_ALSA']:
++            conf.fatal('ALSA driver was explicitly requested but cannot be built')
++        if Options.options.freebob and not conf.env['BUILD_DRIVER_FREEBOB']:
++            conf.fatal('FreeBob driver was explicitly requested but cannot be built')
++        if Options.options.firewire and not conf.env['BUILD_DRIVER_FFADO']:
++            conf.fatal('FFADO driver was explicitly requested but cannot be built')
++        if Options.options.iio and not conf.env['BUILD_DRIVER_IIO']:
++            conf.fatal('IIO driver was explicitly requested but cannot be built')
++        conf.env['BUILD_DRIVER_ALSA'] = Options.options.alsa
++        conf.env['BUILD_DRIVER_FFADO'] = Options.options.firewire
++        conf.env['BUILD_DRIVER_FREEBOB'] = Options.options.freebob
++        conf.env['BUILD_DRIVER_IIO'] = Options.options.iio
+     if conf.env['IS_WINDOWS']:
+         conf.sub_config('windows')
+         if Options.options.portaudio and not conf.env['BUILD_DRIVER_PORTAUDIO']:
+@@ -356,6 +378,12 @@ def configure(conf):
+         display_feature('Build with FireWire (FFADO) support', conf.env['BUILD_DRIVER_FFADO'] == True)
+         display_feature('Build with IIO support', conf.env['BUILD_DRIVER_IIO'] == True)
+ 
++    if conf.env['IS_NETBSD']:
++        display_feature('Build with ALSA support', conf.env['BUILD_DRIVER_ALSA'] == True)
++        display_feature('Build with FireWire (FreeBob) support', conf.env['BUILD_DRIVER_FREEBOB'] == True)
++        display_feature('Build with FireWire (FFADO) support', conf.env['BUILD_DRIVER_FFADO'] == True)
++        display_feature('Build with IIO support', conf.env['BUILD_DRIVER_IIO'] == True)
++
+     if conf.env['IS_WINDOWS']:
+         display_feature('Build with WinMME support', conf.env['BUILD_DRIVER_WINMME'] == True)
+         display_feature('Build with Portaudio support', conf.env['BUILD_DRIVER_PORTAUDIO'] == True)
+@@ -413,6 +441,14 @@ def build(bld):
+         if bld.env['BUILD_JACKDBUS'] == True:
+            bld.add_subdirs('dbus')
+ 
++    if bld.env['IS_NETBSD']:
++        bld.add_subdirs('linux')
++        bld.add_subdirs('example-clients')
++        bld.add_subdirs('tests')
++        bld.add_subdirs('man')
++        if bld.env['BUILD_JACKDBUS'] == True:
++           bld.add_subdirs('dbus')
++
+     if bld.env['IS_MACOSX']:
+         bld.add_subdirs('macosx')
+         bld.add_subdirs('example-clients')

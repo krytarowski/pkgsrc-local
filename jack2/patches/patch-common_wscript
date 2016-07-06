@@ -1,0 +1,92 @@
+$NetBSD$
+
+--- common/wscript.orig	2014-07-19 13:34:15.000000000 +0000
++++ common/wscript
+@@ -1,4 +1,4 @@
+-#! /usr/bin/env python
++#!/usr/pkg/bin/python2.7
+ # encoding: utf-8
+ 
+ import Build
+@@ -32,6 +32,8 @@ def create_jack_process_obj(bld, target,
+         env_includes = ['../macosx', '../posix', '../macosx/coreaudio']
+     if bld.env['IS_LINUX']:
+         env_includes = ['../linux', '../posix', '../linux/alsa']
++    if bld.env['IS_NETBSD']:
++        env_includes = ['../linux', '../posix', '../linux/alsa']
+     if bld.env['IS_SUN']:
+         env_includes = ['../solaris', '../posix', '../solaris/oss']
+     if bld.env['IS_WINDOWS']:
+@@ -99,6 +101,21 @@ def build(bld):
+         uselib.append('RT')
+         uselib.append('DL')
+ 
++    if bld.env['IS_NETBSD']:
++        common_libsources += [
++            'JackDebugClient.cpp',
++            'timestamps.c',
++            '../posix/JackPosixThread.cpp',
++            '../posix/JackPosixSemaphore.cpp',
++            '../posix/JackPosixProcessSync.cpp',
++            '../posix/JackPosixMutex.cpp',
++            '../posix/JackSocket.cpp',
++            '../linux/JackLinuxTime.c',
++            ]
++        includes = ['../linux', '../posix'] + includes
++        uselib.append('RT')
++        uselib.append('DL')
++
+     if bld.env['IS_SUN']:
+         common_libsources += [
+             'JackDebugClient.cpp',
+@@ -164,6 +181,12 @@ def build(bld):
+             '../posix/JackPosixServerLaunch.cpp',
+             ]
+ 
++    if bld.env['IS_NETBSD']:
++        clientlib.source += [
++            '../posix/JackSocketClientChannel.cpp',
++            '../posix/JackPosixServerLaunch.cpp',
++            ]
++
+     if bld.env['IS_SUN']:
+         clientlib.source += [
+             '../posix/JackSocketClientChannel.cpp',
+@@ -257,6 +280,14 @@ def build(bld):
+             '../posix/JackNetUnixSocket.cpp',
+             ]
+ 
++    if bld.env['IS_NETBSD']:
++        serverlib.source += [
++            '../posix/JackSocketServerChannel.cpp',
++            '../posix/JackSocketNotifyChannel.cpp',
++            '../posix/JackSocketServerNotifyChannel.cpp',
++            '../posix/JackNetUnixSocket.cpp',
++            ]
++
+     if bld.env['IS_SUN']:
+         serverlib.source += [
+             '../posix/JackSocketServerChannel.cpp',
+@@ -326,6 +357,10 @@ def build(bld):
+             netlib.source += ['../posix/JackNetUnixSocket.cpp','../posix/JackPosixThread.cpp', '../posix/JackPosixMutex.cpp', '../linux/JackLinuxTime.c']
+             netlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
+ 
++        if bld.env['IS_NETBSD']:
++            netlib.source += ['../posix/JackNetUnixSocket.cpp','../posix/JackPosixThread.cpp', '../posix/JackPosixMutex.cpp', '../linux/JackLinuxTime.c']
++            netlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
++
+         if bld.env['IS_SUN']:
+             netlib.source += ['../posix/JackNetUnixSocket.cpp','../posix/JackPosixThread.cpp', '../posix/JackPosixMutex.cpp', '../solaris/JackSolarisTime.c']
+             netlib.env.append_value("CPPFLAGS", "-fvisibility=hidden")
+@@ -375,6 +410,11 @@ def build(bld):
+          process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
+          process.use = ['ALSA', 'SAMPLERATE']
+ 
++    if bld.env['BUILD_ADAPTER'] and bld.env['IS_NETBSD'] and bld.env['BUILD_DRIVER_ALSA']:
++         audio_adapter_sources += ['../linux/alsa/JackAlsaAdapter.cpp']
++         process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)
++         process.use = ['ALSA', 'SAMPLERATE']
++
+     if bld.env['BUILD_ADAPTER'] and bld.env['IS_SUN']:
+          audio_adapter_sources += ['../solaris/oss/JackOSSAdapter.cpp', 'memops.c']
+          process = create_jack_process_obj(bld, 'audioadapter', audio_adapter_sources, serverlib)

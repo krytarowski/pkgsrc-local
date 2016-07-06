@@ -1,0 +1,11 @@
+$NetBSD$
+
+SHA1 (jack2/v1.9.10.zip) = b817d4026f9deaf9e461bca304dfd2e3ed561c89
+RMD160 (jack2/v1.9.10.zip) = 68b8f15e7862c3acd37acf4f5c2167bc32a9d177
+SHA512 (jack2/v1.9.10.zip) = 7ce1b08cae0145257511b7eeb46d7f06147e1d883508c5bde21913d2d3662860fff0676dca28110cb0d6f3cbb854be35a19c39bea1ee5ebdbf338ace1d7365e3
+Size (jack2/v1.9.10.zip) = 6834405 bytes
+SHA1 (patch-common_wscript) = a1d93fd048800b612fd53741c9a02408ef477a98
+SHA1 (patch-dbus_wscript) = 6a12fb483327b436b2fd107b8dfa0da822172618
+SHA1 (patch-example-clients_wscript) = 0870477cd9232df7fd5ec28802061481a51222e3
+SHA1 (patch-linux_wscript) = 06265e971aa4a71480b66b9b54ed2309949a42f6
+SHA1 (patch-wscript) = 22812ba59456d4e06c945148da001f86936418c4

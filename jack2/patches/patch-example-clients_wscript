@@ -1,0 +1,57 @@
+$NetBSD$
+
+--- example-clients/wscript.orig	2016-07-06 14:01:32.095281798 +0000
++++ example-clients/wscript
+@@ -59,6 +59,8 @@ def configure(conf):
+ def build(bld):
+     if bld.env['IS_LINUX']:
+         os_incdir = ['../linux', '../posix']
++    if bld.env['IS_NETBSD']:
++        os_incdir = ['../linux', '../posix']
+     if bld.env['IS_MACOSX']:
+         os_incdir = ['../macosx', '../posix']
+     if bld.env['IS_SUN']:
+@@ -89,6 +91,8 @@ def build(bld):
+             prog.env.append_value("LINKFLAGS", "")
+         if bld.env['IS_LINUX']:
+             prog.use += ['RT', 'M']
++        if bld.env['IS_NETBSD']:
++            prog.use += ['RT', 'M']
+         if bld.env['IS_SUN']:
+             prog.use += ['M']
+ 
+@@ -105,6 +109,8 @@ def build(bld):
+             prog.env.append_value("LINKFLAGS", "")
+         if bld.env['IS_LINUX']:
+             prog.use += ['RT', 'READLINE']
++        if bld.env['IS_NETBSD']:
++            prog.use += ['RT', 'READLINE']
+         if bld.env['IS_MACOSX']:
+             prog.use += ['READLINE']
+         prog.target = 'jack_transport'
+@@ -121,13 +127,15 @@ def build(bld):
+             prog.use += ['SNDFILE']
+         if bld.env['IS_LINUX']:
+             prog.use += ['RT', 'SNDFILE']
++        if bld.env['IS_NETBSD']:
++            prog.use += ['RT', 'SNDFILE']
+         if bld.env['IS_SUN']:
+             prog.use += ['RT', 'SNDFILE']
+         if bld.env['IS_WINDOWS']:
+             prog.uselib = ['SNDFILE']
+         prog.target = 'jack_rec'
+ 
+-    if bld.env['IS_LINUX'] or bld.env['IS_MACOSX']:
++    if bld.env['IS_LINUX'] or bld.env['IS_MACOSX'] or bld.env['IS_NETBSD']:
+         prog = bld(features = 'c cprogram')
+         prog.includes = os_incdir + ['.', '..', '../common/jack', '../common']
+         prog.source = ['netsource.c', '../common/netjack_packet.c']
+@@ -136,7 +144,7 @@ def build(bld):
+         prog.target = 'jack_netsource'
+         prog.defines = ['HAVE_CONFIG_H']
+ 
+-    if bld.env['IS_LINUX'] and bld.env['BUILD_EXAMPLE_ALSA_IO']:
++    if (bld.env['IS_LINUX'] or bld.env['IS_NETBSD']) and bld.env['BUILD_EXAMPLE_ALSA_IO']:
+         prog = bld(features = 'c cprogram')
+         prog.includes = os_incdir + ['../common/jack', '../common']
+         prog.source = ['alsa_in.c', '../common/memops.c']

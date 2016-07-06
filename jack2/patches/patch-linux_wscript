@@ -1,0 +1,18 @@
+$NetBSD$
+
+--- linux/wscript.orig	2016-07-06 14:01:32.097055273 +0000
++++ linux/wscript
+@@ -43,7 +43,7 @@ def build(bld):
+         jackd.defines = ['HAVE_CONFIG_H','SERVER_SIDE']
+         jackd.source = ['../common/Jackdmp.cpp']
+         jackd.use = ['serverlib']
+-        if bld.env['IS_LINUX'] and bld.env['BUILD_JACKDBUS']:
++        if (bld.env['IS_LINUX'] or bld.env['IS_NETBSD']) and bld.env['BUILD_JACKDBUS']:
+             jackd.source += ['../dbus/reserve.c', '../dbus/audio_reserve.c']
+             jackd.use += ['PTHREAD', 'DL', 'RT', 'M', 'STDC++', 'DBUS-1']
+         else:
+@@ -104,4 +104,3 @@ def build(bld):
+     create_jack_driver_obj(bld, 'netone', [ '../common/JackNetOneDriver.cpp',
+                                             '../common/netjack.c',
+                                             '../common/netjack_packet.c' ], ["SAMPLERATE", "CELT"])
+-
