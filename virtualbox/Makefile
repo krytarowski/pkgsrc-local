@@ -55,9 +55,30 @@ SUBST_SED.paths+=	-e 's!SUPPYTHONLIBS=.*!SUPPYTHONLIBS="python${PYVERSSUFFIX}"!g
 # Add needed rpath for testing execution of an application linked with libpython
 SUBST_SED.paths+=	-e 's!PYTHONLIBRPATH=.*!PYTHONLIBRPATH="${COMPILER_RPATH_FLAG}${PREFIX}/lib"!g'
 
-do-build:
-	${RUN} cd ${WRKSRC} && . ./env.sh && kmk all
+VBLIBDIR=	${PREFIX}/lib/virtualbox
 
+KMK_CONFIG+=	KBUILD_PATH=${WRKSRC}/kBuild
+# Multiple jobs tend to be broken
+KMK_FLAGS+=	-j1
+
+pre-configure:
+	${RUN} echo "VBOX_GCC_OPT=${CXXFLAGS}" >> ${WRKSRC}/LocalConfig.kmk
+	${RUN} echo "VBOX_WITH_ORIGIN:=" >> ${WRKSRC}/LocalConfig.kmk
+	${RUN} echo "VBOX_WITH_RUNPATH:=${VBLIBDIR}" >> ${WRKSRC}/LocalConfig.kmk
+	${RUN} echo "VBOX_PATH_APP_PRIVATE_ARCH:=${VBLIBDIR}" >> ${WRKSRC}/LocalConfig.kmk
+	${RUN} echo "VBOX_PATH_APP_PRIVATE:=${VBLIBDIR}" >> ${WRKSRC}/LocalConfig.kmk
+	${RUN} echo "VBOX_WITH_TESTCASES=" >> ${WRKSRC}/LocalConfig.kmk
+	${RUN} echo "VBOX_WITH_TESTSUITE:=" >> ${WRKSRC}/LocalConfig.kmk
+	${RUN} echo "VBOX_JAVA_HOME:=${JAVA_HOME}" >> ${WRKSRC}/LocalConfig.kmk
+	${RUN} echo "VBOX_USE_SYSTEM_XORG_HEADERS:=1" >> ${WRKSRC}/LocalConfig.kmk
+
+do-build:
+	${RUN} cd ${WRKSRC} && . ./env.sh && ${KMK_CONFIG} kmk ${KMK_FLAGS}
+
+do-install:
+	${RUN} cd ${WRKSRC} && . ./env.sh && kmk install
+
+.include "../../mk/java-vm.mk"
 .include "../../audio/pulseaudio/buildlink3.mk"
 .include "../../multimedia/libvpx/buildlink3.mk"
 .include "../../graphics/png/buildlink3.mk"
