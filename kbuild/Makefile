@@ -46,18 +46,19 @@ do-build:
 		KBUILD_VERBOSE=2 \
 		KBUILD_VERSION_PATCH=${KBUILD_VERSION_PATCH} && \
 	${SETENV} ${MAKE_ENV} ./kBuild/env.sh kmk \
+		NIX_INSTALL_DIR=${PREFIX} \
 		BUILD_TYPE=release \
-		MY_INST_MODE=0644 \
-		MY_INST_BIN_MODE=0755 \
+		MY_INST_MODE=${NONBINMODE} \
+		MY_INST_BIN_MODE=${BINMODE} \
 		rebuild
 
 do-install:
 	${RUN} cd ${WRKSRC} && \
-	${SETENV} ${INSTALL_ENV} \
-		./kBuild/env.sh kmk \
+	${SETENV} ${INSTALL_ENV} ./kBuild/env.sh kmk \
+		NIX_INSTALL_DIR=${PREFIX} \
 		BUILD_TYPE=release \
-		MY_INST_MODE=0644 \
-		MY_INST_BIN_MODE=0755 \
+		MY_INST_MODE=${NONBINMODE} \
+		MY_INST_BIN_MODE=${BINMODE} \
 		PATH_INS=${DESTDIR} \
 		install
 
