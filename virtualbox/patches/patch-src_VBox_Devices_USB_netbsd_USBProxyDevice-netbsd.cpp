@@ -1,7 +1,7 @@
 $NetBSD$
 
---- src/VBox/Devices/USB/netbsd/USBProxyDevice-freebsd.cpp.orig	2016-07-06 20:02:33.301135639 +0000
-+++ src/VBox/Devices/USB/netbsd/USBProxyDevice-freebsd.cpp
+--- src/VBox/Devices/USB/netbsd/USBProxyDevice-netbsd.cpp.orig	2016-07-06 20:02:33.301135639 +0000
++++ src/VBox/Devices/USB/netbsd/USBProxyDevice-netbsd.cpp
 @@ -0,0 +1,1062 @@
 +/*  USBProxyDevice-freebsd.cpp $ */
 +/** @file
