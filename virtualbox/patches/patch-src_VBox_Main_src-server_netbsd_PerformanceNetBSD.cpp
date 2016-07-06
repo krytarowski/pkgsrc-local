@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Main/src-server/netbsd/PerformanceNetBSD.cpp.orig	2016-07-06 19:26:53.627154111 +0000
+--- src/VBox/Main/src-server/netbsd/PerformanceNetBSD.cpp.orig	2016-07-06 20:08:39.069695369 +0000
 +++ src/VBox/Main/src-server/netbsd/PerformanceNetBSD.cpp
-@@ -0,0 +1,118 @@
-+/*  PerformanceFreeBSD.cpp $ */
+@@ -0,0 +1,117 @@
++/*  PerformanceNetBSD.cpp $ */
 +/** @file
-+ * VirtualBox Performance Collector, FreeBSD Specialization.
++ * VirtualBox Performance Collector, NetBSD Specialization.
 + */
 +
 +/*
@@ -26,7 +26,7 @@ $NetBSD$
 +
 +namespace pm {
 +
-+class CollectorFreeBSD : public CollectorHAL
++class CollectorNetBSD : public CollectorHAL
 +{
 +public:
 +    virtual int getHostCpuLoad(ULONG *user, ULONG *kernel, ULONG *idle);
@@ -39,15 +39,15 @@ $NetBSD$
 +
 +CollectorHAL *createHAL()
 +{
-+    return new CollectorFreeBSD();
++    return new CollectorNetBSD();
 +}
 +
-+int CollectorFreeBSD::getHostCpuLoad(ULONG *user, ULONG *kernel, ULONG *idle)
++int CollectorNetBSD::getHostCpuLoad(ULONG *user, ULONG *kernel, ULONG *idle)
 +{
 +    return VERR_NOT_IMPLEMENTED;
 +}
 +
-+int CollectorFreeBSD::getHostCpuMHz(ULONG *mhz)
++int CollectorNetBSD::getHostCpuMHz(ULONG *mhz)
 +{
 +    int CpuMHz = 0;
 +    size_t cbParameter = sizeof(CpuMHz);
@@ -61,7 +61,7 @@ $NetBSD$
 +    return VINF_SUCCESS;
 +}
 +
-+int CollectorFreeBSD::getHostMemoryUsage(ULONG *total, ULONG *used, ULONG *available)
++int CollectorNetBSD::getHostMemoryUsage(ULONG *total, ULONG *used, ULONG *available)
 +{
 +    int rc = VINF_SUCCESS;
 +    u_long cbMemPhys = 0;
@@ -104,12 +104,12 @@ $NetBSD$
 +    return rc;
 +}
 +
-+int CollectorFreeBSD::getProcessCpuLoad(RTPROCESS process, ULONG *user, ULONG *kernel)
++int CollectorNetBSD::getProcessCpuLoad(RTPROCESS process, ULONG *user, ULONG *kernel)
 +{
 +    return VERR_NOT_IMPLEMENTED;
 +}
 +
-+int CollectorFreeBSD::getProcessMemoryUsage(RTPROCESS process, ULONG *used)
++int CollectorNetBSD::getProcessMemoryUsage(RTPROCESS process, ULONG *used)
 +{
 +    return VERR_NOT_IMPLEMENTED;
 +}
@@ -120,4 +120,3 @@ $NetBSD$
 +}
 +
 +} /* namespace pm */
-+

@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Main/src-server/netbsd/HostHardwareNetBSD.cpp.orig	2016-07-06 19:26:34.259425815 +0000
+--- src/VBox/Main/src-server/netbsd/HostHardwareNetBSD.cpp.orig	2016-07-06 20:08:39.045579684 +0000
 +++ src/VBox/Main/src-server/netbsd/HostHardwareNetBSD.cpp
 @@ -0,0 +1,384 @@
-+/*  HostHardwareFreeBSD.cpp $ */
++/*  HostHardwareNetBSD.cpp $ */
 +/** @file
-+ * Classes for handling hardware detection under FreeBSD.
++ * Classes for handling hardware detection under NetBSD.
 + */
 +
 +/*
@@ -39,7 +39,7 @@ $NetBSD$
 +#include <iprt/path.h>
 +#include <iprt/string.h>
 +
-+#ifdef RT_OS_FREEBSD
++#ifdef RT_OS_NETBSD
 +# include <sys/param.h>
 +# include <sys/types.h>
 +# include <sys/stat.h>
@@ -50,7 +50,7 @@ $NetBSD$
 +# include <cam/cam.h>
 +# include <cam/cam_ccb.h>
 +# include <cam/scsi/scsi_pass.h>
-+#endif /* RT_OS_FREEBSD */
++#endif /* RT_OS_NETBSD */
 +#include <vector>
 +
 +
@@ -195,7 +195,7 @@ $NetBSD$
 +        DeviceMatchPattern.pattern.device_pattern.target_lun = CAM_LUN_WILDCARD;
 +        DeviceMatchPattern.pattern.device_pattern.flags      = DEV_MATCH_INQUIRY;
 +
-+#if __FreeBSD_version >= 900000
++#if __NetBSD_version >= 900000
 +# define INQ_PAT data.inq_pat
 +#else
 + #define INQ_PAT inq_pat

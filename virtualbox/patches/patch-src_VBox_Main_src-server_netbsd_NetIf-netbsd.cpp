@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Main/src-server/netbsd/NetIf-netbsd.cpp.orig	2016-07-06 19:26:53.627149903 +0000
+--- src/VBox/Main/src-server/netbsd/NetIf-netbsd.cpp.orig	2016-07-06 20:08:39.061471350 +0000
 +++ src/VBox/Main/src-server/netbsd/NetIf-netbsd.cpp
 @@ -0,0 +1,424 @@
-+/*  NetIf-freebsd.cpp $ */
++/*  NetIf-netbsd.cpp $ */
 +/** @file
-+ * Main - NetIfList, FreeBSD implementation.
++ * Main - NetIfList, NetBSD implementation.
 + */
 +
 +/*

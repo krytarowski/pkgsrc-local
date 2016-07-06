@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Main/src-server/netbsd/USBProxyServiceNetBSD.cpp.orig	2016-07-06 19:26:53.627158531 +0000
+--- src/VBox/Main/src-server/netbsd/USBProxyServiceNetBSD.cpp.orig	2016-07-06 20:08:39.078040350 +0000
 +++ src/VBox/Main/src-server/netbsd/USBProxyServiceNetBSD.cpp
-@@ -0,0 +1,355 @@
-+/*  USBProxyServiceFreeBSD.cpp $ */
+@@ -0,0 +1,354 @@
++/*  USBProxyServiceNetBSD.cpp $ */
 +/** @file
-+ * VirtualBox USB Proxy Service, FreeBSD Specialization.
++ * VirtualBox USB Proxy Service, NetBSD Specialization.
 + */
 +
 +/*
@@ -64,7 +64,7 @@ $NetBSD$
 +/**
 + * Initialize data members.
 + */
-+USBProxyServiceFreeBSD::USBProxyServiceFreeBSD(Host *aHost)
++USBProxyServiceNetBSD::USBProxyServiceNetBSD(Host *aHost)
 +    : USBProxyService(aHost)
 +{
 +    LogFlowThisFunc(("aHost=%p\n", aHost));
@@ -76,7 +76,7 @@ $NetBSD$
 + *
 + * @returns S_OK on success and non-fatal failures, some COM error otherwise.
 + */
-+HRESULT USBProxyServiceFreeBSD::init(void)
++HRESULT USBProxyServiceNetBSD::init(void)
 +{
 +    /*
 +     * Create semaphore.
@@ -99,7 +99,7 @@ $NetBSD$
 +/**
 + * Stop all service threads and free the device chain.
 + */
-+USBProxyServiceFreeBSD::~USBProxyServiceFreeBSD()
++USBProxyServiceNetBSD::~USBProxyServiceNetBSD()
 +{
 +    LogFlowThisFunc(("\n"));
 +
@@ -114,7 +114,7 @@ $NetBSD$
 +}
 +
 +
-+int USBProxyServiceFreeBSD::captureDevice(HostUSBDevice *aDevice)
++int USBProxyServiceNetBSD::captureDevice(HostUSBDevice *aDevice)
 +{
 +    AssertReturn(aDevice, VERR_GENERAL_FAILURE);
 +    AssertReturn(!aDevice->isWriteLockOnCurrentThread(), VERR_GENERAL_FAILURE);
@@ -133,7 +133,7 @@ $NetBSD$
 +}
 +
 +
-+int USBProxyServiceFreeBSD::releaseDevice(HostUSBDevice *aDevice)
++int USBProxyServiceNetBSD::releaseDevice(HostUSBDevice *aDevice)
 +{
 +    AssertReturn(aDevice, VERR_GENERAL_FAILURE);
 +    AssertReturn(!aDevice->isWriteLockOnCurrentThread(), VERR_GENERAL_FAILURE);
@@ -152,7 +152,7 @@ $NetBSD$
 +}
 +
 +
-+bool USBProxyServiceFreeBSD::updateDeviceState(HostUSBDevice *aDevice, PUSBDEVICE aUSBDevice, bool *aRunFilters,
++bool USBProxyServiceNetBSD::updateDeviceState(HostUSBDevice *aDevice, PUSBDEVICE aUSBDevice, bool *aRunFilters,
 +                                               SessionMachine **aIgnoreMachine)
 +{
 +    AssertReturn(aDevice, false);
@@ -167,19 +167,19 @@ $NetBSD$
 + *
 + * See USBProxyService::deviceAdded for details.
 + */
-+void USBProxyServiceFreeBSD::deviceAdded(ComObjPtr<HostUSBDevice> &aDevice, SessionMachinesList &llOpenedMachines,
++void USBProxyServiceNetBSD::deviceAdded(ComObjPtr<HostUSBDevice> &aDevice, SessionMachinesList &llOpenedMachines,
 +                                         PUSBDEVICE aUSBDevice)
 +{
 +    USBProxyService::deviceAdded(aDevice, llOpenedMachines, aUSBDevice);
 +}
 +
-+int USBProxyServiceFreeBSD::wait(RTMSINTERVAL aMillies)
++int USBProxyServiceNetBSD::wait(RTMSINTERVAL aMillies)
 +{
 +    return RTSemEventWait(mNotifyEventSem, aMillies < 1000 ? 1000 : 5000);
 +}
 +
 +
-+int USBProxyServiceFreeBSD::interruptWait(void)
++int USBProxyServiceNetBSD::interruptWait(void)
 +{
 +    return RTSemEventSignal(mNotifyEventSem);
 +}
@@ -225,7 +225,7 @@ $NetBSD$
 +    Log3(("OS device address: %s\n", pDev->pszAddress));
 +}
 +
-+PUSBDEVICE USBProxyServiceFreeBSD::getDevices(void)
++PUSBDEVICE USBProxyServiceNetBSD::getDevices(void)
 +{
 +    PUSBDEVICE pDevices = NULL;
 +    int FileUsb = 0;
@@ -357,4 +357,3 @@ $NetBSD$
 +
 +    return pDevices;
 +}
-+
