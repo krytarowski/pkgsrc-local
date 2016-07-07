@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/HostDrivers/VBoxNetAdp/netbsd/VBoxNetAdp-netbsd.c.orig	2016-07-06 19:55:45.808706876 +0000
+--- src/VBox/HostDrivers/VBoxNetAdp/netbsd/VBoxNetAdp-netbsd.c.orig	2016-07-07 07:08:46.543692306 +0000
 +++ src/VBox/HostDrivers/VBoxNetAdp/netbsd/VBoxNetAdp-netbsd.c
-@@ -0,0 +1,335 @@
-+/*  VBoxNetAdp-freebsd.c $ */
+@@ -0,0 +1,326 @@
++/*  VBoxNetAdp-netbsd.c $ */
 +/** @file
-+ * VBoxNetAdp - Virtual Network Adapter Driver (Host), FreeBSD Specific Code.
++ * VBoxNetAdp - Virtual Network Adapter Driver (Host), NetBSD Specific Code.
 + */
 +
 +/*-
@@ -75,7 +75,6 @@ $NetBSD$
 +#define VBOXNETADP_OS_SPECFIC 1
 +#include "../VBoxNetAdpInternal.h"
 +
-+#if defined(__FreeBSD_version) && __FreeBSD_version >= 800500
 +# include <sys/jail.h>
 +# include <net/vnet.h>
 +
@@ -83,36 +82,28 @@ $NetBSD$
 +# define VBOXCURVNET_SET_FROM_UCRED()   VBOXCURVNET_SET(CRED_TO_VNET(curthread->td_ucred))
 +# define VBOXCURVNET_RESTORE()          CURVNET_RESTORE()
 +
-+#else /* !defined(__FreeBSD_version) || __FreeBSD_version < 800500 */
-+
-+# define VBOXCURVNET_SET(arg)
-+# define VBOXCURVNET_SET_FROM_UCRED()
-+# define VBOXCURVNET_RESTORE()
-+
-+#endif /* !defined(__FreeBSD_version) || __FreeBSD_version < 800500 */
-+
-+static int VBoxNetAdpFreeBSDCtrlioctl(struct cdev *, u_long, caddr_t, int flags,
++static int VBoxNetAdpNetBSDCtrlioctl(struct cdev *, u_long, caddr_t, int flags,
 +    struct thread *);
 +static struct cdevsw vboxnetadp_cdevsw =
 +{
 +    .d_version = D_VERSION,
-+    .d_ioctl = VBoxNetAdpFreeBSDCtrlioctl,
++    .d_ioctl = VBoxNetAdpNetBSDCtrlioctl,
 +    .d_read = (d_read_t *)nullop,
 +    .d_write = (d_write_t *)nullop,
 +    .d_name = VBOXNETADP_CTL_DEV_NAME,
 +};
 +
-+static struct cdev *VBoxNetAdpFreeBSDcdev;
++static struct cdev *VBoxNetAdpNetBSDcdev;
 +
-+static int VBoxNetAdpFreeBSDModuleEvent(struct module *, int, void *);
-+static moduledata_t g_VBoxNetAdpFreeBSDModule = {
++static int VBoxNetAdpNetBSDModuleEvent(struct module *, int, void *);
++static moduledata_t g_VBoxNetAdpNetBSDModule = {
 +    "vboxnetadp",
-+    VBoxNetAdpFreeBSDModuleEvent,
++    VBoxNetAdpNetBSDModuleEvent,
 +    NULL
 +};
 +
 +/** Declare the module as a pseudo device. */
-+DECLARE_MODULE(vboxnetadp, g_VBoxNetAdpFreeBSDModule, SI_SUB_PSEUDO, SI_ORDER_ANY);
++DECLARE_MODULE(vboxnetadp, g_VBoxNetAdpNetBSDModule, SI_SUB_PSEUDO, SI_ORDER_ANY);
 +MODULE_VERSION(vboxnetadp, 1);
 +MODULE_DEPEND(vboxnetadp, vboxdrv, 1, 1, 1);
 +MODULE_DEPEND(vboxnetadp, vboxnetflt, 1, 1, 1);
@@ -121,11 +112,11 @@ $NetBSD$
 + * Module event handler
 + */
 +static int
-+VBoxNetAdpFreeBSDModuleEvent(struct module *pMod, int enmEventType, void *pvArg)
++VBoxNetAdpNetBSDModuleEvent(struct module *pMod, int enmEventType, void *pvArg)
 +{
 +    int rc = 0;
 +
-+    Log(("VBoxNetAdpFreeBSDModuleEvent\n"));
++    Log(("VBoxNetAdpNetBSDModuleEvent\n"));
 +
 +    switch (enmEventType)
 +    {
@@ -144,14 +135,14 @@ $NetBSD$
 +                return RTErrConvertToErrno(rc);
 +            }
 +            /* Create dev node */
-+            VBoxNetAdpFreeBSDcdev = make_dev(&vboxnetadp_cdevsw, 0,
++            VBoxNetAdpNetBSDcdev = make_dev(&vboxnetadp_cdevsw, 0,
 +                UID_ROOT, GID_WHEEL, 0600, VBOXNETADP_CTL_DEV_NAME);
 +
 +            break;
 +
 +        case MOD_UNLOAD:
 +            vboxNetAdpShutdown();
-+            destroy_dev(VBoxNetAdpFreeBSDcdev);
++            destroy_dev(VBoxNetAdpNetBSDcdev);
 +            RTR0Term();
 +            break;
 +        case MOD_SHUTDOWN:
@@ -169,7 +160,7 @@ $NetBSD$
 + * Device I/O Control entry point.
 + */
 +static int
-+VBoxNetAdpFreeBSDCtrlioctl(struct cdev *dev, u_long iCmd, caddr_t data, int flags, struct thread *td)
++VBoxNetAdpNetBSDCtrlioctl(struct cdev *dev, u_long iCmd, caddr_t data, int flags, struct thread *td)
 +{
 +    PVBOXNETADP pAdp;
 +    PVBOXNETADPREQ pReq = (PVBOXNETADPREQ)data;
@@ -216,7 +207,7 @@ $NetBSD$
 +/**
 + * Initialize device, just set the running flag.
 + */
-+static void VBoxNetAdpFreeBSDNetinit(void *priv)
++static void VBoxNetAdpNetBSDNetinit(void *priv)
 +{
 +    PVBOXNETADP pThis = priv;
 +    struct ifnet *ifp = pThis->u.s.ifp;
@@ -229,7 +220,7 @@ $NetBSD$
 + * netflt has already done everything for us so we just hand the
 + * packets to BPF and increment the packet stats.
 + */
-+static void VBoxNetAdpFreeBSDNetstart(struct ifnet *ifp)
++static void VBoxNetAdpNetBSDNetstart(struct ifnet *ifp)
 +{
 +    PVBOXNETADP pThis = ifp->if_softc;
 +    struct mbuf *m;
@@ -251,7 +242,7 @@ $NetBSD$
 +/**
 + * Interface ioctl handling
 + */
-+static int VBoxNetAdpFreeBSDNetioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
++static int VBoxNetAdpNetBSDNetioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 +{
 +    int error = 0;
 +
@@ -313,9 +304,9 @@ $NetBSD$
 +    ifp->if_softc = pThis;
 +    ifp->if_mtu = ETHERMTU;
 +    ifp->if_flags = IFF_BROADCAST | IFF_SIMPLEX | IFF_MULTICAST;
-+    ifp->if_ioctl = VBoxNetAdpFreeBSDNetioctl;
-+    ifp->if_start = VBoxNetAdpFreeBSDNetstart;
-+    ifp->if_init = VBoxNetAdpFreeBSDNetinit;
++    ifp->if_ioctl = VBoxNetAdpNetBSDNetioctl;
++    ifp->if_start = VBoxNetAdpNetBSDNetstart;
++    ifp->if_init = VBoxNetAdpNetBSDNetinit;
 +    IFQ_SET_MAXLEN(&ifp->if_snd, IFQ_MAXLEN);
 +    ifp->if_snd.ifq_drv_maxlen = IFQ_MAXLEN;
 +    IFQ_SET_READY(&ifp->if_snd);

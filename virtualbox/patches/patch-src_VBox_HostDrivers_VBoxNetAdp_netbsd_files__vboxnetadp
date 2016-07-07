@@ -1,8 +1,8 @@
 $NetBSD$
 
---- src/VBox/HostDrivers/VBoxNetAdp/netbsd/files_vboxnetadp.orig	2016-07-06 19:55:45.808711220 +0000
+--- src/VBox/HostDrivers/VBoxNetAdp/netbsd/files_vboxnetadp.orig	2016-07-07 07:08:46.553240648 +0000
 +++ src/VBox/HostDrivers/VBoxNetAdp/netbsd/files_vboxnetadp
-@@ -0,0 +1,81 @@
+@@ -0,0 +1,80 @@
 +#!/bin/sh
 +#  files_vboxnetadp $
 +## @file
@@ -76,11 +76,10 @@ $NetBSD$
 +    ${PATH_ROOT}/include/VBox/types.h=>include/VBox/types.h \
 +    ${PATH_ROOT}/include/VBox/version.h=>include/VBox/version.h \
 +    ${PATH_ROOT}/include/VBox/SUPDrvMangling.h=>include/VBox/SUPDrvMangling.h \
-+    ${PATH_ROOT}/src/VBox/HostDrivers/VBoxNetAdp/freebsd/VBoxNetAdp-freebsd.c=>VBoxNetAdp-freebsd.c \
++    ${PATH_ROOT}/src/VBox/HostDrivers/VBoxNetAdp/netbsd/VBoxNetAdp-netbsd.c=>VBoxNetAdp-netbsd.c \
 +    ${PATH_ROOT}/src/VBox/HostDrivers/VBoxNetAdp/VBoxNetAdp.c=>VBoxNetAdp.c \
 +    ${PATH_ROOT}/src/VBox/HostDrivers/VBoxNetAdp/VBoxNetAdpInternal.h=>VBoxNetAdpInternal.h \
-+    ${PATH_ROOT}/src/VBox/Runtime/r0drv/freebsd/the-freebsd-kernel.h=>r0drv/freebsd/the-freebsd-kernel.h \
++    ${PATH_ROOT}/src/VBox/Runtime/r0drv/netbsd/the-netbsd-kernel.h=>r0drv/netbsd/the-netbsd-kernel.h \
 +    ${PATH_OUT}/version-generated.h=>version-generated.h \
 +    ${PATH_OUT}/product-generated.h=>product-generated.h \
 +"
-+
