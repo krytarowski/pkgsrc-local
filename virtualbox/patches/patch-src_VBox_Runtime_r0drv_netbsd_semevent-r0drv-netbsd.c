@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Runtime/r0drv/netbsd/semevent-r0drv-netbsd.c.orig	2016-07-06 18:15:53.040234892 +0000
+--- src/VBox/Runtime/r0drv/netbsd/semevent-r0drv-netbsd.c.orig	2016-07-07 07:08:46.938368327 +0000
 +++ src/VBox/Runtime/r0drv/netbsd/semevent-r0drv-netbsd.c
-@@ -0,0 +1,256 @@
-+/*  semevent-r0drv-freebsd.c $ */
+@@ -0,0 +1,255 @@
++/*  semevent-r0drv-netbsd.c $ */
 +/** @file
-+ * IPRT - Single Release Event Semaphores, Ring-0 Driver, FreeBSD.
++ * IPRT - Single Release Event Semaphores, Ring-0 Driver, NetBSD.
 + */
 +
 +/*
@@ -38,7 +38,7 @@ $NetBSD$
 +*   Header Files                                                                                                                 *
 +*********************************************************************************************************************************/
 +#define RTSEMEVENT_WITHOUT_REMAPPING
-+#include "the-freebsd-kernel.h"
++#include "the-netbsd-kernel.h"
 +#include "internal/iprt.h"
 +#include <iprt/semaphore.h>
 +
@@ -48,7 +48,7 @@ $NetBSD$
 +#include <iprt/lockvalidator.h>
 +#include <iprt/mem.h>
 +
-+#include "sleepqueue-r0drv-freebsd.h"
++#include "sleepqueue-r0drv-netbsd.h"
 +#include "internal/magics.h"
 +
 +
@@ -56,7 +56,7 @@ $NetBSD$
 +*   Structures and Typedefs                                                                                                      *
 +*********************************************************************************************************************************/
 +/**
-+ * FreeBSD event semaphore.
++ * NetBSD event semaphore.
 + */
 +typedef struct RTSEMEVENTINTERNAL
 +{
@@ -258,4 +258,3 @@ $NetBSD$
 +{
 +    return 1000000000 / hz;
 +}
-+

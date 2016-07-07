@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Runtime/r0drv/netbsd/process-r0drv-netbsd.c.orig	2016-07-06 18:15:53.040229851 +0000
+--- src/VBox/Runtime/r0drv/netbsd/process-r0drv-netbsd.c.orig	2016-07-07 07:08:46.928969370 +0000
 +++ src/VBox/Runtime/r0drv/netbsd/process-r0drv-netbsd.c
-@@ -0,0 +1,51 @@
-+/*  process-r0drv-freebsd.c $ */
+@@ -0,0 +1,50 @@
++/*  process-r0drv-netbsd.c $ */
 +/** @file
-+ * IPRT - Process Management, Ring-0 Driver, FreeBSD.
++ * IPRT - Process Management, Ring-0 Driver, NetBSD.
 + */
 +
 +/*
@@ -37,7 +37,7 @@ $NetBSD$
 +/*********************************************************************************************************************************
 +*   Header Files                                                                                                                 *
 +*********************************************************************************************************************************/
-+#include "the-freebsd-kernel.h"
++#include "the-netbsd-kernel.h"
 +
 +#include <iprt/process.h>
 +
@@ -53,4 +53,3 @@ $NetBSD$
 +{
 +    return (RTR0PROCESS)curproc;
 +}
-+

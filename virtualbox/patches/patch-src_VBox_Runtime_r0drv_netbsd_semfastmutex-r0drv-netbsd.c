@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Runtime/r0drv/netbsd/semfastmutex-r0drv-netbsd.c.orig	2016-07-06 18:15:53.040242869 +0000
+--- src/VBox/Runtime/r0drv/netbsd/semfastmutex-r0drv-netbsd.c.orig	2016-07-07 07:08:46.957643339 +0000
 +++ src/VBox/Runtime/r0drv/netbsd/semfastmutex-r0drv-netbsd.c
-@@ -0,0 +1,115 @@
-+/*  semfastmutex-r0drv-freebsd.c $ */
+@@ -0,0 +1,114 @@
++/*  semfastmutex-r0drv-netbsd.c $ */
 +/** @file
-+ * IPRT - Fast Mutex Semaphores, Ring-0 Driver, FreeBSD.
++ * IPRT - Fast Mutex Semaphores, Ring-0 Driver, NetBSD.
 + */
 +
 +/*
@@ -37,7 +37,7 @@ $NetBSD$
 +/*********************************************************************************************************************************
 +*   Header Files                                                                                                                 *
 +*********************************************************************************************************************************/
-+#include "the-freebsd-kernel.h"
++#include "the-netbsd-kernel.h"
 +
 +#include <iprt/semaphore.h>
 +#include <iprt/err.h>
@@ -52,13 +52,13 @@ $NetBSD$
 +*   Structures and Typedefs                                                                                                      *
 +*********************************************************************************************************************************/
 +/**
-+ * Wrapper for the FreeBSD (sleep) mutex.
++ * Wrapper for the NetBSD (sleep) mutex.
 + */
 +typedef struct RTSEMFASTMUTEXINTERNAL
 +{
 +    /** Magic value (RTSEMFASTMUTEX_MAGIC). */
 +    uint32_t            u32Magic;
-+    /** The FreeBSD shared/exclusive lock mutex. */
++    /** The NetBSD shared/exclusive lock mutex. */
 +    struct sx           SxLock;
 +} RTSEMFASTMUTEXINTERNAL, *PRTSEMFASTMUTEXINTERNAL;
 +
@@ -117,4 +117,3 @@ $NetBSD$
 +    sx_xunlock(&pThis->SxLock);
 +    return VINF_SUCCESS;
 +}
-+

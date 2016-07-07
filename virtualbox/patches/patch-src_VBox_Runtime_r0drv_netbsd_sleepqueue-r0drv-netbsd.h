@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Runtime/r0drv/netbsd/sleepqueue-r0drv-netbsd.h.orig	2016-07-06 18:15:53.040251583 +0000
+--- src/VBox/Runtime/r0drv/netbsd/sleepqueue-r0drv-netbsd.h.orig	2016-07-07 07:08:46.976604489 +0000
 +++ src/VBox/Runtime/r0drv/netbsd/sleepqueue-r0drv-netbsd.h
-@@ -0,0 +1,332 @@
-+/*  sleepqueue-r0drv-freebsd.h $ */
+@@ -0,0 +1,329 @@
++/*  sleepqueue-r0drv-netbsd.h $ */
 +/** @file
-+ * IPRT - FreeBSD Ring-0 Driver Helpers for Abstracting Sleep Queues,
++ * IPRT - NetBSD Ring-0 Driver Helpers for Abstracting Sleep Queues,
 + */
 +
 +/*
@@ -30,10 +30,10 @@ $NetBSD$
 + */
 +
 +
-+#ifndef ___r0drv_freebsd_sleepqueue_r0drv_freebsd_h
-+#define ___r0drv_freebsd_sleepqueue_r0drv_freebsd_h
++#ifndef ___r0drv_netbsd_sleepqueue_r0drv_netbsd_h
++#define ___r0drv_netbsd_sleepqueue_r0drv_netbsd_h
 +
-+#include "the-freebsd-kernel.h"
++#include "the-netbsd-kernel.h"
 +
 +#include <iprt/asm-math.h>
 +#include <iprt/err.h>
@@ -41,7 +41,7 @@ $NetBSD$
 +#include <iprt/time.h>
 +
 +/**
-+ * Kernel mode FreeBSD wait state structure.
++ * Kernel mode MetBSD wait state structure.
 + */
 +typedef struct RTR0SEMBSDSLEEP
 +{
@@ -62,12 +62,12 @@ $NetBSD$
 +    /** Opaque wait channel id. */
 +    void            *pvWaitChan;
 +} RTR0SEMBSDSLEEP;
-+/** Pointer to a FreeBSD wait state. */
++/** Pointer to a MetBSD wait state. */
 +typedef RTR0SEMBSDSLEEP *PRTR0SEMBSDSLEEP;
 +
 +
 +/**
-+ * Updates the timeout of the FreeBSD wait.
++ * Updates the timeout of the MetBSD wait.
 + *
 + * @returns RTSEMWAIT_FLAGS_INDEFINITE if the timeout value is too big.
 + *          0 otherwise
@@ -260,7 +260,7 @@ $NetBSD$
 +
 +
 +/**
-+ * Checks if a FreeBSD wait was interrupted.
++ * Checks if a MetBSD wait was interrupted.
 + *
 + * @returns true / false
 + * @param   pWait               The wait structure.
@@ -273,7 +273,7 @@ $NetBSD$
 +
 +
 +/**
-+ * Checks if a FreeBSD wait has timed out.
++ * Checks if a MetBSD wait has timed out.
 + *
 + * @returns true / false
 + * @param   pWait               The wait structure.
@@ -285,7 +285,7 @@ $NetBSD$
 +
 +
 +/**
-+ * Deletes a FreeBSD wait.
++ * Deletes a MetBSD wait.
 + *
 + * @param   pWait               The wait structure.
 + */
@@ -318,9 +318,7 @@ $NetBSD$
 +{
 +    sleepq_lock(pvWaitChan);
 +    sleepq_broadcast(pvWaitChan, SLEEPQ_CONDVAR, 0, 0);
-+#if __FreeBSD_version >= 800000 /* Broadcast releases the sleep queue lock on FreeBSD 7.x */
 +    sleepq_release(pvWaitChan);
-+#endif
 +}
 +
 +/**
@@ -334,4 +332,3 @@ $NetBSD$
 +}
 +
 +#endif
-+

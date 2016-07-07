@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Runtime/r0drv/netbsd/spinlock-r0drv-netbsd.c.orig	2016-07-06 18:15:53.040256316 +0000
+--- src/VBox/Runtime/r0drv/netbsd/spinlock-r0drv-netbsd.c.orig	2016-07-07 07:08:46.986058035 +0000
 +++ src/VBox/Runtime/r0drv/netbsd/spinlock-r0drv-netbsd.c
-@@ -0,0 +1,210 @@
-+/*  spinlock-r0drv-freebsd.c $ */
+@@ -0,0 +1,209 @@
++/*  spinlock-r0drv-netbsd.c $ */
 +/** @file
-+ * IPRT - Spinlocks, Ring-0 Driver, FreeBSD.
++ * IPRT - Spinlocks, Ring-0 Driver, NetBSD.
 + */
 +
 +/*
@@ -37,7 +37,7 @@ $NetBSD$
 +/*********************************************************************************************************************************
 +*   Header Files                                                                                                                 *
 +*********************************************************************************************************************************/
-+#include "the-freebsd-kernel.h"
++#include "the-netbsd-kernel.h"
 +#include "internal/iprt.h"
 +
 +#include <iprt/spinlock.h>
@@ -212,4 +212,3 @@ $NetBSD$
 +
 +    critical_exit();
 +}
-+
