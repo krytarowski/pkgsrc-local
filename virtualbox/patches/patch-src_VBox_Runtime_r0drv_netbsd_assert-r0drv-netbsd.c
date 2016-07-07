@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Runtime/r0drv/netbsd/assert-r0drv-netbsd.c.orig	2016-07-06 18:14:36.496926155 +0000
+--- src/VBox/Runtime/r0drv/netbsd/assert-r0drv-netbsd.c.orig	2016-07-07 07:08:46.881887133 +0000
 +++ src/VBox/Runtime/r0drv/netbsd/assert-r0drv-netbsd.c
-@@ -0,0 +1,70 @@
-+/*  assert-r0drv-freebsd.c $ */
+@@ -0,0 +1,69 @@
++/*  assert-r0drv-netbsd.c $ */
 +/** @file
-+ * IPRT - Assertion Workers, Ring-0 Drivers, FreeBSD.
++ * IPRT - Assertion Workers, Ring-0 Drivers, NetBSD.
 + */
 +
 +/*
@@ -37,7 +37,7 @@ $NetBSD$
 +/*********************************************************************************************************************************
 +*   Header Files                                                                                                                 *
 +*********************************************************************************************************************************/
-+#include "the-freebsd-kernel.h"
++#include "the-netbsd-kernel.h"
 +
 +#include <iprt/assert.h>
 +#include <iprt/log.h>
@@ -72,4 +72,3 @@ $NetBSD$
 +{
 +    /** @todo implement RTR0AssertPanicSystem. */
 +}
-+

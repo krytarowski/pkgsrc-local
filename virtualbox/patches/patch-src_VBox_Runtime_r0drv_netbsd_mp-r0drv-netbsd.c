@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Runtime/r0drv/netbsd/mp-r0drv-netbsd.c.orig	2016-07-06 18:15:53.040225445 +0000
+--- src/VBox/Runtime/r0drv/netbsd/mp-r0drv-netbsd.c.orig	2016-07-07 07:08:46.919669571 +0000
 +++ src/VBox/Runtime/r0drv/netbsd/mp-r0drv-netbsd.c
-@@ -0,0 +1,308 @@
-+/*  mp-r0drv-freebsd.c $ */
+@@ -0,0 +1,268 @@
++/*  mp-r0drv-netbsd.c $ */
 +/** @file
-+ * IPRT - Multiprocessor, Ring-0 Driver, FreeBSD.
++ * IPRT - Multiprocessor, Ring-0 Driver, NetBSD.
 + */
 +
 +/*
@@ -33,7 +33,7 @@ $NetBSD$
 +/*********************************************************************************************************************************
 +*   Header Files                                                                                                                 *
 +*********************************************************************************************************************************/
-+#include "the-freebsd-kernel.h"
++#include "the-netbsd-kernel.h"
 +
 +#include <iprt/mp.h>
 +#include <iprt/err.h>
@@ -140,12 +140,12 @@ $NetBSD$
 +
 +
 +/**
-+ * Wrapper between the native FreeBSD per-cpu callback and PFNRTWORKER
++ * Wrapper between the native NetBSD per-cpu callback and PFNRTWORKER
 + * for the RTMpOnAll API.
 + *
 + * @param   pvArg   Pointer to the RTMPARGS package.
 + */
-+static void rtmpOnAllFreeBSDWrapper(void *pvArg)
++static void rtmpOnAllNetBSDWrapper(void *pvArg)
 +{
 +    PRTMPARGS pArgs = (PRTMPARGS)pvArg;
 +    pArgs->pfnWorker(curcpu, pArgs->pvUser1, pArgs->pvUser2);
@@ -160,18 +160,18 @@ $NetBSD$
 +    Args.pvUser2 = pvUser2;
 +    Args.idCpu = NIL_RTCPUID;
 +    Args.cHits = 0;
-+    smp_rendezvous(NULL, rtmpOnAllFreeBSDWrapper, smp_no_rendevous_barrier, &Args);
++    smp_rendezvous(NULL, rtmpOnAllNetBSDWrapper, smp_no_rendevous_barrier, &Args);
 +    return VINF_SUCCESS;
 +}
 +
 +
 +/**
-+ * Wrapper between the native FreeBSD per-cpu callback and PFNRTWORKER
++ * Wrapper between the native NetBSD per-cpu callback and PFNRTWORKER
 + * for the RTMpOnOthers API.
 + *
 + * @param   pvArg   Pointer to the RTMPARGS package.
 + */
-+static void rtmpOnOthersFreeBSDWrapper(void *pvArg)
++static void rtmpOnOthersNetBSDWrapper(void *pvArg)
 +{
 +    PRTMPARGS pArgs = (PRTMPARGS)pvArg;
 +    RTCPUID idCpu = curcpu;
@@ -185,11 +185,7 @@ $NetBSD$
 +    /* Will panic if no rendezvousing cpus, so check up front. */
 +    if (RTMpGetOnlineCount() > 1)
 +    {
-+#if __FreeBSD_version >= 900000
 +        cpuset_t    Mask;
-+#elif  __FreeBSD_version >= 700000
-+        cpumask_t   Mask;
-+#endif
 +        RTMPARGS    Args;
 +
 +        Args.pfnWorker = pfnWorker;
@@ -197,29 +193,21 @@ $NetBSD$
 +        Args.pvUser2 = pvUser2;
 +        Args.idCpu = RTMpCpuId();
 +        Args.cHits = 0;
-+#if __FreeBSD_version >= 700000
-+# if __FreeBSD_version >= 900000
 +    Mask = all_cpus;
 +    CPU_CLR(curcpu, &Mask);
-+# else
-+    Mask = ~(cpumask_t)curcpu;
-+# endif
-+        smp_rendezvous_cpus(Mask, NULL, rtmpOnOthersFreeBSDWrapper, smp_no_rendevous_barrier, &Args);
-+#else
-+        smp_rendezvous(NULL, rtmpOnOthersFreeBSDWrapper, NULL, &Args);
-+#endif
++        smp_rendezvous_cpus(Mask, NULL, rtmpOnOthersNetBSDWrapper, smp_no_rendevous_barrier, &Args);
 +    }
 +    return VINF_SUCCESS;
 +}
 +
 +
 +/**
-+ * Wrapper between the native FreeBSD per-cpu callback and PFNRTWORKER
++ * Wrapper between the native NetBSD per-cpu callback and PFNRTWORKER
 + * for the RTMpOnSpecific API.
 + *
 + * @param   pvArg   Pointer to the RTMPARGS package.
 + */
-+static void rtmpOnSpecificFreeBSDWrapper(void *pvArg)
++static void rtmpOnSpecificNetBSDWrapper(void *pvArg)
 +{
 +    PRTMPARGS   pArgs = (PRTMPARGS)pvArg;
 +    RTCPUID     idCpu = curcpu;
@@ -233,11 +221,7 @@ $NetBSD$
 +
 +RTDECL(int) RTMpOnSpecific(RTCPUID idCpu, PFNRTMPWORKER pfnWorker, void *pvUser1, void *pvUser2)
 +{
-+#if __FreeBSD_version >= 900000
 +    cpuset_t    Mask;
-+#elif  __FreeBSD_version >= 700000
-+    cpumask_t   Mask;
-+#endif
 +    RTMPARGS    Args;
 +
 +    /* Will panic if no rendezvousing cpus, so make sure the cpu is online. */
@@ -249,28 +233,21 @@ $NetBSD$
 +    Args.pvUser2 = pvUser2;
 +    Args.idCpu = idCpu;
 +    Args.cHits = 0;
-+#if __FreeBSD_version >= 700000
-+# if __FreeBSD_version >= 900000
++
 +    CPU_SETOF(idCpu, &Mask);
-+# else
-+    Mask = (cpumask_t)1 << idCpu;
-+# endif
-+    smp_rendezvous_cpus(Mask, NULL, rtmpOnSpecificFreeBSDWrapper, smp_no_rendevous_barrier, &Args);
-+#else
-+    smp_rendezvous(NULL, rtmpOnSpecificFreeBSDWrapper, NULL, &Args);
-+#endif
++    smp_rendezvous_cpus(Mask, NULL, rtmpOnSpecificNetBSDWrapper, smp_no_rendevous_barrier, &Args);
++
 +    return Args.cHits == 1
 +         ? VINF_SUCCESS
 +         : VERR_CPU_NOT_FOUND;
 +}
 +
 +
-+#if __FreeBSD_version >= 700000
 +/**
 + * Dummy callback for RTMpPokeCpu.
 + * @param   pvArg   Ignored
 + */
-+static void rtmpFreeBSDPokeCallback(void *pvArg)
++static void rtmpNetBSDPokeCallback(void *pvArg)
 +{
 +    NOREF(pvArg);
 +}
@@ -278,36 +255,19 @@ $NetBSD$
 +
 +RTDECL(int) RTMpPokeCpu(RTCPUID idCpu)
 +{
-+#if __FreeBSD_version >= 900000
 +    cpuset_t    Mask;
-+#elif  __FreeBSD_version >= 700000
-+    cpumask_t   Mask;
-+#endif
 +
 +    /* Will panic if no rendezvousing cpus, so make sure the cpu is online. */
 +    if (!RTMpIsCpuOnline(idCpu))
 +        return VERR_CPU_NOT_FOUND;
 +
-+# if __FreeBSD_version >= 900000
 +    CPU_SETOF(idCpu, &Mask);
-+# else
-+    Mask = (cpumask_t)1 << idCpu;
-+# endif
-+    smp_rendezvous_cpus(Mask, NULL, rtmpFreeBSDPokeCallback, smp_no_rendevous_barrier, NULL);
++    smp_rendezvous_cpus(Mask, NULL, rtmpNetBSDPokeCallback, smp_no_rendevous_barrier, NULL);
 +
 +    return VINF_SUCCESS;
 +}
-+
-+#else  /* < 7.0 */
-+RTDECL(int) RTMpPokeCpu(RTCPUID idCpu)
-+{
-+    return VERR_NOT_SUPPORTED;
-+}
-+#endif /* < 7.0 */
-+
 +
 +RTDECL(bool) RTMpOnAllIsConcurrentSafe(void)
 +{
 +    return true;
 +}
-+

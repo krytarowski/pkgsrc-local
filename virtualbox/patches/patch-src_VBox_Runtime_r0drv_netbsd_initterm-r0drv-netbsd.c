@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Runtime/r0drv/netbsd/initterm-r0drv-netbsd.c.orig	2016-07-06 18:15:53.040211451 +0000
+--- src/VBox/Runtime/r0drv/netbsd/initterm-r0drv-netbsd.c.orig	2016-07-07 07:08:46.891248736 +0000
 +++ src/VBox/Runtime/r0drv/netbsd/initterm-r0drv-netbsd.c
-@@ -0,0 +1,53 @@
-+/*  initterm-r0drv-freebsd.c $ */
+@@ -0,0 +1,52 @@
++/*  initterm-r0drv-netbsd.c $ */
 +/** @file
-+ * IPRT - Initialization & Termination, Ring-0 Driver, FreeBSD.
++ * IPRT - Initialization & Termination, Ring-0 Driver, NetBSD.
 + */
 +
 +/*
@@ -37,7 +37,7 @@ $NetBSD$
 +/*********************************************************************************************************************************
 +*   Header Files                                                                                                                 *
 +*********************************************************************************************************************************/
-+#include "the-freebsd-kernel.h"
++#include "the-netbsd-kernel.h"
 +
 +#include <iprt/err.h>
 +
@@ -55,4 +55,3 @@ $NetBSD$
 +{
 +    /* nothing to undo */
 +}
-+

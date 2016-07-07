@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Runtime/r0drv/netbsd/alloc-r0drv-netbsd.c.orig	2016-07-06 18:11:32.186944481 +0000
+--- src/VBox/Runtime/r0drv/netbsd/alloc-r0drv-netbsd.c.orig	2016-07-07 07:08:46.872622650 +0000
 +++ src/VBox/Runtime/r0drv/netbsd/alloc-r0drv-netbsd.c
-@@ -0,0 +1,185 @@
-+/*  alloc-r0drv-freebsd.c $ */
+@@ -0,0 +1,179 @@
++/*  alloc-r0drv-netbsd.c $ */
 +/** @file
-+ * IPRT - Memory Allocation, Ring-0 Driver, FreeBSD.
++ * IPRT - Memory Allocation, Ring-0 Driver, NetBSD.
 + */
 +
 +/*
@@ -37,7 +37,7 @@ $NetBSD$
 +/*********************************************************************************************************************************
 +*   Header Files                                                                                                                 *
 +*********************************************************************************************************************************/
-+#include "the-freebsd-kernel.h"
++#include "the-netbsd-kernel.h"
 +#include "internal/iprt.h"
 +#include <iprt/mem.h>
 +
@@ -85,13 +85,8 @@ $NetBSD$
 +            return VERR_NO_EXEC_MEMORY;
 +
 +        /* Addr contains a start address vm_map_find will start searching for suitable space at. */
-+#if __FreeBSD_version >= 1000055
 +        int rc = vm_map_find(kernel_map, pVmObject, 0, &Addr,
 +                             cbAllocated, 0, VMFS_ANY_SPACE, VM_PROT_ALL, VM_PROT_ALL, 0);
-+#else
-+        int rc = vm_map_find(kernel_map, pVmObject, 0, &Addr,
-+                             cbAllocated, TRUE, VM_PROT_ALL, VM_PROT_ALL, 0);
-+#endif
 +        if (rc == KERN_SUCCESS)
 +        {
 +            rc = vm_map_wire(kernel_map, Addr, Addr + cbAllocated,
@@ -187,4 +182,3 @@ $NetBSD$
 +        contigfree(pv, cb, M_IPRTCONT);
 +    }
 +}
-+

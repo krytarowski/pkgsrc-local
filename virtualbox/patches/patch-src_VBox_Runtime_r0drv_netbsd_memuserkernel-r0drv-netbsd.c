@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Runtime/r0drv/netbsd/memuserkernel-r0drv-netbsd.c.orig	2016-07-06 18:15:53.040220143 +0000
+--- src/VBox/Runtime/r0drv/netbsd/memuserkernel-r0drv-netbsd.c.orig	2016-07-07 07:08:46.910526349 +0000
 +++ src/VBox/Runtime/r0drv/netbsd/memuserkernel-r0drv-netbsd.c
-@@ -0,0 +1,83 @@
-+/*  memuserkernel-r0drv-freebsd.c $ */
+@@ -0,0 +1,82 @@
++/*  memuserkernel-r0drv-netbsd.c $ */
 +/** @file
-+ * IPRT - User & Kernel Memory, Ring-0 Driver, FreeBSD.
++ * IPRT - User & Kernel Memory, Ring-0 Driver, NetBSD.
 + */
 +
 +/*
@@ -33,7 +33,7 @@ $NetBSD$
 +/*********************************************************************************************************************************
 +*   Header Files                                                                                                                 *
 +*********************************************************************************************************************************/
-+#include "the-freebsd-kernel.h"
++#include "the-netbsd-kernel.h"
 +
 +#include <iprt/mem.h>
 +#include <iprt/err.h>
@@ -85,4 +85,3 @@ $NetBSD$
 +{
 +    return VERR_NOT_SUPPORTED;
 +}
-+
