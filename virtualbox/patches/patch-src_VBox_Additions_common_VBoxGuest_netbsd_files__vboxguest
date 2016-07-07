@@ -1,6 +1,6 @@
 $NetBSD$
 
---- src/VBox/Additions/common/VBoxGuest/netbsd/files_vboxguest.orig	2016-07-06 19:33:42.486723897 +0000
+--- src/VBox/Additions/common/VBoxGuest/netbsd/files_vboxguest.orig	2016-07-07 07:08:46.332361686 +0000
 +++ src/VBox/Additions/common/VBoxGuest/netbsd/files_vboxguest
 @@ -0,0 +1,199 @@
 +#!/bin/sh
@@ -81,10 +81,10 @@ $NetBSD$
 +    ${PATH_ROOT}/include/VBox/VBoxGuestMangling.h=>include/VBox/VBoxGuestMangling.h \
 +    ${PATH_ROOT}/include/VBox/version.h=>include/VBox/version.h \
 +    ${PATH_ROOT}/src/VBox/Additions/common/VBoxGuest/VBoxGuest.cpp=>VBoxGuest.c \
-+    ${PATH_ROOT}/src/VBox/Additions/common/VBoxGuest/VBoxGuest-freebsd.c=>VBoxGuest-freebsd.c \
++    ${PATH_ROOT}/src/VBox/Additions/common/VBoxGuest/VBoxGuest-netbsd.c=>VBoxGuest-netbsd.c \
 +    ${PATH_ROOT}/src/VBox/Additions/common/VBoxGuest/VBoxGuestIDC-unix.c.h=>VBoxGuestIDC-unix.c.h \
 +    ${PATH_ROOT}/src/VBox/Additions/common/VBoxGuest/VBoxGuestInternal.h=>VBoxGuestInternal.h \
-+    ${PATH_ROOT}/src/VBox/Additions/common/VBoxGuest/freebsd/Makefile=>Makefile \
++    ${PATH_ROOT}/src/VBox/Additions/common/VBoxGuest/netbsd/Makefile=>Makefile \
 +    ${PATH_ROOT}/src/VBox/Additions/common/VBoxGuestLib/GenericRequest.cpp=>GenericRequest.c \
 +    ${PATH_ROOT}/src/VBox/Additions/common/VBoxGuestLib/HGCMInternal.cpp=>HGCMInternal.c \
 +    ${PATH_ROOT}/src/VBox/Additions/common/VBoxGuestLib/Init.cpp=>Init.c \
@@ -172,23 +172,23 @@ $NetBSD$
 +    ${PATH_ROOT}/src/VBox/Runtime/r0drv/mp-r0drv.h=>r0drv/mp-r0drv.h \
 +    ${PATH_ROOT}/src/VBox/Runtime/r0drv/power-r0drv.h=>r0drv/power-r0drv.h \
 +    ${PATH_ROOT}/src/VBox/Runtime/r0drv/powernotification-r0drv.c=>r0drv/powernotification-r0drv.c \
-+    ${PATH_ROOT}/src/VBox/Runtime/r0drv/freebsd/assert-r0drv-freebsd.c=>r0drv/freebsd/assert-r0drv-freebsd.c \
-+    ${PATH_ROOT}/src/VBox/Runtime/r0drv/freebsd/alloc-r0drv-freebsd.c=>r0drv/freebsd/alloc-r0drv-freebsd.c \
-+    ${PATH_ROOT}/src/VBox/Runtime/r0drv/freebsd/initterm-r0drv-freebsd.c=>r0drv/freebsd/initterm-r0drv-freebsd.c \
-+    ${PATH_ROOT}/src/VBox/Runtime/r0drv/freebsd/memobj-r0drv-freebsd.c=>r0drv/freebsd/memobj-r0drv-freebsd.c \
-+    ${PATH_ROOT}/src/VBox/Runtime/r0drv/freebsd/memuserkernel-r0drv-freebsd.c=>r0drv/freebsd/memuserkernel-r0drv-freebsd.c \
-+    ${PATH_ROOT}/src/VBox/Runtime/r0drv/freebsd/mp-r0drv-freebsd.c=>r0drv/freebsd/mp-r0drv-freebsd.c \
-+    ${PATH_ROOT}/src/VBox/Runtime/r0drv/freebsd/process-r0drv-freebsd.c=>r0drv/freebsd/process-r0drv-freebsd.c \
-+    ${PATH_ROOT}/src/VBox/Runtime/r0drv/freebsd/semevent-r0drv-freebsd.c=>r0drv/freebsd/semevent-r0drv-freebsd.c \
-+    ${PATH_ROOT}/src/VBox/Runtime/r0drv/freebsd/semeventmulti-r0drv-freebsd.c=>r0drv/freebsd/semeventmulti-r0drv-freebsd.c \
-+    ${PATH_ROOT}/src/VBox/Runtime/r0drv/freebsd/semfastmutex-r0drv-freebsd.c=>r0drv/freebsd/semfastmutex-r0drv-freebsd.c \
-+    ${PATH_ROOT}/src/VBox/Runtime/r0drv/freebsd/semmutex-r0drv-freebsd.c=>r0drv/freebsd/semmutex-r0drv-freebsd.c \
-+    ${PATH_ROOT}/src/VBox/Runtime/r0drv/freebsd/spinlock-r0drv-freebsd.c=>r0drv/freebsd/spinlock-r0drv-freebsd.c \
-+    ${PATH_ROOT}/src/VBox/Runtime/r0drv/freebsd/the-freebsd-kernel.h=>r0drv/freebsd/the-freebsd-kernel.h \
-+    ${PATH_ROOT}/src/VBox/Runtime/r0drv/freebsd/thread-r0drv-freebsd.c=>r0drv/freebsd/thread-r0drv-freebsd.c \
-+    ${PATH_ROOT}/src/VBox/Runtime/r0drv/freebsd/thread2-r0drv-freebsd.c=>r0drv/freebsd/thread2-r0drv-freebsd.c \
-+    ${PATH_ROOT}/src/VBox/Runtime/r0drv/freebsd/time-r0drv-freebsd.c=>r0drv/freebsd/time-r0drv-freebsd.c \
-+    ${PATH_ROOT}/src/VBox/Runtime/r0drv/freebsd/sleepqueue-r0drv-freebsd.h=>r0drv/freebsd/sleepqueue-r0drv-freebsd.h \
++    ${PATH_ROOT}/src/VBox/Runtime/r0drv/netbsd/assert-r0drv-netbsd.c=>r0drv/netbsd/assert-r0drv-netbsd.c \
++    ${PATH_ROOT}/src/VBox/Runtime/r0drv/netbsd/alloc-r0drv-netbsd.c=>r0drv/netbsd/alloc-r0drv-netbsd.c \
++    ${PATH_ROOT}/src/VBox/Runtime/r0drv/netbsd/initterm-r0drv-netbsd.c=>r0drv/netbsd/initterm-r0drv-netbsd.c \
++    ${PATH_ROOT}/src/VBox/Runtime/r0drv/netbsd/memobj-r0drv-netbsd.c=>r0drv/netbsd/memobj-r0drv-netbsd.c \
++    ${PATH_ROOT}/src/VBox/Runtime/r0drv/netbsd/memuserkernel-r0drv-netbsd.c=>r0drv/netbsd/memuserkernel-r0drv-netbsd.c \
++    ${PATH_ROOT}/src/VBox/Runtime/r0drv/netbsd/mp-r0drv-netbsd.c=>r0drv/netbsd/mp-r0drv-netbsd.c \
++    ${PATH_ROOT}/src/VBox/Runtime/r0drv/netbsd/process-r0drv-netbsd.c=>r0drv/netbsd/process-r0drv-netbsd.c \
++    ${PATH_ROOT}/src/VBox/Runtime/r0drv/netbsd/semevent-r0drv-netbsd.c=>r0drv/netbsd/semevent-r0drv-netbsd.c \
++    ${PATH_ROOT}/src/VBox/Runtime/r0drv/netbsd/semeventmulti-r0drv-netbsd.c=>r0drv/netbsd/semeventmulti-r0drv-netbsd.c \
++    ${PATH_ROOT}/src/VBox/Runtime/r0drv/netbsd/semfastmutex-r0drv-netbsd.c=>r0drv/netbsd/semfastmutex-r0drv-netbsd.c \
++    ${PATH_ROOT}/src/VBox/Runtime/r0drv/netbsd/semmutex-r0drv-netbsd.c=>r0drv/netbsd/semmutex-r0drv-netbsd.c \
++    ${PATH_ROOT}/src/VBox/Runtime/r0drv/netbsd/spinlock-r0drv-netbsd.c=>r0drv/netbsd/spinlock-r0drv-netbsd.c \
++    ${PATH_ROOT}/src/VBox/Runtime/r0drv/netbsd/the-netbsd-kernel.h=>r0drv/netbsd/the-netbsd-kernel.h \
++    ${PATH_ROOT}/src/VBox/Runtime/r0drv/netbsd/thread-r0drv-netbsd.c=>r0drv/netbsd/thread-r0drv-netbsd.c \
++    ${PATH_ROOT}/src/VBox/Runtime/r0drv/netbsd/thread2-r0drv-netbsd.c=>r0drv/netbsd/thread2-r0drv-netbsd.c \
++    ${PATH_ROOT}/src/VBox/Runtime/r0drv/netbsd/time-r0drv-netbsd.c=>r0drv/netbsd/time-r0drv-netbsd.c \
++    ${PATH_ROOT}/src/VBox/Runtime/r0drv/netbsd/sleepqueue-r0drv-netbsd.h=>r0drv/netbsd/sleepqueue-r0drv-netbsd.h \
 +    ${PATH_ROOT}/src/VBox/Runtime/r0drv/generic/semspinmutex-r0drv-generic.c=>r0drv/generic/semspinmutex-r0drv-generic.c \
 +    ${PATH_ROOT}/src/VBox/Runtime/r0drv/generic/mpnotification-r0drv-generic.cpp=>r0drv/generic/mpnotification-r0drv-generic.c \
 +    ${PATH_ROOT}/src/VBox/Runtime/r0drv/generic/RTMpIsCpuWorkPending-r0drv-generic.cpp=>r0drv/generic/RTMpIsCpuWorkPending-r0drv-generic.c \

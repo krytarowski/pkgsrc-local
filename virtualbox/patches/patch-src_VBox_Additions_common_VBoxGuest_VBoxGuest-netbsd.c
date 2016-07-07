@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Additions/common/VBoxGuest/VBoxGuest-netbsd.c.orig	2016-07-06 19:31:35.007937800 +0000
+--- src/VBox/Additions/common/VBoxGuest/VBoxGuest-netbsd.c.orig	2016-07-07 07:08:46.294122795 +0000
 +++ src/VBox/Additions/common/VBoxGuest/VBoxGuest-netbsd.c
-@@ -0,0 +1,640 @@
-+/*  VBoxGuest-freebsd.c $ */
+@@ -0,0 +1,631 @@
++/*  VBoxGuest-netbsd.c $ */
 +/** @file
-+ * VirtualBox Guest Additions Driver for FreeBSD.
++ * VirtualBox Guest Additions Driver for NetBSD.
 + */
 +
 +/*
@@ -20,7 +20,7 @@ $NetBSD$
 + * hope that it will be useful, but WITHOUT ANY WARRANTY of any kind.
 + */
 +
-+/** @todo r=bird: This must merge with SUPDrv-freebsd.c before long. The two
++/** @todo r=bird: This must merge with SUPDrv-netbsd.c before long. The two
 + * source files should only differ on prefixes and the extra bits wrt to the
 + * pci device. I.e. it should be diffable so that fixes to one can easily be
 + * applied to the other. */
@@ -108,19 +108,19 @@ $NetBSD$
 +/*
 + * Character device file handlers.
 + */
-+static d_fdopen_t vgdrvFreeBSDOpen;
-+static d_close_t  vgdrvFreeBSDClose;
-+static d_ioctl_t  vgdrvFreeBSDIOCtl;
-+static d_write_t  vgdrvFreeBSDWrite;
-+static d_read_t   vgdrvFreeBSDRead;
-+static d_poll_t   vgdrvFreeBSDPoll;
++static d_fdopen_t vgdrvNetBSDOpen;
++static d_close_t  vgdrvNetBSDClose;
++static d_ioctl_t  vgdrvNetBSDIOCtl;
++static d_write_t  vgdrvNetBSDWrite;
++static d_read_t   vgdrvNetBSDRead;
++static d_poll_t   vgdrvNetBSDPoll;
 +
 +/*
 + * IRQ related functions.
 + */
-+static void vgdrvFreeBSDRemoveIRQ(device_t pDevice, void *pvState);
-+static int  vgdrvFreeBSDAddIRQ(device_t pDevice, void *pvState);
-+static int  vgdrvFreeBSDISR(void *pvState);
++static void vgdrvNetBSDRemoveIRQ(device_t pDevice, void *pvState);
++static int  vgdrvNetBSDAddIRQ(device_t pDevice, void *pvState);
++static int  vgdrvNetBSDISR(void *pvState);
 +
 +
 +/*********************************************************************************************************************************
@@ -135,16 +135,16 @@ $NetBSD$
 +/*
 + * The /dev/vboxguest character device entry points.
 + */
-+static struct cdevsw    g_vgdrvFreeBSDChrDevSW =
++static struct cdevsw    g_vgdrvNetBSDChrDevSW =
 +{
 +    .d_version =        D_VERSION,
 +    .d_flags =          D_TRACKCLOSE | D_NEEDMINOR,
-+    .d_fdopen =         vgdrvFreeBSDOpen,
-+    .d_close =          vgdrvFreeBSDClose,
-+    .d_ioctl =          vgdrvFreeBSDIOCtl,
-+    .d_read =           vgdrvFreeBSDRead,
-+    .d_write =          vgdrvFreeBSDWrite,
-+    .d_poll =           vgdrvFreeBSDPoll,
++    .d_fdopen =         vgdrvNetBSDOpen,
++    .d_close =          vgdrvNetBSDClose,
++    .d_ioctl =          vgdrvNetBSDIOCtl,
++    .d_read =           vgdrvNetBSDRead,
++    .d_write =          vgdrvNetBSDWrite,
++    .d_poll =           vgdrvNetBSDPoll,
 +    .d_name =           "vboxguest"
 +};
 +
@@ -152,9 +152,9 @@ $NetBSD$
 +static VBOXGUESTDEVEXT      g_DevExt;
 +
 +/** List of cloned device. Managed by the kernel. */
-+static struct clonedevs    *g_pvgdrvFreeBSDClones;
++static struct clonedevs    *g_pvgdrvNetBSDClones;
 +/** The dev_clone event handler tag. */
-+static eventhandler_tag     g_vgdrvFreeBSDEHTag;
++static eventhandler_tag     g_vgdrvNetBSDEHTag;
 +/** Reference counter */
 +static volatile uint32_t    cUsers;
 +/** selinfo structure used for polling. */
@@ -163,12 +163,12 @@ $NetBSD$
 +/**
 + * DEVFS event handler.
 + */
-+static void vgdrvFreeBSDClone(void *pvArg, struct ucred *pCred, char *pszName, int cchName, struct cdev **ppDev)
++static void vgdrvNetBSDClone(void *pvArg, struct ucred *pCred, char *pszName, int cchName, struct cdev **ppDev)
 +{
 +    int iUnit;
 +    int rc;
 +
-+    Log(("vgdrvFreeBSDClone: pszName=%s ppDev=%p\n", pszName, ppDev));
++    Log(("vgdrvNetBSDClone: pszName=%s ppDev=%p\n", pszName, ppDev));
 +
 +    /*
 +     * One device node per user, si_drv1 points to the session.
@@ -182,17 +182,17 @@ $NetBSD$
 +        return;
 +    if (iUnit >= 256)
 +    {
-+        Log(("vgdrvFreeBSDClone: iUnit=%d >= 256 - rejected\n", iUnit));
++        Log(("vgdrvNetBSDClone: iUnit=%d >= 256 - rejected\n", iUnit));
 +        return;
 +    }
 +
-+    Log(("vgdrvFreeBSDClone: pszName=%s iUnit=%d\n", pszName, iUnit));
++    Log(("vgdrvNetBSDClone: pszName=%s iUnit=%d\n", pszName, iUnit));
 +
-+    rc = clone_create(&g_pvgdrvFreeBSDClones, &g_vgdrvFreeBSDChrDevSW, &iUnit, ppDev, 0);
-+    Log(("vgdrvFreeBSDClone: clone_create -> %d; iUnit=%d\n", rc, iUnit));
++    rc = clone_create(&g_pvgdrvNetBSDClones, &g_vgdrvNetBSDChrDevSW, &iUnit, ppDev, 0);
++    Log(("vgdrvNetBSDClone: clone_create -> %d; iUnit=%d\n", rc, iUnit));
 +    if (rc)
 +    {
-+        *ppDev = make_dev(&g_vgdrvFreeBSDChrDevSW,
++        *ppDev = make_dev(&g_vgdrvNetBSDChrDevSW,
 +                          iUnit,
 +                          UID_ROOT,
 +                          GID_WHEEL,
@@ -202,15 +202,15 @@ $NetBSD$
 +        {
 +            dev_ref(*ppDev);
 +            (*ppDev)->si_flags |= SI_CHEAPCLONE;
-+            Log(("vgdrvFreeBSDClone: Created *ppDev=%p iUnit=%d si_drv1=%p si_drv2=%p\n",
++            Log(("vgdrvNetBSDClone: Created *ppDev=%p iUnit=%d si_drv1=%p si_drv2=%p\n",
 +                     *ppDev, iUnit, (*ppDev)->si_drv1, (*ppDev)->si_drv2));
 +            (*ppDev)->si_drv1 = (*ppDev)->si_drv2 = NULL;
 +        }
 +        else
-+            Log(("vgdrvFreeBSDClone: make_dev iUnit=%d failed\n", iUnit));
++            Log(("vgdrvNetBSDClone: make_dev iUnit=%d failed\n", iUnit));
 +    }
 +    else
-+        Log(("vgdrvFreeBSDClone: Existing *ppDev=%p iUnit=%d si_drv1=%p si_drv2=%p\n",
++        Log(("vgdrvNetBSDClone: Existing *ppDev=%p iUnit=%d si_drv1=%p si_drv2=%p\n",
 +             *ppDev, iUnit, (*ppDev)->si_drv1, (*ppDev)->si_drv2));
 +}
 +
@@ -218,16 +218,12 @@ $NetBSD$
 + * File open handler
 + *
 + */
-+#if __FreeBSD_version >= 700000
-+static int vgdrvFreeBSDOpen(struct cdev *pDev, int fOpen, struct thread *pTd, struct file *pFd)
-+#else
-+static int vgdrvFreeBSDOpen(struct cdev *pDev, int fOpen, struct thread *pTd)
-+#endif
++static int vgdrvNetBSDOpen(struct cdev *pDev, int fOpen, struct thread *pTd)
 +{
 +    int                 rc;
 +    PVBOXGUESTSESSION   pSession;
 +
-+    LogFlow(("vgdrvFreeBSDOpen:\n"));
++    LogFlow(("vgdrvNetBSDOpen:\n"));
 +
 +    /*
 +     * Try grab it (we don't grab the giant, remember).
@@ -243,7 +239,7 @@ $NetBSD$
 +    {
 +        if (ASMAtomicCmpXchgPtr(&pDev->si_drv1, pSession, (void *)0x42))
 +        {
-+            Log(("vgdrvFreeBSDOpen: success - g_DevExt=%p pSession=%p rc=%d pid=%d\n", &g_DevExt, pSession, rc, (int)RTProcSelf()));
++            Log(("vgdrvNetBSDOpen: success - g_DevExt=%p pSession=%p rc=%d pid=%d\n", &g_DevExt, pSession, rc, (int)RTProcSelf()));
 +            ASMAtomicIncU32(&cUsers);
 +            return 0;
 +        }
@@ -251,7 +247,7 @@ $NetBSD$
 +        VGDrvCommonCloseSession(&g_DevExt, pSession);
 +    }
 +
-+    LogRel(("vgdrvFreeBSDOpen: failed. rc=%d\n", rc));
++    LogRel(("vgdrvNetBSDOpen: failed. rc=%d\n", rc));
 +    return RTErrConvertToErrno(rc);
 +}
 +
@@ -259,10 +255,10 @@ $NetBSD$
 + * File close handler
 + *
 + */
-+static int vgdrvFreeBSDClose(struct cdev *pDev, int fFile, int DevType, struct thread *pTd)
++static int vgdrvNetBSDClose(struct cdev *pDev, int fFile, int DevType, struct thread *pTd)
 +{
 +    PVBOXGUESTSESSION pSession = (PVBOXGUESTSESSION)pDev->si_drv1;
-+    Log(("vgdrvFreeBSDClose: fFile=%#x pSession=%p\n", fFile, pSession));
++    Log(("vgdrvNetBSDClose: fFile=%#x pSession=%p\n", fFile, pSession));
 +
 +    /*
 +     * Close the session if it's still hanging on to the device...
@@ -271,13 +267,13 @@ $NetBSD$
 +    {
 +        VGDrvCommonCloseSession(&g_DevExt, pSession);
 +        if (!ASMAtomicCmpXchgPtr(&pDev->si_drv1, NULL, pSession))
-+            Log(("vgdrvFreeBSDClose: si_drv1=%p expected %p!\n", pDev->si_drv1, pSession));
++            Log(("vgdrvNetBSDClose: si_drv1=%p expected %p!\n", pDev->si_drv1, pSession));
 +        ASMAtomicDecU32(&cUsers);
 +        /* Don't use destroy_dev here because it may sleep resulting in a hanging user process. */
 +        destroy_dev_sched(pDev);
 +    }
 +    else
-+        Log(("vgdrvFreeBSDClose: si_drv1=%p!\n", pSession));
++        Log(("vgdrvNetBSDClose: si_drv1=%p!\n", pSession));
 +    return 0;
 +}
 +
@@ -285,9 +281,9 @@ $NetBSD$
 + * IOCTL handler
 + *
 + */
-+static int vgdrvFreeBSDIOCtl(struct cdev *pDev, u_long ulCmd, caddr_t pvData, int fFile, struct thread *pTd)
++static int vgdrvNetBSDIOCtl(struct cdev *pDev, u_long ulCmd, caddr_t pvData, int fFile, struct thread *pTd)
 +{
-+    LogFlow(("vgdrvFreeBSDIOCtl\n"));
++    LogFlow(("vgdrvNetBSDIOCtl\n"));
 +
 +    int rc = 0;
 +
@@ -303,20 +299,20 @@ $NetBSD$
 +     */
 +    if (IOCPARM_LEN(ulCmd) != sizeof(VBGLBIGREQ))
 +    {
-+        Log(("vgdrvFreeBSDIOCtl: bad request %lu size=%lu expected=%d\n", ulCmd, IOCPARM_LEN(ulCmd), sizeof(VBGLBIGREQ)));
++        Log(("vgdrvNetBSDIOCtl: bad request %lu size=%lu expected=%d\n", ulCmd, IOCPARM_LEN(ulCmd), sizeof(VBGLBIGREQ)));
 +        return ENOTTY;
 +    }
 +
 +    PVBGLBIGREQ ReqWrap = (PVBGLBIGREQ)pvData;
 +    if (ReqWrap->u32Magic != VBGLBIGREQ_MAGIC)
 +    {
-+        Log(("vgdrvFreeBSDIOCtl: bad magic %#x; pArg=%p Cmd=%lu.\n", ReqWrap->u32Magic, pvData, ulCmd));
++        Log(("vgdrvNetBSDIOCtl: bad magic %#x; pArg=%p Cmd=%lu.\n", ReqWrap->u32Magic, pvData, ulCmd));
 +        return EINVAL;
 +    }
 +    if (RT_UNLIKELY(   ReqWrap->cbData == 0
 +                    || ReqWrap->cbData > _1M*16))
 +    {
-+        printf("vgdrvFreeBSDIOCtl: bad size %#x; pArg=%p Cmd=%lu.\n", ReqWrap->cbData, pvData, ulCmd);
++        printf("vgdrvNetBSDIOCtl: bad size %#x; pArg=%p Cmd=%lu.\n", ReqWrap->cbData, pvData, ulCmd);
 +        return EINVAL;
 +    }
 +
@@ -326,7 +322,7 @@ $NetBSD$
 +    void *pvBuf = RTMemTmpAlloc(ReqWrap->cbData);
 +    if (RT_UNLIKELY(!pvBuf))
 +    {
-+        Log(("vgdrvFreeBSDIOCtl: RTMemTmpAlloc failed to alloc %d bytes.\n", ReqWrap->cbData));
++        Log(("vgdrvNetBSDIOCtl: RTMemTmpAlloc failed to alloc %d bytes.\n", ReqWrap->cbData));
 +        return ENOMEM;
 +    }
 +
@@ -334,17 +330,17 @@ $NetBSD$
 +    if (RT_UNLIKELY(rc))
 +    {
 +        RTMemTmpFree(pvBuf);
-+        Log(("vgdrvFreeBSDIOCtl: copyin failed; pvBuf=%p pArg=%p Cmd=%lu. rc=%d\n", pvBuf, pvData, ulCmd, rc));
++        Log(("vgdrvNetBSDIOCtl: copyin failed; pvBuf=%p pArg=%p Cmd=%lu. rc=%d\n", pvBuf, pvData, ulCmd, rc));
 +        return EFAULT;
 +    }
 +    if (RT_UNLIKELY(   ReqWrap->cbData != 0
 +                    && !VALID_PTR(pvBuf)))
 +    {
 +        RTMemTmpFree(pvBuf);
-+        Log(("vgdrvFreeBSDIOCtl: pvBuf invalid pointer %p\n", pvBuf));
++        Log(("vgdrvNetBSDIOCtl: pvBuf invalid pointer %p\n", pvBuf));
 +        return EINVAL;
 +    }
-+    Log(("vgdrvFreeBSDIOCtl: pSession=%p pid=%d.\n", pSession, (int)RTProcSelf()));
++    Log(("vgdrvNetBSDIOCtl: pSession=%p pid=%d.\n", pSession, (int)RTProcSelf()));
 +
 +    /*
 +     * Process the IOCtl.
@@ -356,7 +352,7 @@ $NetBSD$
 +        rc = 0;
 +        if (RT_UNLIKELY(cbDataReturned > ReqWrap->cbData))
 +        {
-+            Log(("vgdrvFreeBSDIOCtl: too much output data %d expected %d\n", cbDataReturned, ReqWrap->cbData));
++            Log(("vgdrvNetBSDIOCtl: too much output data %d expected %d\n", cbDataReturned, ReqWrap->cbData));
 +            cbDataReturned = ReqWrap->cbData;
 +        }
 +        if (cbDataReturned > 0)
@@ -364,29 +360,29 @@ $NetBSD$
 +            rc = copyout(pvBuf, (void *)(uintptr_t)ReqWrap->pvDataR3, cbDataReturned);
 +            if (RT_UNLIKELY(rc))
 +            {
-+                Log(("vgdrvFreeBSDIOCtl: copyout failed; pvBuf=%p pArg=%p Cmd=%lu. rc=%d\n", pvBuf, pvData, ulCmd, rc));
++                Log(("vgdrvNetBSDIOCtl: copyout failed; pvBuf=%p pArg=%p Cmd=%lu. rc=%d\n", pvBuf, pvData, ulCmd, rc));
 +                rc = EFAULT;
 +            }
 +        }
 +    }
 +    else
 +    {
-+        Log(("vgdrvFreeBSDIOCtl: VGDrvCommonIoCtl failed. rc=%d\n", rc));
++        Log(("vgdrvNetBSDIOCtl: VGDrvCommonIoCtl failed. rc=%d\n", rc));
 +        rc = EFAULT;
 +    }
 +    RTMemTmpFree(pvBuf);
 +    return rc;
 +}
 +
-+static int vgdrvFreeBSDPoll(struct cdev *pDev, int fEvents, struct thread *td)
++static int vgdrvNetBSDPoll(struct cdev *pDev, int fEvents, struct thread *td)
 +{
 +    int fEventsProcessed;
 +
-+    LogFlow(("vgdrvFreeBSDPoll: fEvents=%d\n", fEvents));
++    LogFlow(("vgdrvNetBSDPoll: fEvents=%d\n", fEvents));
 +
 +    PVBOXGUESTSESSION pSession = (PVBOXGUESTSESSION)pDev->si_drv1;
 +    if (RT_UNLIKELY(!VALID_PTR(pSession))) {
-+        Log(("vgdrvFreeBSDPoll: no state data for %s\n", devtoname(pDev)));
++        Log(("vgdrvNetBSDPoll: no state data for %s\n", devtoname(pDev)));
 +        return (fEvents & (POLLHUP|POLLIN|POLLRDNORM|POLLOUT|POLLWRNORM));
 +    }
 +
@@ -406,17 +402,17 @@ $NetBSD$
 +    return fEventsProcessed;
 +}
 +
-+static int vgdrvFreeBSDWrite(struct cdev *pDev, struct uio *pUio, int fIo)
++static int vgdrvNetBSDWrite(struct cdev *pDev, struct uio *pUio, int fIo)
 +{
 +    return 0;
 +}
 +
-+static int vgdrvFreeBSDRead(struct cdev *pDev, struct uio *pUio, int fIo)
++static int vgdrvNetBSDRead(struct cdev *pDev, struct uio *pUio, int fIo)
 +{
 +    return 0;
 +}
 +
-+static int vgdrvFreeBSDDetach(device_t pDevice)
++static int vgdrvNetBSDDetach(device_t pDevice)
 +{
 +    struct VBoxGuestDeviceState *pState = device_get_softc(pDevice);
 +
@@ -424,14 +420,14 @@ $NetBSD$
 +        return EBUSY;
 +
 +    /*
-+     * Reverse what we did in vgdrvFreeBSDAttach.
++     * Reverse what we did in vgdrvNetBSDAttach.
 +     */
-+    if (g_vgdrvFreeBSDEHTag != NULL)
-+        EVENTHANDLER_DEREGISTER(dev_clone, g_vgdrvFreeBSDEHTag);
++    if (g_vgdrvNetBSDEHTag != NULL)
++        EVENTHANDLER_DEREGISTER(dev_clone, g_vgdrvNetBSDEHTag);
 +
-+    clone_cleanup(&g_pvgdrvFreeBSDClones);
++    clone_cleanup(&g_pvgdrvNetBSDClones);
 +
-+    vgdrvFreeBSDRemoveIRQ(pDevice, pState);
++    vgdrvNetBSDRemoveIRQ(pDevice, pState);
 +
 +    if (pState->pVMMDevMemRes)
 +        bus_release_resource(pDevice, SYS_RES_MEMORY, pState->iVMMDevMemResId, pState->pVMMDevMemRes);
@@ -451,9 +447,9 @@ $NetBSD$
 + * @returns Whether the interrupt was from VMMDev.
 + * @param   pvState Opaque pointer to the device state.
 + */
-+static int vgdrvFreeBSDISR(void *pvState)
++static int vgdrvNetBSDISR(void *pvState)
 +{
-+    LogFlow(("vgdrvFreeBSDISR: pvState=%p\n", pvState));
++    LogFlow(("vgdrvNetBSDISR: pvState=%p\n", pvState));
 +
 +    bool fOurIRQ = VGDrvCommonISR(&g_DevExt);
 +
@@ -473,11 +469,11 @@ $NetBSD$
 +/**
 + * Sets IRQ for VMMDev.
 + *
-+ * @returns FreeBSD error code.
++ * @returns NetBSD error code.
 + * @param   pDevice  Pointer to the device info structure.
 + * @param   pvState  Pointer to the state info structure.
 + */
-+static int vgdrvFreeBSDAddIRQ(device_t pDevice, void *pvState)
++static int vgdrvNetBSDAddIRQ(device_t pDevice, void *pvState)
 +{
 +    int iResId = 0;
 +    int rc = 0;
@@ -485,12 +481,7 @@ $NetBSD$
 +
 +    pState->pIrqRes = bus_alloc_resource_any(pDevice, SYS_RES_IRQ, &iResId, RF_SHAREABLE | RF_ACTIVE);
 +
-+#if __FreeBSD_version >= 700000
-+    rc = bus_setup_intr(pDevice, pState->pIrqRes, INTR_TYPE_BIO | INTR_MPSAFE, NULL, (driver_intr_t *)vgdrvFreeBSDISR, pState,
-+                        &pState->pfnIrqHandler);
-+#else
-+    rc = bus_setup_intr(pDevice, pState->pIrqRes, INTR_TYPE_BIO, (driver_intr_t *)vgdrvFreeBSDISR, pState, &pState->pfnIrqHandler);
-+#endif
++    rc = bus_setup_intr(pDevice, pState->pIrqRes, INTR_TYPE_BIO, (driver_intr_t *)vgdrvNetBSDISR, pState, &pState->pfnIrqHandler);
 +
 +    if (rc)
 +    {
@@ -509,7 +500,7 @@ $NetBSD$
 + * @param   pDevice  Pointer to the device info structure.
 + * @param   pvState  Opaque pointer to the state info structure.
 + */
-+static void vgdrvFreeBSDRemoveIRQ(device_t pDevice, void *pvState)
++static void vgdrvNetBSDRemoveIRQ(device_t pDevice, void *pvState)
 +{
 +    struct VBoxGuestDeviceState *pState = (struct VBoxGuestDeviceState *)pvState;
 +
@@ -520,7 +511,7 @@ $NetBSD$
 +    }
 +}
 +
-+static int vgdrvFreeBSDAttach(device_t pDevice)
++static int vgdrvNetBSDAttach(device_t pDevice)
 +{
 +    int rc;
 +    int iResId;
@@ -567,9 +558,9 @@ $NetBSD$
 +            rc = VGDrvCommonInitDevExt(&g_DevExt, pState->uIOPortBase,
 +                                       pState->pMMIOBase, pState->VMMDevMemSize,
 +#if ARCH_BITS == 64
-+                                       VBOXOSTYPE_FreeBSD_x64,
++                                       VBOXOSTYPE_NetBSD_x64,
 +#else
-+                                       VBOXOSTYPE_FreeBSD,
++                                       VBOXOSTYPE_NetBSD,
 +#endif
 +                                       VMMDEV_EVENT_MOUSE_POSITION_CHANGED);
 +            if (RT_SUCCESS(rc))
@@ -577,30 +568,30 @@ $NetBSD$
 +                /*
 +                 * Add IRQ of VMMDev.
 +                 */
-+                rc = vgdrvFreeBSDAddIRQ(pDevice, pState);
++                rc = vgdrvNetBSDAddIRQ(pDevice, pState);
 +                if (RT_SUCCESS(rc))
 +                {
 +                    /*
 +                     * Configure device cloning.
 +                     */
-+                    clone_setup(&g_pvgdrvFreeBSDClones);
-+                    g_vgdrvFreeBSDEHTag = EVENTHANDLER_REGISTER(dev_clone, vgdrvFreeBSDClone, 0, 1000);
-+                    if (g_vgdrvFreeBSDEHTag)
++                    clone_setup(&g_pvgdrvNetBSDClones);
++                    g_vgdrvNetBSDEHTag = EVENTHANDLER_REGISTER(dev_clone, vgdrvNetBSDClone, 0, 1000);
++                    if (g_vgdrvNetBSDEHTag)
 +                    {
 +                        printf(DEVICE_NAME ": loaded successfully\n");
 +                        return 0;
 +                    }
 +
 +                    printf(DEVICE_NAME ": EVENTHANDLER_REGISTER(dev_clone,,,) failed\n");
-+                    clone_cleanup(&g_pvgdrvFreeBSDClones);
-+                    vgdrvFreeBSDRemoveIRQ(pDevice, pState);
++                    clone_cleanup(&g_pvgdrvNetBSDClones);
++                    vgdrvNetBSDRemoveIRQ(pDevice, pState);
 +                }
 +                else
 +                    printf((DEVICE_NAME ": VGDrvCommonInitDevExt failed.\n"));
 +                VGDrvCommonDeleteDevExt(&g_DevExt);
 +            }
 +            else
-+                printf((DEVICE_NAME ": vgdrvFreeBSDAddIRQ failed.\n"));
++                printf((DEVICE_NAME ": vgdrvNetBSDAddIRQ failed.\n"));
 +        }
 +        else
 +            printf((DEVICE_NAME ": MMIO region setup failed.\n"));
@@ -612,7 +603,7 @@ $NetBSD$
 +    return ENXIO;
 +}
 +
-+static int vgdrvFreeBSDProbe(device_t pDevice)
++static int vgdrvNetBSDProbe(device_t pDevice)
 +{
 +    if ((pci_get_vendor(pDevice) == VMMDEV_VENDORID) && (pci_get_device(pDevice) == VMMDEV_DEVICEID))
 +        return 0;
@@ -620,25 +611,25 @@ $NetBSD$
 +    return ENXIO;
 +}
 +
-+static device_method_t vgdrvFreeBSDMethods[] =
++static device_method_t vgdrvNetBSDMethods[] =
 +{
 +    /* Device interface. */
-+    DEVMETHOD(device_probe,  vgdrvFreeBSDProbe),
-+    DEVMETHOD(device_attach, vgdrvFreeBSDAttach),
-+    DEVMETHOD(device_detach, vgdrvFreeBSDDetach),
++    DEVMETHOD(device_probe,  vgdrvNetBSDProbe),
++    DEVMETHOD(device_attach, vgdrvNetBSDAttach),
++    DEVMETHOD(device_detach, vgdrvNetBSDDetach),
 +    {0,0}
 +};
 +
-+static driver_t vgdrvFreeBSDDriver =
++static driver_t vgdrvNetBSDDriver =
 +{
 +    DEVICE_NAME,
-+    vgdrvFreeBSDMethods,
++    vgdrvNetBSDMethods,
 +    sizeof(struct VBoxGuestDeviceState),
 +};
 +
-+static devclass_t vgdrvFreeBSDClass;
++static devclass_t vgdrvNetBSDClass;
 +
-+DRIVER_MODULE(vboxguest, pci, vgdrvFreeBSDDriver, vgdrvFreeBSDClass, 0, 0);
++DRIVER_MODULE(vboxguest, pci, vgdrvNetBSDDriver, vgdrvNetBSDClass, 0, 0);
 +MODULE_VERSION(vboxguest, 1);
 +
 +/* Common code that depend on g_DevExt. */
