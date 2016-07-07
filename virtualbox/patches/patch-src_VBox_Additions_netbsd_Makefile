@@ -1,10 +1,10 @@
 $NetBSD$
 
---- src/VBox/Additions/netbsd/Makefile.orig	2016-07-06 19:37:38.981316626 +0000
+--- src/VBox/Additions/netbsd/Makefile.orig	2016-07-07 07:08:46.378102526 +0000
 +++ src/VBox/Additions/netbsd/Makefile
 @@ -0,0 +1,53 @@
 +#
-+# Makefile for the VirtualBox FreeBSD Guest Drivers.
++# Makefile for the VirtualBox NetBSD Guest Drivers.
 +#
 +
 +#

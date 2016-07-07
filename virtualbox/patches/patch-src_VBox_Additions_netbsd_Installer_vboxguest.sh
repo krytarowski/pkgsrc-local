@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Additions/netbsd/Installer/vboxguest.sh.orig	2016-07-06 19:38:01.899905314 +0000
+--- src/VBox/Additions/netbsd/Installer/vboxguest.sh.orig	2016-07-07 07:08:46.369610770 +0000
 +++ src/VBox/Additions/netbsd/Installer/vboxguest.sh
-@@ -0,0 +1,136 @@
+@@ -0,0 +1,135 @@
 +#!/bin/bash
 +#
-+# VirtualBox Guest Additions kernel module control script for FreeBSD.
++# VirtualBox Guest Additions kernel module control script for NetBSD.
 +#
 +# Copyright (C) 2008-2010 Oracle Corporation
 +#
@@ -34,8 +34,8 @@ $NetBSD$
 +
 +get_module_path()
 +{
-+    moduledir="/boot/kernel";
-+    modulepath=$moduledir/vboxguest.ko
++    moduledir="/stand/$(uname -m)/$(uname -r)/modules/";
++    modulepath=$moduledir/vboxguest/vboxguest.kmod
 +    if test -f "$modulepath"; then
 +        VBOXGUESTFILE="$modulepath"
 +    else
@@ -138,4 +138,3 @@ $NetBSD$
 +esac
 +
 +exit
-+
