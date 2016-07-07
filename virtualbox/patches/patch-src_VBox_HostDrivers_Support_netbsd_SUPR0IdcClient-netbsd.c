@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/HostDrivers/Support/netbsd/SUPR0IdcClient-netbsd.c.orig	2016-07-06 19:59:29.192088086 +0000
+--- src/VBox/HostDrivers/Support/netbsd/SUPR0IdcClient-netbsd.c.orig	2016-07-07 07:08:46.515663297 +0000
 +++ src/VBox/HostDrivers/Support/netbsd/SUPR0IdcClient-netbsd.c
-@@ -0,0 +1,56 @@
-+/*  SUPR0IdcClient-freebsd.c $ */
+@@ -0,0 +1,55 @@
++/*  SUPR0IdcClient-netbsd.c $ */
 +/** @file
-+ * VirtualBox Support Driver - IDC Client Lib, FreeBSD Specific Code.
++ * VirtualBox Support Driver - IDC Client Lib, NetBSD Specific Code.
 + */
 +
 +/*
@@ -51,11 +51,10 @@ $NetBSD$
 +
 +int VBOXCALL supR0IdcNativeCall(PSUPDRVIDCHANDLE pHandle, uint32_t iReq, PSUPDRVIDCREQHDR pReq)
 +{
-+    int rc = SUPDrvFreeBSDIDC(iReq, pReq);
++    int rc = SUPDrvNetBSDIDC(iReq, pReq);
 +    if (RT_SUCCESS(rc))
 +        rc = pReq->rc;
 +
 +    NOREF(pHandle);
 +    return rc;
 +}
-+

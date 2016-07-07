@@ -1,7 +1,6 @@
 $NetBSD$
 
---- src/VBox/HostDrivers/Support/netbsd/SUPDrv-netbsd.def.orig	2016-07-06 19:59:29.188729027 +0000
+--- src/VBox/HostDrivers/Support/netbsd/SUPDrv-netbsd.def.orig	2016-07-07 07:08:46.496688121 +0000
 +++ src/VBox/HostDrivers/Support/netbsd/SUPDrv-netbsd.def
-@@ -0,0 +1,2 @@
-+SUPDrvLinuxIDC
-+
+@@ -0,0 +1 @@
++SUPDrvNetBSDIDC

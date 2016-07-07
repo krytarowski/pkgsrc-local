@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/HostDrivers/Support/netbsd/SUPLib-netbsd.cpp.orig	2016-07-06 19:59:29.190429381 +0000
+--- src/VBox/HostDrivers/Support/netbsd/SUPLib-netbsd.cpp.orig	2016-07-07 07:08:46.506033890 +0000
 +++ src/VBox/HostDrivers/Support/netbsd/SUPLib-netbsd.cpp
-@@ -0,0 +1,186 @@
-+/*  SUPLib-freebsd.cpp $ */
+@@ -0,0 +1,185 @@
++/*  SUPLib-netbsd.cpp $ */
 +/** @file
-+ * VirtualBox Support Library - FreeBSD specific parts.
++ * VirtualBox Support Library - NetBSD specific parts.
 + */
 +
 +/*
@@ -188,4 +188,3 @@ $NetBSD$
 +}
 +
 +#endif /* !IN_SUP_HARDENED_R3 */
-+
