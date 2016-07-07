@@ -20,7 +20,7 @@ DEPENDS+=	cdrtools-[0-9]*:../../sysutils/cdrtools
 BUILD_DEPENDS+=	yasm-[0-9]*:../../devel/yasm
 BUILD_DEPENDS+=	kbuild-[0-9]*:../../wip/kbuild
 
-USE_TOOLS+=	gtar pkg-config
+USE_TOOLS+=	gtar pkg-config bison flex
 
 WRKSRC=		${WRKDIR}/VirtualBox-${PKGVERSION_NOREV}
 
@@ -30,6 +30,7 @@ USE_LANGUAGES+=	c c++
 SUBST_CLASSES+=		paths
 SUBST_MESSAGE.paths+=	Adjust paths for pkgsrc
 SUBST_STAGE.paths=	pre-configure
+#SUBST_STAGE.paths=	post-build
 SUBST_FILES.paths+=	configure
 SUBST_SED.paths+=	-e 's!^INCCRYPTO=.*!INCCRYPTO="-I${BUILDLINK_PREFIX.openssl}/include"!g'
 SUBST_SED.paths+=	-e 's!^LIBCRYPTO=.*!LIBCRYPTO="${COMPILER_RPATH_FLAG}${BUILDLINK_PREFIX.openssl}/lib -L${BUILDLINK_PREFIX.openssl}/lib -lssl -lcrypto"!g'

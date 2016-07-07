@@ -46,7 +46,24 @@ $NetBSD$
        else
          log_success "found version $cc_ver"
        fi
-@@ -1932,20 +1927,16 @@ extern "C" int main(void)
+@@ -529,6 +524,7 @@ check_open_watcom()
+     "darwin")   wc_bin="binosx";;  # ??
+     "dos")      wc_bin="binw";;
+     "freebsd")  wc_bin="binfbsd";; # ??
++    "freebsd")  wc_bin="binnbsd";; # ??
+     "linux")    wc_bin="binl";;
+     "solaris")  wc_bin="binsol";;  # ??
+     "os2")      wc_bin="binp";;
+@@ -914,7 +910,7 @@ EOF
+   [ -n "$INCZ" ] && I_INCZ=`prefix_I "$INCZ"`
+   if test_compile "$LIBZ $I_INCZ" zlib zlib; then
+     if test_execute; then
+-      echo "if1of (\$(KBUILD_TARGET),darwin freebsd haiku linux)" >> $CNF
++      echo "if1of (\$(KBUILD_TARGET),darwin freebsd netbsd haiku linux)" >> $CNF
+       cnf_append " SDK_VBOX_ZLIB_LIBS" "`strip_l "$LIBZ"`"
+       cnf_append " SDK_VBOX_ZLIB_INCS" "$INCZ"
+       echo "endif" >> $CNF
+@@ -1932,20 +1928,16 @@ extern "C" int main(void)
  }
  EOF
    found=
@@ -71,3 +88,30 @@ $NetBSD$
          if [ $? -eq 0 ]; then
            found=1
            break
+@@ -2287,7 +2279,7 @@ EOF
+ [ $OSE          -eq 0 ] && echo "  --disable-extpack        don't build the extpack"
+ [ $WITH_DOCS    -eq 1 ] && echo "  --disable-docs           don't build the documentation"
+ [ $WITH_LIBVPX  -eq 1 ] && echo "  --disable-libvpx         don't use libvpx for video capturing"
+-[ "$OS" = "linux" -o "$OS" = "freebsd" ] && echo "  --enable-vde             enable VDE networking"
++[ "$OS" = "linux" -o "$OS" = "freebsd" -o "$OS" = "netbsd" ] && echo "  --enable-vde             enable VDE networking"
+ cat << EOF
+   --disable-udptunnel      disable UDP tunnel networking
+   --disable-devmapper      disable device mapper library access
+@@ -2744,7 +2736,7 @@ if [ $ONLY_ADDITIONS -eq 0 ]; then
+   [ $WITH_JAVA   -eq 1 ] && check_java
+ 
+   # PulseAudio
+-  if [ "$OS" = "linux" -o "$OS" = "freebsd" ]; then
++  if [ "$OS" = "linux" -o "$OS" = "freebsd" -o "$OS" = "netbsd" ]; then
+     if [ $WITH_PULSE -eq 1 ]; then
+       check_pulse
+     elif [ $WITH_PULSE -eq 0 ]; then
+@@ -2803,7 +2795,7 @@ if [ $ONLY_ADDITIONS -eq 0 -a $WITH_UDPT
+ fi
+ 
+ # VDE
+-if [ $ONLY_ADDITIONS -eq 0 -a "$OS" = "linux" -o "$OS" = "freebsd" ]; then
++if [ $ONLY_ADDITIONS -eq 0 -a "$OS" = "linux" -o "$OS" = "freebsd" -o "$OS" = "netbsd" ]; then
+   if [ $WITH_VDE -eq 1 ]; then
+     cnf_append "VBOX_WITH_VDE" "1"
+   fi
