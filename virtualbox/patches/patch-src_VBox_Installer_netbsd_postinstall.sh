@@ -1,12 +1,12 @@
 $NetBSD$
 
---- src/VBox/Installer/netbsd/postinstall.sh.orig	2016-07-06 20:01:35.496909774 +0000
+--- src/VBox/Installer/netbsd/postinstall.sh.orig	2016-07-07 07:08:46.669159987 +0000
 +++ src/VBox/Installer/netbsd/postinstall.sh
-@@ -0,0 +1,76 @@
+@@ -0,0 +1,75 @@
 +#!/bin/sh
 +## @file
 +#
-+# VirtualBox postinstall script for FreeBSD.
++# VirtualBox postinstall script for NetBSD.
 +#
 +
 +#
@@ -78,4 +78,3 @@ $NetBSD$
 +rm -rf $PATH_TMP_MODS
 +
 +exit 0
-+

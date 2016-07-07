@@ -1,6 +1,6 @@
 $NetBSD$
 
---- src/VBox/Installer/netbsd/virtualbox.desktop.orig	2016-07-06 20:01:35.497710027 +0000
+--- src/VBox/Installer/netbsd/virtualbox.desktop.orig	2016-07-07 07:08:46.678057739 +0000
 +++ src/VBox/Installer/netbsd/virtualbox.desktop
 @@ -0,0 +1,18 @@
 +
@@ -16,7 +16,7 @@ $NetBSD$
 +Icon=VBox
 +Categories=Emulator;System;
 +Comment=Run several virtual systems on a single host computer
-+Comment[de]=Windows und andere Betriebssysteme unter FreeBSD ausführen
++Comment[de]=Windows und andere Betriebssysteme unter NetBSD ausführen
 +Comment[it]=Esegui più macchine virtuali su un singolo computer
 +Comment[pl]=Uruchamianie wielu systemów wirtualnych na jednym komputerze gospodarza
 +Comment[sv]=Kör flera virtuella system på en enda värddator

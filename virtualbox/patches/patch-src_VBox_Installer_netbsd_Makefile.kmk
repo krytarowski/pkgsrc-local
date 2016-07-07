@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Installer/netbsd/Makefile.kmk.orig	2016-07-06 20:01:35.492803836 +0000
+--- src/VBox/Installer/netbsd/Makefile.kmk.orig	2016-07-07 07:08:46.625776932 +0000
 +++ src/VBox/Installer/netbsd/Makefile.kmk
-@@ -0,0 +1,339 @@
+@@ -0,0 +1,338 @@
 +#  Makefile.kmk $
 +## @file
-+# Makefile for the FreeBSD installer.
++# Makefile for the NetBSD installer.
 +#
 +
 +#
@@ -23,16 +23,16 @@ $NetBSD$
 +SUB_DEPTH = ../../../..
 +include $(KBUILD_PATH)/subheader.kmk
 +
-+ifneq ($(KBUILD_HOST),freebsd)
-+ $(error "The FreeBSD installer can only be built on FreeBSD!")
++ifneq ($(KBUILD_HOST),netbsd)
++ $(error "The NetBSD installer can only be built on NetBSD!")
 +endif
 +
 +#
 +# Globals and targets.
 +#
 +VBOX_PATH_FBSD_INST_SRC      := $(PATH_SUB_CURRENT)
-+VBOX_FBSD_INST_OUT_DIR       := $(PATH_TARGET)/Installer/freebsd
-+VBOX_FBSD_INST_STAGE_DIR     := $(PATH_TARGET)/Installer/freebsd/install
++VBOX_FBSD_INST_OUT_DIR       := $(PATH_TARGET)/Installer/netbsd
++VBOX_FBSD_INST_STAGE_DIR     := $(PATH_TARGET)/Installer/netbsd/install
 +VBOX_FBSD_DBG_PATH           := usr/lib/debug/opt/VirtualBox
 +VBOX_FBSD_PACKAGE_NAME        = VirtualBox-$(VBOX_VERSION_STRING)-r$(VBOX_SVN_REV).tbz
 +VBOX_FBSD_INST_LIB_DIR       := $(VBOX_FBSD_INST_STAGE_DIR)/lib
@@ -56,18 +56,18 @@ $NetBSD$
 +	$(wildcard $(VBOX_FBSD_INST_OUT_DIR)/VirtualBox-*)
 +
 +#
-+# FreeBSD installs.
++# NetBSD installs.
 +#
-+INSTALLS += freebsd-misc
-+freebsd-misc_INST = bin/
-+freebsd-misc_MODE = a+r,u+w
-+freebsd-misc_SOURCES = \
++INSTALLS += netbsd-misc
++netbsd-misc_INST = bin/
++netbsd-misc_MODE = a+r,u+w
++netbsd-misc_SOURCES = \
 +	$(PATH_ROOT)/src/VBox/Frontends/VirtualBox/images/$(if $(VBOX_OSE),OSE,NonOSE)/VirtualBox_32px.png=>VBox.png \
 +	$(if $(VBOX_OSE),,$(VBOX_BRAND_LICENSE_TXT)=>LICENSE) \
-+	$(if $(VBOX_WITH_QTGUI),$(freebsd-misc_0_OUTDIR)/virtualbox.desktop,)
-+freebsd-misc_CLEAN = $(freebsd-misc_0_OUTDIR)/virtualbox.desktop
++	$(if $(VBOX_WITH_QTGUI),$(netbsd-misc_0_OUTDIR)/virtualbox.desktop,)
++netbsd-misc_CLEAN = $(netbsd-misc_0_OUTDIR)/virtualbox.desktop
 +
-+$$(PATH_freebsd-misc)/virtualbox.desktop: $(PATH_SUB_CURRENT)/virtualbox.desktop $(VBOX_VERSION_STAMP) | $$(dir $$@)
++$$(PATH_netbsd-misc)/virtualbox.desktop: $(PATH_SUB_CURRENT)/virtualbox.desktop $(VBOX_VERSION_STAMP) | $$(dir $$@)
 +	$(call MSG_GENERATE,,$@,$<)
 +ifdef VBOX_PATH_PACKAGE_DOCS
 +	$(QUIET)$(SED) -e "s+\$$VBOX_DOC_PATH+$(VBOX_PATH_PACKAGE_DOCS)+" --output $@ $<
@@ -341,4 +341,3 @@ $NetBSD$
 +endif
 +
 +include $(FILE_KBUILD_SUB_FOOTER)
-+

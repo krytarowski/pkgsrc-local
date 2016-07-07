@@ -1,12 +1,12 @@
 $NetBSD$
 
---- src/VBox/Installer/netbsd/postdeinstall.sh.orig	2016-07-06 20:01:35.496102589 +0000
+--- src/VBox/Installer/netbsd/postdeinstall.sh.orig	2016-07-07 07:08:46.660385240 +0000
 +++ src/VBox/Installer/netbsd/postdeinstall.sh
-@@ -0,0 +1,32 @@
+@@ -0,0 +1,31 @@
 +#!/bin/sh
 +## @file
 +#
-+# VirtualBox postdeinstall script for FreeBSD.
++# VirtualBox postdeinstall script for NetBSD.
 +#
 +
 +#
@@ -34,4 +34,3 @@ $NetBSD$
 +echo "Kernel modules successfully removed."
 +
 +exit 0
-+
