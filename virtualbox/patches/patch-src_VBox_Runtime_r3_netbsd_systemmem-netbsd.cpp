@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Runtime/r3/netbsd/systemmem-netbsd.cpp.orig	2016-07-06 19:48:52.085316902 +0000
+--- src/VBox/Runtime/r3/netbsd/systemmem-netbsd.cpp.orig	2016-07-07 07:08:47.069137512 +0000
 +++ src/VBox/Runtime/r3/netbsd/systemmem-netbsd.cpp
-@@ -0,0 +1,98 @@
-+/*  systemmem-freebsd.cpp $ */
+@@ -0,0 +1,97 @@
++/*  systemmem-netbsd.cpp $ */
 +/** @file
-+ * IPRT - RTSystemQueryTotalRam, Linux ring-3.
++ * IPRT - RTSystemQueryTotalRam, NetBSD ring-3.
 + */
 +
 +/*
@@ -53,7 +53,7 @@ $NetBSD$
 +
 +    AssertPtrReturn(pcb, VERR_INVALID_POINTER);
 +
-+    if (!sysctlbyname("hw.physmem", &cbMemPhys, &cbParameter, NULL, 0))
++    if (!sysctlbyname("hw.physmem64", &cbMemPhys, &cbParameter, NULL, 0))
 +    {
 +        *pcb = cbMemPhys;
 +        return VINF_SUCCESS;
@@ -100,4 +100,3 @@ $NetBSD$
 +
 +    return rc;
 +}
-+

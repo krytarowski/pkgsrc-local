@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Runtime/r3/netbsd/mp-netbsd.cpp.orig	2016-07-06 19:48:52.085308982 +0000
+--- src/VBox/Runtime/r3/netbsd/mp-netbsd.cpp.orig	2016-07-07 07:08:47.050526272 +0000
 +++ src/VBox/Runtime/r3/netbsd/mp-netbsd.cpp
-@@ -0,0 +1,201 @@
-+/*  mp-freebsd.cpp $ */
+@@ -0,0 +1,200 @@
++/*  mp-netbsd.cpp $ */
 +/** @file
-+ * IPRT - Multiprocessor, FreeBSD.
++ * IPRT - Multiprocessor, NetBSD.
 + */
 +
 +/*
@@ -54,7 +54,7 @@ $NetBSD$
 + *
 + * @returns Max cpus.
 + */
-+static RTCPUID rtMpFreeBsdMaxCpus(void)
++static RTCPUID rtMpNetBsdMaxCpus(void)
 +{
 +    int aiMib[2];
 +    aiMib[0] = CTL_HW;
@@ -71,26 +71,26 @@ $NetBSD$
 +
 +RTDECL(int) RTMpCpuIdToSetIndex(RTCPUID idCpu)
 +{
-+    return idCpu < RTCPUSET_MAX_CPUS && idCpu < rtMpFreeBsdMaxCpus() ? idCpu : -1;
++    return idCpu < RTCPUSET_MAX_CPUS && idCpu < rtMpNetBsdMaxCpus() ? idCpu : -1;
 +}
 +
 +
 +RTDECL(RTCPUID) RTMpCpuIdFromSetIndex(int iCpu)
 +{
-+    return (unsigned)iCpu < rtMpFreeBsdMaxCpus() ? iCpu : NIL_RTCPUID;
++    return (unsigned)iCpu < rtMpNetBsdMaxCpus() ? iCpu : NIL_RTCPUID;
 +}
 +
 +
 +RTDECL(RTCPUID) RTMpGetMaxCpuId(void)
 +{
-+    return rtMpFreeBsdMaxCpus() - 1;
++    return rtMpNetBsdMaxCpus() - 1;
 +}
 +
 +
 +RTDECL(bool) RTMpIsCpuOnline(RTCPUID idCpu)
 +{
 +    /*
-+     * FreeBSD doesn't support CPU hotplugging so every CPU which appears
++     * NetBSD doesn't support CPU hotplugging so every CPU which appears
 +     * in the tree is also online.
 +     */
 +    char    szName[40];
@@ -110,14 +110,14 @@ $NetBSD$
 +RTDECL(bool) RTMpIsCpuPossible(RTCPUID idCpu)
 +{
 +    return idCpu != NIL_RTCPUID
-+        && idCpu < rtMpFreeBsdMaxCpus();
++        && idCpu < rtMpNetBsdMaxCpus();
 +}
 +
 +
 +RTDECL(PRTCPUSET) RTMpGetSet(PRTCPUSET pSet)
 +{
 +    RTCpuSetEmpty(pSet);
-+    RTCPUID cMax = rtMpFreeBsdMaxCpus();
++    RTCPUID cMax = rtMpNetBsdMaxCpus();
 +    for (RTCPUID idCpu = 0; idCpu < cMax; idCpu++)
 +        if (RTMpIsCpuPossible(idCpu))
 +            RTCpuSetAdd(pSet, idCpu);
@@ -127,14 +127,14 @@ $NetBSD$
 +
 +RTDECL(RTCPUID) RTMpGetCount(void)
 +{
-+    return rtMpFreeBsdMaxCpus();
++    return rtMpNetBsdMaxCpus();
 +}
 +
 +
 +RTDECL(PRTCPUSET) RTMpGetOnlineSet(PRTCPUSET pSet)
 +{
 +    RTCpuSetEmpty(pSet);
-+    RTCPUID cMax = rtMpFreeBsdMaxCpus();
++    RTCPUID cMax = rtMpNetBsdMaxCpus();
 +    for (RTCPUID idCpu = 0; idCpu < cMax; idCpu++)
 +        if (RTMpIsCpuOnline(idCpu))
 +            RTCpuSetAdd(pSet, idCpu);
@@ -145,7 +145,7 @@ $NetBSD$
 +RTDECL(RTCPUID) RTMpGetOnlineCount(void)
 +{
 +    /*
-+     * FreeBSD has sysconf.
++     * NetBSD has sysconf.
 +     */
 +    return sysconf(_SC_NPROCESSORS_ONLN);
 +}
@@ -203,4 +203,3 @@ $NetBSD$
 +    /* Returns 0 on failure. */
 +    return RTStrToUInt32(szFreqLevels);
 +}
-+

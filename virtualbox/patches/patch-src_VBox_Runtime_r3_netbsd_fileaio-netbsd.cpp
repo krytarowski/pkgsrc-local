@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Runtime/r3/netbsd/fileaio-netbsd.cpp.orig	2016-07-06 19:48:52.085303946 +0000
+--- src/VBox/Runtime/r3/netbsd/fileaio-netbsd.cpp.orig	2016-07-07 07:08:47.041585007 +0000
 +++ src/VBox/Runtime/r3/netbsd/fileaio-netbsd.cpp
-@@ -0,0 +1,672 @@
-+/*  fileaio-freebsd.cpp $ */
+@@ -0,0 +1,671 @@
++/*  fileaio-netbsd.cpp $ */
 +/** @file
-+ * IPRT - File async I/O, native implementation for the FreeBSD host platform.
++ * IPRT - File async I/O, native implementation for the NetBSD host platform.
 + */
 +
 +/*
@@ -674,4 +674,3 @@ $NetBSD$
 +
 +    return VINF_SUCCESS;
 +}
-+
