@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Devices/USB/netbsd/USBProxyDevice-netbsd.cpp.orig	2016-07-06 20:02:33.301135639 +0000
+--- src/VBox/Devices/USB/netbsd/USBProxyDevice-netbsd.cpp.orig	2016-07-07 07:08:46.468615794 +0000
 +++ src/VBox/Devices/USB/netbsd/USBProxyDevice-netbsd.cpp
-@@ -0,0 +1,1062 @@
-+/*  USBProxyDevice-freebsd.cpp $ */
+@@ -0,0 +1,1061 @@
++/*  USBProxyDevice-netbsd.cpp $ */
 +/** @file
-+ * USB device proxy - the FreeBSD backend.
++ * USB device proxy - the NetBSD backend.
 + */
 +
 +/*
@@ -97,7 +97,7 @@ $NetBSD$
 +} USBENDPOINTFBSD, *PUSBENDPOINTFBSD;
 +
 +/**
-+ * Data for the FreeBSD usb proxy backend.
++ * Data for the NetBSD usb proxy backend.
 + */
 +typedef struct USBPROXYDEVFBSD
 +{
@@ -121,7 +121,7 @@ $NetBSD$
 +/*********************************************************************************************************************************
 +*   Internal Functions                                                                                                           *
 +*********************************************************************************************************************************/
-+static int usbProxyFreeBSDEndpointClose(PUSBPROXYDEV pProxyDev, int Endpoint);
++static int usbProxyNetBSDEndpointClose(PUSBPROXYDEV pProxyDev, int Endpoint);
 +
 +/**
 + * Wrapper for the ioctl call.
@@ -136,13 +136,13 @@ $NetBSD$
 + * @param   fHandleNoDev    Whether to handle ENXIO.
 + * @internal
 + */
-+static int usbProxyFreeBSDDoIoCtl(PUSBPROXYDEV pProxyDev, unsigned long iCmd,
++static int usbProxyNetBSDDoIoCtl(PUSBPROXYDEV pProxyDev, unsigned long iCmd,
 +                                  void *pvArg, bool fHandleNoDev)
 +{
 +    int rc = VINF_SUCCESS;
 +    PUSBPROXYDEVFBSD pDevFBSD = USBPROXYDEV_2_DATA(pProxyDev, PUSBPROXYDEVFBSD);
 +
-+    LogFlow(("usbProxyFreeBSDDoIoCtl: iCmd=%#x\n", iCmd));
++    LogFlow(("usbProxyNetBSDDoIoCtl: iCmd=%#x\n", iCmd));
 +
 +    do
 +    {
@@ -153,13 +153,13 @@ $NetBSD$
 +
 +    if (errno == ENXIO && fHandleNoDev)
 +    {
-+        Log(("usbProxyFreeBSDDoIoCtl: ENXIO -> unplugged. pProxyDev=%s\n",
++        Log(("usbProxyNetBSDDoIoCtl: ENXIO -> unplugged. pProxyDev=%s\n",
 +             pProxyDev->pUsbIns->pszName));
 +        errno = ENODEV;
 +    }
 +    else if (errno != EAGAIN)
 +    {
-+        LogFlow(("usbProxyFreeBSDDoIoCtl: Returned %d. pProxyDev=%s\n",
++        LogFlow(("usbProxyNetBSDDoIoCtl: Returned %d. pProxyDev=%s\n",
 +                 errno, pProxyDev->pUsbIns->pszName));
 +    }
 +    return RTErrConvertFromErrno(errno);
@@ -168,13 +168,13 @@ $NetBSD$
 +/**
 + * Init USB subsystem.
 + */
-+static int usbProxyFreeBSDFsInit(PUSBPROXYDEV pProxyDev)
++static int usbProxyNetBSDFsInit(PUSBPROXYDEV pProxyDev)
 +{
 +    struct usb_fs_init UsbFsInit;
 +    PUSBPROXYDEVFBSD pDevFBSD = USBPROXYDEV_2_DATA(pProxyDev, PUSBPROXYDEVFBSD);
 +    int rc;
 +
-+    LogFlow(("usbProxyFreeBSDFsInit: pProxyDev=%p\n", (void *)pProxyDev));
++    LogFlow(("usbProxyNetBSDFsInit: pProxyDev=%p\n", (void *)pProxyDev));
 +
 +    /* Sanity check */
 +    AssertPtrReturn(pDevFBSD, VERR_INVALID_PARAMETER);
@@ -189,7 +189,7 @@ $NetBSD$
 +    UsbFsInit.ep_index_max = USBFBSD_MAXENDPOINTS;
 +
 +    /* Init USB subsystem */
-+    rc = usbProxyFreeBSDDoIoCtl(pProxyDev, USB_FS_INIT, &UsbFsInit, false);
++    rc = usbProxyNetBSDDoIoCtl(pProxyDev, USB_FS_INIT, &UsbFsInit, false);
 +    if (RT_SUCCESS(rc))
 +        pDevFBSD->fInit = true;
 +
@@ -199,13 +199,13 @@ $NetBSD$
 +/**
 + * Uninit USB subsystem.
 + */
-+static int usbProxyFreeBSDFsUnInit(PUSBPROXYDEV pProxyDev)
++static int usbProxyNetBSDFsUnInit(PUSBPROXYDEV pProxyDev)
 +{
 +    struct usb_fs_uninit UsbFsUninit;
 +    PUSBPROXYDEVFBSD pDevFBSD = USBPROXYDEV_2_DATA(pProxyDev, PUSBPROXYDEVFBSD);
 +    int rc;
 +
-+    LogFlow(("usbProxyFreeBSDFsUnInit: ProxyDev=%p\n", (void *)pProxyDev));
++    LogFlow(("usbProxyNetBSDFsUnInit: ProxyDev=%p\n", (void *)pProxyDev));
 +
 +    /* Sanity check */
 +    AssertPtrReturn(pDevFBSD, VERR_INVALID_PARAMETER);
@@ -215,13 +215,13 @@ $NetBSD$
 +
 +    /* Close any open endpoints. */
 +    for (unsigned n = 0; n != USBFBSD_MAXENDPOINTS; n++)
-+        usbProxyFreeBSDEndpointClose(pProxyDev, n);
++        usbProxyNetBSDEndpointClose(pProxyDev, n);
 +
 +    /* Zero default */
 +    memset(&UsbFsUninit, 0, sizeof(UsbFsUninit));
 +
 +    /* Uninit USB subsystem */
-+    rc = usbProxyFreeBSDDoIoCtl(pProxyDev, USB_FS_UNINIT, &UsbFsUninit, false);
++    rc = usbProxyNetBSDDoIoCtl(pProxyDev, USB_FS_UNINIT, &UsbFsUninit, false);
 +    if (RT_SUCCESS(rc))
 +        pDevFBSD->fInit = false;
 +
@@ -231,11 +231,11 @@ $NetBSD$
 +/**
 + * Setup a USB request packet.
 + */
-+static void usbProxyFreeBSDSetupReq(struct usb_device_request *pSetupData,
++static void usbProxyNetBSDSetupReq(struct usb_device_request *pSetupData,
 +                                    uint8_t bmRequestType, uint8_t bRequest, uint16_t wValue,
 +                                    uint16_t wIndex, uint16_t wLength)
 +{
-+    LogFlow(("usbProxyFreeBSDSetupReq: pSetupData=%p bmRequestType=%x "
++    LogFlow(("usbProxyNetBSDSetupReq: pSetupData=%p bmRequestType=%x "
 +             "bRequest=%x wValue=%x wIndex=%x wLength=%x\n", (void *)pSetupData,
 +             bmRequestType, bRequest, wValue, wIndex, wLength));
 +
@@ -251,7 +251,7 @@ $NetBSD$
 +    pSetupData->wLength[1] = (wLength >> 8) & 0xff;
 +}
 +
-+static int usbProxyFreeBSDEndpointOpen(PUSBPROXYDEV pProxyDev, int Endpoint, bool fIsoc, int index)
++static int usbProxyNetBSDEndpointOpen(PUSBPROXYDEV pProxyDev, int Endpoint, bool fIsoc, int index)
 +{
 +    PUSBPROXYDEVFBSD pDevFBSD = USBPROXYDEV_2_DATA(pProxyDev, PUSBPROXYDEVFBSD);
 +    PUSBENDPOINTFBSD pEndpointFBSD = NULL; /* shut up gcc */
@@ -259,7 +259,7 @@ $NetBSD$
 +    struct usb_fs_open UsbFsOpen;
 +    int rc;
 +
-+    LogFlow(("usbProxyFreeBSDEndpointOpen: pProxyDev=%p Endpoint=%d\n",
++    LogFlow(("usbProxyNetBSDEndpointOpen: pProxyDev=%p Endpoint=%d\n",
 +             (void *)pProxyDev, Endpoint));
 +
 +    for (; index < USBFBSD_MAXENDPOINTS; index++)
@@ -292,7 +292,7 @@ $NetBSD$
 +    pXferEndpoint->ppBuffer = &pEndpointFBSD->apvData[0];
 +    pXferEndpoint->pLength = &pEndpointFBSD->acbData[0];
 +
-+    LogFlow(("usbProxyFreeBSDEndpointOpen: ep_index=%d ep_num=%d\n",
++    LogFlow(("usbProxyNetBSDEndpointOpen: ep_index=%d ep_num=%d\n",
 +             index, Endpoint));
 +
 +    memset(&UsbFsOpen, 0, sizeof(UsbFsOpen));
@@ -304,11 +304,11 @@ $NetBSD$
 +
 +    UsbFsOpen.max_frames = fIsoc ? USBFBSD_MAXFRAMES : 2;
 +
-+    rc = usbProxyFreeBSDDoIoCtl(pProxyDev, USB_FS_OPEN, &UsbFsOpen, true);
++    rc = usbProxyNetBSDDoIoCtl(pProxyDev, USB_FS_OPEN, &UsbFsOpen, true);
 +    if (RT_FAILURE(rc))
 +    {
 +        if (rc == VERR_RESOURCE_BUSY)
-+            LogFlow(("usbProxyFreeBSDEndpointOpen: EBUSY\n"));
++            LogFlow(("usbProxyNetBSDEndpointOpen: EBUSY\n"));
 +
 +        return -1;
 +    }
@@ -326,14 +326,14 @@ $NetBSD$
 + *
 + * @returns VBox status code.
 + */
-+static int usbProxyFreeBSDEndpointClose(PUSBPROXYDEV pProxyDev, int Endpoint)
++static int usbProxyNetBSDEndpointClose(PUSBPROXYDEV pProxyDev, int Endpoint)
 +{
 +    PUSBPROXYDEVFBSD pDevFBSD = USBPROXYDEV_2_DATA(pProxyDev, PUSBPROXYDEVFBSD);
 +    PUSBENDPOINTFBSD pEndpointFBSD = &pDevFBSD->aSwEndpoint[Endpoint];
 +    struct usb_fs_close UsbFsClose;
 +    int rc = VINF_SUCCESS;
 +
-+    LogFlow(("usbProxyFreeBSDEndpointClose: pProxyDev=%p Endpoint=%d\n",
++    LogFlow(("usbProxyNetBSDEndpointClose: pProxyDev=%p Endpoint=%d\n",
 +             (void *)pProxyDev, Endpoint));
 +
 +    /* check for cancelling */
@@ -355,7 +355,7 @@ $NetBSD$
 +        UsbFsClose.ep_index = Endpoint;
 +
 +        /* Close endpoint */
-+        rc = usbProxyFreeBSDDoIoCtl(pProxyDev, USB_FS_CLOSE, &UsbFsClose, true);
++        rc = usbProxyNetBSDDoIoCtl(pProxyDev, USB_FS_CLOSE, &UsbFsClose, true);
 +    }
 +    return rc;
 +}
@@ -372,13 +372,13 @@ $NetBSD$
 + *                          not to contain the substring "//".
 + * @param   pvBackend       Backend specific pointer, unused for the linux backend.
 + */
-+static DECLCALLBACK(int) usbProxyFreeBSDOpen(PUSBPROXYDEV pProxyDev, const char *pszAddress,
++static DECLCALLBACK(int) usbProxyNetBSDOpen(PUSBPROXYDEV pProxyDev, const char *pszAddress,
 +                                             void *pvBackend)
 +{
 +    PUSBPROXYDEVFBSD pDevFBSD = USBPROXYDEV_2_DATA(pProxyDev, PUSBPROXYDEVFBSD);
 +    int rc;
 +
-+    LogFlow(("usbProxyFreeBSDOpen: pProxyDev=%p pszAddress=%s\n", pProxyDev, pszAddress));
++    LogFlow(("usbProxyNetBSDOpen: pProxyDev=%p pszAddress=%s\n", pProxyDev, pszAddress));
 +
 +    NOREF(pvBackend);
 +
@@ -390,10 +390,10 @@ $NetBSD$
 +    if (RT_SUCCESS(rc))
 +    {
 +        /*
-+         * Initialize the FreeBSD backend data.
++         * Initialize the NetBSD backend data.
 +         */
 +        pDevFBSD->hFile = hFile;
-+        rc = usbProxyFreeBSDFsInit(pProxyDev);
++        rc = usbProxyNetBSDFsInit(pProxyDev);
 +        if (RT_SUCCESS(rc))
 +        {
 +            /*
@@ -402,7 +402,7 @@ $NetBSD$
 +            rc = RTPipeCreate(&pDevFBSD->hPipeWakeupR, &pDevFBSD->hPipeWakeupW, 0);
 +            if (RT_SUCCESS(rc))
 +            {
-+                LogFlow(("usbProxyFreeBSDOpen(%p, %s): returns successfully hFile=%RTfile iActiveCfg=%d\n",
++                LogFlow(("usbProxyNetBSDOpen(%p, %s): returns successfully hFile=%RTfile iActiveCfg=%d\n",
 +                         pProxyDev, pszAddress, pDevFBSD->hFile, pProxyDev->iActiveCfg));
 +
 +                return VINF_SUCCESS;
@@ -414,7 +414,7 @@ $NetBSD$
 +    else if (rc == VERR_ACCESS_DENIED)
 +        rc = VERR_VUSB_USBFS_PERMISSION;
 +
-+    Log(("usbProxyFreeBSDOpen(%p, %s) failed, rc=%d!\n",
++    Log(("usbProxyNetBSDOpen(%p, %s) failed, rc=%d!\n",
 +         pProxyDev, pszAddress, rc));
 +
 +    return rc;
@@ -428,16 +428,16 @@ $NetBSD$
 + * @returns VINF_SUCCESS.
 + * @param   pProxyDev       The proxy device.
 + */
-+static DECLCALLBACK(int) usbProxyFreeBSDInit(PUSBPROXYDEV pProxyDev)
++static DECLCALLBACK(int) usbProxyNetBSDInit(PUSBPROXYDEV pProxyDev)
 +{
 +    PUSBPROXYDEVFBSD pDevFBSD = USBPROXYDEV_2_DATA(pProxyDev, PUSBPROXYDEVFBSD);
 +    int rc;
 +
-+    LogFlow(("usbProxyFreeBSDInit: pProxyDev=%s\n",
++    LogFlow(("usbProxyNetBSDInit: pProxyDev=%s\n",
 +             pProxyDev->pUsbIns->pszName));
 +
 +    /* Retrieve current active configuration. */
-+    rc = usbProxyFreeBSDDoIoCtl(pProxyDev, USB_GET_CONFIG,
++    rc = usbProxyNetBSDDoIoCtl(pProxyDev, USB_GET_CONFIG,
 +                                &pProxyDev->iActiveCfg, true);
 +    if (RT_FAILURE(rc) || pProxyDev->iActiveCfg == 255)
 +    {
@@ -450,7 +450,7 @@ $NetBSD$
 +        pProxyDev->iActiveCfg++;
 +    }
 +
-+    Log(("usbProxyFreeBSDInit: iActiveCfg=%d\n", pProxyDev->iActiveCfg));
++    Log(("usbProxyNetBSDInit: iActiveCfg=%d\n", pProxyDev->iActiveCfg));
 +
 +    return rc;
 +}
@@ -458,16 +458,16 @@ $NetBSD$
 +/**
 + * Closes the proxy device.
 + */
-+static DECLCALLBACK(void) usbProxyFreeBSDClose(PUSBPROXYDEV pProxyDev)
++static DECLCALLBACK(void) usbProxyNetBSDClose(PUSBPROXYDEV pProxyDev)
 +{
 +    PUSBPROXYDEVFBSD pDevFBSD = USBPROXYDEV_2_DATA(pProxyDev, PUSBPROXYDEVFBSD);
 +
-+    LogFlow(("usbProxyFreeBSDClose: pProxyDev=%s\n", pProxyDev->pUsbIns->pszName));
++    LogFlow(("usbProxyNetBSDClose: pProxyDev=%s\n", pProxyDev->pUsbIns->pszName));
 +
 +    /* sanity check */
 +    AssertPtrReturnVoid(pDevFBSD);
 +
-+    usbProxyFreeBSDFsUnInit(pProxyDev);
++    usbProxyNetBSDFsUnInit(pProxyDev);
 +
 +    RTPipeClose(pDevFBSD->hPipeWakeupR);
 +    RTPipeClose(pDevFBSD->hPipeWakeupW);
@@ -475,7 +475,7 @@ $NetBSD$
 +    RTFileClose(pDevFBSD->hFile);
 +    pDevFBSD->hFile = NIL_RTFILE;
 +
-+    LogFlow(("usbProxyFreeBSDClose: returns\n"));
++    LogFlow(("usbProxyNetBSDClose: returns\n"));
 +}
 +
 +/**
@@ -484,46 +484,46 @@ $NetBSD$
 + * @returns VBox status code.
 + * @param   pDev    The device to reset.
 + */
-+static DECLCALLBACK(int) usbProxyFreeBSDReset(PUSBPROXYDEV pProxyDev, bool fResetOnFreeBSD)
++static DECLCALLBACK(int) usbProxyNetBSDReset(PUSBPROXYDEV pProxyDev, bool fResetOnNetBSD)
 +{
 +    PUSBPROXYDEVFBSD pDevFBSD = USBPROXYDEV_2_DATA(pProxyDev, PUSBPROXYDEVFBSD);
 +    int iParm;
 +    int rc = VINF_SUCCESS;
 +
-+    LogFlow(("usbProxyFreeBSDReset: pProxyDev=%s\n",
++    LogFlow(("usbProxyNetBSDReset: pProxyDev=%s\n",
 +             pProxyDev->pUsbIns->pszName));
 +
-+    if (!fResetOnFreeBSD)
++    if (!fResetOnNetBSD)
 +        goto done;
 +
 +    /* We need to release kernel ressources first. */
-+    rc = usbProxyFreeBSDFsUnInit(pProxyDev);
++    rc = usbProxyNetBSDFsUnInit(pProxyDev);
 +    if (RT_FAILURE(rc))
 +        goto done;
 +
 +    /* Resetting is only possible as super-user, ignore any failures: */
 +    iParm = 0;
-+    rc = usbProxyFreeBSDDoIoCtl(pProxyDev, USB_DEVICEENUMERATE, &iParm, true);
++    rc = usbProxyNetBSDDoIoCtl(pProxyDev, USB_DEVICEENUMERATE, &iParm, true);
 +    if (RT_FAILURE(rc))
 +    {
 +        /* Set the config instead of bus reset */
 +        iParm = 255;
-+        rc = usbProxyFreeBSDDoIoCtl(pProxyDev, USB_SET_CONFIG, &iParm, true);
++        rc = usbProxyNetBSDDoIoCtl(pProxyDev, USB_SET_CONFIG, &iParm, true);
 +        if (RT_SUCCESS(rc))
 +        {
 +            iParm = 0;
-+            rc = usbProxyFreeBSDDoIoCtl(pProxyDev, USB_SET_CONFIG, &iParm, true);
++            rc = usbProxyNetBSDDoIoCtl(pProxyDev, USB_SET_CONFIG, &iParm, true);
 +        }
 +    }
 +    usleep(10000); /* nice it! */
 +
 +    /* Allocate kernel ressources again. */
-+    rc = usbProxyFreeBSDFsInit(pProxyDev);
++    rc = usbProxyNetBSDFsInit(pProxyDev);
 +    if (RT_FAILURE(rc))
 +        goto done;
 +
 +    /* Retrieve current active configuration. */
-+    rc = usbProxyFreeBSDInit(pProxyDev);
++    rc = usbProxyNetBSDInit(pProxyDev);
 +
 +done:
 +    pProxyDev->cIgnoreSetConfigs = 2;
@@ -541,20 +541,20 @@ $NetBSD$
 + * @param   pProxyDev       The device instance data.
 + * @param   iCfg            The configuration to set.
 + */
-+static DECLCALLBACK(int) usbProxyFreeBSDSetConfig(PUSBPROXYDEV pProxyDev, int iCfg)
++static DECLCALLBACK(int) usbProxyNetBSDSetConfig(PUSBPROXYDEV pProxyDev, int iCfg)
 +{
 +    PUSBPROXYDEVFBSD pDevFBSD = USBPROXYDEV_2_DATA(pProxyDev, PUSBPROXYDEVFBSD);
 +    int iCfgIndex;
 +    int rc;
 +
-+    LogFlow(("usbProxyFreeBSDSetConfig: pProxyDev=%s cfg=%x\n",
++    LogFlow(("usbProxyNetBSDSetConfig: pProxyDev=%s cfg=%x\n",
 +             pProxyDev->pUsbIns->pszName, iCfg));
 +
 +    /* We need to release kernel ressources first. */
-+    rc = usbProxyFreeBSDFsUnInit(pProxyDev);
++    rc = usbProxyNetBSDFsUnInit(pProxyDev);
 +    if (RT_FAILURE(rc))
 +    {
-+        LogFlow(("usbProxyFreeBSDSetInterface: Freeing kernel resources "
++        LogFlow(("usbProxyNetBSDSetInterface: Freeing kernel resources "
 +                 "failed failed rc=%d\n", rc));
 +        return rc;
 +    }
@@ -575,54 +575,54 @@ $NetBSD$
 +
 +        if (iCfgIndex == pProxyDev->DevDesc.bNumConfigurations)
 +        {
-+            LogFlow(("usbProxyFreeBSDSetConfig: configuration "
++            LogFlow(("usbProxyNetBSDSetConfig: configuration "
 +                     "%d not found\n", iCfg));
 +            return VERR_NOT_FOUND;
 +        }
 +    }
 +
 +    /* Set the config */
-+    rc = usbProxyFreeBSDDoIoCtl(pProxyDev, USB_SET_CONFIG, &iCfgIndex, true);
++    rc = usbProxyNetBSDDoIoCtl(pProxyDev, USB_SET_CONFIG, &iCfgIndex, true);
 +    if (RT_FAILURE(rc))
 +        return rc;
 +
 +    /* Allocate kernel ressources again. */
-+    return usbProxyFreeBSDFsInit(pProxyDev);
++    return usbProxyNetBSDFsInit(pProxyDev);
 +}
 +
 +/**
 + * Claims an interface.
 + * @returns success indicator.
 + */
-+static DECLCALLBACK(int) usbProxyFreeBSDClaimInterface(PUSBPROXYDEV pProxyDev, int iIf)
++static DECLCALLBACK(int) usbProxyNetBSDClaimInterface(PUSBPROXYDEV pProxyDev, int iIf)
 +{
 +    int rc;
 +
-+    LogFlow(("usbProxyFreeBSDClaimInterface: pProxyDev=%s "
++    LogFlow(("usbProxyNetBSDClaimInterface: pProxyDev=%s "
 +             "ifnum=%x\n", pProxyDev->pUsbIns->pszName, iIf));
 +
 +    /*
 +     * Try to detach kernel driver on this interface, ignore any
 +     * failures
 +     */
-+    usbProxyFreeBSDDoIoCtl(pProxyDev, USB_IFACE_DRIVER_DETACH, &iIf, true);
++    usbProxyNetBSDDoIoCtl(pProxyDev, USB_IFACE_DRIVER_DETACH, &iIf, true);
 +
 +    /* Try to claim interface */
-+    return usbProxyFreeBSDDoIoCtl(pProxyDev, USB_CLAIM_INTERFACE, &iIf, true);
++    return usbProxyNetBSDDoIoCtl(pProxyDev, USB_CLAIM_INTERFACE, &iIf, true);
 +}
 +
 +/**
 + * Releases an interface.
 + * @returns success indicator.
 + */
-+static DECLCALLBACK(int) usbProxyFreeBSDReleaseInterface(PUSBPROXYDEV pProxyDev, int iIf)
++static DECLCALLBACK(int) usbProxyNetBSDReleaseInterface(PUSBPROXYDEV pProxyDev, int iIf)
 +{
 +    int rc;
 +
-+    LogFlow(("usbProxyFreeBSDReleaseInterface: pProxyDev=%s "
++    LogFlow(("usbProxyNetBSDReleaseInterface: pProxyDev=%s "
 +        "ifnum=%x\n", pProxyDev->pUsbIns->pszName, iIf));
 +
-+    return usbProxyFreeBSDDoIoCtl(pProxyDev, USB_RELEASE_INTERFACE, &iIf, true);
++    return usbProxyNetBSDDoIoCtl(pProxyDev, USB_RELEASE_INTERFACE, &iIf, true);
 +}
 +
 +/**
@@ -630,20 +630,20 @@ $NetBSD$
 + *
 + * @returns success indicator.
 + */
-+static DECLCALLBACK(int) usbProxyFreeBSDSetInterface(PUSBPROXYDEV pProxyDev, int iIf, int iAlt)
++static DECLCALLBACK(int) usbProxyNetBSDSetInterface(PUSBPROXYDEV pProxyDev, int iIf, int iAlt)
 +{
 +    PUSBPROXYDEVFBSD pDevFBSD = USBPROXYDEV_2_DATA(pProxyDev, PUSBPROXYDEVFBSD);
 +    struct usb_alt_interface UsbIntAlt;
 +    int rc;
 +
-+    LogFlow(("usbProxyFreeBSDSetInterface: pProxyDev=%p iIf=%x iAlt=%x\n",
++    LogFlow(("usbProxyNetBSDSetInterface: pProxyDev=%p iIf=%x iAlt=%x\n",
 +             pProxyDev, iIf, iAlt));
 +
 +    /* We need to release kernel ressources first. */
-+    rc = usbProxyFreeBSDFsUnInit(pProxyDev);
++    rc = usbProxyNetBSDFsUnInit(pProxyDev);
 +    if (RT_FAILURE(rc))
 +    {
-+        LogFlow(("usbProxyFreeBSDSetInterface: Freeing kernel resources "
++        LogFlow(("usbProxyNetBSDSetInterface: Freeing kernel resources "
 +                 "failed failed rc=%d\n", rc));
 +        return rc;
 +    }
@@ -651,23 +651,23 @@ $NetBSD$
 +    UsbIntAlt.uai_interface_index = iIf;
 +    UsbIntAlt.uai_alt_index = iAlt;
 +
-+    rc = usbProxyFreeBSDDoIoCtl(pProxyDev, USB_SET_ALTINTERFACE, &UsbIntAlt, true);
++    rc = usbProxyNetBSDDoIoCtl(pProxyDev, USB_SET_ALTINTERFACE, &UsbIntAlt, true);
 +    if (RT_FAILURE(rc))
 +    {
-+        LogFlow(("usbProxyFreeBSDSetInterface: Setting interface %d %d "
++        LogFlow(("usbProxyNetBSDSetInterface: Setting interface %d %d "
 +                 "failed rc=%d\n", iIf, iAlt, rc));
 +        return rc;
 +    }
 +
-+    return usbProxyFreeBSDFsInit(pProxyDev);
++    return usbProxyNetBSDFsInit(pProxyDev);
 +}
 +
 +/**
 + * Clears the halted endpoint 'ep_num'.
 + */
-+static DECLCALLBACK(int) usbProxyFreeBSDClearHaltedEp(PUSBPROXYDEV pProxyDev, unsigned int ep_num)
++static DECLCALLBACK(int) usbProxyNetBSDClearHaltedEp(PUSBPROXYDEV pProxyDev, unsigned int ep_num)
 +{
-+    LogFlow(("usbProxyFreeBSDClearHaltedEp: pProxyDev=%s ep_num=%u\n",
++    LogFlow(("usbProxyNetBSDClearHaltedEp: pProxyDev=%s ep_num=%u\n",
 +             pProxyDev->pUsbIns->pszName, ep_num));
 +
 +    /*
@@ -679,20 +679,20 @@ $NetBSD$
 +
 +    struct usb_ctl_request Req;
 +    memset(&Req, 0, sizeof(Req));
-+    usbProxyFreeBSDSetupReq(&Req.ucr_request,
++    usbProxyNetBSDSetupReq(&Req.ucr_request,
 +                            VUSB_DIR_TO_DEV | VUSB_TO_ENDPOINT,
 +                            VUSB_REQ_CLEAR_FEATURE, 0, ep_num, 0);
 +
-+    int rc = usbProxyFreeBSDDoIoCtl(pProxyDev, USB_DO_REQUEST, &Req, true);
++    int rc = usbProxyNetBSDDoIoCtl(pProxyDev, USB_DO_REQUEST, &Req, true);
 +
-+    LogFlow(("usbProxyFreeBSDClearHaltedEp: rc=%Rrc\n", rc));
++    LogFlow(("usbProxyNetBSDClearHaltedEp: rc=%Rrc\n", rc));
 +    return rc;
 +}
 +
 +/**
 + * @copydoc USBPROXYBACK::pfnUrbQueue
 + */
-+static DECLCALLBACK(int) usbProxyFreeBSDUrbQueue(PUSBPROXYDEV pProxyDev, PVUSBURB pUrb)
++static DECLCALLBACK(int) usbProxyNetBSDUrbQueue(PUSBPROXYDEV pProxyDev, PVUSBURB pUrb)
 +{
 +    PUSBPROXYDEVFBSD pDevFBSD = USBPROXYDEV_2_DATA(pProxyDev, PUSBPROXYDEVFBSD);
 +    PUSBENDPOINTFBSD pEndpointFBSD;
@@ -704,7 +704,7 @@ $NetBSD$
 +    int ep_num;
 +    int rc;
 +
-+    LogFlow(("usbProxyFreeBSDUrbQueue: pUrb=%p EndPt=%u Dir=%u\n",
++    LogFlow(("usbProxyNetBSDUrbQueue: pUrb=%p EndPt=%u Dir=%u\n",
 +             pUrb, (unsigned)pUrb->EndPt, (unsigned)pUrb->enmDir));
 +
 +    ep_num = pUrb->EndPt;
@@ -717,7 +717,7 @@ $NetBSD$
 +
 +retry:
 +
-+    index = usbProxyFreeBSDEndpointOpen(pProxyDev, ep_num,
++    index = usbProxyNetBSDEndpointOpen(pProxyDev, ep_num,
 +                                        (pUrb->enmType == VUSBXFERTYPE_ISOC),
 +                                        index);
 +
@@ -750,7 +750,7 @@ $NetBSD$
 +                cFrames = 1;
 +            }
 +
-+            LogFlow(("usbProxyFreeBSDUrbQueue: pUrb->cbData=%u, 0x%02x, "
++            LogFlow(("usbProxyNetBSDUrbQueue: pUrb->cbData=%u, 0x%02x, "
 +                     "0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x\n",
 +                     pUrb->cbData, pbData[0], pbData[1], pbData[2], pbData[3],
 +                     pbData[4], pbData[5], pbData[6], pbData[7]));
@@ -804,9 +804,9 @@ $NetBSD$
 +    /* Start the transfer */
 +    UsbFsStart.ep_index = index;
 +
-+    rc = usbProxyFreeBSDDoIoCtl(pProxyDev, USB_FS_START, &UsbFsStart, true);
++    rc = usbProxyNetBSDDoIoCtl(pProxyDev, USB_FS_START, &UsbFsStart, true);
 +
-+    LogFlow(("usbProxyFreeBSDUrbQueue: USB_FS_START returned rc=%d "
++    LogFlow(("usbProxyNetBSDUrbQueue: USB_FS_START returned rc=%d "
 +             "len[0]=%u len[1]=%u cbData=%u index=%u ep_num=%u\n", rc,
 +             (unsigned)pEndpointFBSD->acbData[0],
 +             (unsigned)pEndpointFBSD->acbData[1],
@@ -836,7 +836,7 @@ $NetBSD$
 + * @param   pProxyDev   The device.
 + * @param   cMillies    Number of milliseconds to wait. Use 0 to not wait at all.
 + */
-+static DECLCALLBACK(PVUSBURB) usbProxyFreeBSDUrbReap(PUSBPROXYDEV pProxyDev, RTMSINTERVAL cMillies)
++static DECLCALLBACK(PVUSBURB) usbProxyNetBSDUrbReap(PUSBPROXYDEV pProxyDev, RTMSINTERVAL cMillies)
 +{
 +    struct usb_fs_endpoint *pXferEndpoint;
 +    PUSBPROXYDEVFBSD pDevFBSD = USBPROXYDEV_2_DATA(pProxyDev, PUSBPROXYDEVFBSD);
@@ -846,7 +846,7 @@ $NetBSD$
 +    struct pollfd pfd[2];
 +    int rc;
 +
-+    LogFlow(("usbProxyFreeBSDUrbReap: pProxyDev=%p, cMillies=%u\n",
++    LogFlow(("usbProxyNetBSDUrbReap: pProxyDev=%p, cMillies=%u\n",
 +             pProxyDev, cMillies));
 +
 +repeat:
@@ -898,13 +898,13 @@ $NetBSD$
 +    memset(&UsbFsComplete, 0, sizeof(UsbFsComplete));
 +
 +    /* Check if any endpoints are complete */
-+    rc = usbProxyFreeBSDDoIoCtl(pProxyDev, USB_FS_COMPLETE, &UsbFsComplete, true);
++    rc = usbProxyNetBSDDoIoCtl(pProxyDev, USB_FS_COMPLETE, &UsbFsComplete, true);
 +    if (RT_SUCCESS(rc))
 +    {
 +        pXferEndpoint = &pDevFBSD->aHwEndpoint[UsbFsComplete.ep_index];
 +        pEndpointFBSD = &pDevFBSD->aSwEndpoint[UsbFsComplete.ep_index];
 +
-+        LogFlow(("usbProxyFreeBSDUrbReap: Reaped "
++        LogFlow(("usbProxyNetBSDUrbReap: Reaped "
 +                 "URB %#p\n", pEndpointFBSD->pUrb));
 +
 +        if (pXferEndpoint->status == USB_ERR_CANCELLED)
@@ -959,7 +959,7 @@ $NetBSD$
 +                break;
 +        }
 +
-+        LogFlow(("usbProxyFreeBSDUrbReap: Status=%d epindex=%u "
++        LogFlow(("usbProxyNetBSDUrbReap: Status=%d epindex=%u "
 +                 "len[0]=%d len[1]=%d\n",
 +                 (int)pXferEndpoint->status,
 +                 (unsigned)UsbFsComplete.ep_index,
@@ -1007,7 +1007,7 @@ $NetBSD$
 + * Cancels the URB.
 + * The URB requires reaping, so we don't change its state.
 + */
-+static DECLCALLBACK(int) usbProxyFreeBSDUrbCancel(PUSBPROXYDEV pProxyDev, PVUSBURB pUrb)
++static DECLCALLBACK(int) usbProxyNetBSDUrbCancel(PUSBPROXYDEV pProxyDev, PVUSBURB pUrb)
 +{
 +    int index;
 +
@@ -1016,11 +1016,11 @@ $NetBSD$
 +    if (index < 0 || index >= USBFBSD_MAXENDPOINTS)
 +        return VINF_SUCCESS; /* invalid index, pretend success. */
 +
-+    LogFlow(("usbProxyFreeBSDUrbCancel: epindex=%u\n", (unsigned)index));
-+    return usbProxyFreeBSDEndpointClose(pProxyDev, index);
++    LogFlow(("usbProxyNetBSDUrbCancel: epindex=%u\n", (unsigned)index));
++    return usbProxyNetBSDEndpointClose(pProxyDev, index);
 +}
 +
-+static DECLCALLBACK(int) usbProxyFreeBSDWakeup(PUSBPROXYDEV pProxyDev)
++static DECLCALLBACK(int) usbProxyNetBSDWakeup(PUSBPROXYDEV pProxyDev)
 +{
 +    PUSBPROXYDEVFBSD pDevFBSD = USBPROXYDEV_2_DATA(pProxyDev, PUSBPROXYDEVFBSD);
 +    size_t cbIgnored;
@@ -1031,7 +1031,7 @@ $NetBSD$
 +}
 +
 +/**
-+ * The FreeBSD USB Proxy Backend.
++ * The NetBSD USB Proxy Backend.
 + */
 +extern const USBPROXYBACK g_USBProxyDeviceHost =
 +{
@@ -1039,19 +1039,19 @@ $NetBSD$
 +    "host",
 +    /* cbBackend */
 +    sizeof(USBPROXYDEVFBSD),
-+    usbProxyFreeBSDOpen,
-+    usbProxyFreeBSDInit,
-+    usbProxyFreeBSDClose,
-+    usbProxyFreeBSDReset,
-+    usbProxyFreeBSDSetConfig,
-+    usbProxyFreeBSDClaimInterface,
-+    usbProxyFreeBSDReleaseInterface,
-+    usbProxyFreeBSDSetInterface,
-+    usbProxyFreeBSDClearHaltedEp,
-+    usbProxyFreeBSDUrbQueue,
-+    usbProxyFreeBSDUrbCancel,
-+    usbProxyFreeBSDUrbReap,
-+    usbProxyFreeBSDWakeup,
++    usbProxyNetBSDOpen,
++    usbProxyNetBSDInit,
++    usbProxyNetBSDClose,
++    usbProxyNetBSDReset,
++    usbProxyNetBSDSetConfig,
++    usbProxyNetBSDClaimInterface,
++    usbProxyNetBSDReleaseInterface,
++    usbProxyNetBSDSetInterface,
++    usbProxyNetBSDClearHaltedEp,
++    usbProxyNetBSDUrbQueue,
++    usbProxyNetBSDUrbCancel,
++    usbProxyNetBSDUrbReap,
++    usbProxyNetBSDWakeup,
 +    0
 +};
 +
@@ -1064,4 +1064,3 @@ $NetBSD$
 + *  indent-tabs-mode: s
 + * End:
 + */
-+
