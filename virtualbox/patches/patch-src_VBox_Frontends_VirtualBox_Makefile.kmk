@@ -1,0 +1,25 @@
+$NetBSD$
+
+--- src/VBox/Frontends/VirtualBox/Makefile.kmk.orig	2016-03-04 19:29:00.000000000 +0000
++++ src/VBox/Frontends/VirtualBox/Makefile.kmk
+@@ -104,6 +104,7 @@ VirtualBox_DEFS.debug     = VBOX_CHECK_S
+ VirtualBox_DEFS.linux     = VBOX_WITH_MASKED_SEAMLESS VBOX_WITH_TRANSLUCENT_SEAMLESS
+ VirtualBox_DEFS.solaris   = VBOX_WITH_MASKED_SEAMLESS VBOX_WITH_TRANSLUCENT_SEAMLESS
+ VirtualBox_DEFS.freebsd   = VBOX_WITH_MASKED_SEAMLESS VBOX_WITH_TRANSLUCENT_SEAMLESS
++VirtualBox_DEFS.netbsd    = VBOX_WITH_MASKED_SEAMLESS VBOX_WITH_TRANSLUCENT_SEAMLESS
+ VirtualBox_DEFS.darwin    = VBOX_WITH_TRANSLUCENT_SEAMLESS # VBOX_WITH_MASKED_SEAMLESS
+ VirtualBox_DEFS.win       = VBOX_WITH_MASKED_SEAMLESS # VBOX_WITH_TRANSLUCENT_SEAMLESS
+ VirtualBox_DEFS.win       += UNICODE QT_DLL
+@@ -118,6 +119,7 @@ VirtualBox_DEFS          += \
+ 	$(if $(VBOX_WITH_SOLARIS_OSS),VBOX_WITH_SOLARIS_OSS) \
+ 	$(if $(VBOX_WITH_E1000),VBOX_WITH_E1000) \
+ 	$(if $(VBOX_WITH_NETFLT)$(eq $(KBUILD_TARGET),freebsd),VBOX_WITH_NETFLT) \
++	$(if $(VBOX_WITH_NETFLT)$(eq $(KBUILD_TARGET),netbsd),VBOX_WITH_NETFLT) \
+ 	$(if $(VBOX_WITH_VDE),VBOX_WITH_VDE) \
+ 	$(if $(VBOX_WITH_UDPTUNNEL),VBOX_WITH_UDPTUNNEL) \
+ 	$(if $(VBOX_WITH_EXTPACK),VBOX_WITH_EXTPACK) \
+@@ -1253,4 +1255,3 @@ nls/VirtualBox_en.ts: \
+ 	$(QUIET)$(SED) -n -i -e \
+ 		'/<context>/,/<\/context>/!p;/<context>/h;/<name>/H;/<message numerus="yes">/,/<\/message>/H;/<\/context>/{H;x;/<message/p}' \
+ 	$@
+-
