@@ -59,6 +59,7 @@ SHA1 (patch-src_VBox_Main_include_ConsoleImpl.h) = 5bc4916830e8f7e2c47c5c98d9491
 SHA1 (patch-src_VBox_Main_include_USBProxyService.h) = 7b70532c0bebcc7ebc809fa36b32795098df9848
 SHA1 (patch-src_VBox_Main_src-client_ConsoleImpl.cpp) = b3da50392a63f5f4313782751df7abfbaf33d2bf
 SHA1 (patch-src_VBox_Main_src-client_ConsoleImpl2.cpp) = ac8fcb71cdc19d76bb8c66c0c20310dabc308215
+SHA1 (patch-src_VBox_Main_src-server_ApplianceImpl.cpp) = 3e1d6959ab6f8422fdd898f376ec114ff9fefd11
 SHA1 (patch-src_VBox_Main_src-server_HostDnsService.cpp) = 493f34bc90ee49085cfddb7f44dd9ab31c95b774
 SHA1 (patch-src_VBox_Main_src-server_HostDnsService.h) = 8b4e078f38dcd9a3ce1ed61c98c8f120e1d78b80
 SHA1 (patch-src_VBox_Main_src-server_HostImpl.cpp) = 94ee908eec9fd15bb2e9d65db373351724363990
