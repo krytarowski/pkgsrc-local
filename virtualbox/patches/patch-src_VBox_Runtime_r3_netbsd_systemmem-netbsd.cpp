@@ -2,7 +2,7 @@ $NetBSD$
 
 --- src/VBox/Runtime/r3/netbsd/systemmem-netbsd.cpp.orig	2016-07-07 07:08:47.069137512 +0000
 +++ src/VBox/Runtime/r3/netbsd/systemmem-netbsd.cpp
-@@ -0,0 +1,97 @@
+@@ -0,0 +1,74 @@
 +/*  systemmem-netbsd.cpp $ */
 +/** @file
 + * IPRT - RTSystemQueryTotalRam, NetBSD ring-3.
@@ -64,39 +64,16 @@ $NetBSD$
 +
 +RTDECL(int) RTSystemQueryAvailableRam(uint64_t *pcb)
 +{
++    int rc = VINF_SUCCESS;
++    u_long cbMemPhys = 0;
++    size_t cbParameter = sizeof(cbMemPhys);
++
 +    AssertPtrReturn(pcb, VERR_INVALID_POINTER);
 +
-+    int rc = VINF_SUCCESS;
-+    u_int cPagesMemFree = 0;
-+    u_int cPagesMemInactive = 0;
-+    u_int cPagesMemCached = 0;
-+    u_int cPagesMemUsed = 0;
-+    int cbPage = 0;
-+    size_t cbParameter;
-+    int cProcessed = 0;
-+
-+    cbParameter = sizeof(cPagesMemFree);
-+    if (sysctlbyname("vm.stats.vm.v_free_count", &cPagesMemFree, &cbParameter, NULL, 0))
-+        rc = RTErrConvertFromErrno(errno);
-+    cbParameter = sizeof(cPagesMemUsed);
-+    if (   RT_SUCCESS(rc)
-+        && sysctlbyname("vm.stats.vm.v_active_count", &cPagesMemUsed, &cbParameter, NULL, 0))
-+        rc = RTErrConvertFromErrno(errno);
-+    cbParameter = sizeof(cPagesMemInactive);
-+    if (   RT_SUCCESS(rc)
-+        && sysctlbyname("vm.stats.vm.v_inactive_count", &cPagesMemInactive, &cbParameter, NULL, 0))
-+        rc = RTErrConvertFromErrno(errno);
-+    cbParameter = sizeof(cPagesMemCached);
-+    if (   RT_SUCCESS(rc)
-+        && sysctlbyname("vm.stats.vm.v_cache_count", &cPagesMemCached, &cbParameter, NULL, 0))
-+        rc = RTErrConvertFromErrno(errno);
-+    cbParameter = sizeof(cbPage);
-+    if (   RT_SUCCESS(rc)
-+        && sysctlbyname("hw.pagesize", &cbPage, &cbParameter, NULL, 0))
-+        rc = RTErrConvertFromErrno(errno);
-+
-+    if (RT_SUCCESS(rc))
-+        *pcb = (cPagesMemFree + cPagesMemInactive + cPagesMemCached ) * cbPage;
-+
-+    return rc;
++    if (!sysctlbyname("hw.usermem64", &cbMemPhys, &cbParameter, NULL, 0))
++    {
++        *pcb = cbMemPhys;
++        return VINF_SUCCESS;
++    }
++    return RTErrConvertFromErrno(errno);
 +}
