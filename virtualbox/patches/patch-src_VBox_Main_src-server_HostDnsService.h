@@ -16,7 +16,7 @@ $NetBSD$
  };
  
 +#  elif defined(RT_OS_NETBSD)
-+class HostDnsServiceFreebsd: public HostDnsServiceResolvConf
++class HostDnsServiceNetbsd: public HostDnsServiceResolvConf
 +{
 +    public:
 +    HostDnsServiceNetbsd(){}
