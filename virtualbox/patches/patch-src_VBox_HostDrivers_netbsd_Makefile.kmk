@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/HostDrivers/netbsd/Makefile.kmk.orig	2016-07-06 19:51:19.315534261 +0000
+--- src/VBox/HostDrivers/netbsd/Makefile.kmk.orig	2016-07-07 07:08:46.599051025 +0000
 +++ src/VBox/HostDrivers/netbsd/Makefile.kmk
-@@ -0,0 +1,26 @@
+@@ -0,0 +1,25 @@
 +#  Makefile.kmk $
 +## @file
-+# Sub-makefile for the FreeBSD host driver helper scripts.
++# Sub-makefile for the NetBSD host driver helper scripts.
 +#
 +
 +#
@@ -28,4 +28,3 @@ $NetBSD$
 +HostDrivers-scripts_SOURCES = Makefile
 +
 +include $(FILE_KBUILD_SUB_FOOTER)
-+
