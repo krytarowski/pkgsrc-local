@@ -1,8 +1,8 @@
 $NetBSD$
 
---- src/VBox/HostDrivers/VBoxNetFlt/netbsd/files_vboxnetflt.orig	2016-07-06 19:54:23.201682288 +0000
+--- src/VBox/HostDrivers/VBoxNetFlt/netbsd/files_vboxnetflt.orig	2016-07-07 07:08:46.581760114 +0000
 +++ src/VBox/HostDrivers/VBoxNetFlt/netbsd/files_vboxnetflt
-@@ -0,0 +1,86 @@
+@@ -0,0 +1,85 @@
 +#!/bin/sh
 +#  files_vboxnetflt $
 +## @file
@@ -76,16 +76,15 @@ $NetBSD$
 +    ${PATH_ROOT}/include/VBox/types.h=>include/VBox/types.h \
 +    ${PATH_ROOT}/include/VBox/version.h=>include/VBox/version.h \
 +    ${PATH_ROOT}/include/VBox/SUPDrvMangling.h=>include/VBox/SUPDrvMangling.h \
-+    ${PATH_ROOT}/src/VBox/HostDrivers/VBoxNetFlt/freebsd/VBoxNetFlt-freebsd.c=>VBoxNetFlt-freebsd.c \
++    ${PATH_ROOT}/src/VBox/HostDrivers/VBoxNetFlt/netbsd/VBoxNetFlt-netbsd.c=>VBoxNetFlt-netbsd.c \
 +    ${PATH_ROOT}/src/VBox/HostDrivers/VBoxNetFlt/VBoxNetFlt.c=>VBoxNetFlt.c \
 +    ${PATH_ROOT}/src/VBox/HostDrivers/VBoxNetFlt/VBoxNetFltInternal.h=>VBoxNetFltInternal.h \
 +    ${PATH_ROOT}/src/VBox/HostDrivers/Support/SUPDrvIDC.h=>SUPDrvIDC.h \
 +    ${PATH_ROOT}/src/VBox/HostDrivers/Support/SUPR0IdcClient.c=>SUPR0IdcClient.c \
 +    ${PATH_ROOT}/src/VBox/HostDrivers/Support/SUPR0IdcClientComponent.c=>SUPR0IdcClientComponent.c \
 +    ${PATH_ROOT}/src/VBox/HostDrivers/Support/SUPR0IdcClientInternal.h=>SUPR0IdcClientInternal.h \
-+    ${PATH_ROOT}/src/VBox/HostDrivers/Support/freebsd/SUPR0IdcClient-freebsd.c=>SUPR0IdcClient-freebsd.c \
-+    ${PATH_ROOT}/src/VBox/Runtime/r0drv/freebsd/the-freebsd-kernel.h=>r0drv/freebsd/the-freebsd-kernel.h \
++    ${PATH_ROOT}/src/VBox/HostDrivers/Support/netbsd/SUPR0IdcClient-netbsd.c=>SUPR0IdcClient-netbsd.c \
++    ${PATH_ROOT}/src/VBox/Runtime/r0drv/netbsd/the-netbsd-kernel.h=>r0drv/netbsd/the-netbsd-kernel.h \
 +    ${PATH_OUT}/version-generated.h=>version-generated.h \
 +    ${PATH_OUT}/product-generated.h=>product-generated.h \
 +"
-+

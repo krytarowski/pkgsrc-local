@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/HostDrivers/VBoxNetFlt/netbsd/Makefile.orig	2016-07-06 19:54:23.201670336 +0000
+--- src/VBox/HostDrivers/VBoxNetFlt/netbsd/Makefile.orig	2016-07-07 07:08:46.562307341 +0000
 +++ src/VBox/HostDrivers/VBoxNetFlt/netbsd/Makefile
-@@ -0,0 +1,39 @@
+@@ -0,0 +1,38 @@
 +#  Makefile $
 +## @file
-+# Makefile for the VirtualBox FreeBSD Host Driver.
++# Makefile for the VirtualBox NetBSD Host Driver.
 +#
 +
 +#
@@ -23,7 +23,7 @@ $NetBSD$
 +
 +KMOD = vboxnetflt
 +
-+CFLAGS += -DRT_OS_FREEBSD -DIN_RING0 -DIN_RT_R0 -DIN_SUP_R0 -DVBOX -DRT_WITH_VBOX -Iinclude -I. -Ir0drv -w -DVBOX_WITH_HARDENING -DVIMAGE
++CFLAGS += -DRT_OS_NETBSD -DIN_RING0 -DIN_RT_R0 -DIN_SUP_R0 -DVBOX -DRT_WITH_VBOX -Iinclude -I. -Ir0drv -w -DVBOX_WITH_HARDENING -DVIMAGE
 +
 +.if (${MACHINE_ARCH} == "i386")
 + CFLAGS += -DRT_ARCH_X86
@@ -32,13 +32,12 @@ $NetBSD$
 +.endif
 +
 +SRCS = \
-+	VBoxNetFlt-freebsd.c \
++	VBoxNetFlt-netbsd.c \
 +	VBoxNetFlt.c \
-+	SUPR0IdcClient-freebsd.c \
++	SUPR0IdcClient-netbsd.c \
 +	SUPR0IdcClient.c \
 +	SUPR0IdcClientComponent.c
 +
 +SRCS += device_if.h bus_if.h opt_netgraph.h
 +
 +.include <bsd.kmod.mk>
-+

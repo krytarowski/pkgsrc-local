@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/HostDrivers/VBoxNetFlt/netbsd/VBoxNetFlt-netbsd.c.orig	2016-07-06 19:54:23.201678187 +0000
+--- src/VBox/HostDrivers/VBoxNetFlt/netbsd/VBoxNetFlt-netbsd.c.orig	2016-07-07 07:08:46.572066003 +0000
 +++ src/VBox/HostDrivers/VBoxNetFlt/netbsd/VBoxNetFlt-netbsd.c
-@@ -0,0 +1,809 @@
-+/*  VBoxNetFlt-freebsd.c $ */
+@@ -0,0 +1,797 @@
++/*  VBoxNetFlt-netbsd.c $ */
 +/** @file
-+ * VBoxNetFlt - Network Filter Driver (Host), FreeBSD Specific Code.
++ * VBoxNetFlt - Network Filter Driver (Host), NetBSD Specific Code.
 + */
 +
 +/*
@@ -103,21 +103,12 @@ $NetBSD$
 +/** mbuf packet tag */
 +#define PACKET_TAG_VBOX             128
 +
-+#if defined(__FreeBSD_version) && __FreeBSD_version >= 800500
 +# include <sys/jail.h>
 +# include <net/vnet.h>
 +
 +# define VBOXCURVNET_SET(arg)           CURVNET_SET_QUIET(arg)
 +# define VBOXCURVNET_SET_FROM_UCRED()   VBOXCURVNET_SET(CRED_TO_VNET(curthread->td_ucred))
 +# define VBOXCURVNET_RESTORE()          CURVNET_RESTORE()
-+
-+#else /* !defined(__FreeBSD_version) || __FreeBSD_version < 800500 */
-+
-+# define VBOXCURVNET_SET(arg)
-+# define VBOXCURVNET_SET_FROM_UCRED()
-+# define VBOXCURVNET_RESTORE()
-+
-+#endif /* !defined(__FreeBSD_version) || __FreeBSD_version < 800500 */
 +
 +/*
 + * Netgraph command list, we don't support any
@@ -167,7 +158,7 @@ $NetBSD$
 +{
 +    int rc;
 +
-+    Log(("VBoxNetFltFreeBSDModuleEvent\n"));
++    Log(("VBoxNetFltNetBSDModuleEvent\n"));
 +
 +    switch (enmEventType)
 +    {
@@ -210,7 +201,7 @@ $NetBSD$
 +/*
 + * Convert from mbufs to vbox scatter-gather data structure
 + */
-+static void vboxNetFltFreeBSDMBufToSG(PVBOXNETFLTINS pThis, struct mbuf *m, PINTNETSG pSG,
++static void vboxNetFltNetBSDMBufToSG(PVBOXNETFLTINS pThis, struct mbuf *m, PINTNETSG pSG,
 +    unsigned int cSegs, unsigned int segOffset)
 +{
 +    static uint8_t const s_abZero[128] = {0};
@@ -247,7 +238,7 @@ $NetBSD$
 +/*
 + * Convert to mbufs from vbox scatter-gather data structure
 + */
-+static struct mbuf * vboxNetFltFreeBSDSGMBufFromSG(PVBOXNETFLTINS pThis, PINTNETSG pSG)
++static struct mbuf * vboxNetFltNetBSDSGMBufFromSG(PVBOXNETFLTINS pThis, PINTNETSG pSG)
 +{
 +    struct mbuf *m;
 +    int error;
@@ -291,9 +282,7 @@ $NetBSD$
 +
 +    if (strcmp(name, NG_VBOXNETFLT_HOOK_IN) == 0)
 +    {
-+#if __FreeBSD_version >= 800000
 +        NG_HOOK_SET_TO_INBOUND(hook);
-+#endif
 +        pThis->u.s.input = hook;
 +    }
 +    else if (strcmp(name, NG_VBOXNETFLT_HOOK_OUT) == 0)
@@ -426,7 +415,7 @@ $NetBSD$
 +/**
 + * Input processing task, handles incoming frames
 + */
-+static void vboxNetFltFreeBSDinput(void *arg, int pending)
++static void vboxNetFltNetBSDinput(void *arg, int pending)
 +{
 +    PVBOXNETFLTINS pThis = (PVBOXNETFLTINS)arg;
 +    struct mbuf *m, *m0;
@@ -456,7 +445,7 @@ $NetBSD$
 +
 +        /* Create a copy and deliver to the virtual switch */
 +        pSG = RTMemTmpAlloc(RT_OFFSETOF(INTNETSG, aSegs[cSegs]));
-+        vboxNetFltFreeBSDMBufToSG(pThis, m, pSG, cSegs, 0);
++        vboxNetFltNetBSDMBufToSG(pThis, m, pSG, cSegs, 0);
 +        fDropIt = pThis->pSwitchPort->pfnRecv(pThis->pSwitchPort, NULL /* pvIf */, pSG, INTNETTRUNKDIR_WIRE);
 +        RTMemTmpFree(pSG);
 +        if (fDropIt)
@@ -471,7 +460,7 @@ $NetBSD$
 +/**
 + * Output processing task, handles outgoing frames
 + */
-+static void vboxNetFltFreeBSDoutput(void *arg, int pending)
++static void vboxNetFltNetBSDoutput(void *arg, int pending)
 +{
 +    PVBOXNETFLTINS pThis = (PVBOXNETFLTINS)arg;
 +    struct mbuf *m, *m0;
@@ -500,7 +489,7 @@ $NetBSD$
 +#endif
 +        /* Create a copy and deliver to the virtual switch */
 +        pSG = RTMemTmpAlloc(RT_OFFSETOF(INTNETSG, aSegs[cSegs]));
-+        vboxNetFltFreeBSDMBufToSG(pThis, m, pSG, cSegs, 0);
++        vboxNetFltNetBSDMBufToSG(pThis, m, pSG, cSegs, 0);
 +        fDropIt = pThis->pSwitchPort->pfnRecv(pThis->pSwitchPort, NULL /* pvIf */, pSG, INTNETTRUNKDIR_HOST);
 +        RTMemTmpFree(pSG);
 +
@@ -532,7 +521,7 @@ $NetBSD$
 +
 +    if (fDst & INTNETTRUNKDIR_WIRE)
 +    {
-+        m = vboxNetFltFreeBSDSGMBufFromSG(pThis, pSG);
++        m = vboxNetFltNetBSDSGMBufFromSG(pThis, pSG);
 +        if (m == NULL)
 +            return VERR_NO_MEMORY;
 +        m = m_pullup(m, ETHER_HDR_LEN);
@@ -545,7 +534,7 @@ $NetBSD$
 +
 +    if (fDst & INTNETTRUNKDIR_HOST)
 +    {
-+        m = vboxNetFltFreeBSDSGMBufFromSG(pThis, pSG);
++        m = vboxNetFltNetBSDSGMBufFromSG(pThis, pSG);
 +        if (m == NULL)
 +            return VERR_NO_MEMORY;
 +        m = m_pullup(m, ETHER_HDR_LEN);
@@ -574,7 +563,7 @@ $NetBSD$
 +    return VINF_SUCCESS;
 +}
 +
-+static bool vboxNetFltFreeBsdIsPromiscuous(PVBOXNETFLTINS pThis)
++static bool vboxNetFltNetBsdIsPromiscuous(PVBOXNETFLTINS pThis)
 +{
 +    /** @todo This isn't taking into account that we put the interface in
 +     *        promiscuous mode.  */
@@ -607,12 +596,12 @@ $NetBSD$
 +    /* Initialize deferred input queue */
 +    bzero(&pThis->u.s.inq, sizeof(struct ifqueue));
 +    mtx_init(&pThis->u.s.inq.ifq_mtx, "vboxnetflt inq", NULL, MTX_SPIN);
-+    TASK_INIT(&pThis->u.s.tskin, 0, vboxNetFltFreeBSDinput, pThis);
++    TASK_INIT(&pThis->u.s.tskin, 0, vboxNetFltNetBSDinput, pThis);
 +
 +    /* Initialize deferred output queue */
 +    bzero(&pThis->u.s.outq, sizeof(struct ifqueue));
 +    mtx_init(&pThis->u.s.outq.ifq_mtx, "vboxnetflt outq", NULL, MTX_SPIN);
-+    TASK_INIT(&pThis->u.s.tskout, 0, vboxNetFltFreeBSDoutput, pThis);
++    TASK_INIT(&pThis->u.s.tskout, 0, vboxNetFltNetBSDoutput, pThis);
 +
 +    RTSpinlockRelease(pThis->hSpinlock);
 +
@@ -629,7 +618,7 @@ $NetBSD$
 +    {
 +        Assert(pThis->pSwitchPort);
 +        pThis->pSwitchPort->pfnReportMacAddress(pThis->pSwitchPort, &pThis->u.s.MacAddr);
-+        pThis->pSwitchPort->pfnReportPromiscuousMode(pThis->pSwitchPort, vboxNetFltFreeBsdIsPromiscuous(pThis));
++        pThis->pSwitchPort->pfnReportPromiscuousMode(pThis->pSwitchPort, vboxNetFltNetBsdIsPromiscuous(pThis));
 +        pThis->pSwitchPort->pfnReportGsoCapabilities(pThis->pSwitchPort, 0, INTNETTRUNKDIR_WIRE | INTNETTRUNKDIR_HOST);
 +        pThis->pSwitchPort->pfnReportNoPreemptDsts(pThis->pSwitchPort, 0 /* none */);
 +        vboxNetFltRelease(pThis, true /*fBusy*/);
@@ -811,4 +800,3 @@ $NetBSD$
 +    NOREF(pThis); NOREF(pvIfData);
 +    return VINF_SUCCESS;
 +}
-+

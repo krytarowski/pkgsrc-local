@@ -1,10 +1,10 @@
 $NetBSD$
 
---- src/VBox/HostDrivers/netbsd/Makefile.orig	2016-07-06 19:51:19.315527348 +0000
+--- src/VBox/HostDrivers/netbsd/Makefile.orig	2016-07-07 07:08:46.590334369 +0000
 +++ src/VBox/HostDrivers/netbsd/Makefile
 @@ -0,0 +1,76 @@
 +#
-+# Makefile for the VirtualBox FreeBSD Host Drivers.
++# Makefile for the VirtualBox NetBSD Host Drivers.
 +#
 +
 +#
@@ -25,7 +25,7 @@ $NetBSD$
 +all:
 +	@echo "*** Building 'vboxdrv' module ***"
 +	@$(MAKE) KBUILD_VERBOSE=$(KBUILD_VERBOSE) -C vboxdrv
-+	@cp vboxdrv/vboxdrv.ko .
++	@cp vboxdrv/vboxdrv.kmod .
 +	@echo
 +	@if [ -d vboxnetflt ]; then \
 +	    if [ -f vboxdrv/Module.symvers ]; then \
@@ -33,7 +33,7 @@ $NetBSD$
 +	    fi; \
 +	    echo "*** Building 'vboxnetflt' module ***"; \
 +	    $(MAKE) KBUILD_VERBOSE=$(KBUILD_VERBOSE) -C vboxnetflt; \
-+	    cp vboxnetflt/vboxnetflt.ko .; \
++	    cp vboxnetflt/vboxnetflt.kmod .; \
 +	    echo; \
 +	fi
 +	@if [ -d vboxnetadp ]; then \
@@ -42,7 +42,7 @@ $NetBSD$
 +	    fi; \
 +	    echo "*** Building 'vboxnetadp' module ***"; \
 +	    $(MAKE) KBUILD_VERBOSE=$(KBUILD_VERBOSE) -C vboxnetadp; \
-+	    cp vboxnetadp/vboxnetadp.ko .; \
++	    cp vboxnetadp/vboxnetadp.kmod .; \
 +	    echo; \
 +	fi
 +
@@ -64,18 +64,18 @@ $NetBSD$
 +	@if [ -d vboxnetadp ]; then \
 +	    $(MAKE) -C vboxnetadp clean; \
 +	fi
-+	rm -f vboxdrv.ko vboxnetflt.ko vboxnetadp.ko
++	rm -f vboxdrv.kmod vboxnetflt.kmod vboxnetadp.kmod
 +
 +load:
 +	@for module in vboxnetadp vboxnetflt vboxdrv; do \
-+		if kldstat -n "$$module" >/dev/null; then \
++		if modstat -n "$$module" >/dev/null; then \
 +			echo "Removing previously installed $$module module"; \
-+			/sbin/kldunload $$module; \
++			/sbin/modunload $$module; \
 +		fi; \
 +	done
 +	@for module in vboxdrv vboxnetflt vboxnetadp; do \
-+		if test -f $$module.ko; then \
++		if test -f $$module.kmod; then \
 +			echo "Installing $$module module"; \
-+			/sbin/kldload ./$$module.ko; \
++			/sbin/modload ./$$module.kmod; \
 +		fi; \
 +	done
