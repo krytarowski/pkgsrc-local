@@ -42,7 +42,7 @@ $NetBSD$
 +private:
 +    RTSEMEVENT mNotifyEventSem;
 +};
-+# endif /* RT_OS_FREEBSD */
++# endif /* RT_OS_NETBSD */
 +
  #endif /* !____H_USBPROXYSERVICE */
  /* vi: set tabstop=4 shiftwidth=4 expandtab: */
