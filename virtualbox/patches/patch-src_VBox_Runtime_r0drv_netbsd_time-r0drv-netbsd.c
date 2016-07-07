@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Runtime/r0drv/netbsd/time-r0drv-netbsd.c.orig	2016-07-06 18:15:53.040273743 +0000
+--- src/VBox/Runtime/r0drv/netbsd/time-r0drv-netbsd.c.orig	2016-07-07 07:08:47.023047744 +0000
 +++ src/VBox/Runtime/r0drv/netbsd/time-r0drv-netbsd.c
-@@ -0,0 +1,74 @@
-+/*  time-r0drv-freebsd.c $ */
+@@ -0,0 +1,73 @@
++/*  time-r0drv-netbsd.c $ */
 +/** @file
-+ * IPRT - Time, Ring-0 Driver, FreeBSD.
++ * IPRT - Time, Ring-0 Driver, NetBSD.
 + */
 +
 +/*
@@ -37,7 +37,7 @@ $NetBSD$
 +/*********************************************************************************************************************************
 +*   Header Files                                                                                                                 *
 +*********************************************************************************************************************************/
-+#include "the-freebsd-kernel.h"
++#include "the-netbsd-kernel.h"
 +#define RTTIME_INCL_TIMESPEC
 +
 +#include <iprt/time.h>
@@ -76,4 +76,3 @@ $NetBSD$
 +    nanotime(&tsp);
 +    return RTTimeSpecSetTimespec(pTime, &tsp);
 +}
-+

@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Runtime/r0drv/netbsd/thread2-r0drv-netbsd.c.orig	2016-07-06 18:15:53.040269928 +0000
+--- src/VBox/Runtime/r0drv/netbsd/thread2-r0drv-netbsd.c.orig	2016-07-07 07:08:47.013842911 +0000
 +++ src/VBox/Runtime/r0drv/netbsd/thread2-r0drv-netbsd.c
-@@ -0,0 +1,155 @@
-+/*  thread2-r0drv-freebsd.c $ */
+@@ -0,0 +1,134 @@
++/*  thread2-r0drv-netbsd.c $ */
 +/** @file
-+ * IPRT - Threads (Part 2), Ring-0 Driver, FreeBSD.
++ * IPRT - Threads (Part 2), Ring-0 Driver, NetBSD.
 + */
 +
 +/*
@@ -37,7 +37,7 @@ $NetBSD$
 +/*********************************************************************************************************************************
 +*   Header Files                                                                                                                 *
 +*********************************************************************************************************************************/
-+#include "the-freebsd-kernel.h"
++#include "the-netbsd-kernel.h"
 +
 +#include <iprt/thread.h>
 +#include <iprt/err.h>
@@ -75,21 +75,9 @@ $NetBSD$
 +            return VERR_INVALID_PARAMETER;
 +    }
 +
-+#if __FreeBSD_version < 700000
-+    /* Do like they're doing in subr_ntoskrnl.c... */
-+    mtx_lock_spin(&sched_lock);
-+#else
 +    thread_lock(curthread);
-+#endif
 +    sched_prio(curthread, iPriority);
-+#if __FreeBSD_version < 600000
-+    curthread->td_base_pri = iPriority;
-+#endif
-+#if __FreeBSD_version < 700000
-+    mtx_unlock_spin(&sched_lock);
-+#else
 +    thread_unlock(curthread);
-+#endif
 +
 +    return VINF_SUCCESS;
 +}
@@ -106,7 +94,7 @@ $NetBSD$
 +
 +DECLHIDDEN(void) rtThreadNativeWaitKludge(PRTTHREADINT pThread)
 +{
-+    /** @todo fix RTThreadWait/RTR0Term race on freebsd. */
++    /** @todo fix RTThreadWait/RTR0Term race on netbsd. */
 +    RTThreadSleep(1);
 +}
 +
@@ -130,11 +118,7 @@ $NetBSD$
 +
 +    rc = rtThreadMain(pThreadInt, (RTNATIVETHREAD)Self, &pThreadInt->szName[0]);
 +
-+#if __FreeBSD_version >= 800002
 +    kproc_exit(rc);
-+#else
-+    kthread_exit(rc);
-+#endif
 +}
 +
 +
@@ -143,11 +127,7 @@ $NetBSD$
 +    int rc;
 +    struct proc *pProc;
 +
-+#if __FreeBSD_version >= 800002
 +    rc = kproc_create(rtThreadNativeMain, pThreadInt, &pProc, RFHIGHPID, 0, "%s", pThreadInt->szName);
-+#else
-+    rc = kthread_create(rtThreadNativeMain, pThreadInt, &pProc, RFHIGHPID, 0, "%s", pThreadInt->szName);
-+#endif
 +    if (!rc)
 +    {
 +        *pNativeThread = (RTNATIVETHREAD)FIRST_THREAD_IN_PROC(pProc);
@@ -157,4 +137,3 @@ $NetBSD$
 +        rc = RTErrConvertFromErrno(rc);
 +    return rc;
 +}
-+

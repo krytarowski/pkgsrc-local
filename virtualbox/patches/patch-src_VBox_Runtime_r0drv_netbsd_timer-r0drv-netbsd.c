@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Runtime/r0drv/netbsd/timer-r0drv-netbsd.c.orig	2016-07-06 18:15:53.040277924 +0000
+--- src/VBox/Runtime/r0drv/netbsd/timer-r0drv-netbsd.c.orig	2016-07-07 07:08:47.032319693 +0000
 +++ src/VBox/Runtime/r0drv/netbsd/timer-r0drv-netbsd.c
-@@ -0,0 +1,286 @@
-+/*  timer-r0drv-freebsd.c $ */
+@@ -0,0 +1,285 @@
++/*  timer-r0drv-netbsd.c $ */
 +/** @file
-+ * IPRT - Memory Allocation, Ring-0 Driver, FreeBSD.
++ * IPRT - Memory Allocation, Ring-0 Driver, NetBSD.
 + */
 +
 +/*
@@ -37,7 +37,7 @@ $NetBSD$
 +/*********************************************************************************************************************************
 +*   Header Files                                                                                                                 *
 +*********************************************************************************************************************************/
-+#include "the-freebsd-kernel.h"
++#include "the-netbsd-kernel.h"
 +
 +#include <iprt/timer.h>
 +#include <iprt/time.h>
@@ -54,7 +54,7 @@ $NetBSD$
 +*   Structures and Typedefs                                                                                                      *
 +*********************************************************************************************************************************/
 +/**
-+ * The internal representation of an FreeBSD timer handle.
++ * The internal representation of an NetBSD timer handle.
 + */
 +typedef struct RTTIMER
 +{
@@ -68,7 +68,7 @@ $NetBSD$
 +    uint8_t                 fSpecificCpu;
 +    /** The CPU it must run on if fSpecificCpu is set. */
 +    uint32_t                iCpu;
-+    /** The FreeBSD callout structure. */
++    /** The NetBSD callout structure. */
 +    struct callout          Callout;
 +    /** Callback. */
 +    PFNRTTIMER              pfnTimer;
@@ -90,7 +90,7 @@ $NetBSD$
 +/*********************************************************************************************************************************
 +*   Internal Functions                                                                                                           *
 +*********************************************************************************************************************************/
-+static void rtTimerFreeBSDCallback(void *pvTimer);
++static void rtTimerNetBSDCallback(void *pvTimer);
 +
 +
 +
@@ -186,7 +186,7 @@ $NetBSD$
 +
 +    tv.tv_sec  =  u64First / 1000000000;
 +    tv.tv_usec = (u64First % 1000000000) / 1000;
-+    callout_reset(&pTimer->Callout, tvtohz(&tv), rtTimerFreeBSDCallback, pTimer);
++    callout_reset(&pTimer->Callout, tvtohz(&tv), rtTimerNetBSDCallback, pTimer);
 +
 +    return VINF_SUCCESS;
 +}
@@ -224,7 +224,7 @@ $NetBSD$
 + *
 + * @param   pvTimer The timer.
 + */
-+static void rtTimerFreeBSDIpiAction(void *pvTimer)
++static void rtTimerNetBSDIpiAction(void *pvTimer)
 +{
 +    PRTTIMER pTimer = (PRTTIMER)pvTimer;
 +    if (    pTimer->iCpu == RTTIMER_FLAGS_CPU_MASK
@@ -233,7 +233,7 @@ $NetBSD$
 +}
 +
 +
-+static void rtTimerFreeBSDCallback(void *pvTimer)
++static void rtTimerNetBSDCallback(void *pvTimer)
 +{
 +    PRTTIMER pTimer = (PRTTIMER)pvTimer;
 +
@@ -254,7 +254,7 @@ $NetBSD$
 +
 +        tv.tv_sec = pTimer->u64NextTS / 1000000000;
 +        tv.tv_usec = (pTimer->u64NextTS % 1000000000) / 1000;
-+        callout_reset(&pTimer->Callout, tvtohz(&tv), rtTimerFreeBSDCallback, pTimer);
++        callout_reset(&pTimer->Callout, tvtohz(&tv), rtTimerNetBSDCallback, pTimer);
 +    }
 +
 +    /* callback */
@@ -262,7 +262,7 @@ $NetBSD$
 +        ||  pTimer->iCpu == curcpu)
 +        pTimer->pfnTimer(pTimer, pTimer->pvUser, pTimer->iTick);
 +    else
-+        smp_rendezvous(NULL, rtTimerFreeBSDIpiAction, NULL, pvTimer);
++        smp_rendezvous(NULL, rtTimerNetBSDIpiAction, NULL, pvTimer);
 +}
 +
 +
@@ -288,4 +288,3 @@ $NetBSD$
 +{
 +    return false;
 +}
-+

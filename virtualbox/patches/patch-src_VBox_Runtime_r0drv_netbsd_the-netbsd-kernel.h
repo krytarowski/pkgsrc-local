@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Runtime/r0drv/netbsd/the-netbsd-kernel.h.orig	2016-07-06 18:15:53.040261165 +0000
+--- src/VBox/Runtime/r0drv/netbsd/the-netbsd-kernel.h.orig	2016-07-07 07:08:46.995240419 +0000
 +++ src/VBox/Runtime/r0drv/netbsd/the-netbsd-kernel.h
-@@ -0,0 +1,119 @@
-+/*  the-freebsd-kernel.h $ */
+@@ -0,0 +1,101 @@
++/*  the-netbsd-kernel.h $ */
 +/** @file
-+ * IPRT - Ring-0 Driver, The FreeBSD Kernel Headers.
++ * IPRT - Ring-0 Driver, The NetBSD Kernel Headers.
 + */
 +
 +/*
@@ -33,8 +33,8 @@ $NetBSD$
 + * OTHER DEALINGS IN THE SOFTWARE.
 + */
 +
-+#ifndef ___the_freebsd_kernel_h
-+#define ___the_freebsd_kernel_h
++#ifndef ___the_netbsd_kernel_h
++#define ___the_netbsd_kernel_h
 +
 +#include <iprt/types.h>
 +
@@ -55,9 +55,7 @@ $NetBSD$
 +#include <sys/unistd.h>
 +#include <sys/kthread.h>
 +#include <sys/lock.h>
-+#if __FreeBSD_version >= 1000030
 +#include <sys/rwlock.h>
-+#endif
 +#include <sys/mutex.h>
 +#include <sys/sched.h>
 +#include <sys/callout.h>
@@ -82,37 +80,21 @@ $NetBSD$
 +/**
 + * Wrappers around the sleepq_ KPI.
 + */
-+#if __FreeBSD_version >= 800026
 +# define SLEEPQ_TIMEDWAIT(EventInt) sleepq_timedwait(EventInt, 0)
 +# define SLEEPQ_TIMEDWAIT_SIG(EventInt) sleepq_timedwait_sig(EventInt, 0)
 +# define SLEEPQ_WAIT(EventInt) sleepq_wait(EventInt, 0)
 +# define SLEEPQ_WAIT_SIG(EventInt) sleepq_wait_sig(EventInt, 0)
-+#else
-+# define SLEEPQ_TIMEDWAIT(EventInt) sleepq_timedwait(EventInt)
-+# define SLEEPQ_TIMEDWAIT_SIG(EventInt) sleepq_timedwait_sig(EventInt)
-+# define SLEEPQ_WAIT(EventInt) sleepq_wait(EventInt)
-+# define SLEEPQ_WAIT_SIG(EventInt) sleepq_wait_sig(EventInt)
-+#endif
 +
 +/**
 + * Our pmap_enter version
 + */
-+#if __FreeBSD_version >= 701105
 +# define MY_PMAP_ENTER(pPhysMap, AddrR3, pPage, fProt, fWired) \
 +    pmap_enter(pPhysMap, AddrR3, VM_PROT_NONE, pPage, fProt, fWired)
-+#else
-+# define MY_PMAP_ENTER(pPhysMap, AddrR3, pPage, fProt, fWired) \
-+    pmap_enter(pPhysMap, AddrR3, pPage, fProt, fWired)
-+#endif
 +
 +/**
 + * Check whether we can use kmem_alloc_attr for low allocs.
 + */
-+#if    (__FreeBSD_version >= 900011) \
-+    || (__FreeBSD_version < 900000 && __FreeBSD_version >= 800505) \
-+    || (__FreeBSD_version < 800000 && __FreeBSD_version >= 703101)
 +# define USE_KMEM_ALLOC_ATTR
-+#endif
 +
 +/**
 + * Check whether we can use kmem_alloc_prot.

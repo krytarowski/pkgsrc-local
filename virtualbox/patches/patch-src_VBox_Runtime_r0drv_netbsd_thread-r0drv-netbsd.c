@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Runtime/r0drv/netbsd/thread-r0drv-netbsd.c.orig	2016-07-06 18:15:53.040265887 +0000
+--- src/VBox/Runtime/r0drv/netbsd/thread-r0drv-netbsd.c.orig	2016-07-07 07:08:47.004520434 +0000
 +++ src/VBox/Runtime/r0drv/netbsd/thread-r0drv-netbsd.c
-@@ -0,0 +1,186 @@
-+/*  thread-r0drv-freebsd.c $ */
+@@ -0,0 +1,181 @@
++/*  thread-r0drv-netbsd.c $ */
 +/** @file
-+ * IPRT - Threads (Part 1), Ring-0 Driver, FreeBSD.
++ * IPRT - Threads (Part 1), Ring-0 Driver, NetBSD.
 + */
 +
 +/*
@@ -33,7 +33,7 @@ $NetBSD$
 +/*********************************************************************************************************************************
 +*   Header Files                                                                                                                 *
 +*********************************************************************************************************************************/
-+#include "the-freebsd-kernel.h"
++#include "the-netbsd-kernel.h"
 +#include "internal/iprt.h"
 +#include <iprt/thread.h>
 +
@@ -119,11 +119,7 @@ $NetBSD$
 +
 +RTDECL(bool) RTThreadYield(void)
 +{
-+#if __FreeBSD_version >= 900032
 +    kern_yield(curthread->td_user_pri);
-+#else
-+    uio_yield();
-+#endif
 +    return false; /** @todo figure this one ... */
 +}
 +
@@ -133,7 +129,7 @@ $NetBSD$
 +    Assert(hThread == NIL_RTTHREAD);
 +
 +    return curthread->td_critnest == 0
-+        && ASMIntAreEnabled(); /** @todo is there a native freebsd function/macro for this? */
++        && ASMIntAreEnabled(); /** @todo is there a native netbsd function/macro for this? */
 +}
 +
 +
@@ -184,8 +180,7 @@ $NetBSD$
 +RTDECL(bool) RTThreadIsInInterrupt(RTTHREAD hThread)
 +{
 +    Assert(hThread == NIL_RTTHREAD); NOREF(hThread);
-+    /** @todo FreeBSD: Implement RTThreadIsInInterrupt. Required for guest
++    /** @todo NetBSD: Implement RTThreadIsInInterrupt. Required for guest
 +     *        additions! */
 +    return !ASMIntAreEnabled();
 +}
-+
