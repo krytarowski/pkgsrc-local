@@ -24,6 +24,7 @@ SHA1 (patch-src_VBox_Additions_common_VBoxService_VBoxService.cpp) = d2f1a2e2f18
 SHA1 (patch-src_VBox_Additions_common_VBoxService_VBoxServiceVMInfo.cpp) = f243f7fa833c05fae684ed8df5bb826dd630c86a
 SHA1 (patch-src_VBox_Additions_common_crOpenGL_Makefile.kmk) = 2888abd438224f8de5cce02537d02173370f4fbd
 SHA1 (patch-src_VBox_Additions_common_crOpenGL_NetBSD__exports.py) = d410ce3fb1494664c0443def76b166a80a767d66
+SHA1 (patch-src_VBox_Additions_common_crOpenGL_fakedri__drv.c) = 9b164dfd0ddc77dfe62ad8e0ea3f8bb40091af93
 SHA1 (patch-src_VBox_Additions_netbsd_Installer_pkg-descr) = 47af78c97b0f9a34aab3ad125d0533c9fe55a289
 SHA1 (patch-src_VBox_Additions_netbsd_Installer_vboxguest.sh) = 4cab757d3113f97d8d1662bb9b448d0295a09326
 SHA1 (patch-src_VBox_Additions_netbsd_Makefile) = 7f205a6b83cd36268308e23ef61e01577a6bc734
