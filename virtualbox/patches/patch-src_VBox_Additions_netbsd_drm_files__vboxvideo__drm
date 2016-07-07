@@ -1,6 +1,6 @@
 $NetBSD$
 
---- src/VBox/Additions/netbsd/drm/files_vboxvideo_drm.orig	2016-07-06 19:38:35.691768471 +0000
+--- src/VBox/Additions/netbsd/drm/files_vboxvideo_drm.orig	2016-07-07 07:08:46.413493808 +0000
 +++ src/VBox/Additions/netbsd/drm/files_vboxvideo_drm
 @@ -0,0 +1,25 @@
 +#!/bin/sh
@@ -22,8 +22,8 @@ $NetBSD$
 +#
 +
 +FILES_VBOXVIDEO_DRM_NOBIN=" \
-+    ${PATH_ROOT}/src/VBox/Additions/freebsd/drm/vboxvideo_drm.c=>vboxvideo_drm.c \
-+    ${PATH_ROOT}/src/VBox/Additions/freebsd/drm/Makefile=>Makefile \
++    ${PATH_ROOT}/src/VBox/Additions/netbsd/drm/vboxvideo_drm.c=>vboxvideo_drm.c \
++    ${PATH_ROOT}/src/VBox/Additions/netbsd/drm/Makefile=>Makefile \
 +"
 +
 +FILES_VBOXVIDEO_DRM_BIN=" \

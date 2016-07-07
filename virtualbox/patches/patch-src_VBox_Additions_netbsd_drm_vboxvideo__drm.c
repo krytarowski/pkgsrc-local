@@ -1,12 +1,12 @@
 $NetBSD$
 
---- src/VBox/Additions/netbsd/drm/vboxvideo_drm.c.orig	2016-07-06 19:38:35.691772876 +0000
+--- src/VBox/Additions/netbsd/drm/vboxvideo_drm.c.orig	2016-07-07 07:08:46.422526448 +0000
 +++ src/VBox/Additions/netbsd/drm/vboxvideo_drm.c
-@@ -0,0 +1,163 @@
+@@ -0,0 +1,139 @@
 +/*  vboxvideo_drm.c $ */
 +/** @file
 + * VirtualBox Guest Additions - vboxvideo DRM module.
-+ * FreeBSD kernel OpenGL module.
++ * NetBSD kernel OpenGL module.
 + */
 +
 +/*
@@ -57,7 +57,6 @@ $NetBSD$
 + */
 +
 +#include <sys/cdefs.h>
-+__FBSDID("$FreeBSD$");
 +
 +#include "dev/drm/drmP.h"
 +#include "dev/drm/drm_pciids.h"
@@ -81,7 +80,6 @@ $NetBSD$
 +
 +static void vboxvideo_configure(struct drm_device *dev)
 +{
-+#if __FreeBSD_version >= 702000
 +	dev->driver->buf_priv_size	= 1; /* No dev_priv */
 +
 +	dev->driver->max_ioctl		= 0;
@@ -92,18 +90,6 @@ $NetBSD$
 +	dev->driver->major		= DRIVER_MAJOR;
 +	dev->driver->minor		= DRIVER_MINOR;
 +	dev->driver->patchlevel		= DRIVER_PATCHLEVEL;
-+#else
-+	dev->driver.buf_priv_size	= 1; /* No dev_priv */
-+
-+	dev->driver.max_ioctl		= 0;
-+
-+	dev->driver.name		= DRIVER_NAME;
-+	dev->driver.desc		= DRIVER_DESC;
-+	dev->driver.date		= DRIVER_DATE;
-+	dev->driver.major		= DRIVER_MAJOR;
-+	dev->driver.minor		= DRIVER_MINOR;
-+	dev->driver.patchlevel		= DRIVER_PATCHLEVEL;
-+#endif
 +}
 +
 +static int
@@ -117,12 +103,8 @@ $NetBSD$
 +{
 +	struct drm_device *dev = device_get_softc(kdev);
 +
-+#if __FreeBSD_version >= 702000
 +	dev->driver = malloc(sizeof(struct drm_driver_info), DRM_MEM_DRIVER,
 +	    M_WAITOK | M_ZERO);
-+#else
-+	bzero(&dev->driver, sizeof(struct drm_driver_info));
-+#endif
 +
 +	vboxvideo_configure(dev);
 +
@@ -137,9 +119,7 @@ $NetBSD$
 +
 +	ret = drm_detach(kdev);
 +
-+#if __FreeBSD_version >= 702000
 +	free(dev->driver, DRM_MEM_DRIVER);
-+#endif
 +
 +	return ret;
 +}
@@ -160,9 +140,5 @@ $NetBSD$
 +};
 +
 +extern devclass_t drm_devclass;
-+#if __FreeBSD_version >= 700010
 +DRIVER_MODULE(vboxvideo, vgapci, vboxvideo_driver, drm_devclass, 0, 0);
-+#else
-+DRIVER_MODULE(vboxvideo, pci, vboxvideo_driver, drm_devclass, 0, 0);
-+#endif
 +MODULE_DEPEND(vboxvideo, drm, 1, 1, 1);

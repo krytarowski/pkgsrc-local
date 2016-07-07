@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Additions/netbsd/drm/Makefile.kmk.orig	2016-07-06 19:38:35.691760417 +0000
+--- src/VBox/Additions/netbsd/drm/Makefile.kmk.orig	2016-07-07 07:08:46.404285508 +0000
 +++ src/VBox/Additions/netbsd/drm/Makefile.kmk
-@@ -0,0 +1,72 @@
+@@ -0,0 +1,71 @@
 +#  Makefile.kmk $
 +## @file
-+# Sub-Makefile for the vboxvideo DRM module (FreeBSD kernel OpenGL module).
++# Sub-Makefile for the vboxvideo DRM module (NetBSD kernel OpenGL module).
 +#
 +
 +#
@@ -29,8 +29,8 @@ $NetBSD$
 +ifdef VBOX_WITH_ADDITION_DRIVERS
 + SYSMODS  += vboxvideo_drm
 +endif
-+ifneq ($(KBUILD_HOST),freebsd)
-+$(error "The FreeBSD guest additions can only be built on FreeBSD!")
++ifneq ($(KBUILD_HOST),netbsd)
++$(error "The NetBSD guest additions can only be built on NetBSD!")
 +endif
 +
 +#
@@ -52,19 +52,19 @@ $NetBSD$
 +vboxvideo_drm_NAME          = vboxvideo
 +vboxvideo_drm_DEFS          = VBOX_WITH_HGCM VBOX_SVN_REV=$(VBOX_SVN_REV)
 +vboxvideo_drm_DEPS         += $(VBOX_SVN_REV_KMK)
-+vboxvideo_drm_INCS.freebsd  = \
++vboxvideo_drm_INCS.netbsd  = \
 +	$(vboxvideo_drm_0_OUTDIR) \
 +	$(PATH_STAGE)/gen-sys-hdrs
 +vboxvideo_drm_SOURCES       = vboxvideo_drm.c
 +vboxvideo_drm_LIBS          = \
 +	$(VBOX_LIB_VBGL_R0) \
 +	$(VBOX_LIB_IPRT_GUEST_R0)
-+vboxvideo_drm_ORDERDEPS.freebsd = \
++vboxvideo_drm_ORDERDEPS.netbsd = \
 +	$(PATH_STAGE)/gen-sys-hdrs/pci_if.h \
 +	$(PATH_STAGE)/gen-sys-hdrs/bus_if.h \
 +	$(PATH_STAGE)/gen-sys-hdrs/device_if.h \
 +	$(vboxvideo_drm_0_OUTDIR)/opt_drm.h
-+vboxvideo_drm_CLEAN.freebsd = $(vboxvideo_drm_DEPS)
++vboxvideo_drm_CLEAN.netbsd = $(vboxvideo_drm_DEPS)
 +
 +#
 +# Header for DRM not included by us.
@@ -74,4 +74,3 @@ $NetBSD$
 +	$(QUIET)touch $(vboxvideo_drm_0_OUTDIR)/opt_drm.h
 +
 +include $(FILE_KBUILD_SUB_FOOTER)
-+

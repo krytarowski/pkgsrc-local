@@ -1,11 +1,11 @@
 $NetBSD$
 
---- src/VBox/Additions/netbsd/drm/Makefile.orig	2016-07-06 19:38:20.971842918 +0000
+--- src/VBox/Additions/netbsd/drm/Makefile.orig	2016-07-07 07:08:46.395472943 +0000
 +++ src/VBox/Additions/netbsd/drm/Makefile
-@@ -0,0 +1,27 @@
+@@ -0,0 +1,26 @@
 +#  Makefile $
 +## @file
-+# Makefile for the VirtualBox FreeBSD Host Driver.
++# Makefile for the VirtualBox NetBSD Host Driver.
 +#
 +
 +#
@@ -29,4 +29,3 @@ $NetBSD$
 +SRCS += device_if.h bus_if.h pci_if.h opt_drm.h
 +
 +.include <bsd.kmod.mk>
-+
