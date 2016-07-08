@@ -21,6 +21,8 @@ BUILD_DEPENDS+=	yasm-[0-9]*:../../devel/yasm
 BUILD_DEPENDS+=	kbuild-[0-9]*:../../devel/kbuild
 BUILD_DEPENDS+=	acpica-utils-[0-9]*:../../sysutils/acpica-utils
 
+TOOL_DEPENDS+=	libxml2-[0-9]*:../../textproc/libxml2 # for xmllint
+
 USE_TOOLS+=	gtar pkg-config bison flex
 
 WRKSRC=		${WRKDIR}/VirtualBox-${PKGVERSION_NOREV}
