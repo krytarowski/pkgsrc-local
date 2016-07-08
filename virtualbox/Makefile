@@ -32,8 +32,8 @@ USE_LANGUAGES+=	c c++
 
 SUBST_CLASSES+=		paths
 SUBST_MESSAGE.paths=	Adjust paths for pkgsrc
-SUBST_STAGE.paths=	pre-configure
-#SUBST_STAGE.paths=	post-build
+#SUBST_STAGE.paths=	pre-configure
+SUBST_STAGE.paths=	post-build
 SUBST_FILES.paths+=	configure
 SUBST_SED.paths+=	-e 's!^INCCRYPTO=.*!INCCRYPTO="-I${BUILDLINK_PREFIX.openssl}/include"!g'
 SUBST_SED.paths+=	-e 's!^LIBCRYPTO=.*!LIBCRYPTO="${COMPILER_RPATH_FLAG}${BUILDLINK_PREFIX.openssl}/lib -L${BUILDLINK_PREFIX.openssl}/lib -lssl -lcrypto"!g'
@@ -45,6 +45,9 @@ SUBST_SED.paths+=	-e 's!^LIBZ=.*!LIBZ="${COMPILER_RPATH_FLAG}${BUILDLINK_PREFIX.
 .include "../../sysutils/lvm2/buildlink3.mk"
 SUBST_SED.paths+=	-e 's!^INCDEVMAPPER=.*!INCDEVMAPPER="-I${BUILDLINK_PREFIX.lvm2}/include"!g'
 SUBST_SED.paths+=	-e 's!^LIBDEVMAPPER=.*!LIBDEVMAPPER="${COMPILER_RPATH_FLAG}${BUILDLINK_PREFIX.lvm2}/lib -L${BUILDLINK_PREFIX.lvm2}/lib -ldevmapper"!g'
+.include "../../libcap/buildlink3.mk"
+SUBST_SED.paths+=	-e 's!^INCCAP=.*!INCCAP="-I${BUILDLINK_PREFIX.libcap}/include"!g'
+SUBST_SED.paths+=	-e 's!^LIBCAP=.*!LIBCAP="${COMPILER_RPATH_FLAG}${BUILDLINK_PREFIX.libcap}/lib -L${BUILDLINK_PREFIX.libcap}/lib -lcap"!g'
 .endif
 SUBST_SED.paths+=	-e 's!^INCCURL=.*!INCCURL="-I${BUILDLINK_PREFIX.curl}/include"!g'
 SUBST_SED.paths+=	-e 's!^LIBCURL=.*!LIBCURL="${COMPILER_RPATH_FLAG}${BUILDLINK_PREFIX.curl}/lib -L${BUILDLINK_PREFIX.curl}/lib -lcurl"!g'
