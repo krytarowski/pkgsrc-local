@@ -6,12 +6,12 @@ $NetBSD$
   if1of (freebsd.x86, $(VBOX_WITH_EXTPACK_OS_ARCHS))
    VBOX_VBOXDTRACE_FILES += $(call VBOX_VBOXDTRACE_FILES_MACRO,freebsd.x86,bin,so)
   endif
-+ if1of (netbsd.amd64, $(VBOX_WITH_EXTPACK_OS_ARCHS))
-+  VBOX_VBOXDTRACE_FILES += $(call VBOX_VBOXDTRACE_FILES_MACRO,netbsd.amd64,bin,so)
-+ endif
-+ if1of (netbsd.x86, $(VBOX_WITH_EXTPACK_OS_ARCHS))
-+  VBOX_VBOXDTRACE_FILES += $(call VBOX_VBOXDTRACE_FILES_MACRO,netbsd.x86,bin,so)
-+ endif
++# if1of (netbsd.amd64, $(VBOX_WITH_EXTPACK_OS_ARCHS))
++#  VBOX_VBOXDTRACE_FILES += $(call VBOX_VBOXDTRACE_FILES_MACRO,netbsd.amd64,bin,so)
++# endif
++# if1of (netbsd.x86, $(VBOX_WITH_EXTPACK_OS_ARCHS))
++#  VBOX_VBOXDTRACE_FILES += $(call VBOX_VBOXDTRACE_FILES_MACRO,netbsd.x86,bin,so)
++# endif
   if1of (linux.amd64, $(VBOX_WITH_EXTPACK_OS_ARCHS))
    VBOX_VBOXDTRACE_FILES += $(call VBOX_VBOXDTRACE_FILES_MACRO,linux.amd64,bin,so)
   endif
