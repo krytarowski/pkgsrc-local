@@ -1,7 +1,7 @@
 # $NetBSD$
 
 DISTNAME=	libcap-2.25
-CATEGORIES=	local
+CATEGORIES=	sysutils
 MASTER_SITES=	https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/
 
 MAINTAINER=	pkgsrc-users@NetBSD.org
@@ -17,14 +17,14 @@ NOT_FOR_UNPRIVILEGED=	yes
 PKGCONFIG_OVERRIDE+=	libcap/libcap.pc.in
 
 MAKE_FLAGS+=	prefix=${PREFIX}
-MAKE_FLAGS+= 	lib=${PREFIX}/lib
+MAKE_FLAGS+=	lib=${PREFIX}/lib
 MAKE_FLAGS+=	LIBDIR=${PREFIX}/lib
 MAKE_FLAGS+=	SBINDIR=${PREFIX}/sbin
 MAKE_FLAGS+=	INCDIR=${PREFIX}/include
 MAKE_FLAGS+=	MANDIR=${PREFIX}/${PKGMANDIR}
 MAKE_FLAGS+=	PKGCONFIGDIR=${PREFIX}/lib/pkgconfig
 
-#MAKE_INSTALL_FLAGS+=	RAISE_SETFCAP=no
-MAKE_INSTALL_FLAGS+=	DESTDIR=${DESTDIR}
+INSTALL_MAKE_FLAGS+=	RAISE_SETFCAP=no
+INSTALL_MAKE_FLAGS+=	DESTDIR=${DESTDIR}
 
 .include "../../mk/bsd.pkg.mk"
