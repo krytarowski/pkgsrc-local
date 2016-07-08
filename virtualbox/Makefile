@@ -19,6 +19,7 @@ DEPENDS+=	cdrtools-[0-9]*:../../sysutils/cdrtools
 
 BUILD_DEPENDS+=	yasm-[0-9]*:../../devel/yasm
 BUILD_DEPENDS+=	kbuild-[0-9]*:../../wip/kbuild
+BUILD_DEPENDS+=	acpica-utils-[0-9]*:../../sysutils/acpica-utils
 
 USE_TOOLS+=	gtar pkg-config bison flex
 
@@ -80,6 +81,7 @@ do-install:
 	${RUN} cd ${WRKSRC} && . ./env.sh && kmk install
 
 .include "../../mk/java-vm.mk"
+.include "../../net/libIDL/buildlink3.mk"
 .include "../../audio/pulseaudio/buildlink3.mk"
 .include "../../multimedia/libvpx/buildlink3.mk"
 .include "../../graphics/png/buildlink3.mk"
@@ -93,4 +95,6 @@ do-install:
 .include "../../x11/qt4-libs/buildlink3.mk"
 .include "../../lang/python/pyversion.mk"
 .include "../../lang/python/application.mk"
+.include "../../lang/python/application.mk"
+.include "../../lang/python/tool.mk"
 .include "../../mk/bsd.pkg.mk"
