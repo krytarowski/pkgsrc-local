@@ -207,6 +207,7 @@ SHA1 (patch-src_VBox_ValidationKit_testmanager_core_coreconsts.py) = 68eec44aa0d
 SHA1 (patch-src_VBox_ValidationKit_tests_autostart_tdAutostart1.py) = 750ed6069a119efe97ebc082b74d6a1c8ee6950a
 SHA1 (patch-src_apps_Makefile.kmk) = 578f077b8961fab80d839c7024e3e89cec29c3e0
 SHA1 (patch-src_libs_libxml2-2.9.2_include_vboxconfig.h) = 461438f04dcf7f54051f897834f3fc6457ddfdf0
+SHA1 (patch-src_libs_xpcom18a4_nsprpub_pr_include_md___netbsd.cfg) = ef93614e10b24f2952202b90db6fc26c0c83ddac
 SHA1 (patch-src_recompiler_Makefile.kmk) = 0f849ac56932b41882f056df3b59a5626fe8608b
 SHA1 (patch-src_recompiler_exec.c) = b8d61864eb2b6426607c850585b1ccd11446e905
 SHA1 (patch-tools_bin_gen-slickedit-workspace.sh) = 3db84478c9d4235319cccbe2c2d57c540f859738
