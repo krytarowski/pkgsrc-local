@@ -42,6 +42,7 @@ SUBST_SED.paths+=	-e 's!^LIBX11=.*!LIBX11="${COMPILER_RPATH_FLAG}${X11BASE}/lib 
 SUBST_SED.paths+=	-e 's!^INCZ=.*!INCZ="-I${BUILDLINK_PREFIX.zlib}/include"!g'
 SUBST_SED.paths+=	-e 's!^LIBZ=.*!LIBZ="${COMPILER_RPATH_FLAG}${BUILDLINK_PREFIX.zlib}/lib -L${BUILDLINK_PREFIX.zlib}/lib -lz"!g'
 .if ${OPSYS} == "Linux"
+.include "../../sysutils/lvm2/buildlink3.mk"
 SUBST_SED.paths+=	-e 's!^INCDEVMAPPER=.*!INCDEVMAPPER="-I${BUILDLINK_PREFIX.lvm2}/include"!g'
 SUBST_SED.paths+=	-e 's!^LIBDEVMAPPER=.*!LIBDEVMAPPER="${COMPILER_RPATH_FLAG}${BUILDLINK_PREFIX.lvm2}/lib -L${BUILDLINK_PREFIX.lvm2}/lib -ldevmapper"!g'
 .endif
@@ -87,9 +88,6 @@ do-install:
 	${RUN} cd ${WRKSRC} && . ./env.sh && kmk install
 
 .include "../../mk/java-vm.mk"
-.if ${OPSYS} == "Linux"
-.  include "../../sysutils/lvm2/buildlink3.mk"
-,endif
 .include "../../net/libIDL/buildlink3.mk"
 .include "../../audio/pulseaudio/buildlink3.mk"
 .include "../../multimedia/libvpx/buildlink3.mk"
