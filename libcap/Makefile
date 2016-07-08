@@ -11,7 +11,8 @@ LICENSE=	gnu-gpl-v2
 
 USE_TOOLS+=	pkg-config gmake perl
 
-#ONLY_FOR_PLATFORM=	Linux-*-*
+ONLY_FOR_PLATFORM=	Linux-*-*
+NOT_FOR_UNPRIVILEGED=	yes
 
 PKGCONFIG_OVERRIDE+=	libcap/libcap.pc.in
 
@@ -25,8 +26,5 @@ MAKE_FLAGS+=	PKGCONFDIR=${PREFIX}/lib/pkgconfig
 
 #MAKE_INSTALL_FLAGS+=	RAISE_SETFCAP=no
 MAKE_INSTALL_FLAGS+=	DESTDIR=${DESTDIR}
-
-PKG_DESTDIR_SUPPORT=	destdir
-PRIVILEGED_STAGES+=	install
 
 .include "../../mk/bsd.pkg.mk"
