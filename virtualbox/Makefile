@@ -75,8 +75,10 @@ SUBST_SED.paths+=	-e 's!PYTHONLIBRPATH=.*!PYTHONLIBRPATH="${COMPILER_RPATH_FLAG}
 VBLIBDIR=	${PREFIX}/lib/virtualbox
 
 KMK_ENV_VARS+=	KBUILD_PATH=${WRKSRC}/kBuild
+KMK_ENV_VARS+=	KBUILD_LIB_SEARCH_ROOTS="/ /usr/ ${X11BASE}/ ${PREFIX}/"
 # Multiple jobs tend to be broken
 KMK_FLAGS+=	-j1
+KMK_FLAGS+=	KBUILD_LIB_SEARCH_ROOTS=${PREFIX}/lib
 
 pre-configure:
 	${RUN} ${ECHO} "VBOX_GCC_OPT=${CXXFLAGS}" >> ${WRKSRC}/LocalConfig.kmk
