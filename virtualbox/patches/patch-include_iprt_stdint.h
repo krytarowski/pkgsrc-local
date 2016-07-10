@@ -19,7 +19,18 @@ $NetBSD$
  
  # ifndef __STDC_CONSTANT_MACROS
  #  define __STDC_CONSTANT_MACROS
-@@ -157,7 +158,8 @@ typedef uint64_t            uintmax_t;
+@@ -70,6 +71,10 @@
+ # ifndef __STDC_LIMIT_MACROS
+ #  define __STDC_LIMIT_MACROS
+ # endif
++#ifdef __NetBSD__
++# include <sys/param.h>
++# include <sys/types.h>
++#endif
+ # include <sys/stdint.h>
+ 
+ #else /* No system stdint.h */
+@@ -157,7 +162,8 @@ typedef uint64_t            uintmax_t;
  # if !defined(_MSC_VER) || defined(DOXYGEN_RUNNING)
  #  if ARCH_BITS == 32 \
     || defined(RT_OS_LINUX) \
@@ -29,7 +40,7 @@ $NetBSD$
  #   if !defined(_INTPTR_T_DECLARED)  && !defined(_INTPTR_T)
  typedef signed long         intptr_t;
  #   endif
-@@ -241,4 +243,3 @@ typedef uint64_t            uintptr_t;
+@@ -241,4 +247,3 @@ typedef uint64_t            uintptr_t;
  #endif
  
  #endif
