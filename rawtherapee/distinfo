@@ -4,4 +4,4 @@ SHA1 (rawtherapee-4.2.tar.xz) = 9a8773f0a0358b11f3fed3b46b3facf78617a97d
 RMD160 (rawtherapee-4.2.tar.xz) = 6e62b73cdddc2f008154e6872be5d1d66690a04a
 SHA512 (rawtherapee-4.2.tar.xz) = feec61aeb84804cf01ff03fa9d7309f0eb3c04c43818c8397cc6f3ee762aca19484bce7594414d2141248b9740bdd4269fd86f76dcf391c61d4647fa169d48f6
 Size (rawtherapee-4.2.tar.xz) = 7787664 bytes
-SHA1 (patch-CMakeLists.txt) = 77a89709295e381ee931a6e93d571684019e00e9
+SHA1 (patch-CMakeLists.txt) = 49bcdd6bd4208769d7b7934a7982d2c5334e3559
