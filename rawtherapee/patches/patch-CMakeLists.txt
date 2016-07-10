@@ -2,17 +2,26 @@ $NetBSD$
 
 --- CMakeLists.txt.orig	2014-10-24 19:03:26.000000000 +0000
 +++ CMakeLists.txt
-@@ -206,6 +206,9 @@ pkg_check_modules (GIOMM   REQUIRED giom
+@@ -206,6 +206,18 @@ pkg_check_modules (GIOMM   REQUIRED giom
  pkg_check_modules (GTHREAD REQUIRED gthread-2.0>=2.16)
  pkg_check_modules (GOBJECT REQUIRED gobject-2.0>=2.16)
  pkg_check_modules (SIGC    REQUIRED sigc++-2.0)
 +
-+include_directories(${SIGC_INCLUDE_DIRS})
++include_directories(
++    ${GTK_INCLUDE_DIRS}
++    ${GLIB2_INCLUDE_DIRS}
++    ${GLIBMM_INCLUDE_DIRS}
++    ${GIO_INCLUDE_DIRS}
++    ${GIOMM_INCLUDE_DIRS}
++    ${GTHREAD_INCLUDE_DIRS}
++    ${GOBJECT_INCLUDE_DIRS}
++    ${SIGC_INCLUDE_DIRS}
++)
 +
  # NOTE: The new mechanism has been tested with BUILD_SHARED = OFF
  if (WIN32)
      add_definitions (-DWIN32)
-@@ -234,7 +237,7 @@ if (WITH_BZIP)
+@@ -234,7 +246,7 @@ if (WITH_BZIP)
    find_package(BZip2)
    if (BZIP2_FOUND)
      add_definitions (-DBZIP_SUPPORT)
