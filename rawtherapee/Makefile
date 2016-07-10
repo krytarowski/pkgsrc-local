@@ -18,7 +18,6 @@ USE_LANGUAGES=	c c++
 CXXFLAGS+=	-std=gnu++11
 
 .include "../../devel/libsigc++1/buildlink3.mk"
-.include "../../devel/libsigc++/buildlink3.mk"
 .include "../../graphics/tiff/buildlink3.mk"
 .include "../../audio/libcanberra/buildlink3.mk"
 .include "../../wip/libiptcdata/buildlink3.mk"
