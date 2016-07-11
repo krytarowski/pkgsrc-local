@@ -14,8 +14,8 @@ LICENSE=	modified-bsd
 USE_TOOLS+=	bash bison flex gmake pax perl pkg-config
 USE_LANGUAGES=	c c++
 
-BUILD_DEPENDS+=	gperf>=3.0.1:../../devel/gperf
-BUILD_DEPENDS+=	yasm>=0:../../devel/yasm
+BUILD_DEPENDS+=	gperf-[0-9]*:../../devel/gperf
+BUILD_DEPENDS+=	yasm-[0-9]*:../../devel/yasm
 
 ONLY_FOR_PLATFORM=	*-*-arm *-*-i386 *-*-x86_64
 
@@ -25,10 +25,16 @@ ONLY_FOR_PLATFORM=	*-*-arm *-*-i386 *-*-x86_64
 .include "../../audio/alsa-lib/buildlink3.mk"
 .endif
 
-REPLACE_PYTHON+=	tools/gn/bootstrap
+REPLACE_PYTHON+=	tools/gn/bootstrap/bootstrap.py
+
+# Chromium builds better with Clang
+PKGSRC_COMPILER=	clang
+PKG_CC=			clang
+PKG_CXX=		clang++
+CXXFLAGS+=		-std=c++11
 
 pre-configure:
-	${RUN} cd ${WRKSRC} && ${ ./tools/gn/bootstrap
+	${RUN} cd ${WRKSRC} && ${PKGSRC_SETENV} ${MAKE_ENV} ${PYTHONBIN} ./tools/gn/bootstrap/bootstrap.py
 
 .include "../../devel/GConf/buildlink3.mk"
 .include "../../devel/gettext-lib/buildlink3.mk"
@@ -37,6 +43,7 @@ pre-configure:
 .include "../../devel/zlib/buildlink3.mk"
 .include "../../graphics/png/buildlink3.mk"
 .include "../../lang/python/pyversion.mk"
+.include "../../lang/python/application.mk"
 .include "../../mk/jpeg.buildlink3.mk"
 .include "../../multimedia/libvpx/buildlink3.mk"
 .include "../../textproc/libxslt/buildlink3.mk"
