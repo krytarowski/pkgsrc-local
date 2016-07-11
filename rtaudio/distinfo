@@ -1,0 +1,9 @@
+$NetBSD$
+
+SHA1 (rtaudio/4.1.2.zip) = d6af2fe2f5b6321712f44a9cc1ee410373847893
+RMD160 (rtaudio/4.1.2.zip) = c00b9dbdf9d92acbec313022fe457cb5810dadc0
+SHA512 (rtaudio/4.1.2.zip) = ecce9fbb36c39f753250380a84a749057938057da6ce32768b6fad4aa70ab9fde25b42967fe4d364ef39921a4ac8ffb75cfaf81664a73b82a5a069393d5b0c98
+Size (rtaudio/4.1.2.zip) = 243131 bytes
+SHA1 (patch-RtAudio.cpp) = b2a668f7dc83cb532f54582c03073f8aacc354a5
+SHA1 (patch-autogen.sh) = f0595892af8be70df629d8d9c0335d0005a4ef1f
+SHA1 (patch-configure.ac) = 72f8460457b45c8e751755141ee65e6c592c41fb
