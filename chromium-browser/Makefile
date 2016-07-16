@@ -28,9 +28,9 @@ ONLY_FOR_PLATFORM=	*-*-arm *-*-i386 *-*-x86_64
 REPLACE_PYTHON+=	tools/gn/bootstrap/bootstrap.py
 
 # Chromium builds better with Clang
-PKGSRC_COMPILER=	clang
-PKG_CC=			clang
-PKG_CXX=		clang++
+#PKGSRC_COMPILER=	clang
+##;2BPKG_CC=			clang
+#PKG_CXX=		clang++
 CXXFLAGS+=		-std=gnu++11
 
 pre-configure:
