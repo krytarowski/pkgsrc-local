@@ -1,0 +1,13 @@
+$NetBSD$
+
+SHA1 (rt-tests-1.0.tar.xz) = 638545b607a6027aa8b335df1d488a0eb2e8c6cc
+RMD160 (rt-tests-1.0.tar.xz) = 16082c17f0e5169bfd7970d0fb41d9cc4c3fa874
+SHA512 (rt-tests-1.0.tar.xz) = 379cd7c1ab3b36bfe6453afc336e3617b54ac4dc7d5486c6a99c617bcb7e4fa8c32b387cf77ea2955bc452752c2b873e6490491fc3afdcb7d6cef5da07b08eb4
+Size (rt-tests-1.0.tar.xz) = 86096 bytes
+SHA1 (patch-Makefile) = 20fba6fee5c34db09496e9af302a0905e1870920
+SHA1 (patch-src_cyclictest_cyclictest.c) = 4f635a7ffabf09099f9991dccd554866226658fe
+SHA1 (patch-src_hackbench_hackbench.c) = d4841189fe5f6b625bd5140bae71176463799b48
+SHA1 (patch-src_lib_rt-utils.c) = 426be2022d54b49ea006f8195e327cb471aa187d
+SHA1 (patch-src_pmqtest_pmqtest.c) = d51e1fc561a6a9d43d4ba87553c1d6f8f98d7ab7
+SHA1 (patch-src_ptsematest_ptsematest.c) = 8e0266fb673c05897728aa39b3c34cfc74395904
+SHA1 (patch-src_rt-migrate-test_rt-migrate-test.c) = ee942302e298e0b2c39638bde2f4452e9947202e

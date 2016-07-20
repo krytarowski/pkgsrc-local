@@ -1,0 +1,12 @@
+$NetBSD$
+
+--- Makefile.orig	2016-05-13 18:30:12.000000000 +0000
++++ Makefile
+@@ -7,7 +7,6 @@ OBJDIR = bld
+ sources = cyclictest.c \
+ 	  hackbench.c \
+ 	  pip_stress.c \
+-	  pi_stress.c \
+ 	  pmqtest.c \
+ 	  ptsematest.c \
+ 	  rt-migrate-test.c \
