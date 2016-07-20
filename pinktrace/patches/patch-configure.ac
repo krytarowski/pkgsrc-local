@@ -1,0 +1,69 @@
+$NetBSD$
+
+--- configure.ac.orig	2011-06-28 13:54:33.000000000 +0000
++++ configure.ac
+@@ -74,7 +74,7 @@ dnl }}}
+ 
+ dnl {{{ Check for supported operating system
+ SYSSRC_DEFAULT=/usr/src/sys
+-AC_ARG_VAR([SYSSRC], [Path to the system sources for FreeBSD (default: $SYSSRC_DEFAULT)])
++AC_ARG_VAR([SYSSRC], [Path to the system sources for BSD (default: $SYSSRC_DEFAULT)])
+ AC_MSG_CHECKING([for supported operating system])
+ case "$host_os" in
+ freebsd*)
+@@ -123,6 +123,27 @@ linux*)
+ 	PINKTRACE_CFLAGS="${PINKTRACE_CFLAGS} -DPINKTRACE_LINUX"
+ 	PINKTRACE_PC_CFLAGS="${PINKTRACE_PC_CFLAGS} -DPINKTRACE_LINUX"
+ 	;;
++freebsd*)
++	opsys="freebsd"
++	AC_MSG_RESULT([$host_os])
++	PINKTRACE_CFLAGS="${PINKTRACE_CFLAGS} -DPINKTRACE_FREEBSD"
++	PINKTRACE_PC_CFLAGS="${PINKTRACE_PC_CFLAGS} -DPINKTRACE_NETBSD"
++	dnl Check for kernel sources, required to generate syscall names.
++	AC_MSG_CHECKING([for kernel sources])
++	if test x"$SYSSRC" = x ; then
++		if test -d "$SYSSRC_DEFAULT" ; then
++			SYSSRC="$SYSSRC_DEFAULT"
++		else
++			AC_MSG_RESULT([NO!])
++			AC_MSG_ERROR([System sources not found under $SYSSRC_DEFAULT])
++		fi
++	elif ! test -d "$SYSSRC" ; then
++		AC_MSG_RESULT([NO!])
++		AC_MSG_ERROR([Not a directory: $SYSSRC])
++	fi
++	AC_MSG_RESULT([$SYSSRC])
++	AC_SUBST([SYSSRC])
++	;;
+ *)
+ 	AC_MSG_RESULT([NO!])
+ 	AC_MSG_ERROR([Operating system $host_os is not supported by pinktrace!])
+@@ -130,6 +151,7 @@ linux*)
+ esac
+ AM_CONDITIONAL([FREEBSD], test x"$opsys" = x"freebsd")
+ AM_CONDITIONAL([LINUX], test x"$opsys" = x"linux")
++AM_CONDITIONAL([NETBSD], test x"$opsys" = x"netbsd")
+ dnl }}}
+ 
+ dnl {{{ Check for supported architecture
+@@ -333,8 +355,8 @@ if test x"$WANT_EASY" = x"yes" ; then
+ 	AC_CHECK_HEADER([alloca.h], [], AC_MSG_ERROR([pinktrace_easy requires alloca.h]))
+ 	AC_FUNC_ALLOCA
+ 
+-	if test x"$opsys" = x"freebsd" ; then
+-		AC_MSG_ERROR([pinktrace_easy is not available for FreeBSD])
++	if test x"$opsys" = x"freebsd" -o test x"$opsys" = x"netbsd" ; then
++		AC_MSG_ERROR([pinktrace_easy is not available for BSD])
+ dnl 		AC_MSG_CHECKING([whether ptrace() defines required requests])
+ dnl 		AC_PREPROC_IFELSE([AC_LANG_SOURCE([
+ dnl #include <sys/types.h>
+@@ -707,7 +729,7 @@ if test x"$enable_ruby" = x"yes" ; then
+ else
+ 	echo "Ruby bindings: Disabled"
+ fi
+-echo "Now run make (or gmake on FreeBSD) to build PinkTrace"
++echo "Now run make (or gmake on BSD) to build PinkTrace"
+ echo "To build the Haskell bindings, use cabal after make"
+ echo "-----------------------------------------------------"
+ dnl }}}

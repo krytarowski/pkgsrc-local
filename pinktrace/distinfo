@@ -1,0 +1,7 @@
+$NetBSD$
+
+SHA1 (pinktrace-0.1.2.tar.gz) = 5546e83c2937fd76ceabf68c2c8dec5edf7a2088
+RMD160 (pinktrace-0.1.2.tar.gz) = b0cac1559541d7a990905ff77fdab1f79c9f89f2
+SHA512 (pinktrace-0.1.2.tar.gz) = 6c748a1cd9786ff33a5ef552e0524445642d321f1995a502a8338d33125dcc34938dbfe5f29bacecbda3fac7f507c10184e116d500de738427e147c952eeb8f9
+Size (pinktrace-0.1.2.tar.gz) = 163338 bytes
+SHA1 (patch-configure.ac) = cc44399ded3452eedb007e5aafe892a3bbcbf8a5
