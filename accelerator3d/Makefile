@@ -22,6 +22,22 @@ REPLACE_PYTHON+=	accelerator.py
 
 NO_BUILD=	yes
 
+ACCELERATOR3D_DATADIR=	${PREFIX}/share/${PKGBASE}
+
+SUBST_CLASSES+=		prefix
+SUBST_FILES.prefix=	accelerator.py
+SUBST_MESSAGE.prefix=	Fixing PREFIX path.
+SUBST_SED.prefix=	-e "s|'snd'|'${PREFIX}/share/${PKGBASE}'|"
+SUBST_SED.prefix=	-e "s|'gfx'|'${PREFIX}/share/${PKGBASE}'|"
+SUBST_STAGE.prefix=	pre-install
+
+INSTALLATION_DIRS+=	bin share/${PKGBASE}
+
+do-install:
+	${RUN} ${INSTALL_SCRIPT} ${WRKSRC}/accelerator.py ${DESTDIR}${PREFIX}/bin/accelerator3d
+	${RUN} ${INSTALL_DATA} ${WRKSRC}/snd/* ${DESTDIR}${ACCELERATOR3D_DATADIR}
+	${RUN} ${INSTALL_DATA} ${WRKSRC}/gfx/* ${DESTDIR}${ACCELERATOR3D_DATADIR}
+
 .include "../../lang/python/application.mk"
 .include "../../lang/python/pyversion.mk"
 .include "../../mk/bsd.pkg.mk"
