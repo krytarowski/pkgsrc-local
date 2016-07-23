@@ -8,12 +8,12 @@ MASTER_SITES=	${MASTER_SITE_PYPI:=P/PyOpenGL/}
 MAINTAINER=	pkgsrc-users@NetBSD.org
 HOMEPAGE=	http://pyopengl.sourceforge.net/
 COMMENT=	Python bindings for OpenGL
+# There are many similar licenses, see license.txt
+LICENSE=	modified-bsd AND mit
 
 DEPENDS+=	${PYPKGPREFIX}-Tk-[0-9]*:../../x11/py-Tk
 
 PYTHON_VERSIONS_INCOMPATIBLE=	34 35 # py-Numeric
-
-REPLACE_PYTHON+=	OpenGL/Tk/__init__.py
 
 .include "../../lang/python/application.mk"
 .include "../../lang/python/distutils.mk"
