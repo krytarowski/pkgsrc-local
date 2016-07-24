@@ -16,25 +16,7 @@ USE_LANGUAGES=		c fortran
 PLIST_SUBST+=		PYVERSSUFFIX=${PYVERSSUFFIX}
 MAKE_ENV+=		ATLAS=None
 
-REPLACE_PYTHON+=	*.py
-REPLACE_PYTHON+=	numpy/*.py
-REPLACE_PYTHON+=	numpy/compat/*.py
-REPLACE_PYTHON+=	numpy/core/*.py
-REPLACE_PYTHON+=	numpy/core/tests/*.py
-REPLACE_PYTHON+=	numpy/distutils/*.py
-REPLACE_PYTHON+=	numpy/distutils/tests/*.py
-REPLACE_PYTHON+=	numpy/distutils/tests/f2py_ext/*.py
-REPLACE_PYTHON+=	numpy/distutils/tests/f2py_f90_ext/*.py
-REPLACE_PYTHON+=	numpy/distutils/tests/gen_ext/*.py
-REPLACE_PYTHON+=	numpy/distutils/tests/pyrex_ext/*.py
-REPLACE_PYTHON+=	numpy/distutils/tests/swig_ext/*.py
-REPLACE_PYTHON+=	numpy/f2py/*.py
-REPLACE_PYTHON+=	numpy/f2py/docs/usersguide/*.py
-REPLACE_PYTHON+=	numpy/fft/tests/*.py
-REPLACE_PYTHON+=	numpy/ma/*.py
-REPLACE_PYTHON+=	numpy/matrixlib/*.py
-REPLACE_PYTHON+=	numpy/random/mtrand/*.py
-REPLACE_PYTHON+=	numpy/testing/*.py
+REPLACE_PYTHON+=	*.py */*.py */*/*.py */*/*/*.py */*/*/*/*.py
 
 # XXX Avoid picking up other compilers when installed
 .include "../../mk/compiler.mk"
