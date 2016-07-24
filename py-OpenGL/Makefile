@@ -15,6 +15,22 @@ DEPENDS+=	${PYPKGPREFIX}-Tk-[0-9]*:../../x11/py-Tk
 
 PYTHON_VERSIONS_INCOMPATIBLE=	34 35 # py-Numeric
 
+REPLACE_PYTHON+=	*.py */*.py */*/*.py */*/*/*.py */*/*/*/*.py
+
+# Tests require:
+# - devel/py-virtualenv
+# - devel/py-game
+# ...
+
+SUBST_CLASSES+=		pyver
+SUBST_MESSAGE.pyver=	Set Python version suffix for virtualenv calls.
+SUBST_STAGE.pyver=	pre-configure
+SUBST_FILES.pyver=	tests/tests.py
+SUBST_SED.pyver=	-e '121s,virtualenv,virtualenv-${PYVERSSUFFIX},'
+
+do-test:
+	${RUN} ${PYTHONBIN} ${WRKSRC}/tests/tests.py
+
 .include "../../lang/python/application.mk"
 .include "../../lang/python/distutils.mk"
 .include "../../graphics/Mesa/buildlink3.mk"
