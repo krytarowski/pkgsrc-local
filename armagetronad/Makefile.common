@@ -12,8 +12,6 @@ MASTER_SITES=	${MASTER_SITE_SOURCEFORGE:=armagetronad/}
 MAINTAINER=	adam.hoka@gmail.com
 HOMEPAGE=	http://www.armagetronad.org/
 
-PKG_DESTDIR_SUPPORT=	none
-
 GNU_CONFIGURE=	yes
 USE_LANGUAGES=	c c++
 USE_TOOLS+=	bash gmake
