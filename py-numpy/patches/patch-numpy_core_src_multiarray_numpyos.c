@@ -1,5 +1,7 @@
 $NetBSD$
 
+Don't include <xlocale.h> for NetBSD.
+
 --- numpy/core/src/multiarray/numpyos.c.orig	2016-06-25 15:38:34.000000000 +0000
 +++ numpy/core/src/multiarray/numpyos.c
 @@ -15,8 +15,10 @@
