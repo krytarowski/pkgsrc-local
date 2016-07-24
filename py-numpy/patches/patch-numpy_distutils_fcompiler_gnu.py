@@ -7,6 +7,15 @@ Do not run a shell command when it is "None".
 
 --- numpy/distutils/fcompiler/gnu.py.orig	2016-06-25 15:38:34.000000000 +0000
 +++ numpy/distutils/fcompiler/gnu.py
+@@ -57,7 +57,7 @@ class GnuFCompiler(FCompiler):
+                     return ('gfortran', m.group(1))
+         else:
+             # Output probably from --version, try harder:
+-            m = re.search(r'GNU Fortran\s+95.*?([0-9-.]+)', version_string)
++            m = re.search(r'95.*?([0-9-.]+)', version_string)
+             if m:
+                 return ('gfortran', m.group(1))
+             m = re.search(r'GNU Fortran.*?\-?([0-9-.]+)', version_string)
 @@ -87,7 +87,7 @@ class GnuFCompiler(FCompiler):
          'compiler_f77' : [None, "-g", "-Wall", "-fno-second-underscore"],
          'compiler_f90' : None,  # Use --fcompiler=gnu95 for f90 codes
