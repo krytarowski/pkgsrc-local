@@ -1,5 +1,7 @@
 $NetBSD$
 
+Handle NetBSD specific <sys/endian.h>
+
 --- numpy/core/include/numpy/npy_endian.h.orig	2016-06-25 15:38:34.000000000 +0000
 +++ numpy/core/include/numpy/npy_endian.h
 @@ -6,9 +6,14 @@
