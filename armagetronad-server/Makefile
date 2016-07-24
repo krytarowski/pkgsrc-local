@@ -3,7 +3,7 @@
 
 .include "../../local/armagetronad/Makefile.common"
 
-PKGNAME=	${DISTNAME:S/.src//}
+PKGNAME=	${DISTNAME:S/.src//:S/armagetronad/armagetronad-server/}
 COMMENT=	Server for the armagetronad game
 
 MAINTAINER=     pkgsrc-users@NetBSD.org
