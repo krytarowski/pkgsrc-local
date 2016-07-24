@@ -20,6 +20,7 @@ REPLACE_PYTHON+=	*.py */*.py */*/*.py */*/*/*.py */*/*/*/*.py
 # Tests require:
 # - devel/py-virtualenv
 # - devel/py-game
+# - math/py-numpy
 # ...
 
 SUBST_CLASSES+=		pyver
