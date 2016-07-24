@@ -36,8 +36,8 @@ LDFLAGS+=		${_COMPILER_ABI_FLAG.${ABI}}
 .include "../../mk/bsd.prefs.mk"
 
 # needs devel/py-nose
-#do-test:
-#	${PYTHONBIN} -c "import numpy; numpy.test()"
+do-test:
+	${RUN} PYTHONPATH=${DESTDIR}${PREFIX}/${PYSITELIB} ${PYTHONBIN} -c "import numpy; numpy.test()"
 
 .include "../../lang/python/application.mk"
 .include "../../lang/python/distutils.mk"
