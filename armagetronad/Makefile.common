@@ -13,6 +13,8 @@ HOMEPAGE=	http://www.armagetronad.org/
 
 WRKSRC=		${WRKDIR}/${DISTNAME:S/.src//}
 
+DISTINFO_FILE=	${.CURDIR}/../../local/armagetronad/distinfo
+
 GNU_CONFIGURE=	yes
 USE_LANGUAGES=	c c++
 USE_TOOLS+=	bash gmake
