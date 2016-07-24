@@ -5,18 +5,18 @@ any ABI flags as appropriate.
 On OS X, do not use '-bundle' and 'dynamic_lookup' (to avoid Python.framework).
 Do not run a shell command when it is "None".
 
---- numpy/distutils/fcompiler/gnu.py.orig	2015-02-01 16:38:21.000000000 +0000
+--- numpy/distutils/fcompiler/gnu.py.orig	2016-06-25 15:38:34.000000000 +0000
 +++ numpy/distutils/fcompiler/gnu.py
-@@ -72,7 +72,7 @@ class GnuFCompiler(FCompiler):
+@@ -87,7 +87,7 @@ class GnuFCompiler(FCompiler):
          'compiler_f77' : [None, "-g", "-Wall", "-fno-second-underscore"],
-         'compiler_f90' : None, # Use --fcompiler=gnu95 for f90 codes
+         'compiler_f90' : None,  # Use --fcompiler=gnu95 for f90 codes
          'compiler_fix' : None,
 -        'linker_so'    : [None, "-g", "-Wall"],
 +        'linker_so'    : [None, "-g", "-Wall", "-shared", ""],
          'archiver'     : ["ar", "-cr"],
          'ranlib'       : ["ranlib"],
          'linker_exe'   : [None, "-g", "-Wall"]
-@@ -127,7 +127,7 @@ class GnuFCompiler(FCompiler):
+@@ -134,7 +134,7 @@ class GnuFCompiler(FCompiler):
                      s = 'Env. variable MACOSX_DEPLOYMENT_TARGET set to 10.3'
                      warnings.warn(s)
  
@@ -25,7 +25,7 @@ Do not run a shell command when it is "None".
          else:
              opt.append("-shared")
          if sys.platform.startswith('sunos'):
-@@ -261,7 +261,7 @@ class Gnu95FCompiler(GnuFCompiler):
+@@ -263,7 +263,7 @@ class Gnu95FCompiler(GnuFCompiler):
                            "-fno-second-underscore"] + _EXTRAFLAGS,
          'compiler_fix' : [None, "-Wall",  "-g","-ffixed-form",
                            "-fno-second-underscore"] + _EXTRAFLAGS,
@@ -34,7 +34,7 @@ Do not run a shell command when it is "None".
          'archiver'     : ["ar", "-cr"],
          'ranlib'       : ["ranlib"],
          'linker_exe'   : [None, "-Wall"]
-@@ -274,7 +274,7 @@ class Gnu95FCompiler(GnuFCompiler):
+@@ -276,7 +276,7 @@ class Gnu95FCompiler(GnuFCompiler):
  
      def _universal_flags(self, cmd):
          """Return a list of -arch flags for every supported architecture."""
