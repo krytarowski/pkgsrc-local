@@ -1,6 +1,6 @@
 $NetBSD$
 
---- numpy/core/setup.py.orig	2016-07-24 11:35:48.946656208 +0000
+--- numpy/core/setup.py.orig	2016-06-25 15:38:34.000000000 +0000
 +++ numpy/core/setup.py
 @@ -272,6 +272,10 @@ def check_types(config_cmd, ext, build_d
      if res:
