@@ -17,8 +17,14 @@ WRKSRC=		${WRKDIR}/${DISTNAME:S/.src//}
 GNU_CONFIGURE=	yes
 USE_LANGUAGES=	c c++
 USE_TOOLS+=	bash gmake
-REPLACE_BASH+=	batch/*.in
 REPLACE_PYTHON+=	language/update.py
+
+SUBST_CLASSES+=		bash
+SUBST_MESSAGE.bash=	Set proper BASH path.
+SUBST_STAGE.bash=	pre-configure
+SUBST_FILES.bash=	batch/Makefile.am
+SUBST_FILES.bash+=	batch/Makefile.in
+SUBST_SED.bash=		-e 's,`which bash`,${BASH},'
 
 CONFIGURE_ARGS+=	--disable-uninstall
 
