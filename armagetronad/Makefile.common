@@ -9,7 +9,6 @@ DISTNAME=	armagetronad-0.2.8.3.3.src
 CATEGORIES=	games
 MASTER_SITES=	${MASTER_SITE_SOURCEFORGE:=armagetronad/}
 
-MAINTAINER=	adam.hoka@gmail.com
 HOMEPAGE=	http://www.armagetronad.org/
 
 WRKSRC=		${WRKDIR}/${DISTNAME:S/.src//}
