@@ -26,6 +26,7 @@ do-install:
 .include "../../lang/lua51/buildlink3.mk"
 .include "../../audio/libvorbis/buildlink3.mk"
 .include "../../graphics/SDL_image/buildlink3.mk"
+.include "../../devel/SDL_gfx/buildlink3.mk"
 .include "../../multimedia/smpeg/buildlink3.mk"
 .include "../../devel/SDL/buildlink3.mk"
 .include "../../mk/bsd.pkg.mk"
