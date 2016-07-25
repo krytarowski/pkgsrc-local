@@ -5,6 +5,7 @@ RMD160 (btanks-0.9.8083.tar.bz2) = e0eaebdfea636ddeabfba230315353036e06dfcb
 SHA512 (btanks-0.9.8083.tar.bz2) = beef8f480e4c20c4f3d29aaa63fd52b370b89cceb8a7dda92f0d0fa5517969abf1fce6b0109782300f1b5bb92cf3c599677b168cd66f3b44c2d2dd1742ce0241
 Size (btanks-0.9.8083.tar.bz2) = 28754069 bytes
 SHA1 (patch-SConstruct) = 6555fce760c52a9cba352abbab9d51bd02952d25
+SHA1 (patch-clunk_source.cpp) = 3bbd3785298b30ea837e66dffa03e985eacceb49
 SHA1 (patch-engine_SConscript) = c82cc5a1385ed6f4b8ad9bc1b460a3768c25dee0
 SHA1 (patch-engine_sl08_sl08.h) = bcc7c314db6818a2713735b6d5c79afb1da7628c
 SHA1 (patch-math_range__list.h) = 472fe52de940efaaee8995f1eb3d142fb00708c3
