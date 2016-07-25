@@ -1,0 +1,21 @@
+$NetBSD$
+
+--- sdlx/SConscript.orig	2008-12-07 20:04:40.000000000 +0000
++++ sdlx/SConscript
+@@ -12,7 +12,7 @@ env.Append(CPPDEFINES=['SDLXAPI=DLLEXPOR
+ 
+ env.MergeFlags(sdl_cflags, sdl_libs)
+ 
+-libs = ['mrt', 'SDL', 'SDL_image']
++libs = ['mrt', 'SDL', 'SDL_image', 'SDL_gfx']
+ 
+ if sys.platform != "win32":
+ 	c_map_env= env.Clone()
+@@ -35,7 +35,6 @@ else: 
+ sdlx_sources = 	['cursor.cpp', 'sdl_ex.cpp', 'surface.cpp', 'system.cpp', 'joystick.cpp',
+ 	'thread.cpp', 'mutex.cpp', 'semaphore.cpp', 'color.cpp',
+ 	c_map, 'font.cpp', 'timer.cpp', 'module.cpp', 'file_rw.cpp', 
+-	'gfx/SDL_rotozoom.c', 
+ 	] #  'ttf.cpp', 
+ 
+ if sys.platform == 'win32': 

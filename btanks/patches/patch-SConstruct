@@ -1,0 +1,35 @@
+$NetBSD$
+
+--- SConstruct.orig	2009-12-10 14:58:55.000000000 +0000
++++ SConstruct
+@@ -50,7 +50,7 @@ import SCons.Util
+ if os.environ.has_key('CC'):
+ 	env['CC'] = os.environ['CC']
+ if os.environ.has_key('CFLAGS'):
+-	env['CCFLAGS'] += SCons.Util.CLVar(os.environ['CFLAGS'])
++	env['CFLAGS'] += SCons.Util.CLVar(os.environ['CFLAGS'])
+ if os.environ.has_key('CXX'):
+ 	env['CXX'] = os.environ['CXX']
+ if os.environ.has_key('CXXFLAGS'):
+@@ -91,19 +91,9 @@ if sys.platform == "win32":
+ 		#env.Append(CPPDEFINES = ['NDEBUG']) 
+ 
+ else:
+-	if env['gcc_visibility']: 
+-		env.Append(CCFLAGS=['-fvisibility=hidden']);
+-		env.Append(CXXFLAGS=['-fvisibility-inlines-hidden', '-fvisibility=hidden']);
+-
+-	if debug:
+-		env.Append(CCFLAGS=['-ggdb', '-D_FORTIFY_SOURCE=2'])
+-		env.Append(CPPFLAGS=['-ggdb', '-D_FORTIFY_SOURCE=2'])
+-	else: 
+-		env.Append(CCFLAGS=['-O3'])
+-		env.Append(CPPFLAGS=['-O3'])
+ 		
+-	env.Append(CPPFLAGS=['-Wall', '-Wno-deprecated', '-pedantic', '-Wno-long-long', '-pipe', '-pthread'])
+-	env.Append(CCFLAGS=['-Wall', '-Wno-deprecated', '-pedantic', '-Wno-long-long', '-pipe', '-pthread'])
++	env.Append(CPPFLAGS=['-Wall', '-Wno-deprecated', '-pedantic', '-Wno-long-long', '-pthread'])
++	env.Append(CCFLAGS=['-Wall', '-Wno-deprecated', '-pedantic', '-Wno-long-long', '-pthread'])
+ 
+ 
+ conf_env = env.Clone()
