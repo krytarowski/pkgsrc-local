@@ -1,0 +1,7 @@
+$NetBSD$
+
+SHA1 (btanks-0.9.8083.tar.bz2) = e3f76e7cbda0a90a606e8358c6aa686cebba02d6
+RMD160 (btanks-0.9.8083.tar.bz2) = e0eaebdfea636ddeabfba230315353036e06dfcb
+SHA512 (btanks-0.9.8083.tar.bz2) = beef8f480e4c20c4f3d29aaa63fd52b370b89cceb8a7dda92f0d0fa5517969abf1fce6b0109782300f1b5bb92cf3c599677b168cd66f3b44c2d2dd1742ce0241
+Size (btanks-0.9.8083.tar.bz2) = 28754069 bytes
+SHA1 (patch-engine_SConscript) = c82cc5a1385ed6f4b8ad9bc1b460a3768c25dee0

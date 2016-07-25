@@ -1,0 +1,22 @@
+$NetBSD$
+
+--- engine/SConscript.orig	2009-12-30 13:50:33.000000000 +0000
++++ engine/SConscript
+@@ -79,7 +79,7 @@ bt_libs = ['mrt', 'sdlx', smpeg_lib, 'SD
+ 
+ if sys.platform != 'win32':
+ 	got_lua = False
+-	for lua in ['lua5.1', 'lua5.0', 'lua']: 
++	for lua in ['lua-5.1']: 
+ 		try: 
+ 			env.ParseConfig("pkg-config --cflags --libs %s 2>/dev/null" %lua);
+ 			got_lua = True
+@@ -89,7 +89,7 @@ if sys.platform != 'win32':
+ 		except: 
+ 			continue
+ 	if not got_lua: 
+-		raise Exception("Cannot find lua5.1/lua5.0 or lua pkg-config information")
++		raise Exception("Cannot find lua-5.1 or lua pkg-config information")
+ 
+ env.Append(CPPDEFINES=['ENABLE_LUA'])
+ bt_sources.append('luaxx/state.cpp')
