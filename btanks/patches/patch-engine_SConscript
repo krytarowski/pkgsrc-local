@@ -2,7 +2,7 @@ $NetBSD$
 
 --- engine/SConscript.orig	2009-12-30 13:50:33.000000000 +0000
 +++ engine/SConscript
-@@ -79,7 +79,7 @@ bt_libs = ['mrt', 'sdlx', smpeg_lib, 'SD
+@@ -79,17 +79,17 @@ bt_libs = ['mrt', 'sdlx', smpeg_lib, 'SD
  
  if sys.platform != 'win32':
  	got_lua = False
@@ -11,7 +11,10 @@ $NetBSD$
  		try: 
  			env.ParseConfig("pkg-config --cflags --libs %s 2>/dev/null" %lua);
  			got_lua = True
-@@ -89,7 +89,7 @@ if sys.platform != 'win32':
+ 			env.Append(CPPDEFINES=['ENABLE_LUA'])
+-			bt_libs.append(lua)
++			bt_libs.append('lua5.1')
+ 			break
  		except: 
  			continue
  	if not got_lua: 
