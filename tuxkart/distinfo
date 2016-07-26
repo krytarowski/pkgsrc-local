@@ -1,0 +1,7 @@
+$NetBSD$
+
+SHA1 (tuxkart-0.4.0.tar.gz) = c546a10f603dbeab02ed2169f1b4237119dff295
+RMD160 (tuxkart-0.4.0.tar.gz) = 2bdc73f84f139835c02e1f445c9a46477541cdd3
+SHA512 (tuxkart-0.4.0.tar.gz) = 5c49b417a1e582d0151a79c0ee5f746ff22c118ce7ed6d243ae43c9d465cb23891736afd10db771cd1f133414f34fce7747e63dafbbe8ebe4f3997ab77ec31a9
+Size (tuxkart-0.4.0.tar.gz) = 4932535 bytes
+SHA1 (patch-src_guNet.cxx) = a815b3bceaf5fa6199ed9308bbd0af0069aa990f
