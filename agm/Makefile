@@ -20,7 +20,7 @@ SUBST_FILES.rcsids+=	process.c
 SUBST_FILES.rcsids+=	progress.c
 SUBST_FILES.rcsids+=	sort.c
 SUBST_FILES.rcsids+=	wordfuncs.c
-SUBST_SED.rcsids=	-e "s!$Revision!Revision!"
+SUBST_SED.rcsids=	-e "s!.Revision: !Revision: !"
 
 
 .include "../../mk/bsd.pkg.mk"
