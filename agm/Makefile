@@ -22,5 +22,9 @@ SUBST_FILES.rcsids+=	sort.c
 SUBST_FILES.rcsids+=	wordfuncs.c
 SUBST_SED.rcsids=	-e "s!.Revision: !Revision: !"
 
+MAKE_FLAGS+=	BINDIR=${PREFIX}/bin
+MAKE_FLAGS+=	MANDIR=${PREFIX}/${PKGMANDIR}
+MAKE_FLAGS+=	WORDDIR=${PREFIX}/share/agm
+MAKE_FLAGS+=	CC=${CC}
 
 .include "../../mk/bsd.pkg.mk"

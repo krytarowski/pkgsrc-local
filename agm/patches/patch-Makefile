@@ -1,0 +1,18 @@
+$NetBSD$
+
+--- Makefile.orig	1998-03-18 01:02:29.000000000 +0000
++++ Makefile
+@@ -96,9 +96,10 @@ $(MANDIR)/man6:
+ 	mkdir $(MANDIR)/man6
+ 
+ install: agm agm.6 $(MANDIR)/man6
+-	strip agm
+-	cp {,x}agm $(BINDIR)
+-	chmod 755 $(BINDIR)/{,x}agm
++	cp agm $(BINDIR)
++	cp xagm $(BINDIR)
++	chmod 755 $(BINDIR)/agm
++	chmod 755 $(BINDIR)/xagm
+ 	cp agm.6 $(MANDIR)/man6
+ 	chmod 644 $(MANDIR)/man6/agm.6
+ 
