@@ -2,3 +2,4 @@
 bin/agm
 bin/xagm
 man/man6/agm.6
+share/agm/words

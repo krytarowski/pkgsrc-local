@@ -27,6 +27,8 @@ MAKE_FLAGS+=	MANDIR=${PREFIX}/${PKGMANDIR}
 MAKE_FLAGS+=	WORDDIR=${PREFIX}/share/agm
 MAKE_FLAGS+=	CC=${CC}
 
+INSTALL_TARGET=		install install-words
+
 REPLACE_INTERPRETER+=	wish
 REPLACE.wish.old=	/usr/bin/wish
 REPLACE.wish.new=	${LOCALBASE}/bin/wish
