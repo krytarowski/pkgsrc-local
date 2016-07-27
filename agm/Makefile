@@ -1,13 +1,13 @@
 # $NetBSD$
 
 DISTNAME=	agm-1.3.1
-CATEGORIES=	local
+CATEGORIES=	games
 MASTER_SITES=	ftp://ftp.ibiblio.org/pub/linux/games/amusements/
 
-MAINTAINER=	INSERT_YOUR_MAIL_ADDRESS_HERE
+MAINTAINER=	pkgsrc-users@NetBSD.org
 HOMEPAGE=	ftp://ftp.ibiblio.org/pub/linux/games/amusements/
-COMMENT=	TODO: Short description of the package
-#LICENSE=	# TODO: (see mk/license.mk)
+COMMENT=	Multiple-word anagram search program
+LICENSE=	generic-nonlicense
 
 SUBST_CLASSES+=		rcsids
 SUBST_MESSAGE.rcsids=	Strip RCS IDs as they cause problems when patching.
