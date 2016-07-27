@@ -1,6 +1,6 @@
 $NetBSD$
 
---- process.c.orig	2016-07-27 09:11:40.801584349 +0000
+--- process.c.orig	2016-07-27 09:14:32.175888066 +0000
 +++ process.c
 @@ -27,14 +27,11 @@ char process_RCSid[] = "Revision: 1.6 $"
  
