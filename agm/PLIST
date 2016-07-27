@@ -1,1 +1,4 @@
 @comment $NetBSD$
+bin/agm
+bin/xagm
+man/man6/agm.6
