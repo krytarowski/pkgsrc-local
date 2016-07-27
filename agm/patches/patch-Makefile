@@ -10,7 +10,7 @@ $NetBSD$
  BINDIR=/usr/local/bin
  # Location of manual pages
  #MANDIR=../../man
-@@ -93,18 +94,21 @@ sample_output: agm
+@@ -93,18 +94,22 @@ sample_output: agm
  	./agm -c2 williamshatner leonardnimoy > sample_output
  
  $(MANDIR)/man6:
@@ -35,6 +35,7 @@ $NetBSD$
  install-words:
 -	cp words $(WORDDIR)
 -	chmod 644 $(WORDDIR)/words
++	install -d $(DESTDIR)$(WORDDIR)
 +	cp words $(DESTDIR)$(WORDDIR)
 +	chmod 644 $(DESTDIR)$(WORDDIR)/words
  
