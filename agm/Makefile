@@ -27,4 +27,9 @@ MAKE_FLAGS+=	MANDIR=${PREFIX}/${PKGMANDIR}
 MAKE_FLAGS+=	WORDDIR=${PREFIX}/share/agm
 MAKE_FLAGS+=	CC=${CC}
 
+REPLACE_INTERPRETER+=	wish
+REPLACE.wish.old=	/usr/bin/wish
+REPLACE.wish.new=	${LOCALBASE}/bin/wish
+REPLACE_FILES.wish=	xagm
+
 .include "../../mk/bsd.pkg.mk"
