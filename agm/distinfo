@@ -4,5 +4,3 @@ SHA1 (agm-1.3.1.tar.gz) = 9afcbd47e8bbb79e2f08d009d10e9690ae9f200d
 RMD160 (agm-1.3.1.tar.gz) = b348b99ef9ef58f474d7a0acff572c369bbaf55e
 SHA512 (agm-1.3.1.tar.gz) = 143c6c3a31e542f59bbb0fab4372a2747f78b299fff07b9f136b41c930423b27a56f1c9635efa1248caf05d0449f6e63a0c5ed86d136a1c3ffa6309d64297687
 Size (agm-1.3.1.tar.gz) = 420211 bytes
-SHA1 (patch-gobble.c) = 435d11626af590fb8c9cbcd4d9e5daf5ede64027
-SHA1 (patch-process.c) = 04e477deb48798f728d196009ef9471f8f7ac21d
