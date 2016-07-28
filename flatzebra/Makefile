@@ -1,13 +1,13 @@
 # $NetBSD$
 
 DISTNAME=	flatzebra-0.1.6
-CATEGORIES=	local
+CATEGORIES=	devel
 MASTER_SITES=	http://perso.b2b2c.ca/~sarrazip/dev/
 
 MAINTAINER=	pkgsrc-users@NetBSD.org
 HOMEPAGE=	http://perso.b2b2c.ca/~sarrazip/dev/
-COMMENT=	TODO: Short description of the package
-#LICENSE=	# TODO: (see mk/license.mk)
+COMMENT=	Generic game engine for 2D double-buffering animation
+LICENSE=	gnu-gpl-v2
 
 GNU_CONFIGURE=	yes
 USE_LIBTOOL=	yes
@@ -17,6 +17,6 @@ USE_LANGUAGES=	c c++
 PKGCONFIG_OVERRIDE+=	flatzebra-0.1.pc.in
 
 .include "../../audio/SDL_mixer/buildlink3.mk"
-.include "../../graphics/SDL_image/buildlink3.mk"
 .include "../../devel/SDL/buildlink3.mk"
+.include "../../graphics/SDL_image/buildlink3.mk"
 .include "../../mk/bsd.pkg.mk"
