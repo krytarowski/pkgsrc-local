@@ -7,7 +7,7 @@ MASTER_SITES=	http://perso.b2b2c.ca/~sarrazip/dev/
 MAINTAINER=	pkgsrc-users@NetBSD.org
 HOMEPAGE=	http://perso.b2b2c.ca/~sarrazip/dev/
 COMMENT=	Robot-killing video game
-LICENSE=	#
+LICENSE=	gnu-gpl-v2
 
 GNU_CONFIGURE=	yes
 USE_LANGUAGES=	c c++
