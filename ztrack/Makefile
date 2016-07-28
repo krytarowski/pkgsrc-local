@@ -7,7 +7,7 @@ MASTER_SITES=	${MASTER_SITE_SUNSITE:=games/arcade/}
 MAINTAINER=	pkgsrc-users@NetBSD.org
 # Nothing better available
 HOMEPAGE=	${MASTER_SITE_SUNSITE:=games/arcade/}
-COMMENT=	TODO: Short description of the package
+COMMENT=	Simple curses-based pseudo-3D driving game
 LICENSE=	public-domain
 
 WRKSRC=	${WRKDIR}/ztrack
