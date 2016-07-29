@@ -1,6 +1,6 @@
 $NetBSD$
 
---- src/nvcore/DefsGnucNetBSD.h.orig	2016-07-29 23:08:03.335913009 +0000
+--- src/nvcore/DefsGnucNetBSD.h.orig	2016-07-29 23:10:46.878988677 +0000
 +++ src/nvcore/DefsGnucNetBSD.h
 @@ -0,0 +1,65 @@
 +#ifndef NV_CORE_H
@@ -63,7 +63,7 @@ $NetBSD$
 +typedef uint32_t    uint32;
 +typedef int32_t     int32;
 +
-+typedef uint64_t    uint64;
++typedef unsigned long long    uint64;
 +typedef int64_t     int64;
 +
 +// Aliases
