@@ -8,7 +8,7 @@ EXTRACT_SUFX=	.tar.xz
 
 MAINTAINER=	pkgsrc-users@NetBSD.org
 HOMEPAGE=	http://releases.wildfiregames.com/
-COMMENT=	TODO: Short description of the package
+COMMENT=	Historical real-time strategy game
 LICENSE=	gnu-gpl-v2 AND gnu-lgpl-v2.1
 
 WRKSRC=		${WRKDIR}/${DISTNAME:S/-unix-build//}
