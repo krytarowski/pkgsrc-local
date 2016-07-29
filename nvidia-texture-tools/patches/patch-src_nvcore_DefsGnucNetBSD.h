@@ -1,5 +1,7 @@
 $NetBSD$
 
+Add NetBSD support.
+
 --- src/nvcore/DefsGnucNetBSD.h.orig	2016-07-29 23:19:05.554359582 +0000
 +++ src/nvcore/DefsGnucNetBSD.h
 @@ -0,0 +1,65 @@

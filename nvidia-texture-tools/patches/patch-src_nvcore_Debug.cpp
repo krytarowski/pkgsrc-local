@@ -1,5 +1,7 @@
 $NetBSD$
 
+Add NetBSD support.
+
 --- src/nvcore/Debug.cpp.orig	2010-05-15 09:12:05.000000000 +0000
 +++ src/nvcore/Debug.cpp
 @@ -34,7 +34,7 @@

@@ -1,5 +1,9 @@
 $NetBSD$
 
+Add NetBSD support.
+Adapt for new libpng API.
+Fix false->NULL conversion warnings.
+
 --- src/nvimage/ImageIO.cpp.orig	2010-05-15 09:12:05.000000000 +0000
 +++ src/nvimage/ImageIO.cpp
 @@ -135,7 +135,7 @@ FloatImage * nv::ImageIO::loadFloat(cons

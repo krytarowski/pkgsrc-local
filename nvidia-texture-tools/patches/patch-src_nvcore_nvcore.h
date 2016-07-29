@@ -1,5 +1,7 @@
 $NetBSD$
 
+Add NetBSD support.
+
 --- src/nvcore/nvcore.h.orig	2010-05-15 09:12:05.000000000 +0000
 +++ src/nvcore/nvcore.h
 @@ -43,6 +43,9 @@

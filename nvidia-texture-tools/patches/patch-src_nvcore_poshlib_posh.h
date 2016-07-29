@@ -1,5 +1,7 @@
 $NetBSD$
 
+Add NetBSD support.
+
 --- src/nvcore/poshlib/posh.h.orig	2010-05-15 09:12:05.000000000 +0000
 +++ src/nvcore/poshlib/posh.h
 @@ -372,6 +372,11 @@ Metrowerks:

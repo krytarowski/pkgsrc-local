@@ -1,5 +1,7 @@
 $NetBSD$
 
+Add support for NetBSD.
+
 --- src/nvmath/nvmath.h.orig	2010-05-15 09:12:05.000000000 +0000
 +++ src/nvmath/nvmath.h
 @@ -115,7 +115,7 @@ inline bool isFinite(const float f)
