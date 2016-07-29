@@ -11,8 +11,10 @@ HOMEPAGE=	http://releases.wildfiregames.com/
 COMMENT=	Datafiles for the 0ad game
 LICENSE=	public-domain AND cc-by-sa-v3.0
 
-WRKSRC=		${WRKDIR}/${DISTNAME:S/-unix-build//}
+WRKSRC=		${WRKDIR}/${DISTNAME:S/-unix-data//}
 USE_LANGUAGES=	# none
+
+USE_TOOLS+=	pax
 
 DATADIR_0AD=	${PREFIX}/share/0ad
 
