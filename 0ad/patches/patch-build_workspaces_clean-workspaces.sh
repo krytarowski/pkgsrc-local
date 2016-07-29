@@ -11,3 +11,12 @@ $NetBSD$
      MAKE=${MAKE:="gmake"}
      ;;
    * )
+@@ -37,7 +37,7 @@ fi
+ 
+ echo "Removing generated test files..."
+ 
+-find ../../source -name "test_*.cpp" -type f -not -name "test_setup.cpp" -exec rm {} \;
++find ../../source -name "test_*.cpp" -type f ! -name "test_setup.cpp" -exec rm {} \;
+ 
+ echo "Cleaning build output..."
+ 

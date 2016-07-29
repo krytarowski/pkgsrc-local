@@ -16,4 +16,15 @@ USE_LANGUAGES=	c c++
 
 USE_TOOLS+=	gmake
 
+do-configure:
+	${RUN} cd ${WRKSRC} && ./build/workspaces/clean-workspaces.sh
+	${RUN} cd ${WRKSRC} && ./build/workspaces/update-workspaces.sh \
+		--bindir=${PREFIX}/bin \
+		--datadir=${PREFIX}/share/${PKGBASE} \
+		--libdir=${PREFIX}/lib/${PKGBASE}
+
+do-build:
+	${RUN} cd ${WRKSRC} && \
+		${GMAKE} config=release verbose=1 -C build/workspaces/gcc
+
 .include "../../mk/bsd.pkg.mk"
