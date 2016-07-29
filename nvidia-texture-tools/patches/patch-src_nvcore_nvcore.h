@@ -12,12 +12,12 @@ $NetBSD$
  #elif defined POSH_OS_OSX
  #	define NV_OS_DARWIN 1
  #	define NV_OS_UNIX 1
-@@ -158,7 +161,7 @@
- #elif NV_CC_GNUC
- #	if NV_OS_LINUX
+@@ -160,6 +163,8 @@
  #		include "DefsGnucLinux.h"
--#	elif NV_OS_DARWIN
-+#	elif NV_OS_DARWIN || NV_OS_NETBSD
+ #	elif NV_OS_DARWIN
  #		include "DefsGnucDarwin.h"
++#	elif NV_OS_NETBSD
++#		include "DefsGnucNetBSD.h"
  #	elif NV_OS_MINGW
  #		include "DefsGnucWin32.h"
+ #	elif NV_OS_CYGWIN
