@@ -1,16 +1,26 @@
 # $NetBSD$
 
 DISTNAME=	0ad-0.0.20-alpha-unix-data
-CATEGORIES=	local
+PKGNAME=	${DISTNAME:S/-unix-data//:S/0ad-/0ad-data/:S/-alpha/alpha/}
+CATEGORIES=	games
 MASTER_SITES=	http://releases.wildfiregames.com/
 EXTRACT_SUFX=	.tar.xz
 
-MAINTAINER=	INSERT_YOUR_MAIL_ADDRESS_HERE
+MAINTAINER=	pkgsrc-users@NetBSD.org
 HOMEPAGE=	http://releases.wildfiregames.com/
-COMMENT=	TODO: Short description of the package
-#LICENSE=	# TODO: (see mk/license.mk)
+COMMENT=	Datafiles for the 0ad game
+LICENSE=	public-domain AND cc-by-sa-v3.0
 
-WRKSRC=		${WRKDIR}/0ad-0.0.20-alpha
+WRKSRC=		${WRKDIR}/${DISTNAME:S/-unix-build//}
 USE_LANGUAGES=	# none
+
+DATADIR_0AD=	${PREFIX}/share/0ad
+
+INSTALLATION_DIRS+=	${DATADIR_0AD}
+
+NO_BUILD=	yes
+
+do-install:
+	${RUN} cd ${WRKSRC} && ${PAX} -rw . ${DESTDIR}${DATADIR_0AD}
 
 .include "../../mk/bsd.pkg.mk"
