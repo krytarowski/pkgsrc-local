@@ -14,7 +14,7 @@ LICENSE=	gnu-gpl-v2 AND gnu-lgpl-v2.1
 WRKSRC=		${WRKDIR}/${DISTNAME:S/-unix-build//}
 USE_LANGUAGES=	c c++
 
-USE_TOOLS+=	gmake perl
+USE_TOOLS+=	gmake perl bash
 
 do-configure:
 	${RUN} cd ${WRKSRC} && ./build/workspaces/clean-workspaces.sh
