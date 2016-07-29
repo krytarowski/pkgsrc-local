@@ -4,3 +4,7 @@ SHA1 (nvidia-texture-tools-2.0.8.tar.gz) = 5e032be01a17feef3f78fd0aa35aaf1eec81b
 RMD160 (nvidia-texture-tools-2.0.8.tar.gz) = 86fc38c77cf0529bd0b1746322a7923cc3deecaf
 SHA512 (nvidia-texture-tools-2.0.8.tar.gz) = 342b9e14a1bdeeee8fae4a3b0446b25b01e13915cc5bd29396e6ca01bb1262c64e759008a7d7debf8a811c7cf16c54d44c22f31557e626cd0bafea07724bab01
 Size (nvidia-texture-tools-2.0.8.tar.gz) = 939218 bytes
+SHA1 (patch-src_nvcore_Debug.cpp) = 2c7af9504ca025d9e5fc7c29188a80d1027ffd58
+SHA1 (patch-src_nvcore_nvcore.h) = 1422ee05fd408452ab54febef7c4ab31ee00cc82
+SHA1 (patch-src_nvcore_poshlib_posh.h) = e0e1c7c79814deea68ba53394b10937bc2eca417
+SHA1 (patch-src_nvmath_nvmath.h) = 968853af8e278c07624a111c2277a7db9cfe4e1d
