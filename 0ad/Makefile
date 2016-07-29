@@ -14,7 +14,7 @@ LICENSE=	gnu-gpl-v2 AND gnu-lgpl-v2.1
 WRKSRC=		${WRKDIR}/${DISTNAME:S/-unix-build//}
 USE_LANGUAGES=	c c++
 
-USE_TOOLS+=	gmake
+USE_TOOLS+=	gmake perl
 
 do-configure:
 	${RUN} cd ${WRKSRC} && ./build/workspaces/clean-workspaces.sh
@@ -27,4 +27,5 @@ do-build:
 	${RUN} cd ${WRKSRC} && \
 		${GMAKE} config=release verbose=1 -C build/workspaces/gcc
 
+.include "../../textproc/libxml2/buildlink3.mk"
 .include "../../mk/bsd.pkg.mk"
