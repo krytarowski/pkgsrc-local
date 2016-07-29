@@ -13,4 +13,8 @@ HAS_CONFIGURE=	yes
 USE_CMAKE=	yes
 USE_LANGUAGES=	c c++
 
+.include "../../graphics/openexr/buildlink3.mk"
+.include "../../graphics/png/buildlink3.mk"
+.include "../../graphics/tiff/buildlink3.mk"
+.include "../../mk/jpeg.buildlink3.mk"
 .include "../../mk/bsd.pkg.mk"
