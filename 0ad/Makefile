@@ -1,7 +1,7 @@
 # $NetBSD$
 
 DISTNAME=	0ad-0.0.20-alpha-unix-build
-PKGNAME=	${DISTNAME:S/-unix-build//:S/-alpha/alpha/}
+PKGNAME=	${DISTNAME:S/-unix-build//:S/-alpha/.alpha/}
 CATEGORIES=	games
 MASTER_SITES=	http://releases.wildfiregames.com/
 EXTRACT_SUFX=	.tar.xz
