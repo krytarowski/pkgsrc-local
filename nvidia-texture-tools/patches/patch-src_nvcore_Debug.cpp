@@ -20,9 +20,9 @@ $NetBSD$
  
  	static bool nvHasStackTrace() {
  #if NV_OS_DARWIN
-@@ -211,11 +211,22 @@ namespace 
- 			ucontext_t * ucp = (ucontext_t *)secret;
- 			return (void *) ucp->uc_mcontext.regs->nip;
+@@ -199,6 +199,17 @@ namespace 
+ 				return (void *) ucp->uc_mcontext->ss.eip;
+ #			endif
  #		endif
 +#	elif NV_OS_NETBSD
 +#		if NV_CPU_X86_64
@@ -35,7 +35,10 @@ $NetBSD$
 +			ucontext_t * ucp = (ucontext_t *)secret;
 +			return (void *)ucp->uc_mcontext.__gregs[_REG_PC];
 +#		endif
- #	endif
+ #	else
+ #		if NV_CPU_X86_64
+ 			// #define REG_RIP REG_INDEX(rip) // seems to be 16
+@@ -215,7 +226,7 @@ namespace 
  		
  		// How to obtain the instruction pointers in different platforms, from mlton's source code.
  		// http://mlton.org/
