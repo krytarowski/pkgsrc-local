@@ -1,8 +1,8 @@
 $NetBSD$
 
---- src/nvcore/DefsGnucNetBSD.h.orig	2016-07-29 23:04:50.805986844 +0000
+--- src/nvcore/DefsGnucNetBSD.h.orig	2016-07-29 23:08:03.335913009 +0000
 +++ src/nvcore/DefsGnucNetBSD.h
-@@ -0,0 +1,49 @@
+@@ -0,0 +1,65 @@
 +#ifndef NV_CORE_H
 +#error "Do not include this file directly."
 +#endif
@@ -52,3 +52,19 @@ $NetBSD$
 +#endif
 +
 +#define restrict    __restrict__
++
++// Type definitions
++typedef uint8_t     uint8;
++typedef int8_t      int8;
++
++typedef uint16_t    uint16;
++typedef int16_t     int16;
++
++typedef uint32_t    uint32;
++typedef int32_t     int32;
++
++typedef uint64_t    uint64;
++typedef int64_t     int64;
++
++// Aliases
++typedef uint32      uint;
