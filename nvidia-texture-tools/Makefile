@@ -13,6 +13,8 @@ HAS_CONFIGURE=	yes
 USE_CMAKE=	yes
 USE_LANGUAGES=	c c++
 
+CMAKE_ARGS+=	-DNVTT_SHARED=ON
+
 .include "../../graphics/openexr/buildlink3.mk"
 .include "../../graphics/png/buildlink3.mk"
 .include "../../graphics/tiff/buildlink3.mk"
