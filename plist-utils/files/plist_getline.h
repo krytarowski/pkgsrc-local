@@ -1,7 +1,7 @@
 /* $NetBSD$ */
 
 /*-
- * Copyright (c) 2016 Kamil Rytarowski <kamil@NetBSD.org>.
+ * Copyright (c) 2016 The NetBSD Foundation, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
