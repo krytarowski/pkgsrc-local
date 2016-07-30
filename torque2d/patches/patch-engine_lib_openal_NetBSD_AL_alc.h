@@ -1,6 +1,6 @@
 $NetBSD$
 
---- engine/lib/openal/NetBSD/AL/alc.h.orig	2016-07-30 11:25:52.802623511 +0000
+--- engine/lib/openal/NetBSD/AL/alc.h.orig	2016-07-30 11:47:19.701489377 +0000
 +++ engine/lib/openal/NetBSD/AL/alc.h
 @@ -0,0 +1,71 @@
 +#ifndef ALC_CONTEXT_H_

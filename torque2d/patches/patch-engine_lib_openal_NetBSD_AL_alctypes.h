@@ -1,6 +1,6 @@
 $NetBSD$
 
---- engine/lib/openal/NetBSD/AL/alctypes.h.orig	2016-07-30 11:25:52.803440759 +0000
+--- engine/lib/openal/NetBSD/AL/alctypes.h.orig	2016-07-30 11:47:19.706386947 +0000
 +++ engine/lib/openal/NetBSD/AL/alctypes.h
 @@ -0,0 +1,30 @@
 +#ifndef _ALCTYPES_H_

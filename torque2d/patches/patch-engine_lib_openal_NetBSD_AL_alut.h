@@ -1,6 +1,6 @@
 $NetBSD$
 
---- engine/lib/openal/NetBSD/AL/alut.h.orig	2016-07-30 11:25:52.805820630 +0000
+--- engine/lib/openal/NetBSD/AL/alut.h.orig	2016-07-30 11:47:19.721126517 +0000
 +++ engine/lib/openal/NetBSD/AL/alut.h
 @@ -0,0 +1,53 @@
 +#ifndef _ALUT_H_

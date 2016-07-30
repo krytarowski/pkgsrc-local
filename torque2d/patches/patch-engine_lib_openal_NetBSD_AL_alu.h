@@ -1,6 +1,6 @@
 $NetBSD$
 
---- engine/lib/openal/NetBSD/AL/alu.h.orig	2016-07-30 11:25:52.805033053 +0000
+--- engine/lib/openal/NetBSD/AL/alu.h.orig	2016-07-30 11:47:19.716277314 +0000
 +++ engine/lib/openal/NetBSD/AL/alu.h
 @@ -0,0 +1,37 @@
 +#ifndef __alu_h_

@@ -1,6 +1,6 @@
 $NetBSD$
 
---- engine/lib/openal/NetBSD/openALFn.h.orig	2016-07-30 11:25:22.783008355 +0000
+--- engine/lib/openal/NetBSD/openALFn.h.orig	2016-07-30 11:47:19.735825363 +0000
 +++ engine/lib/openal/NetBSD/openALFn.h
 @@ -0,0 +1,101 @@
 +#ifndef AL_FUNCTION
