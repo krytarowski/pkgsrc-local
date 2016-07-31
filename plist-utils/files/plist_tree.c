@@ -95,6 +95,7 @@ static struct plist_tree_type {
 	rb_tree_t plist_tree;
 	rb_tree_t plist_vars_tree;
 	int initialized;
+	regex_t plist_regex_options;
 } plist_tree_singleton = {
 	.initialized = 0
 };
@@ -102,11 +103,24 @@ static struct plist_tree_type {
 void
 plist_tree_init(void)
 {
+	int ret;
 
 	assert(plist_tree_singleton.initialized == 0);
 
 	rb_tree_init(&plist_tree_singleton.plist_tree, &plist_tree_ops);
 	rb_tree_init(&plist_tree_singleton.plist_vars_tree, &plist_tree_ops);
+
+#define MAX_ERROR_MSG 0x1000
+#define REGEX_STRING_PLIST "PLIST"
+
+	if ((ret = regcomp(&plist_tree_singleton.plist_regex_options,
+	                   REGEX_STRING_PLIST, REG_BASIC)) != 0) {
+		char error_message[MAX_ERROR_MSG];
+		regerror(ret, &plist_tree_singleton.plist_regex_options,
+		         error_message, MAX_ERROR_MSG);
+		errx(EXIT_FAILURE, "Regex error compiling '%s': %s\n",
+		                   REGEX_STRING_PLIST, error_message);
+	}
 
 	plist_tree_singleton.initialized = 1;
 }
@@ -115,24 +129,32 @@ char *
 get_key(const char *entry)
 {
 	char *copy;
-	size_t n;
-	regex_t regex;
+	size_t n = 0;
 	char *s;
 	regmatch_t rm[10];
 	int ret;
+	size_t i;
 
 	assert(entry);
 
 	/* 1. Strip all ${PLIST.option}-like strings */
-	if ((ret = regcomp(&regex, "PLIST", REG_BASIC)) != 0)
-		err(EXIT_FAILURE, "regcomp ret=%d", ret);
+	ret = regexec(&plist_tree_singleton.plist_regex_options, entry,
+	              __arraycount(rm), rm, 0);
+	if (!ret) { /* Something found! */
+		printf("MAM DOPASOWANIE!\n");
+		/* Set pointer just after the matched string */
+		for(i = 0; i < __arraycount(rm); i++) {
+			if (rm[i].rm_so == -1)
+				break;
 
-	if (regexec(&regex, entry, 10, rm, 0) != 0)
-		err(EXIT_FAILURE, "regcomp");
+			n = rm[i].rm_eo;
+		}
+	}
 
-	regasub(&copy, "TEST", rm, entry);
-
-	regfree(&regex);
+	/* Set copy that now contains an entry with removed '${PLIST.*}' */
+	copy = strdup(entry + n);
+	if (copy == NULL)
+		err(EXIT_FAILURE, "strdup");
 
 	return copy;
 }
