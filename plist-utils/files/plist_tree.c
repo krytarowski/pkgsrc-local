@@ -111,10 +111,10 @@ plist_tree_init(void)
 	rb_tree_init(&plist_tree_singleton.plist_vars_tree, &plist_tree_ops);
 
 #define MAX_ERROR_MSG 0x1000
-#define REGEX_STRING_PLIST "PLIST"
+#define REGEX_STRING_PLIST "${PLIST.[^}]*}"
 
 	if ((ret = regcomp(&plist_tree_singleton.plist_regex_options,
-	                   REGEX_STRING_PLIST, REG_BASIC)) != 0) {
+	                   REGEX_STRING_PLIST, REG_EXTENDED)) != 0) {
 		char error_message[MAX_ERROR_MSG];
 		regerror(ret, &plist_tree_singleton.plist_regex_options,
 		         error_message, MAX_ERROR_MSG);
@@ -144,6 +144,7 @@ get_key(const char *entry)
 		printf("MAM DOPASOWANIE!\n");
 		/* Set pointer just after the matched string */
 		for(i = 0; i < __arraycount(rm); i++) {
+			printf("DOPASOWANIE[%zu].rm_so=%zu;.rm_eo=%zu\n", i, rm[i].rm_so, rm[i].rm_eo);
 			if (rm[i].rm_so == -1)
 				break;
 
@@ -155,6 +156,8 @@ get_key(const char *entry)
 	copy = strdup(entry + n);
 	if (copy == NULL)
 		err(EXIT_FAILURE, "strdup");
+
+	printf("ORYGINAL='%s' KOPIA='%s'!\n", entry, copy);
 
 	return copy;
 }
