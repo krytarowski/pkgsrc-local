@@ -111,7 +111,7 @@ plist_tree_init(void)
 	rb_tree_init(&plist_tree_singleton.plist_vars_tree, &plist_tree_ops);
 
 #define MAX_ERROR_MSG 0x1000
-#define REGEX_STRING_PLIST "${PLIST.[^}]*}"
+#define REGEX_STRING_PLIST "\\${PLIST.[^}]*}"
 
 	if ((ret = regcomp(&plist_tree_singleton.plist_regex_options,
 	                   REGEX_STRING_PLIST, REG_EXTENDED)) != 0) {
