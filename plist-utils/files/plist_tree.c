@@ -119,12 +119,13 @@ get_key(const char *entry)
 	regex_t regex;
 	char *s;
 	regmatch_t rm[10];
+	int ret;
 
 	assert(entry);
 
 	/* 1. Strip all ${PLIST.option}-like strings */
-	if (regcomp(&regex, "PLIST", REG_BASIC) != 0)
-		err(EXIT_FAILURE, "regcomp");
+	if ((ret = regcomp(&regex, "PLIST", REG_BASIC)) != 0)
+		err(EXIT_FAILURE, "regcomp ret=%d", ret);
 
 	if (regexec(&regex, entry, 10, rm, 0) != 0)
 		err(EXIT_FAILURE, "regcomp");
@@ -177,7 +178,7 @@ plist_tree_remove(const char *entry)
 {
 	struct plist_pair_entry *pair;
 
-        assert(plist_tree_singleton.initialized == 1);
+	assert(plist_tree_singleton.initialized == 1);
 	assert(entry);
 
 	pair = rb_tree_find_node(&plist_tree_singleton.plist_tree, entry);
