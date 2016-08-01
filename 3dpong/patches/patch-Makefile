@@ -14,12 +14,40 @@ $NetBSD$
  
  
  # Where to install things:
- 
+-
 -PREFIX=/usr/local
++DESTDIR?=
 +PREFIX?=/usr/local
  BIN_PREFIX=$(PREFIX)/bin
  MAN_PREFIX=$(PREFIX)/man
  
+@@ -44,16 +44,16 @@ OBJECTS=obj/3dpong.o obj/window.o obj/co
+ all:	3dpong
+ 
+ install:	3dpong
+-	install -d $(BIN_PREFIX)
+-	cp 3dpong $(BIN_PREFIX)/
+-	chmod 755 $(BIN_PREFIX)/3dpong
+-	cp examples/3dpong-vs-computer.sh $(BIN_PREFIX)/
+-	chmod 755 $(BIN_PREFIX)/3dpong-vs-computer.sh
+-	cp examples/3dpong-handball.sh $(BIN_PREFIX)/
+-	chmod 755 $(BIN_PREFIX)/3dpong-handball.sh
+-	install -d $(MAN_PREFIX)/man6
+-	cp src/3dpong.6 $(MAN_PREFIX)/man6/
+-	chmod 644 $(MAN_PREFIX)/man6/3dpong.6
++	install -d $(DESTDIR)$(BIN_PREFIX)
++	cp 3dpong $(DESTDIR)$(BIN_PREFIX)/
++	chmod 755 $(DESTDIR)$(BIN_PREFIX)/3dpong
++	cp examples/3dpong-vs-computer.sh $(DESTDIR)$(BIN_PREFIX)/
++	chmod 755 $(DESTDIR)$(BIN_PREFIX)/3dpong-vs-computer.sh
++	cp examples/3dpong-handball.sh $(DESTDIR)$(BIN_PREFIX)/
++	chmod 755 $(DESTDIR)$(BIN_PREFIX)/3dpong-handball.sh
++	install -d $(DESTDIR)$(MAN_PREFIX)/man6
++	cp src/3dpong.6 $(DESTDIR)$(MAN_PREFIX)/man6/
++	chmod 644 $(DESTDIR)$(MAN_PREFIX)/man6/3dpong.6
+ 
+ uninstall:
+ 	-rm $(BIN_PREFIX)/3dpong
 @@ -104,4 +104,3 @@ obj/randnum.o:	src/randnum.c src/randnum
  
  obj/text.o:	src/text.c src/text.h
