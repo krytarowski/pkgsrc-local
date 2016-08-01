@@ -11,7 +11,8 @@ LICENSE=	gnu-gpl-v2
 
 USE_TOOLS+=	gmake
 
-USE_X11=	yes
+MAKE_FLAGS+=	MAN_PREFIX=${PREFIX}/${PKGMANDIR}
+MAKE_FLAGS+=	XLIB="${COMPILER_RPATH_FLAG}${X11BASE}/lib -L${X11BASE}/lib -lX11"
 
 .include "../../mk/x11.buildlink3.mk"
 .include "../../mk/bsd.pkg.mk"

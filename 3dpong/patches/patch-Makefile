@@ -1,0 +1,27 @@
+$NetBSD$
+
+--- Makefile.orig	2004-04-29 06:23:16.000000000 +0000
++++ Makefile
+@@ -11,14 +11,14 @@
+ 
+ # Makefile user-definable variables
+ 
+-CC=gcc
+-CFLAGS=-I/usr/X11R6/include
++C?C=gcc
++CFLAGS?=-I/usr/X11R6/include
+ MATHLIB=-lm
+ 
+ 
+ # Where to install things:
+ 
+-PREFIX=/usr/local
++PREFIX?=/usr/local
+ BIN_PREFIX=$(PREFIX)/bin
+ MAN_PREFIX=$(PREFIX)/man
+ 
+@@ -104,4 +104,3 @@ obj/randnum.o:	src/randnum.c src/randnum
+ 
+ obj/text.o:	src/text.c src/text.h
+ 	$(CC)	$(CFLAGS) src/text.c -c -o obj/text.o
+-
