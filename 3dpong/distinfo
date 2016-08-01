@@ -1,0 +1,7 @@
+$NetBSD$
+
+SHA1 (3dpong-0.5.tar.gz) = c794a376f4f292b8aa6fb1a90c5e53d0c6411df2
+RMD160 (3dpong-0.5.tar.gz) = f69a08a7416354485501c6831560bb3ab453c896
+SHA512 (3dpong-0.5.tar.gz) = 83d771e149e94f0fadbb8c19ed2ba1d4ce518d97ad910185a5eee1c1c3501200403329db8aff1408953e712355785ea77eb63bcf2a7e01fd38868853cdaadcbc
+Size (3dpong-0.5.tar.gz) = 37004 bytes
+SHA1 (patch-src_randnum.c) = 66ea9c01613633a1a5ce577724ddcee36e38dcb9
