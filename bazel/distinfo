@@ -1,6 +1,6 @@
 $NetBSD$
 
-SHA1 (bazel/0.3.1.zip) = 4b224f4d41a3980e3f5f264154b871afb861b047
-RMD160 (bazel/0.3.1.zip) = 55f09af348eb409572b260dac3c764047c2d0a03
-SHA512 (bazel/0.3.1.zip) = b88d4781ebeb687bf4a551b2d8f620c7410552a093734850a98a9fc28d4d7f1a5f2f715e77bb9333adba0c53338e80deb65f7f9b80c1ef602d4d240dddf141fe
-Size (bazel/0.3.1.zip) = 125518302 bytes
+SHA1 (bazel-0.3.1.tar.gz) = 9d9db28ab8001641c1d6b4f0e3338ce36deccfea
+RMD160 (bazel-0.3.1.tar.gz) = 69885adec14ff5b11ec93b54a84d6fcc96d069a9
+SHA512 (bazel-0.3.1.tar.gz) = f9f1119b61cdf65b16b53e1de5f0b944becfd6301ebc0777731ece3c2794b3b67c2dad190a3fe9dffe609b35f07b4d0719f03ab67fc9722f7e2666580adc4fc1
+Size (bazel-0.3.1.tar.gz) = 120911350 bytes
