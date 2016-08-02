@@ -21,9 +21,10 @@ USE_JAVA=	yes
 USE_JAVA2=	yes
 
 MAKE_ENV+=	JAVA_HOME=${PKG_JAVA_HOME}
+MAKE_ENV+=	PROTOC=${PREFIX}/bin/protoc
 
 do-build:
-	${RUN} cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} ./compile.sh
+	${RUN} cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} ${BASH} -x ./compile.sh
 
 .include "../../devel/protobuf/buildlink3.mk"
 .include "../../mk/java-vm.mk"
