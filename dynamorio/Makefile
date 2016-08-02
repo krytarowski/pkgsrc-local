@@ -1,0 +1,13 @@
+# $NetBSD$
+
+DISTNAME=	dynamorio-6.1.1
+CATEGORIES=	devel
+MASTER_SITES=	${MASTER_SITE_GITHUB:=DynamoRIO/}
+GITHUB_TAG=	release_${PKGVERSION_NOREV:S/./_/g}
+
+MAINTAINER=	pkgsrc-users@NetBSD.org
+HOMEPAGE=	https://github.com/DynamoRIO/dynamorio/
+COMMENT=	Dynamic Instrumentation Tool Platform
+LICENSE=	modified-bsd
+
+.include "../../mk/bsd.pkg.mk"
