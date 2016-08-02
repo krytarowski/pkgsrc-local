@@ -10,4 +10,9 @@ HOMEPAGE=	https://github.com/DynamoRIO/dynamorio/
 COMMENT=	Dynamic Instrumentation Tool Platform
 LICENSE=	modified-bsd
 
+USE_CMAKE=	yes
+USE_TOOLS+=	perl
+USE_LANGUAGES+=	c c++
+
+.include "../../graphics/ImageMagick/buildlink3.mk"
 .include "../../mk/bsd.pkg.mk"
