@@ -3,9 +3,10 @@
 # used by devel/protobuf/Makefile
 # used by devel/py-protobuf/Makefile
 
-DISTNAME=	protobuf-2.6.1
+DISTNAME=	protobuf-3.0.0
 MASTER_SITES=	${MASTER_SITE_GITHUB:=google/}
-GITHUB_RELEASE=	v${PKGVERSION_NOREV}
+#GITHUB_RELEASE=	v${PKGVERSION_NOREV}
+GITHUB_TAG=	v${PKGVERSION_NOREV}
 
-DISTINFO_FILE=	${.CURDIR}/../../devel/protobuf/distinfo
-PATCHDIR=	${.CURDIR}/../../devel/protobuf/patches
+DISTINFO_FILE=	${.CURDIR}/../../local/protobuf/distinfo
+PATCHDIR=	${.CURDIR}/../../local/protobuf/patches
