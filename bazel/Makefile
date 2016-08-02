@@ -20,6 +20,8 @@ REPLACE_BASH=	compile.sh
 USE_JAVA=	yes
 USE_JAVA2=	yes
 
+MAKE_ENV+=	JAVA_HOME=${PKG_JAVA_HOME}
+
 do-build:
 	${RUN} cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} ./compile.sh
 
