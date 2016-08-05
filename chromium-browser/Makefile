@@ -2,6 +2,7 @@
 
 DISTNAME=	54.0.2820.1
 PKGNAME=	${DISTNAME:S/^/chromium-browser-/}
+DIST_SUBDIR=	${PKGBASE}
 CATEGORIES=	www
 MASTER_SITES=	https://chromium.googlesource.com/chromium/src.git/+archive/
 
