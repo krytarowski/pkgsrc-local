@@ -32,7 +32,7 @@ $NetBSD$
 +}
 +
 +// static
-+ProcessMetrics* ProcessMetrics::CreateProcessMetrics(ProcessHandle process) {
++std::unique_ptr<ProcessMetrics> ProcessMetrics::CreateProcessMetrics(ProcessHandle process) {
 +  return new ProcessMetrics(process);
 +}
 +

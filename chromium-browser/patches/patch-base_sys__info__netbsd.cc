@@ -2,7 +2,7 @@ $NetBSD$
 
 --- base/sys_info_netbsd.cc.orig	2016-08-05 20:43:29.897148024 +0000
 +++ base/sys_info_netbsd.cc
-@@ -0,0 +1,98 @@
+@@ -0,0 +1,100 @@
 +// Copyright (c) 2011 The Chromium Authors. All rights reserved.
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -69,6 +69,7 @@ $NetBSD$
 +  return memsize;
 +}
 +
++#if 0
 +// static
 +uint64_t SysInfo::MaxSharedMemorySize() {
 +  int mib[3];
@@ -87,6 +88,7 @@ $NetBSD$
 +
 +  return static_cast<uint64_t>(limit);
 +}
++#endif
 +
 +// static
 +std::string SysInfo::CPUModelName() {
