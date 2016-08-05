@@ -38,10 +38,7 @@ REPLACE_PYTHON+=	*/*/*/*/*/*/*/*.py
 REPLACE_PYTHON+=	*/*/*/*/*/*/*/*/*.py
 REPLACE_PYTHON+=	*/*/*/*/*/*/*/*/*/*.py
 
-# Chromium builds better with Clang
-#PKGSRC_COMPILER=	clang
-#PKG_CC=			clang
-#PKG_CXX=		clang++
+# Fix building C++11 code
 CXXFLAGS+=		-std=gnu++11
 
 do-configure:
