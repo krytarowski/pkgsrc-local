@@ -33,7 +33,7 @@ $NetBSD$
 +
 +// static
 +std::unique_ptr<ProcessMetrics> ProcessMetrics::CreateProcessMetrics(ProcessHandle process) {
-+  return new ProcessMetrics(process);
++  return WrapUnique(new ProcessMetrics(process));
 +}
 +
 +size_t ProcessMetrics::GetPagefileUsage() const {
