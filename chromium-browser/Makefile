@@ -1,10 +1,9 @@
 # $NetBSD: Makefile,v 1.14 2012/09/24 18:26:53 asau Exp $
 
-DISTNAME=	chromium-51.0.2704.103
-PKGNAME=	${DISTNAME:S/chromium/chromium-browser/}
+DISTNAME=	54.0.2820.1
+PKGNAME=	${DISTNAME:S/^/chromium-browser-/}
 CATEGORIES=	www
-MASTER_SITES=	http://commondatastorage.googleapis.com/chromium-browser-official/
-EXTRACT_SUFX=	.tar.xz
+MASTER_SITES=	https://chromium.googlesource.com/chromium/src.git/+archive/
 
 MAINTAINER=	pkgsrc-users@NetBSD.org
 HOMEPAGE=	http://dev.chromium.org/Home
