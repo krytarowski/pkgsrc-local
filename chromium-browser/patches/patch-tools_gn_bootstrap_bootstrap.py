@@ -50,7 +50,7 @@ $NetBSD$
 +        'base/process/process_handle_netbsd.cc',
 +        'base/process/process_iterator_netbsd.cc',
 +        'base/process/process_posix.cc',
-+        'base/process/process_metrics_linux.cc',
++        'base/process/process_metrics_netbsd.cc',
 +        'base/strings/sys_string_conversions_posix.cc',
 +        'base/sys_info_netbsd.cc',
 +        'base/threading/platform_thread_netbsd.cc',
