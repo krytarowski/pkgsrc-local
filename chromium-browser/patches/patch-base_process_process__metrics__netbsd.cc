@@ -2,7 +2,7 @@ $NetBSD$
 
 --- base/process/process_metrics_netbsd.cc.orig	2016-08-05 20:43:29.892467804 +0000
 +++ base/process/process_metrics_netbsd.cc
-@@ -0,0 +1,201 @@
+@@ -0,0 +1,213 @@
 +// Copyright (c) 2013 The Chromium Authors. All rights reserved.
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -21,6 +21,18 @@ $NetBSD$
 +#include <fcntl.h>  /* O_RDONLY */
 +
 +#include <uvm/uvm_extern.h> /* struct vmtotal */
++
++#include "base/files/dir_reader_posix.h"
++#include "base/files/file_util.h"
++#include "base/logging.h"
++#include "base/memory/ptr_util.h"
++#include "base/strings/string_number_conversions.h"
++#include "base/strings/string_split.h"
++#include "base/strings/string_tokenizer.h"
++#include "base/strings/string_util.h"
++#include "base/sys_info.h"
++#include "base/threading/thread_restrictions.h"
++#include "build/build_config.h"
 +
 +namespace base {
 +

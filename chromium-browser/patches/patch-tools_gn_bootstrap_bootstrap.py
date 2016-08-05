@@ -33,8 +33,8 @@ $NetBSD$
      ])
  
 +  if is_netbsd:
-+    libs.extend(['-lrt', '-latomic'])
-+    ldflags.extend(['-pthread'])
++    libs.extend(['-lrt'])
++    ldflags.extend(['-lpthread'])
 +
 +    static_libraries['xdg_user_dirs'] = {
 +        'sources': [
