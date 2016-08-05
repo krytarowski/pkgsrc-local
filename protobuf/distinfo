@@ -4,6 +4,3 @@ SHA1 (protobuf-3.0.0.tar.gz) = cffdb9bd6eed66b7c3322197740510fd103bb6df
 RMD160 (protobuf-3.0.0.tar.gz) = f9c9381f709ea33a43de8bd986d2bbc1fc10bf50
 SHA512 (protobuf-3.0.0.tar.gz) = 70938a9f8d999e81b5591f72fd032d891286184d6bf5744bcb2d31e22687a77db4aaedb2507427283985ae042cb4e1c56a25fb42d3d410a26eadd186fce1692c
 Size (protobuf-3.0.0.tar.gz) = 3899337 bytes
-SHA1 (patch-post__process__dist.sh) = f51d0dec3045e47c7542867f90c289d3ff937ff6
-SHA1 (patch-src_google_protobuf_stubs_atomicops.h) = 84754ded95b9b78f4211a7aa1de381ce53ed4e40
-SHA1 (patch-src_google_protobuf_stubs_atomicops__internals__arm__gcc.h) = eea504fd07a52e90b28e93644fd5cc6172011036
