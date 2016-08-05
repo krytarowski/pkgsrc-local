@@ -1,0 +1,20 @@
+$NetBSD$
+
+--- build/config/BUILDCONFIG.gn.orig	2016-08-05 17:13:38.000000000 +0000
++++ build/config/BUILDCONFIG.gn
+@@ -328,6 +328,15 @@ if (current_os == "win" || current_os ==
+   is_nacl = false
+   is_posix = true
+   is_win = false
++} else if (current_os == "netbsd") {
++  is_android = false
++  is_chromeos = false
++  is_ios = false
++  is_linux = false
++  is_mac = false
++  is_nacl = false
++  is_posix = true
++  is_win = false
+ }
+ 
+ # =============================================================================
