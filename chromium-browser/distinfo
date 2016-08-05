@@ -4,6 +4,7 @@ SHA1 (chromium-browser/54.0.2820.1.tar.gz) = e190966d1f71a722dbd502d085664321039
 RMD160 (chromium-browser/54.0.2820.1.tar.gz) = 20c76bd182bb529a927d479e12039bac57733a31
 SHA512 (chromium-browser/54.0.2820.1.tar.gz) = b8d8e5144964217a367ff672326de729db29e1cd1fb07b51e5d21d7343e2d7d37212b41843f74965f675e473e04b9a75c5115a814a73e8593a02e9684af493e2
 Size (chromium-browser/54.0.2820.1.tar.gz) = 777748332 bytes
+SHA1 (patch-base_debug_debugger__posix.cc) = d8e481b42d981d6a69c7bd4f48fc2b3a0e5fca3f
 SHA1 (patch-base_debug_debugging__flags.h) = da39a3ee5e6b4b0d3255bfef95601890afd80709
 SHA1 (patch-base_message__loop_message__loop.cc) = 134ab83da65cdba2bee7ea0f8aba58a9ae2a2934
 SHA1 (patch-base_process_process__handle__netbsd.cc) = ddc4e860b75f36eb8731c7d7a3e13b216d283330
