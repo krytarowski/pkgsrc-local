@@ -6,6 +6,8 @@ DIST_SUBDIR=	${PKGBASE}
 CATEGORIES=	www
 MASTER_SITES=	https://chromium.googlesource.com/chromium/src.git/+archive/
 
+EXTRACT_DIR=	${WRKSRC}
+
 MAINTAINER=	pkgsrc-users@NetBSD.org
 HOMEPAGE=	http://dev.chromium.org/Home
 COMMENT=	Open-source browser project
