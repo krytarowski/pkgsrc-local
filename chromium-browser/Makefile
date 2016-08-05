@@ -42,7 +42,7 @@ REPLACE_PYTHON+=	*/*/*/*/*/*/*/*/*/*.py
 #PKGSRC_COMPILER=	clang
 #PKG_CC=			clang
 #PKG_CXX=		clang++
-#CXXFLAGS+=		-std=gnu++11
+CXXFLAGS+=		-std=gnu++11
 
 do-configure:
 	${RUN} cd ${WRKSRC} && ${PKGSRC_SETENV} ${MAKE_ENV} ${PYTHONBIN} ./tools/gn/bootstrap/bootstrap.py
