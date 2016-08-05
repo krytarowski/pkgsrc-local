@@ -33,7 +33,7 @@ $NetBSD$
      ])
  
 +  if is_netbsd:
-+    libs.extend(['-lrt', -lexecinfo'])
++    libs.extend(['-lrt', '-lexecinfo'])
 +    ldflags.extend(['-lpthread'])
 +
 +    static_libraries['xdg_user_dirs'] = {
