@@ -27,15 +27,24 @@ ONLY_FOR_PLATFORM=	*-*-arm *-*-i386 *-*-x86_64
 .include "../../audio/alsa-lib/buildlink3.mk"
 .endif
 
-REPLACE_PYTHON+=	tools/gn/bootstrap/bootstrap.py
+REPLACE_PYTHON+=	*.py
+REPLACE_PYTHON+=	*/*.py
+REPLACE_PYTHON+=	*/*/*.py
+REPLACE_PYTHON+=	*/*/*/*.py
+REPLACE_PYTHON+=	*/*/*/*/*.py
+REPLACE_PYTHON+=	*/*/*/*/*/*.py
+REPLACE_PYTHON+=	*/*/*/*/*/*/*.py
+REPLACE_PYTHON+=	*/*/*/*/*/*/*/*.py
+REPLACE_PYTHON+=	*/*/*/*/*/*/*/*/*.py
+REPLACE_PYTHON+=	*/*/*/*/*/*/*/*/*/*.py
 
 # Chromium builds better with Clang
 #PKGSRC_COMPILER=	clang
-##;2BPKG_CC=			clang
+#PKG_CC=			clang
 #PKG_CXX=		clang++
-CXXFLAGS+=		-std=gnu++11
+#CXXFLAGS+=		-std=gnu++11
 
-pre-configure:
+do-configure:
 	${RUN} cd ${WRKSRC} && ${PKGSRC_SETENV} ${MAKE_ENV} ${PYTHONBIN} ./tools/gn/bootstrap/bootstrap.py
 
 .include "../../devel/GConf/buildlink3.mk"
