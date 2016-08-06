@@ -12,5 +12,4 @@ HOMEPAGE=       http://code.google.com/p/protobuf/
 
 LICENSE=	modified-bsd
 
-DISTINFO_FILE=	${.CURDIR}/../../local/protobuf/distinfo
 PATCHDIR=	${.CURDIR}/../../local/protobuf/patches
