@@ -3,9 +3,8 @@
 
 .include "Makefile.common"
 
-GITHUB_RELEASE=	${DISTNAME:S/protobuf-/protobuf-cpp-/}
-
-.warning GITHUB_RELEASE=$(GITHUB_RELEASE)
+DISTNAME=	protobuf-cpp-3.0.0
+GITHUB_RELEASE=	v${PKGVERSION_NOREV}
 
 CATEGORIES=	devel
 
