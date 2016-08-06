@@ -4,6 +4,7 @@
 .include "Makefile.common"
 
 DISTNAME=	protobuf-cpp-${PROTOBUFVER}
+PKGNAME=	${DISTNAME:S/-cpp//}
 
 MAINTAINER=	aran@100acres.us
 COMMENT=	Google protocol buffers
@@ -19,8 +20,6 @@ PKGCONFIG_OVERRIDE+=	protobuf-lite.pc.in
 PKGCONFIG_OVERRIDE+=	protobuf.pc.in
 
 TEST_TARGET=	check
-
-WRKSRC=		${WRKDIR}/protobuf-${PKGVERSION_NOREV}
 
 pre-configure:
 	${RUN} cd ${WRKSRC} && ./autogen.sh

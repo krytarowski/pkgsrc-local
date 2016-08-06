@@ -14,4 +14,6 @@ HOMEPAGE=       http://code.google.com/p/protobuf/
 
 LICENSE=	modified-bsd
 
+WRKSRC=		${WRKDIR}/protobuf-${PKGVERSION_NOREV}
+
 PATCHDIR=	${.CURDIR}/../../local/protobuf/patches

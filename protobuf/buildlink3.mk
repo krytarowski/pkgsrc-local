@@ -5,8 +5,8 @@ BUILDLINK_TREE+=	protobuf
 .if !defined(PROTOBUF_BUILDLINK3_MK)
 PROTOBUF_BUILDLINK3_MK:=
 
-BUILDLINK_API_DEPENDS.protobuf+=	protobuf>=2.4.1
-BUILDLINK_PKGSRCDIR.protobuf?=	../../devel/protobuf
+BUILDLINK_API_DEPENDS.protobuf+=	protobuf>=3.0.0
+BUILDLINK_PKGSRCDIR.protobuf?=	../../local/protobuf
 
 .include "../../devel/zlib/buildlink3.mk"
 .endif	# PROTOBUF_BUILDLINK3_MK
