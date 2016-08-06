@@ -269,10 +269,10 @@ ${PYSITELIB}/google/protobuf/util/json_format_proto3_pb2.pyo
 ${PYSITELIB}/google/protobuf/wrappers_pb2.py
 ${PYSITELIB}/google/protobuf/wrappers_pb2.pyc
 ${PYSITELIB}/google/protobuf/wrappers_pb2.pyo
-${PYSITELIB}/protobuf-${PKGVERSION}-py2.7-nspkg.pth
-${PYSITELIB}/protobuf-${PKGVERSION}-py2.7.egg-info/PKG-INFO
-${PYSITELIB}/protobuf-${PKGVERSION}-py2.7.egg-info/SOURCES.txt
-${PYSITELIB}/protobuf-${PKGVERSION}-py2.7.egg-info/dependency_links.txt
-${PYSITELIB}/protobuf-${PKGVERSION}-py2.7.egg-info/namespace_packages.txt
-${PYSITELIB}/protobuf-${PKGVERSION}-py2.7.egg-info/requires.txt
-${PYSITELIB}/protobuf-${PKGVERSION}-py2.7.egg-info/top_level.txt
+${PYSITELIB}/${EGG_NAME}-nspkg.pth
+${PYSITELIB}/${EGG_INFODIR}/PKG-INFO
+${PYSITELIB}/${EGG_INFODIR}/SOURCES.txt
+${PYSITELIB}/${EGG_INFODIR}/dependency_links.txt
+${PYSITELIB}/${EGG_INFODIR}/namespace_packages.txt
+${PYSITELIB}/${EGG_INFODIR}/requires.txt
+${PYSITELIB}/${EGG_INFODIR}/top_level.txt

@@ -18,6 +18,8 @@ BUILD_DEPENDS+=	${PYPKGPREFIX}-google-apputils-[0-9]*:../../devel/py-google-appu
 BUILD_DEPENDS+=	${PYPKGPREFIX}-dateutil-[0-9]*:../../time/py-dateutil
 BUILD_DEPENDS+=	${PYPKGPREFIX}-pytz-[0-9]*:../../time/py-pytz
 
+EGG_NAME=	protobuf-${PKGVERSION_NOREV}
+
 .include "../../local/protobuf/buildlink3.mk"
 .include "../../lang/python/egg.mk"
 .include "../../mk/bsd.pkg.mk"
