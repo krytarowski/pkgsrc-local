@@ -2,13 +2,16 @@
 
 .include "../../local/protobuf/Makefile.common"
 
-DISTNAME=	protobuf-java-3.0.0
+DISTNAME=	protobuf-java-${PROTOBUFVER}
 PKGNAME=	java-${DISTNAME:S/-java//}
 CATEGORIES+=	java
 
-MAINTAINER=	khorben@defora.org
+MAINTAINER=	pkgsrc-users@NetBSD.org
 COMMENT=	Java bindings for protobuf
 
+USE_JAVA=	yes
+USE_JAVA2=	yes
+
 .include "../../local/protobuf/buildlink3.mk"
-#.include "../../lang/python/egg.mk"
+.include "../../mk/java-vm.mk"
 .include "../../mk/bsd.pkg.mk"

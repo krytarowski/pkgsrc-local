@@ -3,7 +3,7 @@
 
 .include "Makefile.common"
 
-DISTNAME=	protobuf-cpp-3.0.0
+DISTNAME=	protobuf-cpp-${PROTOBUFVER}
 
 MAINTAINER=	aran@100acres.us
 COMMENT=	Google protocol buffers
