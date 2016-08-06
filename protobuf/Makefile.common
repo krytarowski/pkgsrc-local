@@ -5,6 +5,12 @@
 
 MASTER_SITES=	${MASTER_SITE_GITHUB:=google/}
 GITHUB_PROJECT=	protobuf
+GITHUB_RELEASE=	v${PKGVERSION_NOREV}
+
+CATEGORIES=	devel
+HOMEPAGE=       http://code.google.com/p/protobuf/
+
+LICENSE=	modified-bsd
 
 DISTINFO_FILE=	${.CURDIR}/../../local/protobuf/distinfo
 PATCHDIR=	${.CURDIR}/../../local/protobuf/patches

@@ -4,14 +4,9 @@
 .include "Makefile.common"
 
 DISTNAME=	protobuf-cpp-3.0.0
-GITHUB_RELEASE=	v${PKGVERSION_NOREV}
-
-CATEGORIES=	devel
 
 MAINTAINER=	aran@100acres.us
-HOMEPAGE=	http://code.google.com/p/protobuf/
 COMMENT=	Google protocol buffers
-LICENSE=	modified-bsd
 
 GNU_CONFIGURE=	yes
 USE_LIBTOOL=	yes
