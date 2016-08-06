@@ -2,8 +2,8 @@
 
 .include "../../local/protobuf/Makefile.common"
 
-DISTNAME=       protobuf-python-3.0.0
-PKGNAME=	${PYPKGPREFIX}-${DISTNAME}
+DISTNAME=	protobuf-python-3.0.0
+PKGNAME=	${PYPKGPREFIX}-${DISTNAME:S/-python//}
 CATEGORIES+=	python
 
 MAINTAINER=	khorben@defora.org
