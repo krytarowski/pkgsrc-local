@@ -1,0 +1,13 @@
+$NetBSD$
+
+--- CMakeLists.txt.orig	2016-08-07 21:41:39.370125046 +0000
++++ CMakeLists.txt
+@@ -193,6 +193,8 @@ endif()
+ # The target OS:
+ if (APPLE)
+   set(MACOS 1)
++elseif (NETBSD)
++  set(NETBSD 1)
+ elseif (UNIX)
+   set(LINUX 1)
+ endif (APPLE)
