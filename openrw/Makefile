@@ -17,6 +17,7 @@ USE_CMAKE=	yes
 
 USE_LANGUAGES=	c c++
 
+.include "../../graphics/png/buildlink3.mk"
 .include "../../audio/libmad/buildlink3.mk"
 .include "../../audio/openal-soft/buildlink3.mk"
 .include "../../audio/libsndfile/buildlink3.mk"
