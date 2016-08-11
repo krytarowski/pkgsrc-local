@@ -14,7 +14,19 @@ $NetBSD$
  	strcpy(state.basic.saveName, outBuff);
  
  	BlockDword scriptBlockSize;
-@@ -1286,4 +1290,3 @@ std::vector<SaveGameInfo> SaveGame::getA
+@@ -1251,7 +1255,11 @@ bool SaveGame::getSaveInfo(const std::st
+ 	char* saveName = (char*)basicState->saveName;
+ 
+ 	// Convert to UTF-8 and copy back to the return struct
++#if defined(RW_NETBSD)
++	iconv(icv, (const char**)&saveName, &bytes, &outCur, &outSize);
++#else
+ 	iconv(icv, &saveName, &bytes, &outCur, &outSize);
++#endif
+ 	strcpy(basicState->saveName, outBuff);
+ 
+ 	return true;
+@@ -1286,4 +1294,3 @@ std::vector<SaveGameInfo> SaveGame::getA
  
  	return infos;
  }
