@@ -1,0 +1,4 @@
+$NetBSD$
+
+SHA1 (patch-CMakeLists.txt) = 97c6f9e54cddbdb2e23e7ea33f452f0964a69ba2
+SHA1 (patch-rwgame_GameConfig.cpp) = 315dd8434f6a72e17a1c6bb829bfd99ce5f0b9f7
