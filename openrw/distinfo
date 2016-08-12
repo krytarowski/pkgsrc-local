@@ -1,7 +1,7 @@
 $NetBSD$
 
-SHA1 (patch-CMakeLists.txt) = 33854a203b9e496777fb07397bfc94d68b1c2a45
+SHA1 (patch-CMakeLists.txt) = 4212fef6b8c447548a2e50674b9f1adafaa3c6d2
 SHA1 (patch-rwengine_src_engine_SaveGame.cpp) = ac5468aaebf1446b07f46d3d52e80fd10a15b012
 SHA1 (patch-rwengine_src_loaders_LoaderGXT.cpp) = 685c6fc7c53ab09256a3d21687f2fcaeb84c7edc
 SHA1 (patch-rwengine_src_render_OpenGLRenderer.cpp) = 0e63c5d5023eff00ba01aec9f2541ba12f7eba03
-SHA1 (patch-rwgame_GameConfig.cpp) = 315dd8434f6a72e17a1c6bb829bfd99ce5f0b9f7
+SHA1 (patch-rwgame_GameConfig.cpp) = d45a31bdd7f28393259fc7969138de4225252fd5
