@@ -20,6 +20,8 @@ NO_BUILD=	yes
 
 INSTALLATION_DIRS+=	share/${PKGBASE}
 
+DEPENDS+=	coreutils-[0-9]*:../../sysutils/coreutils
+
 do-install:
 	${RUN} cd ${WRKSRC} && ${PAX} -rw . ${DESTDIR}${PREFIX}/share/${PKGBASE}
 

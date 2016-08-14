@@ -1,0 +1,33 @@
+#!/bin/sh
+
+# Kamil Rytarowski (c) 2016
+# 2-clause-bsd license
+
+CDMOUNT=/media/cdrom
+FULLINSTALL=1
+
+args=`getopt cf: $*`
+if [ $? -ne 0 ]; then
+	echo 'Usage: [-c PATH] [-f 1/0]'
+	exit 2
+fi
+set -- $args
+while [ $# -gt 0 ]; do
+	case "$1" in
+        -c)
+		CDMOUNT="$2"; shift
+		;;
+        -f)
+		FULLINSTALL="$2"; shift
+		;;
+	--)
+		shift; break
+		;;
+	esac
+	shift
+done
+
+
+export CDMOUNT
+export FULLINSTALL
+@BASH@ @PREFIX@/share/gemrb-gameinstallers/auto-installer.sh
