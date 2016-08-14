@@ -25,6 +25,7 @@ MAKE_ENV+=	PROTOC=${PREFIX}/bin/protoc
 
 do-build:
 	${RUN} cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} ${BASH} -x ./compile.sh
+#	${RUN} cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} ${BASH} ./compile.sh
 
 .include "../../devel/protobuf/buildlink3.mk"
 .include "../../mk/java-vm.mk"
