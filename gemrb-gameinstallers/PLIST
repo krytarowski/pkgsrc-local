@@ -1,1 +1,25 @@
 @comment $NetBSD$
+share/gemrb-gameinstallers/auto-installer.sh
+share/gemrb-gameinstallers/bg1/install-5cd-extra.sh
+share/gemrb-gameinstallers/bg1/install-5cd-minimal.sh
+share/gemrb-gameinstallers/bg1/install-patch-baldurdash-fix.sh
+share/gemrb-gameinstallers/bg1/install-patch-baldurdash-text.sh
+share/gemrb-gameinstallers/bg1/install-patch-intl.sh
+share/gemrb-gameinstallers/bg1/install-patch-us.sh
+share/gemrb-gameinstallers/includes/autoinstall-includes.sh
+share/gemrb-gameinstallers/includes/cd-includes.sh
+share/gemrb-gameinstallers/includes/generic-includes.sh
+share/gemrb-gameinstallers/includes/patch-includes.sh
+share/gemrb-gameinstallers/pst/install-2cd-extra.sh
+share/gemrb-gameinstallers/pst/install-2cd-minimal.sh
+share/gemrb-gameinstallers/pst/install-4cd-extra.sh
+share/gemrb-gameinstallers/pst/install-4cd-minimal.sh
+share/gemrb-gameinstallers/pst/install-patch-official.sh
+share/gemrb-gameinstallers/totsc/install-1cd-uk.sh
+share/gemrb-gameinstallers/totsc/install-3cd-extra.sh
+share/gemrb-gameinstallers/totsc/install-3cd-minimal.sh
+share/gemrb-gameinstallers/totsc/install-patch-baldurdash-fix.sh
+share/gemrb-gameinstallers/totsc/install-patch-baldurdash-text.sh
+share/gemrb-gameinstallers/totsc/install-patch-intl.sh
+share/gemrb-gameinstallers/totsc/install-patch-uk.sh
+share/gemrb-gameinstallers/totsc/install-patch-us.sh

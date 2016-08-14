@@ -10,7 +10,7 @@ HOMEPAGE=	http://www.gemrb.org/
 COMMENT=	GemRB Python installer
 LICENSE=	gnu-gpl-v3
 
-USE_TOOLS+=	bash
+USE_TOOLS+=	bash pax:build
 
 USE_LANGUAGES=	# none
 
