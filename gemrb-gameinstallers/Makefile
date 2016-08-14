@@ -18,11 +18,24 @@ REPLACE_BASH+=	*.sh */*.sh
 
 NO_BUILD=	yes
 
-INSTALLATION_DIRS+=	share/${PKGBASE}
+SUBST_CLASSES+=		exe
+SUBST_STAGE.exe=	pre-configure
+SUBST_MESSAGE.clustalx=	Adjusting paths for pkgsrc
+SUBST_FILES.exe=	gemrb-gameinstallers
+SUBST_VARS.exe=		PREFIX
+SUBST_VARS.exe=		BASH
+
+
+INSTALLATION_DIRS+=	bin share/${PKGBASE}
 
 DEPENDS+=	coreutils-[0-9]*:../../sysutils/coreutils
 
+post-extract:
+	${CP} ${FILESDIR}/gemrb-gameinstallers ${WRKSRC}
+
 do-install:
 	${RUN} cd ${WRKSRC} && ${PAX} -rw . ${DESTDIR}${PREFIX}/share/${PKGBASE}
+	${LN} -s ${PREFIX}/share/${PKGBASE}/gemrb-gameinstallers \
+		${DESTDIR}${PREFIX}/bin/gemrb-gameinstallers
 
 .include "../../mk/bsd.pkg.mk"

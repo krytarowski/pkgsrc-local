@@ -1,4 +1,5 @@
 @comment $NetBSD$
+bin/gemrb-gameinstallers
 share/gemrb-gameinstallers/auto-installer.sh
 share/gemrb-gameinstallers/bg1/install-5cd-extra.sh
 share/gemrb-gameinstallers/bg1/install-5cd-minimal.sh
@@ -6,6 +7,7 @@ share/gemrb-gameinstallers/bg1/install-patch-baldurdash-fix.sh
 share/gemrb-gameinstallers/bg1/install-patch-baldurdash-text.sh
 share/gemrb-gameinstallers/bg1/install-patch-intl.sh
 share/gemrb-gameinstallers/bg1/install-patch-us.sh
+share/gemrb-gameinstallers/gemrb-gameinstallers
 share/gemrb-gameinstallers/includes/autoinstall-includes.sh
 share/gemrb-gameinstallers/includes/cd-includes.sh
 share/gemrb-gameinstallers/includes/generic-includes.sh
