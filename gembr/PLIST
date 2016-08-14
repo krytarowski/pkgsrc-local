@@ -49,6 +49,7 @@ lib/gemrb/plugins/WAVReader.so
 lib/gemrb/plugins/WEDImporter.so
 lib/gemrb/plugins/WMPImporter.so
 lib/gemrb/plugins/ZLibManager.so
+man/man6/gemrb.6
 share/applications/gemrb.desktop
 share/doc/gemrb/AUTHORS
 share/doc/gemrb/COPYING
@@ -2224,5 +2225,4 @@ share/gemrb/unhardcoded/shared/spsmpuff.pro
 share/gemrb/unhardcoded/shared/storespl.2da
 share/gemrb/unhardcoded/shared/turn.spl
 share/icons/hicolor/scalable/apps/gemrb.svg
-share/man/man6/gemrb.6
 share/pixmaps/gemrb.png
