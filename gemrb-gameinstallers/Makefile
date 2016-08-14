@@ -35,7 +35,7 @@ post-extract:
 
 do-install:
 	${RUN} cd ${WRKSRC} && ${PAX} -rw . ${DESTDIR}${PREFIX}/share/${PKGBASE}
-	${LN} -s ${PREFIX}/share/${PKGBASE}/gemrb-gameinstallers \
+	${LN} -sf ${PREFIX}/share/${PKGBASE}/gemrb-gameinstallers \
 		${DESTDIR}${PREFIX}/bin/gemrb-gameinstallers
 
 .include "../../mk/bsd.pkg.mk"
