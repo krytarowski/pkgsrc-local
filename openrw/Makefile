@@ -17,14 +17,14 @@ USE_CMAKE=	yes
 
 USE_LANGUAGES=	c c++
 
-.include "../../graphics/png/buildlink3.mk"
-.include "../../audio/libmad/buildlink3.mk"
-.include "../../audio/openal-soft/buildlink3.mk"
-.include "../../audio/libsndfile/buildlink3.mk"
-.include "../../devel/SDL2/buildlink3.mk"
-.include "../../graphics/glm/buildlink3.mk"
-.include "../../devel/bullet/buildlink3.mk"
-.include "../../devel/boost-libs/buildlink3.mk"
-.include "../../graphics/Mesa/buildlink3.mk"
 .include "../../wip/mk/git-package.mk"
+.include "../../audio/libmad/buildlink3.mk"
+.include "../../audio/libsndfile/buildlink3.mk"
+.include "../../audio/openal-soft/buildlink3.mk"
+.include "../../devel/SDL2/buildlink3.mk"
+.include "../../devel/boost-libs/buildlink3.mk"
+.include "../../devel/bullet/buildlink3.mk"
+.include "../../graphics/Mesa/buildlink3.mk"
+.include "../../graphics/glm/buildlink3.mk"
+.include "../../graphics/png/buildlink3.mk"
 .include "../../mk/bsd.pkg.mk"
