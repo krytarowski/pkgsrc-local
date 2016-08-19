@@ -1,5 +1,7 @@
 $NetBSD$
 
+Install man-page into appropriate directory.
+
 --- CMakeLists.txt.orig	2016-02-13 21:01:52.000000000 +0000
 +++ CMakeLists.txt
 @@ -1,5 +1,7 @@
