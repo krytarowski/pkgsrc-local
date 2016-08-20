@@ -13,5 +13,8 @@ USE_LANGUAGES=	# none
 
 PYTHON_VERSIONS_INCOMPATIBLE=	27
 
+DEPENDS+=	${PYPKGPREFIX}-prompt_toolkit-[0-9]*:../../wip/py-prompt_toolkit
+DEPENDS+=	${PYPKGPREFIX}-ply-[0-9]*:../../devel/py-ply
+
 .include "../../lang/python/egg.mk"
 .include "../../mk/bsd.pkg.mk"
