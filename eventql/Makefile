@@ -1,16 +1,16 @@
 # $NetBSD$
 
 DISTNAME=	eventql-0.3.0.rc0
-CATEGORIES=	local
+CATEGORIES=	databases
 MASTER_SITES=	${MASTER_SITE_GITHUB:=eventql/}
 GITHUB_TAG=	v${PKGVERSION_NOREV:S/.rc/-rc/}
 
-MAINTAINER=	INSERT_YOUR_MAIL_ADDRESS_HERE
+MAINTAINER=	pkgsrc-users@NetBSD.org
 HOMEPAGE=	https://github.com/eventql/eventql/
 COMMENT=	distributed, column-oriented database for event collection and analytics
 LICENSE=	gnu-agpl-v3
 
-WRKSRC=			${WRKDIR}/eventql-0.3.0-rc0
+WRKSRC=			${WRKDIR}/${PKGNAME_NOREV:S/.rc/-rc/}
 USE_TOOLS+=		pkg-config autoconf automake autoconf perl
 USE_PKGLOCALEDIR=	yes
 USE_LANGUAGES=		c c++
