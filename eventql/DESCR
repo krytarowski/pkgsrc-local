@@ -1,0 +1,2 @@
+EventQL is a distributed, column-oriented database built for large-scale event
+collection and analytics. It runs super-fast SQL and JavaScript queries.
