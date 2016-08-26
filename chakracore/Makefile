@@ -15,6 +15,8 @@ LICENSE=	mit
 USE_LANGUAGES=	c c++
 USE_CMAKE=	yes
 
+CXXFLAGS+=	-std=c++11
+
 .include "../../wip/mk/git-package.mk"
 .include "../../textproc/icu/buildlink3.mk"
 .include "../../lang/libunwind/buildlink3.mk"
