@@ -1,6 +1,6 @@
 $NetBSD$
 
---- CMakeLists.txt.orig	2016-08-26 18:28:16.142050106 +0000
+--- CMakeLists.txt.orig	2016-08-26 18:28:16.000000000 +0000
 +++ CMakeLists.txt
 @@ -58,6 +58,27 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL Darwin
      endif()
