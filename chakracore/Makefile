@@ -16,4 +16,6 @@ USE_LANGUAGES=	c c++
 USE_CMAKE=	yes
 
 .include "../../wip/mk/git-package.mk"
+.include "../../textproc/icu/buildlink3.mk"
+.include "../../lang/libunwind/buildlink3.mk"
 .include "../../mk/bsd.pkg.mk"
