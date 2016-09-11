@@ -1,0 +1,7 @@
+$NetBSD$
+
+SHA1 (jerryscript/v1.0.zip) = 411d6ce3d9593fe581d55e07260522461c0f65e7
+RMD160 (jerryscript/v1.0.zip) = 03604503410f93e81141d25aac7fda5091bdc073
+SHA512 (jerryscript/v1.0.zip) = 19c21bbf0262cefa333ed049e45a28c23db7a3ee5556ff7dcbe51bd06940bb0e2569e959e44bdbe70dfb6d85a31e3ee0bb768741595b0ecea841713afd444b2b
+Size (jerryscript/v1.0.zip) = 3327711 bytes
+SHA1 (patch-jerry-core_vm_vm.c) = cdd52837453092afaa25f44e1460bb17605edc2a
