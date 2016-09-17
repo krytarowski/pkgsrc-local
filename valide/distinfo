@@ -1,0 +1,7 @@
+$NetBSD$
+
+SHA1 (valide-0.7.1.tar.gz) = 76bcf9daa47c6fb83879fa7634b7f7bf758e0a3a
+RMD160 (valide-0.7.1.tar.gz) = 45fedee8506d796380906def36f3ba5e3244b2e5
+SHA512 (valide-0.7.1.tar.gz) = 36046662c97b2df242236c4ec2cb06e9bc461a2d9c3d77e95b5a750b96559a06b273391d1846141fa59c661a7e60d072907289554d79e2efbfc2cab8533178f9
+Size (valide-0.7.1.tar.gz) = 1590672 bytes
+SHA1 (patch-libvalide_libyaml-glib_autogen.sh) = 7f71089962674bb99c6a97dae153d3c02e0d1ae5
