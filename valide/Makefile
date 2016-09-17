@@ -19,6 +19,10 @@ REPLACE_PYTHON=	waf
 WAF_REPLACE_EXECUTABLE=	no
 WAF_HAS_MANDIR=		no
 
+.include "../../lang/vala/buildlink3.mk"
+.include "../../x11/gtksourceview2/buildlink3.mk"
+.include "../../textproc/libxml2/buildlink3.mk"
+.include "../../x11/gtk2/buildlink3.mk"
 .include "../../devel/glib2/buildlink3.mk"
 .include "../../lang/python/application.mk"
 .include "../../devel/waf/waf.mk"
