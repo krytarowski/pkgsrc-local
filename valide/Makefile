@@ -14,4 +14,12 @@ USE_TOOLS+=	pkg-config
 PKGCONFIG_OVERRIDE+=	libvalide/libyaml-glib/libyaml-glib-1.0.pc.in
 PKGCONFIG_OVERRIDE+=	libvalide/libyaml-glib/libyaml/libyaml-1.0.pc.in
 
+REPLACE_PYTHON=	waf
+
+WAF_REPLACE_EXECUTABLE=	no
+WAF_HAS_MANDIR=		no
+
+.include "../../devel/glib2/buildlink3.mk"
+.include "../../lang/python/application.mk"
+.include "../../devel/waf/waf.mk"
 .include "../../mk/bsd.pkg.mk"
