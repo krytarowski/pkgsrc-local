@@ -2,6 +2,7 @@
 
 GITHUB_PROJECT=	adaptagrams
 GITHUB_TAG=	0503f7524f5b2aa96b356dfdd817f9f9869d2b20
+# Date of the latest git commit
 DISTNAME=	adaptagrams-0.20160901
 CATEGORIES=	graphics
 MASTER_SITES=	${MASTER_SITE_GITHUB:=mjwybrow/}
@@ -17,6 +18,8 @@ USE_TOOLS+=	aclocal autoconf autoheader automake autoreconf
 USE_LANGUAGES=	c c++
 
 GNU_CONFIGURE=	yes
+
+TEST_TARGET=	check
 
 pre-configure:
 # ./autogen.sh runs ./configure && make && make check and sets questionable shebang
