@@ -8,11 +8,11 @@ GITHUB_TAG=	v${PKGVERSION_NOREV}
 MAINTAINER=	pkgsrc-users@NetBSD.org
 HOMEPAGE=	https://tinycthread.github.io/
 COMMENT=	Small, portable implementation of the C11 threads API
-#LICENSE=	# TODO: (see mk/license.mk)
+LICENSE=	zlib
 
 USE_LIBTOOL=	yes
 
-INSTALLATION_DIRS=      include lib
+INSTALLATION_DIRS=	include lib
 PTHREAD_AUTO_VARS=	yes
 
 do-build:
@@ -28,6 +28,13 @@ do-install:
 		${LIBTOOL} --mode=install ${INSTALL_LIB} \
 			-c libtinycthread.la ${DESTDIR}${PREFIX}/lib/libtinycthread.la
 	${INSTALL_DATA} ${WRKSRC}/source/tinycthread.h ${DESTDIR}${PREFIX}/include
+
+do-test:
+.for f in test hello
+	${RUN} cd ${WRKSRC}/test && \
+		${CC} -ltinycthread -L../source/.libs/ -I../source ${f}.c -o ${f} && \
+		LD_LIBRARY_PATH=${WRKSRC}/source/.libs/ ./${f}
+.endfor
 
 .include "../../mk/pthread.buildlink3.mk"
 .include "../../mk/bsd.pkg.mk"
