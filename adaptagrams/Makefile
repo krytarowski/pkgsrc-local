@@ -9,7 +9,7 @@ MASTER_SITES=	${MASTER_SITE_GITHUB:=mjwybrow/}
 
 MAINTAINER=	pkgsrc-users@NetBSD.org
 HOMEPAGE=	http://www.adaptagrams.org/
-COMMENT=	Libraries for constraint-based layout and connector routing for diagrams
+COMMENT=	Tools for adaptive diagrams
 LICENSE=	gnu-lgpl-v2.1
 
 WRKSRC=		${WRKDIR}/adaptagrams-${GITHUB_TAG}/cola
