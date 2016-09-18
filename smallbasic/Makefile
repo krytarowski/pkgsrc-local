@@ -21,9 +21,10 @@ BUILD_DEPENDS+=	vim-[0-9]*:../../editors/vim
 
 GNU_CONFIGURE=		YES
 CONFIG_SHELL=		${BASH}
-CONFIGURE_ARGS+=	--enable-sdl
 
 BUILDLINK_TRANSFORM+=	rm:-ldl
+
+.include "options.mk"
 
 pre-configure:
 	${RUN} cd ${WRKSRC} && ${SH} ./autogen.sh
