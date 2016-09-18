@@ -1,5 +1,2 @@
 @comment $NetBSD$
-${PLIST.sdl}bin/sbasicg
-${PLIST.sdl}bin/sbasicg
-${PLIST.sdl}share/applications/smallbasic.desktop
-${PLIST.sdl}share/icons/hicolor/128x128/apps/sb-desktop-128x128.png
+bin/sbasic
