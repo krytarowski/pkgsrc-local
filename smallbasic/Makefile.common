@@ -23,6 +23,8 @@ CONFIG_SHELL=		${BASH}
 
 BUILDLINK_TRANSFORM+=	rm:-ldl
 
+DISTINFO_FILE=	${.CURDIR}/../../local/smallbasic/distinfo
+
 pre-configure:
 	${RUN} cd ${WRKSRC} && ${SH} ./autogen.sh
 
