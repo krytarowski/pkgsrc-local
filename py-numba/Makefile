@@ -9,7 +9,7 @@ MASTER_SITES=	${MASTER_SITE_GITHUB:=numba/}
 MAINTAINER=	pkgsrc-users@NetBSD.org
 HOMEPAGE=	http://numba.pydata.org/
 COMMENT=	NumPy aware dynamic Python compiler using LLVM
-LICENSE=	bsd-2-clause
+LICENSE=	2-clause-bsd
 
 USE_LANGUAGES=	c c++
 
