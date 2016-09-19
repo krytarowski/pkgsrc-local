@@ -15,6 +15,7 @@ LICENSE=	2-clause-bsd
 USE_LANGUAGES=	c++
 
 DEPENDS+=	${PYPKGPREFIX}-enum-[0-9]*:../../devel/py-enum
+DEPENDS+=	${PYPKGPREFIX}-six-[0-9]*:../../lang/py-six
 
 EGG_NAME=	llvmlite-0.13.0
 
