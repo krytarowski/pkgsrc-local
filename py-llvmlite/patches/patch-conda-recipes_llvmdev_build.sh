@@ -1,5 +1,7 @@
 $NetBSD$
 
+Add NetBSD support.
+
 --- conda-recipes/llvmdev/build.sh.orig	2016-08-24 14:49:54.000000000 +0000
 +++ conda-recipes/llvmdev/build.sh
 @@ -13,6 +13,8 @@ if [[ "$unamestr" == 'Linux' ]]; then

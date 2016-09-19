@@ -1,5 +1,7 @@
 $NetBSD$
 
+Add NetBSD support
+
 --- ffi/build.py.orig	2016-08-24 14:49:54.000000000 +0000
 +++ ffi/build.py
 @@ -142,6 +142,8 @@ def main():

@@ -1,5 +1,7 @@
 $NetBSD$
 
+Add NetBSD support
+
 --- ffi/Makefile.netbsd.orig	2016-09-19 01:45:04.243949019 +0000
 +++ ffi/Makefile.netbsd
 @@ -0,0 +1,18 @@

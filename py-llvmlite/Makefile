@@ -10,7 +10,7 @@ GITHUB_TAG=	v${PKGVERSION_NOREV}
 MAINTAINER=	pkgsrc-users@NetBSD.org
 HOMEPAGE=	http://llvmlite.pydata.org/
 COMMENT=	Lightweight LLVM python binding for JIT compilers
-LICENSE=	bsd-2-clause
+LICENSE=	2-clause-bsd
 
 USE_LANGUAGES=	c++
 
