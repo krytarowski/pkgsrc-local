@@ -16,6 +16,7 @@ USE_LANGUAGES=	c++
 
 #DEPENDS+=	${PYPKGPREFIX}-enum-[0-9]*:../../wip/py-enum
 
+.include "../../lang/llvm/buildlink3.mk"
 .include "../../lang/python/application.mk"
 .include "../../lang/python/egg.mk"
 .include "../../mk/bsd.pkg.mk"
