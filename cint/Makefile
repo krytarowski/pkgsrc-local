@@ -1,14 +1,13 @@
 # $NetBSD: Makefile,v 1.31 2015/12/11 23:32:53 joerg Exp $
 
-DISTNAME=		cint5.15
-PKGNAME=		cint-5.15.174
-PKGREVISION=		2
+DISTNAME=		cint-5.16.19-source
+PKGNAME=		${DISTNAME:S/-source//}
 CATEGORIES=		lang
 MASTER_SITES=		ftp://root.cern.ch/root/
-#MASTER_SITES=		${MASTER_SITE_BACKUP}
+MASTER_SITES+=		https://root.cern.ch/download/
 
 MAINTAINER=		drochner@NetBSD.org
-HOMEPAGE=		http://root.cern.ch/root/Cint.html
+HOMEPAGE=		http://www.hanno.jp/gotom/Cint.html
 COMMENT=		C/C++ interpreter
 
 CONFLICTS=		man-pages-[0-9]*
