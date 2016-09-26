@@ -1,6 +1,6 @@
 $NetBSD$
 
-SHA1 (tc-play/v2.0.zip) = c60e6d23610faf1e0bb13a103561861decca6f86
-RMD160 (tc-play/v2.0.zip) = aafe00c5a9f0d601652bd5a4e7e2c4d694e78c66
-SHA512 (tc-play/v2.0.zip) = 910f5616bb8f399e4ed3d8d9db82cfa54c8dd13624462cc3bc2ba0d077417bfe5a734349b179a1f7242c843c9f016ab6c2b538d937a99bcf6ef0a8269b9b622c
-Size (tc-play/v2.0.zip) = 1042841 bytes
+SHA1 (tc-play-2.0.tar.gz) = 372687615a3ea076a0610689ab6cf8d9abd1e1a7
+RMD160 (tc-play-2.0.tar.gz) = 2bccbfd6de98e635cb10c92b6527c1ebb90d5414
+SHA512 (tc-play-2.0.tar.gz) = 17408b2a664eb6822c77ede4f38ca67cdf643512014619d830a2c024bb8971811eded4edd65f6398d6112a3b57cd11a5b414357878c817c9cc2aac9d851946d7
+Size (tc-play-2.0.tar.gz) = 1015525 bytes
