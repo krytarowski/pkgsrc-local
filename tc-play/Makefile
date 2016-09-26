@@ -8,7 +8,7 @@ GITHUB_TAG=	v${PKGVERSION_NOREV}
 MAINTAINER=	pkgsrc-users@NetBSD.org
 HOMEPAGE=	https://github.com/bwalex/tc-play/
 COMMENT=	Free and simple TrueCrypt Implementation based on dm-crypt
-LICENSE=	simplified-bsd
+LICENSE=	2-clause-bsd
 
 USE_CMAKE=	yes
 
