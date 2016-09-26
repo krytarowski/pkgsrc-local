@@ -11,5 +11,8 @@ COMMENT=	Free and simple TrueCrypt Implementation based on dm-crypt
 LICENSE=	2-clause-bsd
 
 USE_CMAKE=	yes
+USE_TOOLS+=	pkg-config
+USE_LANGUAGES=	c c++
 
+.include "../../devel/libuuid/buildlink3.mk"
 .include "../../mk/bsd.pkg.mk"
