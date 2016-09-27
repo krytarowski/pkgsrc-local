@@ -2,7 +2,7 @@ $NetBSD$
 
 --- Makefile.orig	2006-11-24 08:41:26.000000000 +0000
 +++ Makefile
-@@ -38,7 +38,7 @@ include/iosenum.h : cint$(G__CFG_EXEEXT)
+@@ -38,11 +38,11 @@ include/iosenum.h : cint$(G__CFG_EXEEXT)
  		touch include/iosenum.h; \
  	else \
  		(echo Generating iosenum.h. This might take a while...; \
@@ -11,3 +11,8 @@ $NetBSD$
  		unset VS_UNICODE_OUTPUT; \
  		LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:. \
  		DYLD_LIBRARY_PATH=$$DYLD_LIBRARY_PATH:. \
+-		./cint$(G__CFG_EXEEXT) $(G__CFG_INCP)inc iosenum.cxx); \
++		./cint$(G__CFG_EXEEXT) $(G__CFG_INCP)inc include/iosenum.cxx); \
+ 	fi)
+ 	@echo > done
+ 
