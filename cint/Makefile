@@ -10,7 +10,7 @@ MAINTAINER=		drochner@NetBSD.org
 HOMEPAGE=		http://www.hanno.jp/gotom/Cint.html
 COMMENT=		C/C++ interpreter
 
-CONFLICTS=		man-pages-[0-9]*
+#CONFLICTS=		man-pages-[0-9]*
 
 USE_LANGUAGES=		c c++
 
@@ -28,11 +28,8 @@ PLIST.threads=		yes
 INSTALLATION_DIRS=	bin ${PKGMANDIR}/man1 ${PKGMANDIR}/man2
 INSTALLATION_DIRS+=	${PKGMANDIR}/man3
 USE_LANGUAGES=		c c++
-CHECK_PORTABILITY_SKIP+=	INSTALLBIN
 
-post-extract:
-	${FIND} ${WRKSRC} -depth -type d -name CVS -exec ${RM} -rf {} \;
-	${FIND} ${WRKSRC} -type f -name .cvsignore -exec ${RM} -f {} \;
+HAS_CONFIGURE=		yes
 
 do-build:
 	cd ${WRKDIR};						\
