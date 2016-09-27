@@ -36,6 +36,7 @@ CONFIGURE_ARGS+=	--readline=${PREFIX}/lib/libreadline.a
 USE_LANGUAGES=		c c++
 
 HAS_CONFIGURE=		yes
+BUILDLINK_TRANSFORM.NetBSD+=	rm:-ldl
 
 BUILD_TARGET=
 
