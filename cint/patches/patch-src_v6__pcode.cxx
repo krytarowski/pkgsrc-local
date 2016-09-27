@@ -8,7 +8,7 @@ $NetBSD$
          pos._Off = (off_t)G__asm_inst[pc+3];
 +#elif defined(__NetBSD__)
 +        fpos_t pos;
-+        pos._pos = (fpos_t)G__asm_inst[pc+3];
++        pos._pos = (off_t)G__asm_inst[pc+3];
  #else
          fpos_t pos = (fpos_t)G__asm_inst[pc+3];
  #endif

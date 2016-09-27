@@ -12,6 +12,6 @@ SHA1 (patch-src_gcc3strm.cxx) = 0a40e104b236bc0548c5d8c536c94de0f0d347b6
 SHA1 (patch-src_v6__macro.cxx) = 5b7aa2c48e8546bc39e5dfb1d71c037f5079d99b
 SHA1 (patch-src_v6__newlink.cxx) = 9f8208efa77b131788cf2a29b342799c81af99a7
 SHA1 (patch-src_v6__parse.cxx) = 7967db48f2205213e1ab618b604fa5fc91fd4458
-SHA1 (patch-src_v6__pcode.cxx) = 41c6185b7295ceee7efbe730440c49ca7baa18d5
+SHA1 (patch-src_v6__pcode.cxx) = 7828f23bffa8d9a9d869a5389c190920ec3dd9cd
 SHA1 (patch-tool_INSTALLBIN) = 74a9eff4a4651b887347a35c4c4d8c24bc142d49
 SHA1 (patch-tool_makecint.cxx) = cfbce2bfb8dabbb098d148809012b40f1393a564
