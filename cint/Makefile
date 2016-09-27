@@ -25,8 +25,8 @@ USE_LANGUAGES=		c c++
 
 HAS_CONFIGURE=			yes
 BUILDLINK_TRANSFORM.NetBSD+=	rm:-ldl
-CFLAGS+=			-Wno-write-strings
-LDFLAGS.NetBSD+=		${COMPILER_RPATH_FLAG}${PREFIX}/lib
+CPPFLAGS+=			-Wno-write-strings
+LDFLAGS+=			${COMPILER_RPATH_FLAG}${PREFIX}/lib
 
 BUILD_TARGET=			# empty string required
 
