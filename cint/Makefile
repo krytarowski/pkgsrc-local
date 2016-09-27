@@ -37,7 +37,8 @@ USE_LANGUAGES=		c c++
 
 HAS_CONFIGURE=			yes
 BUILDLINK_TRANSFORM.NetBSD+=	rm:-ldl
-CFLAGS+=			-Wno-write-strings
+#CFLAGS+=			-Wno-write-strings
+#LDFLAGS.NetBSD+=		-fPIC
 
 BUILD_TARGET=
 
