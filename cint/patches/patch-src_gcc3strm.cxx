@@ -7,7 +7,7 @@ $NetBSD$
  static int G__G__stream_7_7_0(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
  {
 +#if defined(__NetBSD__)
-+      G__letint(result7, 103, (long) ((fpos<mbstate_t>*) G__getstructoffset())->_pos->operator==(*(fpos<mbstate_t>*) libp->para[0].ref));
++//      G__letint(result7, 103, (long) ((fpos<mbstate_t>*) G__getstructoffset())->operator==(*(fpos<mbstate_t>*) libp->para[0].ref));
 +#else
        G__letint(result7, 103, (long) ((fpos<mbstate_t>*) G__getstructoffset())->operator==(*(fpos<mbstate_t>*) libp->para[0].ref));
 +#endif
@@ -17,7 +17,7 @@ $NetBSD$
  static int G__G__stream_7_8_0(G__value* result7, G__CONST char* funcname, struct G__param* libp, int hash)
  {
 +#if defined(__NetBSD__)
-+      G__letint(result7, 103, (long) ((fpos<mbstate_t>*) G__getstructoffset())->_pos->operator!=(*(fpos<mbstate_t>*) libp->para[0].ref));
++//      G__letint(result7, 103, (long) ((fpos<mbstate_t>*) G__getstructoffset())->operator!=(*(fpos<mbstate_t>*) libp->para[0].ref));
 +#else
        G__letint(result7, 103, (long) ((fpos<mbstate_t>*) G__getstructoffset())->operator!=(*(fpos<mbstate_t>*) libp->para[0].ref));
 +#endif
