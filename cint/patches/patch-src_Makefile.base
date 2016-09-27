@@ -6,11 +6,20 @@ $NetBSD$
  
  HEADERS =       common.h global.h fproto.h memtest.h sunos.h ../inc/G__ci.h 
  
-+SHLIB_OPT=	-fPIC
++SHLIB_OPT =     -fPIC
 +
  OBJECTS = 	$(PLATFORM) \
  		$(STDLIBS) \
  		$(APIO) \
+@@ -86,7 +88,7 @@ $(CINTLIB) : $(OBJECTS)
+ 
+ # Cint core as shared library on Linux
+ $(CINTSYSDIR)/libcint.so : $(OBJECTS)
+-	$(LD) $(LDDLLOPT) $(SHLIB_OPT) -o $@ $(OBJECTS)
++	$(LD) $(LDDLLOPT) $(SHLIB_OPT) -fPIC -o $@ $(OBJECTS)
+ 
+ # Cint core as shared library on HP-UX
+ $(CINTSYSDIR)/libcint.sl : $(OBJECTS)
 @@ -470,4 +472,3 @@ Shadow$(OBJPOST) : Api.h $(HEADERS)
  ############################################################################
  clean :
