@@ -4,4 +4,4 @@ SHA1 (cint-5.16.19-source.tar.gz) = 22307e50b4414f4e6e70d791d3ccfe2cc2163f59
 RMD160 (cint-5.16.19-source.tar.gz) = ff7deb0cdf5534fb8849eaf5febf9e57117066ff
 SHA512 (cint-5.16.19-source.tar.gz) = ae96247dc62f7ab27d514b302cd836a9bed07ed24adc664224c063a70e1305a335e01031e0dd18646d3d7215593590a8d5100c4236aba08064bbcf0ece531c02
 Size (cint-5.16.19-source.tar.gz) = 1975329 bytes
-SHA1 (patch-cint-5.16.19_tool_INSTALLBIN) = 7ef6ced8029c6c0c91762c01d8cfc58a4f3ab4c1
+SHA1 (patch-tool_INSTALLBIN) = 74a9eff4a4651b887347a35c4c4d8c24bc142d49

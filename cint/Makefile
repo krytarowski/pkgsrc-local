@@ -13,6 +13,8 @@ COMMENT=		C/C++ interpreter
 
 USE_LANGUAGES=		c c++
 
+WRKSRC=			${WRKDIR}/${PKGNAME_NOREV}
+
 #GCC_REQD+=		3.0
 #PTHREAD_OPTS+=		native
 #PLIST_VARS+=		threads
