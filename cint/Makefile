@@ -26,21 +26,24 @@ WRKSRC=			${WRKDIR}/${PKGNAME_NOREV}
 #PLIST.threads=		yes
 #.endif
 
+MAKE_JOBS_SAFE=		no
+
 #INSTALLATION_DIRS=	bin ${PKGMANDIR}/man1 ${PKGMANDIR}/man2
 #INSTALLATION_DIRS+=	${PKGMANDIR}/man3
 
 CONFIGURE_ARGS+=	--arch=netbsd
 #CONFIGURE_ARGS+=	--readline=${BUILDLINK_PREFIX.readline}/lib/libreadline.a
-CONFIGURE_ARGS+=	--readline=${PREFIX}/lib/libreadline.a
+#CONFIGURE_ARGS+=	--readline=${PREFIX}/lib/libreadline.so
+CONFIGURE_ARGS+=	--readline=${BUILDLINK_PREFIX.readline}/lib/libreadline.so
 
 USE_LANGUAGES=		c c++
 
 HAS_CONFIGURE=			yes
 BUILDLINK_TRANSFORM.NetBSD+=	rm:-ldl
-#CFLAGS+=			-Wno-write-strings
-#LDFLAGS.NetBSD+=		-fPIC
+CFLAGS+=			-Wno-write-strings
+LDFLAGS.NetBSD+=		${COMPILER_RPATH_FLAG}${BUILDLINK_PREFIX.readline}/lib
 
-BUILD_TARGET=
+BUILD_TARGET=			# empty string required
 
-.include "../../devel/readline/buildlink3.mk"
+.include "../../mk/readline.buildlink3.mk"
 .include "../../mk/bsd.pkg.mk"
