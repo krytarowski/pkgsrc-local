@@ -39,7 +39,7 @@ pre-install:
 
 do-install:
 .for _file_ in cint makecint MAKEINFO G__ci.h
-	${INSTALL_PROGRAM} ${WRKDIR}/${_file_} ${DESTDIR}${PREFIX}/${_file_}
+	${INSTALL_PROGRAM} ${WRKSRC}/${_file_} ${DESTDIR}${PREFIX}/${_file_}
 .endfor
 	${SED} "s;XXXPREFIXXXX;${PREFIX};g" <${FILESDIR}/cint.sh \
 		>${DESTDIR}${PREFIX}/bin/cint
