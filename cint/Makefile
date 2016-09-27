@@ -9,28 +9,30 @@ MAINTAINER=		drochner@NetBSD.org
 HOMEPAGE=		http://www.hanno.jp/gotom/Cint.html
 COMMENT=		C/C++ interpreter
 
-USE_TOOLS+=		bash gmake
+USE_TOOLS+=		bash gmake pax
 USE_LANGUAGES=		c c++
 
 CONFIG_SHELL=		${BASH}
 
 WRKSRC=			${WRKDIR}/${PKGNAME_NOREV}
 
-MAKE_JOBS_SAFE=		no
-
 CONFIGURE_ARGS+=	--arch=netbsd
+# For some reason I cannot get BUILDLINK path for .readline
 CONFIGURE_ARGS+=	--readline=${PREFIX}/lib/libreadline.so
 
 USE_LANGUAGES=		c c++
 
 HAS_CONFIGURE=			yes
 BUILDLINK_TRANSFORM.NetBSD+=	rm:-ldl
+# It does not work
 CPPFLAGS+=			-Wno-write-strings
+# For some reason I cannot get BUILDLINK path for .readline
 LDFLAGS+=			${COMPILER_RPATH_FLAG}${PREFIX}/lib
 
 BUILD_TARGET=			# empty string required
 
 INSTALLATION_DIRS+=	bin cint cint/lib share/doc/cint
+INSTALLATION_DIRS+=	${PKGMANDIR}/man1 ${PKGMANDIR}/man2 ${PKGMANDIR}/man3
 
 post-extract:
 	${FIND} ${WRKSRC} -depth -type d -name CVS -exec ${RM} -rf {} \;
@@ -43,7 +45,7 @@ pre-install:
 
 do-install:
 .for _file_ in cint makecint # inc/G__ci.h
-	${INSTALL_PROGRAM} ${WRKSRC}/${_file_} ${DESTDIR}${PREFIX}/${_file_}
+	${INSTALL_PROGRAM} ${WRKSRC}/${_file_} ${DESTDIR}${PREFIX}/cint/
 .endfor
 	${SED} "s;XXXPREFIXXXX;${PREFIX};g" <${FILESDIR}/cint.sh \
 		>${DESTDIR}${PREFIX}/bin/cint
@@ -56,8 +58,8 @@ do-install:
 		${DESTDIR}${PREFIX}/share/doc/cint
 .endfor
 .for _file_ in cint.1 makecint.1 garbage.2 security.2 unique.2 array.h.3 fft.h.3 statistics.h.3
-	${INSTALL_MAN} ${WRKSRC}/doc/man${_file_:H}/${_file_} \
-		${DESTDIR}${PREFIX}/${PKGMANDIR}/man${_file_:H}
+	${INSTALL_MAN} ${WRKSRC}/doc/man${_file_:E}/${_file_} \
+		${DESTDIR}${PREFIX}/${PKGMANDIR}/man${_file_:E}
 .endfor
 
 .include "../../mk/readline.buildlink3.mk"
