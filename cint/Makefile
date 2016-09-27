@@ -14,19 +14,16 @@ COMMENT=		C/C++ interpreter
 
 USE_LANGUAGES=		c c++
 
-#same distribution file name for minor versions
-DIST_SUBDIR=		${PKGNAME_NOREV}
-WRKSRC=			${WRKDIR}
-GCC_REQD+=		3.0
-PTHREAD_OPTS+=		native
-PLIST_VARS+=		threads
-.include "../../mk/pthread.buildlink3.mk"
-.if defined(PTHREAD_TYPE) && ${PTHREAD_TYPE} == "native"
-PLIST.threads=		yes
-.endif
+#GCC_REQD+=		3.0
+#PTHREAD_OPTS+=		native
+#PLIST_VARS+=		threads
+#.include "../../mk/pthread.buildlink3.mk"
+#.if defined(PTHREAD_TYPE) && ${PTHREAD_TYPE} == "native"
+#PLIST.threads=		yes
+#.endif
 
-INSTALLATION_DIRS=	bin ${PKGMANDIR}/man1 ${PKGMANDIR}/man2
-INSTALLATION_DIRS+=	${PKGMANDIR}/man3
+#INSTALLATION_DIRS=	bin ${PKGMANDIR}/man1 ${PKGMANDIR}/man2
+#INSTALLATION_DIRS+=	${PKGMANDIR}/man3
 USE_LANGUAGES=		c c++
 
 HAS_CONFIGURE=		yes
