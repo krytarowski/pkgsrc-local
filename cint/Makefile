@@ -32,13 +32,17 @@ BUILD_TARGET=			# empty string required
 
 INSTALLATION_DIRS+=	bin cint cint/lib share/doc/cint
 
+post-extract:
+	${FIND} ${WRKSRC} -depth -type d -name CVS -exec ${RM} -rf {} \;
+	${FIND} ${WRKSRC} -type f -name .cvsignore -exec ${RM} -f {} \;
+
 # We do not want these files to be installed
 pre-install:
 	${RM} -f ${WRKSRC}/include/Makeit
 	${RM} -f ${WRKSRC}/include/make*
 
 do-install:
-.for _file_ in cint makecint MAKEINFO G__ci.h
+.for _file_ in cint makecint # inc/G__ci.h
 	${INSTALL_PROGRAM} ${WRKSRC}/${_file_} ${DESTDIR}${PREFIX}/${_file_}
 .endfor
 	${SED} "s;XXXPREFIXXXX;${PREFIX};g" <${FILESDIR}/cint.sh \
