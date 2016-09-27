@@ -1,0 +1,30 @@
+$NetBSD$
+
+--- configure.orig	2006-11-24 08:30:23.000000000 +0000
++++ configure
+@@ -102,6 +102,17 @@ function config_linux {
+     config_GCC_defaults
+ }
+ 
++function config_netbsdx8664gcc {
++    config_GCC_defaults
++
++    EXTRA_LIB_DIR=/usr/lib64
++    CPP="gcc -E -C -m64"
++    CXXFLAGS="-m64  -fPIC ${CXXFLAGS}"
++    CFLAGS="-m64  -fPIC ${CFLAGS}"
++    LDFLAGS="-m64 ${LDFLAGS}"
++
++}
++
+ function config_linuxx8664gcc {
+     config_GCC_defaults
+ 
+@@ -327,6 +338,7 @@ function guess_arch {
+ #        freebsd*:*:5*)         arch=freebsd5        ;;
+ #        freebsd*:*:4*)         arch=freebsd4        ;;
+ #        freebsd*:*:*)          arch=freebsd         ;;
++         netbsd:x86_64:*)       arch=netbsdx8664gcc  ;;
+ #        hp-ux:ia64:*)          arch=hpuxia64acc     ;;
+ #        hp-ux:*:*)             arch=hpuxacc         ;;
+ #        hurd*:*:*)             arch=hurddeb         ;;

@@ -11,7 +11,10 @@ COMMENT=		C/C++ interpreter
 
 #CONFLICTS=		man-pages-[0-9]*
 
+USE_TOOLS+=		bash
 USE_LANGUAGES=		c c++
+
+CONFIG_SHELL=		${BASH}
 
 WRKSRC=			${WRKDIR}/${PKGNAME_NOREV}
 
@@ -28,22 +31,6 @@ WRKSRC=			${WRKDIR}/${PKGNAME_NOREV}
 USE_LANGUAGES=		c c++
 
 HAS_CONFIGURE=		yes
-
-do-build:
-	cd ${WRKDIR};						\
-	case ${OPSYS} in					\
-	FreeBSD|DragonFly)					\
-		${PKGSRC_SETENV} ${MAKE_ENV} ${SH} ./setup platform/freebsd_C \
-		;;						\
-	NetBSD|OpenBSD|Bitrig)					\
-		${PKGSRC_SETENV} ${MAKE_ENV} ${SH} ./setup platform/netbsd \
-		;;						\
-	SunOS)							\
-		${PKGSRC_SETENV} ${MAKE_ENV} ${SH} ./setup platform/solaris_gcc \
-		;;						\
-	*)							\
-		${ECHO} 'not yet ported to ${OPSYS}'; exit 1 ;;	\
-	esac
 
 do-install:
 	${INSTALL_DATA_DIR} ${DESTDIR}${PREFIX}/cint
