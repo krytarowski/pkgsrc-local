@@ -2,7 +2,26 @@ $NetBSD$
 
 --- configure.orig	2006-11-24 08:30:23.000000000 +0000
 +++ configure
-@@ -102,6 +102,17 @@ function config_linux {
+@@ -6,18 +6,6 @@
+ #
+ ##############################################################
+ #
+-# This is a bash script, which works with any reasonable sh.
+-# Solaris sh is not, so we have to start bash, and call ourselves again.
+-
+-[ "x$1" != "x__have_the_proper_shell@" ] && ( \
+-uname -a | grep -i sunos > /dev/null \
+-  && (bash $0 __have_the_proper_shell@ "$*") \
+-  || (sh $0 __have_the_proper_shell@ "$*") \
+-)
+-
+-[ "x$1" != "x__have_the_proper_shell@" ] && exit
+-shift
+-
+ # configure settings to build CINT
+ 
+ ARCHS=(linux linuxicc macgcc djgpp cygwin mingw mwerks hpux aix msvc7 msvc8 solaris solarisgcc)
+@@ -102,6 +90,17 @@ function config_linux {
      config_GCC_defaults
  }
  
@@ -20,7 +39,7 @@ $NetBSD$
  function config_linuxx8664gcc {
      config_GCC_defaults
  
-@@ -327,6 +338,7 @@ function guess_arch {
+@@ -327,6 +326,7 @@ function guess_arch {
  #        freebsd*:*:5*)         arch=freebsd5        ;;
  #        freebsd*:*:4*)         arch=freebsd4        ;;
  #        freebsd*:*:*)          arch=freebsd         ;;
