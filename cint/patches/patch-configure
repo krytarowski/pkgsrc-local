@@ -55,3 +55,12 @@ $NetBSD$
  #        hp-ux:ia64:*)          arch=hpuxia64acc     ;;
  #        hp-ux:*:*)             arch=hpuxacc         ;;
  #        hurd*:*:*)             arch=hurddeb         ;;
+@@ -412,7 +416,7 @@ function processflag_cintex_libdir {
+     CINTEXLIBDIR=$1
+ }
+ 
+-function processflag_readlinelib {
++function processflag_readline {
+     READLINELIB=$1
+     BUILDREADLINE=
+ }

@@ -30,7 +30,8 @@ WRKSRC=			${WRKDIR}/${PKGNAME_NOREV}
 #INSTALLATION_DIRS+=	${PKGMANDIR}/man3
 
 CONFIGURE_ARGS+=	--arch=netbsd
-CONFIGURE_ARGS+=	--readline=${BUILDLINK_PREFIX.readline}/lib/libreadline.a
+#CONFIGURE_ARGS+=	--readline=${BUILDLINK_PREFIX.readline}/lib/libreadline.a
+CONFIGURE_ARGS+=	--readline=${PREFIX}/lib/libreadline.a
 
 USE_LANGUAGES=		c c++
 
