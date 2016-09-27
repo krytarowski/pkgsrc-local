@@ -25,7 +25,7 @@ $NetBSD$
  
  #############################################################
  ###
-@@ -102,6 +90,26 @@ function config_linux {
+@@ -102,6 +90,27 @@ function config_linux {
      config_GCC_defaults
  }
  
@@ -37,22 +37,23 @@ $NetBSD$
 +    CXXFLAGS="-m64  -fPIC ${CXXFLAGS}"
 +    CFLAGS="-m64  -fPIC ${CFLAGS}"
 +    LDFLAGS="-m64 ${LDFLAGS}"
-+
++    DEFAULTLIBS="-lm -lterminfo"
 +}
 +
 +function config_netbsd {
 +    config_GCC_defaults
 +
-+    CPP="gcc -E -C -m64"
-+    CXXFLAGS="-m64  -fPIC ${CXXFLAGS}"
-+    CFLAGS="-m64  -fPIC ${CFLAGS}"
-+    LDFLAGS="-m64 ${LDFLAGS}"
++    CPP="gcc -E -C"
++    CXXFLAGS="-fPIC ${CXXFLAGS}"
++    CFLAGS="-fPIC ${CFLAGS}"
++    LDFLAGS="${LDFLAGS}"
++    DEFAULTLIBS="-lm -lterminfo"
 +}
 +
  function config_linuxx8664gcc {
      config_GCC_defaults
  
-@@ -327,6 +335,7 @@ function guess_arch {
+@@ -327,6 +336,7 @@ function guess_arch {
  #        freebsd*:*:5*)         arch=freebsd5        ;;
  #        freebsd*:*:4*)         arch=freebsd4        ;;
  #        freebsd*:*:*)          arch=freebsd         ;;
@@ -60,7 +61,7 @@ $NetBSD$
  #        hp-ux:ia64:*)          arch=hpuxia64acc     ;;
  #        hp-ux:*:*)             arch=hpuxacc         ;;
  #        hurd*:*:*)             arch=hurddeb         ;;
-@@ -412,7 +421,7 @@ function processflag_cintex_libdir {
+@@ -412,7 +422,7 @@ function processflag_cintex_libdir {
      CINTEXLIBDIR=$1
  }
  
