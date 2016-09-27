@@ -3,8 +3,7 @@
 DISTNAME=		cint-5.16.19-source
 PKGNAME=		${DISTNAME:S/-source//}
 CATEGORIES=		lang
-MASTER_SITES=		ftp://root.cern.ch/root/
-MASTER_SITES+=		https://root.cern.ch/download/
+MASTER_SITES=		https://root.cern.ch/download/
 
 MAINTAINER=		drochner@NetBSD.org
 HOMEPAGE=		http://www.hanno.jp/gotom/Cint.html
