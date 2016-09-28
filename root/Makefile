@@ -1,10 +1,9 @@
 # $NetBSD: Makefile,v 1.59 2016/03/05 11:28:58 jperkin Exp $
 
-DISTNAME=		root_v5.26.00b.source
-PKGNAME=		root-5.26
-PKGREVISION=		17
+DISTNAME=		root_v6.06.08.source
+PKGNAME=		${DISTNAME:S/.source//:S/_v/-/}
 CATEGORIES=		misc
-MASTER_SITES=		ftp://root.cern.ch/root/
+MASTER_SITES=		https://root.cern.ch/download/
 
 MAINTAINER=		drochner@NetBSD.org
 HOMEPAGE=		http://root.cern.ch/
