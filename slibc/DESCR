@@ -1,0 +1,17 @@
+This library provides an implementation of the bounds-checking C functions
+(as specified in Annex K of the current C standard, a.k.a. C11) for use with
+the GNU C library.
+
+These functions lower the risk of introducing security vulnerabilities such as
+buffer overflows and format string vulnerabilities into your code by providing
+clear and easy-to-use interfaces. For each C function a secure alternate
+function ending in a "_s" postfix is provided (e.g., strcpy_s). Use of these
+functions is recommended by security experts and secure coding standards (CERT
+Secure Coding Standard C).
+
+This library consists of
+    -) a thread-safe implementation of all functions specified in the ISO
+       Standard (except widechar functions)
+    -) API documentation for all functions
+    -) test cases for all functions
+    -) overloaded C++ template functions for easier use when compiling with g++
