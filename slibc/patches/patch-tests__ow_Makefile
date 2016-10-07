@@ -1,0 +1,33 @@
+$NetBSD$
+
+--- tests_ow/Makefile.orig	2012-11-22 08:54:38.219376000 +0000
++++ tests_ow/Makefile
+@@ -2,6 +2,7 @@ include ../VERSION
+ include ../Makefile.inc
+ 
+ CFLAGS += -I../include/slibc -Wno-format -Wno-format-extra-args -D__UNIX__ 
++CPPFLAGS ?=
+ LDLIBS += -L../src/ -lslibc
+ 
+ .PHONY: all clean
+@@ -14,15 +15,15 @@ OW_TEST_EXES_W:=  safembyt safewfmt.c sa
+ all: $(OW_TEST_EXES)
+ 
+ safefmt:  ../src/$(SLIBC_LIB_SO)
+-	$(CC) $(CFLAGS) -I../ -o $@ safefmt.c $(LDLIBS)
++	$(CC) $(CPPFLAGS) $(CFLAGS) -I../ -o $@ safefmt.c $(LDLIBS)
+ safestr:  ../src/$(SLIBC_LIB_SO)
+-	$(CC) $(CFLAGS) -I../ -o $@ safestr.c $(LDLIBS)
++	$(CC) $(CPPFLAGS) $(CFLAGS) -I../ -o $@ safestr.c $(LDLIBS)
+ safefile: ../src/$(SLIBC_LIB_SO)
+-	$(CC) $(CFLAGS) -I../ -o $@ safefile.c $(LDLIBS)
++	$(CC) $(CPPFLAGS) $(CFLAGS) -I../ -o $@ safefile.c $(LDLIBS)
+ safetime: ../src/$(SLIBC_LIB_SO)
+-	$(CC) $(CFLAGS) -I../ -o $@ safetime.c $(LDLIBS)
++	$(CC) $(CPPFLAGS) $(CFLAGS) -I../ -o $@ safetime.c $(LDLIBS)
+ safeio:   ../src/$(SLIBC_LIB_SO)
+-	$(CC) $(CFLAGS) -I../ -o $@ safeio.c $(LDLIBS)
++	$(CC) $(CPPFLAGS) $(CFLAGS) -I../ -o $@ safeio.c $(LDLIBS)
+ 
+ 
+ test: $(OW_TEST_EXES)
