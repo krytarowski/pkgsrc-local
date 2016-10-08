@@ -1,8 +1,7 @@
 # $NetBSD: Makefile,v 1.22 2014/10/09 14:06:01 wiz Exp $
 #
 
-DISTNAME=	covered-0.4.7
-PKGREVISION=	5
+DISTNAME=	covered-0.7.10
 CATEGORIES=	cad
 MASTER_SITES=	${MASTER_SITE_SOURCEFORGE:=covered/}
 
@@ -10,9 +9,7 @@ MAINTAINER=	dmcmahill@NetBSD.org
 HOMEPAGE=	http://covered.sourceforge.net/
 COMMENT=	Verilog code coverage analyzer (stable release version)
 
-DEPENDS+=	verilog{,-current}-[0-9]*:../../cad/verilog
-
-CONFLICTS+=	covered-current-[0-9]*
+DEPENDS+=	verilog-[0-9]*:../../cad/verilog
 
 GNU_CONFIGURE=	YES
 USE_TOOLS+=	bison gmake lex
