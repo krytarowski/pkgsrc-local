@@ -9,8 +9,6 @@ MAINTAINER=	dmcmahill@NetBSD.org
 HOMEPAGE=	http://covered.sourceforge.net/
 COMMENT=	Verilog code coverage analyzer (stable release version)
 
-DEPENDS+=	verilog-[0-9]*:../../cad/verilog
-
 GNU_CONFIGURE=	YES
 USE_TOOLS+=	bison gmake lex
 
@@ -31,6 +29,7 @@ CONFIGURE_ENV+=	r_cv_path_TK_CONFIG=${BUILDLINK_PREFIX.tk}/lib/tkConfig.sh
 
 CPPFLAGS+=	-DUSE_INTERP_RESULT
 
+.include "../../local/iverilog/buildlink3.mk"
 .include "../../devel/gperf/buildlink3.mk"
 .include "../../devel/zlib/buildlink3.mk"
 .include "../../lang/tcl/buildlink3.mk"
