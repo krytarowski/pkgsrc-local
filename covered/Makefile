@@ -10,7 +10,7 @@ HOMEPAGE=	http://covered.sourceforge.net/
 COMMENT=	Verilog code coverage analyzer (stable release version)
 
 GNU_CONFIGURE=	YES
-USE_TOOLS+=	bison gmake lex
+USE_TOOLS+=	bison gmake lex autoheader
 
 REPLACE_INTERPRETER+=	WISH
 REPLACE.WISH.old=	.*wish
