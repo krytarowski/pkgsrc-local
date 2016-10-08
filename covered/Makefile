@@ -15,8 +15,8 @@ USE_TOOLS+=	bison gmake lex autoheader
 CONFIGURE_ARGS+=	--with-tcl-config=${BUILDLINK_PREFIX.tcl}/lib/tclConfig.sh
 CONFIGURE_ARGS+=	--with-tk-config=${BUILDLINK_PREFIX.tk}/lib/tkConfig.sh
 
-#CONFIGURE_ENV+=	r_cv_path_TCL_CONFIG=${BUILDLINK_PREFIX.tcl}/lib/tclConfig.sh
-#CONFIGURE_ENV+=	r_cv_path_TK_CONFIG=${BUILDLINK_PREFIX.tk}/lib/tkConfig.sh
+# This is required for TCL/TK dependency
+CPPFLAGS+=	-DUSE_INTERP_RESULT
 
 .include "../../local/iverilog/buildlink3.mk"
 .include "../../devel/gperf/buildlink3.mk"
