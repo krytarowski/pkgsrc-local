@@ -1,5 +1,7 @@
 $NetBSD$
 
+Fix inline use.
+
 --- src/lxt2_read.h.orig	2008-06-27 14:02:03.000000000 +0000
 +++ src/lxt2_read.h
 @@ -247,12 +247,12 @@ unsigned process_mask_dirty : 1; /* only

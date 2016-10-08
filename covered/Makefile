@@ -8,12 +8,10 @@ MASTER_SITES=	${MASTER_SITE_SOURCEFORGE:=covered/}
 MAINTAINER=	dmcmahill@NetBSD.org
 HOMEPAGE=	http://covered.sourceforge.net/
 COMMENT=	Verilog code coverage analyzer (stable release version)
+LICENSE=	gnu-gpl-v2
 
 GNU_CONFIGURE=	YES
-USE_TOOLS+=	bison gmake lex autoheader
-
-CONFIGURE_ARGS+=	--with-tcl-config=${BUILDLINK_PREFIX.tcl}/lib/tclConfig.sh
-CONFIGURE_ARGS+=	--with-tk-config=${BUILDLINK_PREFIX.tk}/lib/tkConfig.sh
+USE_TOOLS+=	bison gmake lex
 
 # This is required for TCL/TK dependency
 CPPFLAGS+=	-DUSE_INTERP_RESULT
