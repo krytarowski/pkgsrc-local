@@ -12,22 +12,11 @@ COMMENT=	Verilog code coverage analyzer (stable release version)
 GNU_CONFIGURE=	YES
 USE_TOOLS+=	bison gmake lex autoheader
 
-REPLACE_INTERPRETER+=	WISH
-REPLACE.WISH.old=	.*wish
-REPLACE.WISH.new=	${PREFIX}/bin/wish
-REPLACE_FILES.WISH=	scripts/main_view.tcl
-REPLACE_FILES.WISH+=	scripts/menu_create.tcl
-REPLACE_FILES.WISH+=	scripts/preferences.tcl
-REPLACE_FILES.WISH+=	scripts/summary.tcl
+CONFIGURE_ARGS+=	--with-tcl-config=${BUILDLINK_PREFIX.tcl}/lib/tclConfig.sh
+CONFIGURE_ARGS+=	--with-tk-config=${BUILDLINK_PREFIX.tk}/lib/tkConfig.sh
 
-# we use this hack of setting a cache variable because
-# the configure script uses AC_PATH_PROG to try and find
-# the *Config.sh scripts but these are not installed with
-# the execute bit set.
-CONFIGURE_ENV+=	r_cv_path_TCL_CONFIG=${BUILDLINK_PREFIX.tcl}/lib/tclConfig.sh
-CONFIGURE_ENV+=	r_cv_path_TK_CONFIG=${BUILDLINK_PREFIX.tk}/lib/tkConfig.sh
-
-CPPFLAGS+=	-DUSE_INTERP_RESULT
+#CONFIGURE_ENV+=	r_cv_path_TCL_CONFIG=${BUILDLINK_PREFIX.tcl}/lib/tclConfig.sh
+#CONFIGURE_ENV+=	r_cv_path_TK_CONFIG=${BUILDLINK_PREFIX.tk}/lib/tkConfig.sh
 
 .include "../../local/iverilog/buildlink3.mk"
 .include "../../devel/gperf/buildlink3.mk"
