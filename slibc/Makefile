@@ -14,5 +14,6 @@ USE_TOOLS=	gmake
 USE_LANGUAGES=	c c++
 
 CPPFLAGS.NetBSD+=	-Derrno_t=int
+CPPFLAGS.NetBSD+=	-Drsize_t=size_t
 
 .include "../../mk/bsd.pkg.mk"
