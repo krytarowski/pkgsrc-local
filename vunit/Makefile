@@ -12,4 +12,5 @@ LICENSE=	mpl-2.0 AND artistic-2.0
 
 #USE_LANGUAGES=	# none
 
+.include "../../lang/python/egg.mk"
 .include "../../mk/bsd.pkg.mk"
