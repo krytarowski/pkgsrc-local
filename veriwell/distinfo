@@ -1,6 +1,6 @@
 $NetBSD$
 
-SHA1 (Veriwell-2.8.7.tar.gz) = 34a3b603e8c30250ad94cbd98b42590ee50c3d0b
-RMD160 (Veriwell-2.8.7.tar.gz) = 864af3f1bff9aa55d9a8567505ae0f1d4c21acad
-SHA512 (Veriwell-2.8.7.tar.gz) = 02c08ad2050cb5bac4a63b26fa91c7f5f417cd1e35ef8592561b2e6999d97c9b340d6d8695bcd77075a31063964e87b9c1bc7c159e1e505d8f0dd4373beb56bd
-Size (Veriwell-2.8.7.tar.gz) = 54084 bytes
+SHA1 (veriwell-2.8.7.tar.gz) = 9ef4e6a25a4fd65db325a89ed89b199547fabbd6
+RMD160 (veriwell-2.8.7.tar.gz) = 3d86c40b353f701d61cab301e0f7c3ec136c88e7
+SHA512 (veriwell-2.8.7.tar.gz) = c0858ce71bd8cfef989e96899bc0d5fc0c919d8248cad0bebde7faf31073cde0423ddb168cf0fabb9f7b46ced7b953ad392627b7e1ad5ea1e7ef75f9524717a8
+Size (veriwell-2.8.7.tar.gz) = 875596 bytes

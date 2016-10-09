@@ -1,9 +1,9 @@
 # $NetBSD$
 
-DISTNAME=	Veriwell-2.8.7
+DISTNAME=	veriwell-2.8.7
 PKGNAME=	${DISTNAME:tl}
 CATEGORIES=	cad
-MASTER_SITES=	${MASTER_SITE_SOURCEFORGE:=VeriWell/}
+MASTER_SITES=	${MASTER_SITE_SOURCEFORGE:=veriwell/}
 
 MAINTAINER=	pkgsrc-users@NetBSD.org
 HOMEPAGE=	https://sourceforge.net/projects/veriwell/
