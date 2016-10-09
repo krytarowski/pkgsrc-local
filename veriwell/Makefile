@@ -12,4 +12,5 @@ LICENSE=	gnu-gpl-v2
 GNU_CONFIGURE=	yes
 USE_LANGUAGES=	c c++
 
+.include "../../devel/zlib/buildlink3.mk"
 .include "../../mk/bsd.pkg.mk"
