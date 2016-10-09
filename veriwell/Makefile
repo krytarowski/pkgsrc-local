@@ -1,7 +1,6 @@
 # $NetBSD$
 
 DISTNAME=	veriwell-2.8.7
-PKGNAME=	${DISTNAME:tl}
 CATEGORIES=	cad
 MASTER_SITES=	${MASTER_SITE_SOURCEFORGE:=veriwell/}
 

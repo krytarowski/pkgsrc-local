@@ -1,1 +1,7 @@
 @comment $NetBSD$
+bin/veriwell
+include/acc_user.h
+include/veriuser.c
+include/veriuser.h
+lib/libveriwell.la
+man/man1/veriwell.1
