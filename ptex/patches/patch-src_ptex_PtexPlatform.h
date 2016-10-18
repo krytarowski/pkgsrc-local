@@ -1,5 +1,9 @@
 $NetBSD$
 
+The alloca(3) function is an extension and place of its definition varies.
+The <alloca.h> header is required on SunOS and acceptable on other systems, but
+unavailable on NetBSD.
+
 --- src/ptex/PtexPlatform.h.orig	2016-04-04 17:14:05.000000000 +0000
 +++ src/ptex/PtexPlatform.h
 @@ -62,7 +62,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE
