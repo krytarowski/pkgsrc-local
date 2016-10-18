@@ -2,7 +2,7 @@
 
 PKG_OPTIONS_VAR=	PKG_OPTIONS.opensubdiv
 PKG_SUPPORTED_OPTIONS=	opengl ptex doc # cuda tbb opencl dx11
-PKG_SUGGESTED_OPTIONS=	doc # ptex opengl
+PKG_SUGGESTED_OPTIONS=	opengl
 PLIST_VARS+=		opengl doc # ptex has no extra PLIST entries
 
 .include 		"../../mk/bsd.options.mk"
