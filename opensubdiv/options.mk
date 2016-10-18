@@ -2,8 +2,8 @@
 
 PKG_OPTIONS_VAR=	PKG_OPTIONS.opensubdiv
 PKG_SUPPORTED_OPTIONS=	opengl ptex doc # cuda tbb opencl dx11
-PKG_SUGGESTED_OPTIONS=	opengl
-PLIST_VARS+=		opengl
+PKG_SUGGESTED_OPTIONS=	ptex # opengl
+PLIST_VARS+=		opengl # ptex has no extra PLIST entries
 
 .include 		"../../mk/bsd.options.mk"
 
@@ -12,22 +12,20 @@ PLIST_VARS+=		opengl
 CMAKE_ARGS+=	-DGLEW_LOCATION:PATH=${PREFIX}
 PLIST.opengl=	yes
 .else
-CMAKE_ARGS+=	-DNO_OPENGL
+CMAKE_ARGS+=	-DNO_OPENGL:BOOL=ON
 .endif
 
 .if !empty(PKG_OPTIONS:Mptex)
-.include "../../graphics/glew/buildlink3.mk"
+.include "../../graphics/ptex/buildlink3.mk"
 CMAKE_ARGS+=	-DPTEX_LOCATION:PATH=${PREFIX}
-#PLIST_SRC+=		PLIST.openssl
-#CONFIGURE_ARGS+=	--enable-perl
-#USE_TOOLS+=		perl
 .else
 CMAKE_ARGS+=	-DNO_PTEX:BOOL=ON
 .endif
 
 .if !empty(PKG_OPTIONS:Mdoc)
-#.include "../../security/openssl/buildlink3.mk"
-#PLIST_SRC+=		PLIST.openssl
-#CONFIGURE_ARGS+=	--enable-perl
-#USE_TOOLS+=		perl
+BUILD_DEPENDS+=	doxygen>=1.8.9.1:../../devel/doxygen
+BUILD_DEPENDS+=	${PYPKGPREFIX}-docutils-[0-9]*:../../textproc/py-docutils
+.include "../../lang/pyversion.mk"
+.else
+CMAKE_ARGS+=	-DNO_DOC:BOOL=ON
 .endif
