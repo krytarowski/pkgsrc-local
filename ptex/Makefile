@@ -13,4 +13,6 @@ LICENSE=	modified-bsd # with slightly changes spelling
 USE_CMAKE=	yes
 USE_LANGUAGES=	c c++
 
+BUILDLINK_TRANSFORM+=	opt:-std=c++98:-std=gnu++98 # alloca(3)
+
 .include "../../mk/bsd.pkg.mk"
