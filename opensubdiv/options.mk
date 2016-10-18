@@ -3,15 +3,16 @@
 PKG_OPTIONS_VAR=	PKG_OPTIONS.opensubdiv
 PKG_SUPPORTED_OPTIONS=	opengl ptex doc # cuda tbb opencl dx11
 PKG_SUGGESTED_OPTIONS=	opengl
+PLIST_VARS+=		opengl
 
 .include 		"../../mk/bsd.options.mk"
 
 .if !empty(PKG_OPTIONS:Mopengl)
 .include "../../graphics/glew/buildlink3.mk"
 CMAKE_ARGS+=	-DGLEW_LOCATION:PATH=${PREFIX}
+PLIST.opengl=	yes
 .else
 CMAKE_ARGS+=	-DNO_OPENGL
-PLIST.opengl=	yes
 .endif
 
 .if !empty(PKG_OPTIONS:Mptex)
