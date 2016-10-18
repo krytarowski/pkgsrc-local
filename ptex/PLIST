@@ -1,9 +1,0 @@
-@comment $NetBSD$
-bin/ptxinfo
-include/PtexHalf.h
-include/PtexInt.h
-include/PtexUtils.h
-include/PtexVersion.h
-include/Ptexture.h
-lib/libPtex.a
-lib/libPtex.so
