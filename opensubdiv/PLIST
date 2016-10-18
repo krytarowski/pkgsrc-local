@@ -3,6 +3,7 @@ bin/far_perf
 bin/far_regression
 bin/hbr_baseline
 bin/hbr_regression
+${PLIST.opengl}bin/stringify
 include/opensubdiv/far/error.h
 include/opensubdiv/far/patchDescriptor.h
 include/opensubdiv/far/patchMap.h
@@ -37,8 +38,16 @@ include/opensubdiv/hbr/vertex.h
 include/opensubdiv/hbr/vertexEdit.h
 include/opensubdiv/osd/bufferDescriptor.h
 include/opensubdiv/osd/cpuEvaluator.h
+${PLIST.opengl}include/opensubdiv/osd/cpuGLVertexBuffer.h
 include/opensubdiv/osd/cpuPatchTable.h
 include/opensubdiv/osd/cpuVertexBuffer.h
+${PLIST.opengl}include/opensubdiv/osd/glComputeEvaluator.h
+${PLIST.opengl}include/opensubdiv/osd/glLegacyGregoryPatchTable.h
+${PLIST.opengl}include/opensubdiv/osd/glMesh.h
+${PLIST.opengl}include/opensubdiv/osd/glPatchTable.h
+${PLIST.opengl}include/opensubdiv/osd/glVertexBuffer.h
+${PLIST.opengl}include/opensubdiv/osd/glXFBEvaluator.h
+${PLIST.opengl}include/opensubdiv/osd/glslPatchShaderSource.h
 include/opensubdiv/osd/mesh.h
 include/opensubdiv/osd/nonCopyable.h
 include/opensubdiv/osd/ompEvaluator.h
@@ -65,3 +74,6 @@ include/opensubdiv/vtr/types.h
 lib/libosdCPU.a
 lib/libosdCPU.so
 lib/libosdCPU.so.3.1.0.RC2
+${PLIST.opengl}lib/libosdGPU.a
+${PLIST.opengl}lib/libosdGPU.so
+${PLIST.opengl}lib/libosdGPU.so.3.1.0.RC2

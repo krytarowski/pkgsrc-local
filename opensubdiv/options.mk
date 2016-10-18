@@ -11,7 +11,7 @@ PKG_SUGGESTED_OPTIONS=	opengl
 CMAKE_ARGS+=	-DGLEW_LOCATION:PATH=${PREFIX}
 .else
 CMAKE_ARGS+=	-DNO_OPENGL
-#PLIST_SRC+=		PLIST.openssl
+PLIST.opengl=	yes
 .endif
 
 .if !empty(PKG_OPTIONS:Mptex)
