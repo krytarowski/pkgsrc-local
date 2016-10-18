@@ -1,0 +1,12 @@
+# $NetBSD$
+
+BUILDLINK_TREE+=	ptex
+
+.if !defined(PTEX_BUILDLINK3_MK)
+PTEX_BUILDLINK3_MK:=
+
+BUILDLINK_API_DEPENDS.ptex+=	ptex>=2.1.28
+BUILDLINK_PKGSRCDIR.ptex?=	../../local/ptex
+.endif	# PTEX_BUILDLINK3_MK
+
+BUILDLINK_TREE+=	-ptex
