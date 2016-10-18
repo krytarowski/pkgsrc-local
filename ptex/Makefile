@@ -15,4 +15,6 @@ USE_LANGUAGES=	c c++
 
 BUILDLINK_TRANSFORM+=	opt:-std=c++98:-std=gnu++98 # alloca(3)
 
+TEST_TARGET=	test
+
 .include "../../mk/bsd.pkg.mk"
