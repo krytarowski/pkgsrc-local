@@ -18,4 +18,6 @@ USE_LANGUAGES=	c c++
 # Useless and installs files by default into subdirs of $PREFIX/bin/
 CMAKE_ARGS+=	-DNO_TUTORIALS:BOOL=ON
 
+TEST_TARGET=	test
+
 .include "../../mk/bsd.pkg.mk"
