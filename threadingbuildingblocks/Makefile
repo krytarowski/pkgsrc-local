@@ -18,4 +18,9 @@ USE_LANGUAGES=	c c++
 
 USE_TOOLS+=	gmake
 
+GCC_REQD+=	6.1 # c++14
+
+BUILD_TARGET=	# empty, all runs tests and it take a lot of time
+MAKE_FLAGS+=	stdver=c++14
+
 .include "../../mk/bsd.pkg.mk"
