@@ -16,11 +16,20 @@ LICENSE=	apache-2.0
 WRKSRC=		${WRKDIR}/tbb${TBB_VERSION}oss
 USE_LANGUAGES=	c c++
 
-USE_TOOLS+=	gmake
+USE_TOOLS+=	gmake pax
 
-GCC_REQD+=	6.1 # c++14
+GCC_REQD+=	5.3 # c++11
 
 BUILD_TARGET=	# empty, all runs tests and it take a lot of time
-MAKE_FLAGS+=	stdver=c++14
+MAKE_FLAGS+=	stdver=c++11
+
+INSTALLATION_DIRS+=	include/tbb lib
+
+do-install:
+.for file in libtbb.so.2 libtbbmalloc.so.2 libtbbmalloc_proxy.so.2
+	cd ${WRKSRC}/build/netbsd*release/ && \
+		${INSTALL_LIB} ${file} ${DESTDIR}${PREFIX}/lib
+.endfor
+	cd ${WRKSRC}/include && ${PAX} -rw . ${DESTDIR}${PREFIX}/include
 
 .include "../../mk/bsd.pkg.mk"
