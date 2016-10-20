@@ -1,8 +1,8 @@
 $NetBSD$
 
---- build/netbsd.gcc.inc.orig	2016-10-19 23:53:09.072240105 +0000
+--- build/netbsd.gcc.inc.orig	2016-10-20 01:46:08.872245327 +0000
 +++ build/netbsd.gcc.inc
-@@ -0,0 +1,88 @@
+@@ -0,0 +1,89 @@
 +# Copyright (c) 2005-2016 Intel Corporation
 +#
 +# Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,6 +37,7 @@ $NetBSD$
 +CONLY = gcc
 +LIB_LINK_FLAGS = -shared
 +LIBS = -lpthread 
++LINK_FLAGS = -Wl,-rpath-link=. -rdynamic
 +C_FLAGS = $(CPLUS_FLAGS)
 +
 +# gcc 6.0 and later have -flifetime-dse option that controls

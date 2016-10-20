@@ -1,6 +1,6 @@
 $NetBSD$
 
---- build/netbsd.inc.orig	2016-10-19 23:12:21.733001723 +0000
+--- build/netbsd.inc.orig	2016-10-20 01:46:08.876367387 +0000
 +++ build/netbsd.inc
 @@ -0,0 +1,112 @@
 +# Copyright (c) 2005-2016 Intel Corporation
@@ -112,6 +112,6 @@ $NetBSD$
 +RML.DLL = $(RML_NO_VERSION.DLL).1
 +RML.LIB = $(RML_NO_VERSION.DLL)
 +
-+TEST_LAUNCHER=sh $(tbb_root)/build/test_launcher.sh $(largs)
++TEST_LAUNCHER=/usr/pkg/bin/bash $(tbb_root)/build/test_launcher.sh $(largs)
 +
 +OPENCL.LIB = -lOpenCL
