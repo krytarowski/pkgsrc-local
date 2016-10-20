@@ -16,4 +16,6 @@ LICENSE=	apache-2.0
 WRKSRC=		${WRKDIR}/tbb${TBB_VERSION}oss
 USE_LANGUAGES=	c c++
 
+USE_TOOLS+=	gmake
+
 .include "../../mk/bsd.pkg.mk"
