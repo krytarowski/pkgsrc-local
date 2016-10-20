@@ -7,4 +7,4 @@ Size (tbb2017_20160916oss_src.tgz) = 2938546 bytes
 SHA1 (patch-build_common.inc) = 78bfc2d2b1857b4fcee35cbbfd2febb67bbb0aaa
 SHA1 (patch-build_netbsd.gcc.inc) = d7cd7501b528b582f9dcc6bc13fd864dbdb324ad
 SHA1 (patch-build_netbsd.inc) = afe3016f90ab4d0738c575a45f9cb2bfe6c5849c
-SHA1 (patch-build_version__info__netbsd.sh) = 0c3ebaa50f2629b90e55d0bad8eb49f9a33ca70d
+SHA1 (patch-build_version__info__netbsd.sh) = f760f259ca5cf484e4f03e234eb9ee6e1afdfbae

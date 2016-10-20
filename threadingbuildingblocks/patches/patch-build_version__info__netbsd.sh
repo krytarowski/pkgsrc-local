@@ -27,7 +27,7 @@ $NetBSD$
 +echo "#define __TBB_VERSION_STRINGS(N) \\"
 +echo '#N": BUILD_HOST'"\t\t"`hostname -s`" ("`uname -m`")"'" ENDL \'
 +echo '#N": BUILD_OS'"\t\t"`uname -sr`'" ENDL \'
-+echo '#N": BUILD_KERNEL'"\t"`uname -i`'" ENDL \'
++echo '#N": BUILD_KERNEL'"\t"`uname -r`'" ENDL \'
 +echo '#N": BUILD_GCC'"\t\t"`${CXX} -dumpversion`'" ENDL \'
 +[ -z "$COMPILER_VERSION" ] || echo '#N": BUILD_COMPILER'"\t"$COMPILER_VERSION'" ENDL \'
 +echo '#N": BUILD_LD'"\t\t"`ld -v 2>&1 | head -n 1`'" ENDL \'
