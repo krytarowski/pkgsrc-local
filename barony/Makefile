@@ -16,7 +16,6 @@ USE_CMAKE=	yes
 USE_LANGUAGES=	c c++
 
 CMAKE_ARGS+=	-DPNG_NAMES=png16
-CMAKE_ARGS+=	-DPNG_PNG_INCLUDE_DIR:PATH=${BUILDLINK_PREFIX.png}/include
 
 CFLAGS+=	-Wno-write-strings
 LDFLAGS+=	-lexecinfo
