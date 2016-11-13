@@ -1,31 +1,24 @@
 # $NetBSD: Makefile,v 1.4 2016/10/17 11:47:12 joerg Exp $
 
-GITHUB_PROJECT=	adaptagrams
-GITHUB_TAG=	0503f7524f5b2aa96b356dfdd817f9f9869d2b20
+GITHUB_PROJECT=	opt
+GITHUB_TAG=	43d57505564617b33946f6a56850d764cb4a6f74
 # Date of the latest git commit
-DISTNAME=	adaptagrams-0.20160901
-CATEGORIES=	graphics
-MASTER_SITES=	${MASTER_SITE_GITHUB:=mjwybrow/}
+DISTNAME=	wmutils-opt-0.20161004
+CATEGORIES=	x11
+MASTER_SITES=	${MASTER_SITE_GITHUB:=wmutils/}
 
 MAINTAINER=	pkgsrc-users@NetBSD.org
-HOMEPAGE=	http://www.adaptagrams.org/
-COMMENT=	Tools for adaptive diagrams
-LICENSE=	gnu-lgpl-v2.1
+HOMEPAGE=	http://wmutils.io/
+COMMENT=	Optional addons to wmutils
+LICENSE=	isc
 
 EXTRACT_USING+=	bsdtar
 
-WRKSRC=		${WRKDIR}/adaptagrams-${GITHUB_TAG}/cola
+#WRKSRC=		${WRKDIR}/opt-${GITHUB_TAG}
 
-USE_TOOLS+=	aclocal autoconf autoheader automake autoreconf pkg-config
-USE_LIBTOOL=	yes
-USE_LANGUAGES=	c c++
+USE_TOOLS+=	gmake
 
-GNU_CONFIGURE=	yes
+MAKE_FLAGS+=	MANPREFIX=${PREFIX}/${PKGMANDIR}
 
-TEST_TARGET=	check
-
-pre-configure:
-# ./autogen.sh runs ./configure && make && make check and sets questionable shebang
-	${RUN} cd ${WRKSRC} && ${MKDIR} -p m4 && autoreconf -fiv
-
+.include "../../x11/libxcb/buildlink3.mk"
 .include "../../mk/bsd.pkg.mk"
