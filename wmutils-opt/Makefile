@@ -14,10 +14,9 @@ LICENSE=	isc
 
 EXTRACT_USING+=	bsdtar
 
-#WRKSRC=		${WRKDIR}/opt-${GITHUB_TAG}
-
 USE_TOOLS+=	gmake
 
+MAKE_FLAGS+=	PREFIX=${PREFIX}
 MAKE_FLAGS+=	MANPREFIX=${PREFIX}/${PKGMANDIR}
 
 .include "../../x11/libxcb/buildlink3.mk"
