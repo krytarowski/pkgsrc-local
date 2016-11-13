@@ -1,18 +1,12 @@
-Adaptagrams is a library of tools and reusable code for adaptive diagramming
-applications, for example: drawing tools, automated document and diagram
-layout, smart presentation software, graph drawing, chart layout, etc.
+wmutils' opt
 
-Currently, the Adaptagrams repository includes four cross-platform C++
-libraries, These libraries are collectively known as cola (Constraint Layout):
+opt is at set of optional utilities meant to accompany wmutils-core.
 
- * libvpsc - a solver for the Variable Placement with Separation Constraints
-              problem.
+Just as the wmutils-core programs, each utility does one job and does it well,
+like dealing with window events or names.
 
- * libcola - a library for constraint graph layout.
-
- * libavoid - a library providing high-quality object-avoiding polyline and
-              orthogonalconnector routing for use in interactive diagram
-              editors.
-
- * libtopology - a library containing extensions to libcola to support topology
-                 preserving constraint-based layout.
+opt has less utilities than core, here is a little overview:
+ * chwb2 - control two different window borders
+ * wew   - print window events
+ * wname - print a window's name
+ * xmmv  - move a window with the mouse
