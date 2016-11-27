@@ -13,4 +13,9 @@ LICENSE=	gnu-gpl-v3
 USE_CMAKE=	yes
 USE_LANGUAGES=	c c++
 
+.include "../../devel/kparts/buildlink3.mk"
+.include "../../security/polkit-qt5/buildlink3.mk"
+.include "../../textproc/yaml-cpp/buildlink3.mk"
+.include "../../x11/qt5-qttools/buildlink3.mk"
+.include "../../x11/qt5-qtbase/buildlink3.mk"
 .include "../../mk/bsd.pkg.mk"
