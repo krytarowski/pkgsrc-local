@@ -12,3 +12,5 @@ Size (libcxx-3.6.2.src.tar.xz) = 944020 bytes
 SHA1 (llvm-3.6.2.src.tar.xz) = 7a00257eb2bc9431e4c77c3a36b033072c54bc7e
 RMD160 (llvm-3.6.2.src.tar.xz) = 521cbc5fe2925ea3c6e90c7a31f752a04045c972
 Size (llvm-3.6.2.src.tar.xz) = 12802380 bytes
+SHA1 (patch-include_llvm_ADT_Triple.h) = 28f4a63e33e1b878ae273bdb1f217f0fcd04e59b
+SHA1 (patch-lib_Support_Triple.cpp) = 15945789197455af53927999aecd98dd5fbd6a1d
