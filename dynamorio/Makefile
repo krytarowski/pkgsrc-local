@@ -14,5 +14,8 @@ USE_CMAKE=	yes
 USE_TOOLS+=	perl
 USE_LANGUAGES+=	c c++
 
+# Hack in CMakeLists.txt to workaround warning for cpp -E
+BUILDLINK_TRANSFORM+=	rm:-E
+
 .include "../../graphics/ImageMagick/buildlink3.mk"
 .include "../../mk/bsd.pkg.mk"
