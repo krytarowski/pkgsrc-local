@@ -1,9 +1,9 @@
 $NetBSD$
 
-SHA1 (dynamorio-7.0.0.rc1.tar.gz) = b1c5bab206ce43c1112f3cc3e3345d6e02d6d707
-RMD160 (dynamorio-7.0.0.rc1.tar.gz) = 54d0313d9b66be7dc37606fe93941b04c6bf37fb
-SHA512 (dynamorio-7.0.0.rc1.tar.gz) = 23db0225f45118f0c64d0940e9f680b391de6a2002e2ff76f76b336745dac4ed1bdcfd862ee9009bb4f9d6898baac95224f46bf13092b46787bada64f3cfdedc
-Size (dynamorio-7.0.0.rc1.tar.gz) = 17206085 bytes
+SHA1 (dynamorio-7.0.0-998da669f4653e2fce5e9a33c01ea6d076d12d33.tar.gz) = 8343b8040ae71095cf0b90b18aa1a1bcd38f6fd6
+RMD160 (dynamorio-7.0.0-998da669f4653e2fce5e9a33c01ea6d076d12d33.tar.gz) = 3698040be29c23fab48d6d515cf239c669d52241
+SHA512 (dynamorio-7.0.0-998da669f4653e2fce5e9a33c01ea6d076d12d33.tar.gz) = 0d4db01b108723783c4c4f1eed494e41c8f9016a575155d846e9a832897c25a313b4b1ef6c24b5f92568f69877dfd0b452c99160469ac071c1a4367e8864f7b0
+Size (dynamorio-7.0.0-998da669f4653e2fce5e9a33c01ea6d076d12d33.tar.gz) = 17397285 bytes
 SHA1 (patch-CMakeLists.txt) = 26c3978e285b068e6399e8f5d790586402c73f0f
 SHA1 (patch-tools_nudgeunix.c) = 8430973ada0abea2d756be4d890c73375160df68
 SHA1 (patch-tools_runstats.c) = 1e23d70befc886b1b3925e51da3490e7a37b8078
