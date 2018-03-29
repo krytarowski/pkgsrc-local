@@ -4,6 +4,6 @@ SHA1 (dynamorio-7.0.0-998da669f4653e2fce5e9a33c01ea6d076d12d33.tar.gz) = 8343b80
 RMD160 (dynamorio-7.0.0-998da669f4653e2fce5e9a33c01ea6d076d12d33.tar.gz) = 3698040be29c23fab48d6d515cf239c669d52241
 SHA512 (dynamorio-7.0.0-998da669f4653e2fce5e9a33c01ea6d076d12d33.tar.gz) = 0d4db01b108723783c4c4f1eed494e41c8f9016a575155d846e9a832897c25a313b4b1ef6c24b5f92568f69877dfd0b452c99160469ac071c1a4367e8864f7b0
 Size (dynamorio-7.0.0-998da669f4653e2fce5e9a33c01ea6d076d12d33.tar.gz) = 17397285 bytes
-SHA1 (patch-CMakeLists.txt) = 26c3978e285b068e6399e8f5d790586402c73f0f
+SHA1 (patch-CMakeLists.txt) = 0f6d34cdbe0ce181e8dfb9bbb47b2d86ec8185df
 SHA1 (patch-tools_nudgeunix.c) = 8430973ada0abea2d756be4d890c73375160df68
 SHA1 (patch-tools_runstats.c) = 1e23d70befc886b1b3925e51da3490e7a37b8078

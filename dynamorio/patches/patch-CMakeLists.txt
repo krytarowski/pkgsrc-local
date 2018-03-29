@@ -1,6 +1,6 @@
 $NetBSD$
 
---- CMakeLists.txt.orig	2016-08-07 21:41:39.370125046 +0000
+--- CMakeLists.txt.orig	2018-03-24 20:04:13.000000000 +0000
 +++ CMakeLists.txt
 @@ -193,6 +193,8 @@ endif()
  # The target OS:
@@ -11,3 +11,12 @@ $NetBSD$
  elseif (UNIX)
    set(LINUX 1)
  endif (APPLE)
+@@ -1253,7 +1255,7 @@ if (WIN32)
+   string(STRIP "${cpp_err}" cpp_err)
+ endif (WIN32)
+ if (cpp_result OR cpp_err)
+-  message(FATAL_ERROR "*** ${CMAKE_CPP} failed: ***\n${cpp_err}")
++#  message(FATAL_ERROR "*** ${CMAKE_CPP} failed: ***\n${cpp_err}")
+ endif (cpp_result OR cpp_err)
+ string(REGEX MATCHALL
+   "-D[^ \r\n]+" defines "${cpp_out}")
