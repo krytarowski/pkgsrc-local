@@ -1,6 +1,6 @@
 # $NetBSD$
 
-DISTNAME=	dynamorio-6.1.1
+DISTNAME=	dynamorio-7.0.0.rc1
 CATEGORIES=	devel
 MASTER_SITES=	${MASTER_SITE_GITHUB:=DynamoRIO/}
 GITHUB_TAG=	release_${PKGVERSION_NOREV:S/./_/g}
