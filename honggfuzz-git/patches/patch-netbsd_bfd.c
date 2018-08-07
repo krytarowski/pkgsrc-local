@@ -1,11 +1,11 @@
 $NetBSD$
 
---- netbsd/bfd.c.orig	2018-08-07 21:24:07.608093573 +0000
+--- netbsd/bfd.c.orig	2018-08-07 21:30:44.950520734 +0000
 +++ netbsd/bfd.c
-@@ -0,0 +1,191 @@
+@@ -0,0 +1,207 @@
 +/*
 + *
-+ * honggfuzz - architecture dependent code (LINUX/BFD)
++ * honggfuzz - architecture dependent code (NETBSD/BFD)
 + * -----------------------------------------
 + *
 + * Author: Robert Swiecki <swiecki@google.com>
@@ -26,7 +26,7 @@ $NetBSD$
 + *
 + */
 +
-+#include "linux/bfd.h"
++#include "netbsd/bfd.h"
 +
 +#include <bfd.h>
 +#include <dis-asm.h>
@@ -59,11 +59,27 @@ $NetBSD$
 +#define _HF_BFD_GE_2_29
 +#endif
 +
++static char *
++getexecname(void)
++{
++	static char buf[PATH_MAX] = {};
++	size_t sz = __arraycount(buf);
++	int mib[4] = { CTL_KERN, KERN_PROC_ARGS, -1, KERN_PROC_PATHNAME };
++
++	if (buf[0] == '\0') {
++		if (sysctl(mib, __arraycunt(mib), buf, &sz, NULL, 0)) {
++			PLOG_F("sysctl() failed");
++		}
++	}	
++
++	return buf;
++}
++
 +static pthread_mutex_t arch_bfd_mutex = PTHREAD_MUTEX_INITIALIZER;
 +
 +static bool arch_bfdInit(pid_t pid, bfd_t* bfdParams) {
-+    char fname[PATH_MAX];
-+    snprintf(fname, sizeof(fname), "/proc/%d/exe", pid);
++    const char *fname;
++    fname = getexecname();
 +    if ((bfdParams->bfdh = bfd_openr(fname, 0)) == NULL) {
 +        LOG_E("bfd_openr(%s) failed", fname);
 +        return false;
@@ -152,11 +168,11 @@ $NetBSD$
 +
 +    bfd_init();
 +
-+    char fname[PATH_MAX];
-+    snprintf(fname, sizeof(fname), "/proc/%d/exe", pid);
++    const char *fname;
++    fname = getexecname();
 +    bfd* bfdh = bfd_openr(fname, NULL);
 +    if (bfdh == NULL) {
-+        LOG_W("bfd_openr('/proc/%d/exe') failed", pid);
++        LOG_W("bfd_openr('%s') failed", fname, pid);
 +        return;
 +    }
 +
