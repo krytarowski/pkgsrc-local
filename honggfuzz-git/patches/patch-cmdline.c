@@ -1,8 +1,8 @@
 $NetBSD$
 
---- cmdline.c.orig	2018-08-08 23:14:16.000000000 +0000
+--- cmdline.c.orig	2018-08-09 01:52:21.908677192 +0000
 +++ cmdline.c
-@@ -383,6 +383,34 @@ bool cmdlineParse(int argc, char* argv[]
+@@ -384,6 +384,34 @@ bool cmdlineParse(int argc, char* argv[]
                  .kernelOnly = false,
                  .useClone = true,
              },
@@ -37,7 +37,7 @@ $NetBSD$
      };
  
      TAILQ_INIT(&hfuzz->io.dynfileq);
-@@ -666,6 +694,38 @@ bool cmdlineParse(int argc, char* argv[]
+@@ -671,6 +699,38 @@ bool cmdlineParse(int argc, char* argv[]
                  hfuzz->linux.cloneFlags |= (CLONE_NEWUSER | CLONE_NEWIPC);
                  break;
  #endif /* defined(_HF_ARCH_LINUX) */

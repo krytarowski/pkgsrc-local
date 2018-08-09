@@ -1,8 +1,8 @@
 $NetBSD$
 
---- netbsd/perf.c.orig	2018-08-08 23:15:59.706238272 +0000
+--- netbsd/perf.c.orig	2018-08-09 01:52:22.068778969 +0000
 +++ netbsd/perf.c
-@@ -0,0 +1,388 @@
+@@ -0,0 +1,387 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD/PERF)
@@ -45,7 +45,6 @@ $NetBSD$
 +#include "libhfcommon/files.h"
 +#include "libhfcommon/log.h"
 +#include "libhfcommon/util.h"
-+#include "pt.h"
 +
 +#define _HF_PERF_MAP_SZ (1024 * 512)
 +#define _HF_PERF_AUX_SZ (1024 * 1024)

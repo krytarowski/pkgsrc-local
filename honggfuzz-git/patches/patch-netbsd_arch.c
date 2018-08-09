@@ -1,8 +1,8 @@
 $NetBSD$
 
---- netbsd/arch.c.orig	2018-08-08 23:15:59.691626843 +0000
+--- netbsd/arch.c.orig	2018-08-09 01:52:22.054145621 +0000
 +++ netbsd/arch.c
-@@ -0,0 +1,495 @@
+@@ -0,0 +1,485 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD)
@@ -60,6 +60,8 @@ $NetBSD$
 +#include "sanitizers.h"
 +#include "subproc.h"
 +
++extern char **environ;
++
 +static inline bool arch_shouldAttach(run_t* run) {
 +    if (run->global->exe.persistent && run->linux.attachedPid == run->pid) {
 +        return false;
@@ -99,12 +101,10 @@ $NetBSD$
 +bool arch_launchChild(run_t* run) {
 +    /*
 +     * Disable ASLR:
-+     * This might fail in Docker, as Docker blocks __NR_personality. Consequently
-+     * it's just a debug warning
 +     */
-+    if (run->global->linux.disableRandomization &&
-+        syscall(__NR_personality, ADDR_NO_RANDOMIZE) == -1) {
-+        PLOG_D("personality(ADDR_NO_RANDOMIZE) failed");
++    if (run->global->linux.disableRandomization) {
++        /* TODO */
++        PLOG_D(" failed");
 +    }
 +
 +#define ARGS_MAX 512
@@ -153,16 +153,6 @@ $NetBSD$
 +void arch_prepareParentAfterFork(run_t* run) {
 +    /* Parent */
 +    if (run->global->exe.persistent) {
-+        const struct f_owner_ex fown = {
-+            .type = F_OWNER_TID,
-+            .pid = syscall(__NR_gettid),
-+        };
-+        if (fcntl(run->persistentSock, F_SETOWN_EX, &fown)) {
-+            PLOG_F("fcntl(%d, F_SETOWN_EX)", run->persistentSock);
-+        }
-+        if (fcntl(run->persistentSock, F_SETSIG, SIGIO) == -1) {
-+            PLOG_F("fcntl(%d, F_SETSIG, SIGIO)", run->persistentSock);
-+        }
 +        if (fcntl(run->persistentSock, F_SETFL, O_ASYNC) == -1) {
 +            PLOG_F("fcntl(%d, F_SETFL, O_ASYNC)", run->persistentSock);
 +        }

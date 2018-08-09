@@ -1,8 +1,8 @@
 $NetBSD$
 
---- honggfuzz.h.orig	2018-08-08 23:14:18.000000000 +0000
+--- honggfuzz.h.orig	2018-08-09 01:52:21.909145071 +0000
 +++ honggfuzz.h
-@@ -297,6 +297,27 @@ typedef struct {
+@@ -298,6 +298,27 @@ typedef struct {
          bool useClone;
          sigset_t waitSigSet;
      } linux;
