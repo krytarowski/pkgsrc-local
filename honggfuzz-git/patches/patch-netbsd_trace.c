@@ -2,7 +2,7 @@ $NetBSD$
 
 --- netbsd/trace.c.orig	2018-08-09 21:49:50.941925143 +0000
 +++ netbsd/trace.c
-@@ -0,0 +1,993 @@
+@@ -0,0 +1,973 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD/PTRACE)
@@ -797,32 +797,12 @@ $NetBSD$
 +    }
 +}
 +
-+#define __WEVENT(status) ((status & 0xFF0000) >> 16)
 +static void arch_traceEvent(run_t* run, int status, pid_t pid) {
++    ptrace_state_t state;
 +    LOG_D("PID: %d, Ptrace event: %d", pid, __WEVENT(status));
-+    switch (__WEVENT(status)) {
-+        case PTRACE_EVENT_EXIT: {
-+            unsigned long event_msg;
-+            if (ptrace(PTRACE_GETEVENTMSG, pid, NULL, &event_msg) == -1) {
-+                PLOG_E("ptrace(PTRACE_GETEVENTMSG,%d) failed", pid);
-+                return;
-+            }
 +
-+            if (WIFEXITED(event_msg)) {
-+                LOG_D("PID: %d exited with exit_code: %lu", pid,
-+                    (unsigned long)WEXITSTATUS(event_msg));
-+                if (WEXITSTATUS(event_msg) == (unsigned long)HF_SAN_EXIT_CODE) {
-+                    arch_traceExitAnalyze(run, pid);
-+                }
-+            } else if (WIFSIGNALED(event_msg)) {
-+                LOG_D(
-+                    "PID: %d terminated with signal: %lu", pid, (unsigned long)WTERMSIG(event_msg));
-+            } else {
-+                LOG_D("PID: %d exited with unknown status: %lu", pid, event_msg);
-+            }
-+        } break;
-+        default:
-+            break;
++    if (ptrace(PT_GET_PROCESS_STATE, pid, &state, sizeof(state)) != -1) {
++        PLOG_E("ptrace(PT_GET_PROCESS_STATE,%d) failed", pid);
 +    }
 +
 +    ptrace(PT_CONTINUE, pid, (void *)-1, 0);
