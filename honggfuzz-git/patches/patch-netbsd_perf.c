@@ -1,11 +1,11 @@
 $NetBSD$
 
---- netbsd/perf.c.orig	2018-08-07 21:30:44.960725135 +0000
+--- netbsd/perf.c.orig	2018-08-08 23:15:59.706238272 +0000
 +++ netbsd/perf.c
-@@ -0,0 +1,392 @@
+@@ -0,0 +1,388 @@
 +/*
 + *
-+ * honggfuzz - architecture dependent code (LINUX/PERF)
++ * honggfuzz - architecture dependent code (NETBSD/PERF)
 + * -----------------------------------------
 + *
 + * Author: Robert Swiecki <swiecki@google.com>
@@ -28,13 +28,9 @@ $NetBSD$
 +
 +#include "perf.h"
 +
-+#include <asm/mman.h>
 +#include <errno.h>
 +#include <fcntl.h>
 +#include <inttypes.h>
-+#include <linux/hw_breakpoint.h>
-+#include <linux/perf_event.h>
-+#include <linux/sysctl.h>
 +#include <signal.h>
 +#include <stdlib.h>
 +#include <string.h>

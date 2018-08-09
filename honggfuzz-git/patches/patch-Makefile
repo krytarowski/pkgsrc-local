@@ -1,6 +1,6 @@
 $NetBSD$
 
---- Makefile.orig	2018-08-07 21:30:02.565078650 +0000
+--- Makefile.orig	2018-08-08 23:14:16.000000000 +0000
 +++ Makefile
 @@ -137,6 +137,17 @@ else ifeq ($(OS),Darwin)
      endif

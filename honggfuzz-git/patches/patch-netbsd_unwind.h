@@ -1,6 +1,6 @@
 $NetBSD$
 
---- netbsd/unwind.h.orig	2018-08-07 21:30:44.986873853 +0000
+--- netbsd/unwind.h.orig	2018-08-08 23:15:59.731569372 +0000
 +++ netbsd/unwind.h
 @@ -0,0 +1,58 @@
 +/*
@@ -26,10 +26,10 @@ $NetBSD$
 + *
 + */
 +
-+#ifndef _HF_LINUX_UNWIND_H_
-+#define _HF_LINUX_UNWIND_H_
++#ifndef _HF_NETBSD_UNWIND_H_
++#define _HF_NETBSD_UNWIND_H_
 +
-+#include <linux/limits.h>
++#include <sys/param.h>
 +#include <sys/types.h>
 +
 +/* String buffer size for function names in stack traces produced from libunwind */

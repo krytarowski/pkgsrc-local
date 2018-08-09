@@ -1,6 +1,6 @@
 $NetBSD$
 
---- netbsd/bfd.h.orig	2018-08-07 21:30:44.955570765 +0000
+--- netbsd/bfd.h.orig	2018-08-08 23:15:59.701365522 +0000
 +++ netbsd/bfd.h
 @@ -0,0 +1,42 @@
 +/*
@@ -26,15 +26,15 @@ $NetBSD$
 + *
 + */
 +
-+#ifndef _HF_LINUX_BFD_H_
-+#define _HF_LINUX_BFD_H_
++#ifndef _HF_NETBSD_BFD_H_
++#define _HF_NETBSD_BFD_H_
 +
 +#include <inttypes.h>
 +#include <limits.h>
 +#include <string.h>
 +#include <sys/types.h>
 +
-+#include "linux/unwind.h"
++#include "netbsd/unwind.h"
 +
 +#define _HF_INSTR_SZ 64
 +

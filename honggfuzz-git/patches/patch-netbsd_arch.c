@@ -1,11 +1,11 @@
 $NetBSD$
 
---- netbsd/arch.c.orig	2018-08-07 21:30:44.945232047 +0000
+--- netbsd/arch.c.orig	2018-08-08 23:15:59.691626843 +0000
 +++ netbsd/arch.c
-@@ -0,0 +1,544 @@
+@@ -0,0 +1,495 @@
 +/*
 + *
-+ * honggfuzz - architecture dependent code (LINUX)
++ * honggfuzz - architecture dependent code (NETBSD)
 + * -----------------------------------------
 + *
 + * Author: Robert Swiecki <swiecki@google.com>
@@ -40,12 +40,9 @@ $NetBSD$
 +#include <stdlib.h>
 +#include <string.h>
 +#include <sys/cdefs.h>
-+#include <sys/personality.h>
-+#include <sys/prctl.h>
 +#include <sys/syscall.h>
 +#include <sys/time.h>
 +#include <sys/types.h>
-+#include <sys/user.h>
 +#include <sys/utsname.h>
 +#include <sys/wait.h>
 +#include <time.h>
@@ -57,8 +54,8 @@ $NetBSD$
 +#include "libhfcommon/log.h"
 +#include "libhfcommon/ns.h"
 +#include "libhfcommon/util.h"
-+#include "linux/perf.h"
-+#include "linux/trace.h"
++#include "netbsd/perf.h"
++#include "netbsd/trace.h"
 +#include "sancov.h"
 +#include "sanitizers.h"
 +#include "subproc.h"
@@ -87,62 +84,19 @@ $NetBSD$
 +    return 0;
 +}
 +
-+/* Avoid problem with caching of PID/TID in glibc */
-+static pid_t arch_clone(uintptr_t flags) {
-+    if (flags & CLONE_VM) {
-+        LOG_E("Cannot use clone(flags & CLONE_VM)");
-+        return -1;
-+    }
-+
-+    if (setjmp(env) == 0) {
-+        void* stack_mid = &arch_clone_stack[sizeof(arch_clone_stack) / 2];
-+        /* Parent */
-+        return clone(arch_cloneFunc, stack_mid, flags, NULL, NULL, NULL);
-+    }
-+    /* Child */
-+    return 0;
-+}
-+
-+pid_t arch_fork(run_t* run) {
-+    pid_t pid = run->global->linux.useClone ? arch_clone(CLONE_UNTRACED | SIGCHLD) : fork();
++pid_t arch_fork(run_t* run __unused) {
++    pid_t pid = fork();
 +    if (pid == -1) {
 +        return pid;
 +    }
 +    if (pid == 0) {
 +        logMutexReset();
-+        if (prctl(PR_SET_PDEATHSIG, (unsigned long)SIGKILL, 0UL, 0UL, 0UL) == -1) {
-+            PLOG_W("prctl(PR_SET_PDEATHSIG, SIGKILL)");
-+        }
 +        return pid;
 +    }
 +    return pid;
 +}
 +
 +bool arch_launchChild(run_t* run) {
-+    if ((run->global->linux.cloneFlags & CLONE_NEWNET) && (nsIfaceUp("lo") == false)) {
-+        LOG_W("Cannot bring interface 'lo' up");
-+    }
-+
-+    /*
-+     * Make it attach-able by ptrace()
-+     */
-+    if (prctl(PR_SET_DUMPABLE, 1UL, 0UL, 0UL, 0UL) == -1) {
-+        PLOG_E("prctl(PR_SET_DUMPABLE, 1)");
-+        return false;
-+    }
-+
-+    /*
-+     * Kill a process which corrupts its own heap (with ABRT)
-+     */
-+    if (setenv("MALLOC_CHECK_", "7", 0) == -1) {
-+        PLOG_E("setenv(MALLOC_CHECK_=7) failed");
-+        return false;
-+    }
-+    if (setenv("MALLOC_PERTURB_", "85", 0) == -1) {
-+        PLOG_E("setenv(MALLOC_PERTURB_=85) failed");
-+        return false;
-+    }
-+
 +    /*
 +     * Disable ASLR:
 +     * This might fail in Docker, as Docker blocks __NR_personality. Consequently
@@ -184,12 +138,9 @@ $NetBSD$
 +    alarm(0);
 +
 +    /* Wait for the ptrace to attach now */
-+    if (kill(syscall(__NR_getpid), SIGSTOP) == -1) {
++    if (raise(SIGSTOP) == -1) {
 +        LOG_F("Couldn't stop itself");
 +    }
-+#if defined(__NR_execveat)
-+    syscall(__NR_execveat, run->global->linux.exeFd, "", args, environ, AT_EMPTY_PATH);
-+#endif /* defined__NR_execveat) */
 +    execve(args[0], (char* const*)args, environ);
 +    int errno_cpy = errno;
 +    alarm(1);

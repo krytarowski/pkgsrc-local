@@ -1,11 +1,11 @@
 $NetBSD$
 
---- netbsd/unwind.c.orig	2018-08-07 21:30:44.981787919 +0000
+--- netbsd/unwind.c.orig	2018-08-08 23:15:59.726753736 +0000
 +++ netbsd/unwind.c
-@@ -0,0 +1,283 @@
+@@ -0,0 +1,282 @@
 +/*
 + *
-+ * honggfuzz - architecture dependent code (LINUX/UNWIND)
++ * honggfuzz - architecture dependent code (NETBSD/UNWIND)
 + * -----------------------------------------
 + *
 + * Author: Robert Swiecki <swiecki@google.com>
@@ -29,7 +29,6 @@ $NetBSD$
 +#include "unwind.h"
 +
 +#include <endian.h>
-+#include <libunwind-ptrace.h>
 +#include <stdio.h>
 +#include <stdlib.h>
 +#include <string.h>

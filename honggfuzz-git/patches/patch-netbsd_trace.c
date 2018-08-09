@@ -1,11 +1,11 @@
 $NetBSD$
 
---- netbsd/trace.c.orig	2018-08-07 21:30:44.971314223 +0000
+--- netbsd/trace.c.orig	2018-08-08 23:15:59.716780092 +0000
 +++ netbsd/trace.c
-@@ -0,0 +1,1405 @@
+@@ -0,0 +1,1399 @@
 +/*
 + *
-+ * honggfuzz - architecture dependent code (LINUX/PTRACE)
++ * honggfuzz - architecture dependent code (NETBSD/PTRACE)
 + * -----------------------------------------
 + *
 + * Author: Robert Swiecki <swiecki@google.com>
@@ -26,7 +26,7 @@ $NetBSD$
 + *
 + */
 +
-+#include "linux/trace.h"
++#include "netbsd/trace.h"
 +
 +#include <ctype.h>
 +#include <dirent.h>
@@ -40,7 +40,6 @@ $NetBSD$
 +#include <stdlib.h>
 +#include <string.h>
 +#include <sys/cdefs.h>
-+#include <sys/personality.h>
 +#include <sys/ptrace.h>
 +#include <sys/resource.h>
 +#include <sys/stat.h>
@@ -48,7 +47,6 @@ $NetBSD$
 +#include <sys/time.h>
 +#include <sys/types.h>
 +#include <sys/uio.h>
-+#include <sys/user.h>
 +#include <sys/wait.h>
 +#include <time.h>
 +#include <unistd.h>
@@ -57,16 +55,12 @@ $NetBSD$
 +#include "libhfcommon/files.h"
 +#include "libhfcommon/log.h"
 +#include "libhfcommon/util.h"
-+#include "linux/bfd.h"
-+#include "linux/unwind.h"
++#include "netbsd/bfd.h"
++#include "netbsd/unwind.h"
 +#include "sancov.h"
 +#include "sanitizers.h"
 +#include "socketfuzzer.h"
 +#include "subproc.h"
-+
-+#if defined(__ANDROID__)
-+#include "capstone.h"
-+#endif
 +
 +#if defined(__i386__) || defined(__arm__) || defined(__powerpc__)
 +#define REG_TYPE uint32_t
