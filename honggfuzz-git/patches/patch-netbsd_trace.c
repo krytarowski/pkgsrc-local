@@ -2,7 +2,7 @@ $NetBSD$
 
 --- netbsd/trace.c.orig	2018-08-09 21:49:50.941925143 +0000
 +++ netbsd/trace.c
-@@ -0,0 +1,973 @@
+@@ -0,0 +1,977 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD/PTRACE)
@@ -797,9 +797,9 @@ $NetBSD$
 +    }
 +}
 +
-+static void arch_traceEvent(run_t* run, int status, pid_t pid) {
++static void arch_traceEvent(run_t* run, pid_t pid) {
 +    ptrace_state_t state;
-+    LOG_D("PID: %d, Ptrace event: %d", pid, __WEVENT(status));
++    LOG_D("PID: %d, ptrace event");
 +
 +    if (ptrace(PT_GET_PROCESS_STATE, pid, &state, sizeof(state)) != -1) {
 +        PLOG_E("ptrace(PT_GET_PROCESS_STATE,%d) failed", pid);
@@ -809,11 +809,15 @@ $NetBSD$
 +}
 +
 +void arch_traceAnalyze(run_t* run, int status, pid_t pid) {
++
 +    /*
 +     * It's a ptrace event, deal with it elsewhere
 +     */
-+    if (WIFSTOPPED(status) && __WEVENT(status)) {
-+        return arch_traceEvent(run, status, pid);
++    if (WIFSTOPPED(status) && WSTOPSIG(status) == SIGTRAP) {
++        struct ptrace_siginfo info;
++        ptrace(PT_GET_SIGINFO, pid, &info, sizeof(info));
++        if (info.psi_siginfo.si_code == TRAP_CHLD)
++            return arch_traceEvent(run, pid);
 +    }
 +
 +    if (WIFSTOPPED(status)) {
