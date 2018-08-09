@@ -207,7 +207,7 @@ $NetBSD$
 +         * Convert PC to char array to be compatible with hash function
 +         */
 +        char pcStr[REGSIZEINCHAR] = {0};
-+        snprintf(pcStr, REGSIZEINCHAR, REG_PD REG_PM, (register_t)(long)funcs[i].pc);
++        snprintf(pcStr, REGSIZEINCHAR, PRIxREGISTER PRIxREGISTER, (register_t)(long)funcs[i].pc);
 +
 +        /*
 +         * Hash the last three nibbles
@@ -242,7 +242,7 @@ $NetBSD$
 +        run->report, sizeof(run->report), "STACK HASH: %016" PRIx64 "\n", run->backtrace);
 +    util_ssnprintf(run->report, sizeof(run->report), "STACK:\n");
 +    for (size_t i = 0; i < funcCnt; i++) {
-+        util_ssnprintf(run->report, sizeof(run->report), " <" REG_PD REG_PM "> [%s():%zu at %s]\n",
++        util_ssnprintf(run->report, sizeof(run->report), " <" PRIxREGISTER PRIxREGISTER "> [%s():%zu at %s]\n",
 +            (register_t)(long)funcs[i].pc, funcs[i].func, funcs[i].line, funcs[i].mapName);
 +    }
 +
@@ -305,7 +305,7 @@ $NetBSD$
 +
 +    arch_getInstrStr(pid, &pc, instr);
 +
-+    LOG_D("Pid: %d, signo: %d, errno: %d, code: %d, addr: %p, pc: %" REG_PM ", instr: '%s'", pid,
++    LOG_D("Pid: %d, signo: %d, errno: %d, code: %d, addr: %p, pc: %" PRIxREGISTER ", instr: '%s'", pid,
 +        info.psi_siginfo.si_signo, info.psi_siginfo.si_errno, info.psi_siginfo.si_code, info.psi_siginfo.si_addr, pc, instr);
 +
 +    if (!SI_FROMUSER(&info.psi_siginfo) && pc && info.psi_siginfo.si_addr < run->global->netbsd.ignoreAddr) {
@@ -444,14 +444,14 @@ $NetBSD$
 +            run->origFileName);
 +    } else if (saveUnique) {
 +        snprintf(run->crashFileName, sizeof(run->crashFileName),
-+            "%s/%s.PC.%" REG_PM ".STACK.%" PRIx64 ".CODE.%d.ADDR.%p.INSTR.%s.%s",
++            "%s/%s.PC.%" PRIxREGISTER ".STACK.%" PRIx64 ".CODE.%d.ADDR.%p.INSTR.%s.%s",
 +            run->global->io.crashDir, arch_sigName(info.psi_siginfo.si_signo), pc, run->backtrace, info.psi_siginfo.si_code,
 +            sig_addr, instr, run->global->io.fileExtn);
 +    } else {
 +        char localtmstr[PATH_MAX];
 +        util_getLocalTime("%F.%H:%M:%S", localtmstr, sizeof(localtmstr), time(NULL));
 +        snprintf(run->crashFileName, sizeof(run->crashFileName),
-+            "%s/%s.PC.%" REG_PM ".STACK.%" PRIx64 ".CODE.%d.ADDR.%p.INSTR.%s.%s.%d.%s",
++            "%s/%s.PC.%" PRIxREGISTER ".STACK.%" PRIx64 ".CODE.%d.ADDR.%p.INSTR.%s.%s.%d.%s",
 +            run->global->io.crashDir, arch_sigName(info.psi_siginfo.si_signo), pc, run->backtrace, info.psi_siginfo.si_code,
 +            sig_addr, instr, localtmstr, pid, run->global->io.fileExtn);
 +    }
@@ -695,7 +695,7 @@ $NetBSD$
 +        /* Keep the crashes file name format identical */
 +        if (run->backtrace != 0ULL && run->global->io.saveUnique) {
 +            snprintf(run->crashFileName, sizeof(run->crashFileName),
-+                "%s/%s.PC.%" REG_PM ".STACK.%" PRIx64 ".CODE.%s.ADDR.%p.INSTR.%s.%s",
++                "%s/%s.PC.%" PRIxREGISTER ".STACK.%" PRIx64 ".CODE.%s.ADDR.%p.INSTR.%s.%s",
 +                run->global->io.crashDir, "SAN", pc, run->backtrace, op, crashAddr, "[UNKNOWN]",
 +                run->global->io.fileExtn);
 +        } else {
@@ -703,7 +703,7 @@ $NetBSD$
 +            char localtmstr[PATH_MAX];
 +            util_getLocalTime("%F.%H:%M:%S", localtmstr, sizeof(localtmstr), time(NULL));
 +            snprintf(run->crashFileName, sizeof(run->crashFileName),
-+                "%s/%s.PC.%" REG_PM ".STACK.%" PRIx64 ".CODE.%s.ADDR.%p.INSTR.%s.%s.%s",
++                "%s/%s.PC.%" PRIxREGISTER ".STACK.%" PRIx64 ".CODE.%s.ADDR.%p.INSTR.%s.%s.%s",
 +                run->global->io.crashDir, "SAN", pc, run->backtrace, op, crashAddr, "[UNKNOWN]",
 +                localtmstr, run->global->io.fileExtn);
 +        }
@@ -749,7 +749,7 @@ $NetBSD$
 +            run->report, sizeof(run->report), "STACK HASH: %016" PRIx64 "\n", run->backtrace);
 +        util_ssnprintf(run->report, sizeof(run->report), "STACK:\n");
 +        for (int i = 0; i < funcCnt; i++) {
-+            util_ssnprintf(run->report, sizeof(run->report), " <" REG_PD REG_PM "> ",
++            util_ssnprintf(run->report, sizeof(run->report), " <" PRIxREGISTER PRIxREGISTER "> ",
 +                (register_t)(long)funcs[i].pc);
 +            if (funcs[i].mapName[0] != '\0') {
 +                util_ssnprintf(run->report, sizeof(run->report), "[%s + 0x%zx]\n", funcs[i].mapName,
