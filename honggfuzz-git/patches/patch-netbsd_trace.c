@@ -207,7 +207,7 @@ $NetBSD$
 +         * Convert PC to char array to be compatible with hash function
 +         */
 +        char pcStr[REGSIZEINCHAR] = {0};
-+        snprintf(pcStr, REGSIZEINCHAR, PRIxREGISTER PRIxREGISTER, (register_t)(long)funcs[i].pc);
++        snprintf(pcStr, REGSIZEINCHAR, "%" PRIxREGISTER, (register_t)(long)funcs[i].pc);
 +
 +        /*
 +         * Hash the last three nibbles
@@ -242,7 +242,7 @@ $NetBSD$
 +        run->report, sizeof(run->report), "STACK HASH: %016" PRIx64 "\n", run->backtrace);
 +    util_ssnprintf(run->report, sizeof(run->report), "STACK:\n");
 +    for (size_t i = 0; i < funcCnt; i++) {
-+        util_ssnprintf(run->report, sizeof(run->report), " <" PRIxREGISTER PRIxREGISTER "> [%s():%zu at %s]\n",
++        util_ssnprintf(run->report, sizeof(run->report), " <%" PRIxREGISTER "> [%s():%zu at %s]\n",
 +            (register_t)(long)funcs[i].pc, funcs[i].func, funcs[i].line, funcs[i].mapName);
 +    }
 +
@@ -749,7 +749,7 @@ $NetBSD$
 +            run->report, sizeof(run->report), "STACK HASH: %016" PRIx64 "\n", run->backtrace);
 +        util_ssnprintf(run->report, sizeof(run->report), "STACK:\n");
 +        for (int i = 0; i < funcCnt; i++) {
-+            util_ssnprintf(run->report, sizeof(run->report), " <" PRIxREGISTER PRIxREGISTER "> ",
++            util_ssnprintf(run->report, sizeof(run->report), " <%" PRIxREGISTER "> ",
 +                (register_t)(long)funcs[i].pc);
 +            if (funcs[i].mapName[0] != '\0') {
 +                util_ssnprintf(run->report, sizeof(run->report), "[%s + 0x%zx]\n", funcs[i].mapName,
