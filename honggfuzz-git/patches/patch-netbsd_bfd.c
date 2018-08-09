@@ -1,8 +1,8 @@
 $NetBSD$
 
---- netbsd/bfd.c.orig	2018-08-09 02:18:25.355236198 +0000
+--- netbsd/bfd.c.orig	2018-08-09 12:21:21.869276890 +0000
 +++ netbsd/bfd.c
-@@ -0,0 +1,207 @@
+@@ -0,0 +1,210 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD/BFD)
@@ -28,6 +28,9 @@ $NetBSD$
 +
 +#include "netbsd/bfd.h"
 +
++#include <sys/param.h>
++#include <sys/types.h>
++#include <sys/sysctl.h>
 +#include <bfd.h>
 +#include <dis-asm.h>
 +#include <inttypes.h>
@@ -67,7 +70,7 @@ $NetBSD$
 +	int mib[4] = { CTL_KERN, KERN_PROC_ARGS, -1, KERN_PROC_PATHNAME };
 +
 +	if (buf[0] == '\0') {
-+		if (sysctl(mib, __arraycunt(mib), buf, &sz, NULL, 0)) {
++		if (sysctl(mib, __arraycount(mib), buf, &sz, NULL, 0)) {
 +			PLOG_F("sysctl() failed");
 +		}
 +	}	
@@ -77,7 +80,7 @@ $NetBSD$
 +
 +static pthread_mutex_t arch_bfd_mutex = PTHREAD_MUTEX_INITIALIZER;
 +
-+static bool arch_bfdInit(pid_t pid, bfd_t* bfdParams) {
++static bool arch_bfdInit(pid_t pid HF_ATTR_UNUSED, bfd_t* bfdParams) {
 +    const char *fname;
 +    fname = getexecname();
 +    if ((bfdParams->bfdh = bfd_openr(fname, 0)) == NULL) {
@@ -163,7 +166,7 @@ $NetBSD$
 +    return ret;
 +}
 +
-+void arch_bfdDisasm(pid_t pid, uint8_t* mem, size_t size, char* instr) {
++void arch_bfdDisasm(pid_t pid HF_ATTR_UNUSED, uint8_t* mem, size_t size, char* instr) {
 +    MX_SCOPED_LOCK(&arch_bfd_mutex);
 +
 +    bfd_init();
@@ -172,7 +175,7 @@ $NetBSD$
 +    fname = getexecname();
 +    bfd* bfdh = bfd_openr(fname, NULL);
 +    if (bfdh == NULL) {
-+        LOG_W("bfd_openr('%s') failed", fname, pid);
++        LOG_W("bfd_openr('%s') failed", fname);
 +        return;
 +    }
 +

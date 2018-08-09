@@ -1,6 +1,6 @@
 $NetBSD$
 
---- honggfuzz.h.orig	2018-08-09 02:18:25.204847680 +0000
+--- honggfuzz.h.orig	2018-08-09 12:21:21.703612055 +0000
 +++ honggfuzz.h
 @@ -298,6 +298,27 @@ typedef struct {
          bool useClone;
@@ -30,3 +30,21 @@ $NetBSD$
  } honggfuzz_t;
  
  typedef struct {
+@@ -339,6 +360,17 @@ typedef struct {
+         int cpuIptBtsFd;
+     } linux;
+ 
++    struct {
++        /* For NetBSD code */
++        uint8_t* perfMmapBuf;
++        uint8_t* perfMmapAux;
++        hwcnt_t hwCnts;
++        pid_t attachedPid;
++        int cpuInstrFd;
++        int cpuBranchFd;
++        int cpuIptBtsFd;
++    } netbsd;
++
+     bool hasCrashed;
+ } run_t;
+ 

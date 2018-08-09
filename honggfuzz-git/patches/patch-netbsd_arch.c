@@ -1,8 +1,8 @@
 $NetBSD$
 
---- netbsd/arch.c.orig	2018-08-09 02:22:45.582694875 +0000
+--- netbsd/arch.c.orig	2018-08-09 12:21:21.864394665 +0000
 +++ netbsd/arch.c
-@@ -0,0 +1,475 @@
+@@ -0,0 +1,371 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD)
@@ -72,17 +72,6 @@ $NetBSD$
 +        return false;
 +    }
 +    return true;
-+}
-+
-+static uint8_t arch_clone_stack[128 * 1024];
-+static __thread jmp_buf env;
-+
-+HF_ATTR_NO_SANITIZE_ADDRESS
-+HF_ATTR_NO_SANITIZE_MEMORY
-+static int arch_cloneFunc(void* arg HF_ATTR_UNUSED) {
-+    longjmp(env, 1);
-+    abort();
-+    return 0;
 +}
 +
 +pid_t arch_fork(run_t* run __unused) {
@@ -220,7 +209,7 @@ $NetBSD$
 +    /* All queued wait events must be tested when SIGCHLD was delivered */
 +    for (;;) {
 +        int status;
-+        pid_t pid = TEMP_FAILURE_RETRY(waitpid(-1, &status, __WALL | __WNOTHREAD | WNOHANG));
++        pid_t pid = TEMP_FAILURE_RETRY(waitpid(-1, &status, __WALL | WNOHANG));
 +        if (pid == 0) {
 +            return false;
 +        }
@@ -306,7 +295,6 @@ $NetBSD$
 +        }
 +    }
 +
-+    arch_perfAnalyze(run);
 +    sancov_Analyze(run);
 +}
 +
@@ -332,93 +320,6 @@ $NetBSD$
 +    sigemptyset(&hfuzz->netbsd.waitSigSet);
 +    sigaddset(&hfuzz->netbsd.waitSigSet, SIGIO);
 +    sigaddset(&hfuzz->netbsd.waitSigSet, SIGCHLD);
-+
-+    for (;;) {
-+        __attribute__((weak)) const char* gnu_get_libc_version(void);
-+        if (!gnu_get_libc_version) {
-+            LOG_W("Unknown libc implementation. Using clone() instead of fork()");
-+            break;
-+        }
-+        const char* gversion = gnu_get_libc_version();
-+        int major, minor;
-+        if (sscanf(gversion, "%d.%d", &major, &minor) != 2) {
-+            LOG_W("Unknown glibc version:'%s'. Using clone() instead of fork()", gversion);
-+            break;
-+        }
-+        if ((major < 2) || (major == 2 && minor < 23)) {
-+            LOG_W(
-+                "Your glibc version:'%s' will most likely result in malloc()-related "
-+                "deadlocks. Min. version 2.24 (Or, Ubuntu's 2.23-0ubuntu6) suggested. "
-+                "See https://sourceware.org/bugzilla/show_bug.cgi?id=19431 for explanation. "
-+                "Using clone() instead of fork()",
-+                gversion);
-+            break;
-+        }
-+        LOG_D("Glibc version:'%s', OK", gversion);
-+        hfuzz->netbsd.useClone = false;
-+        break;
-+    }
-+
-+    if (hfuzz->feedback.dynFileMethod != _HF_DYNFILE_NONE) {
-+        unsigned long major = 0, minor = 0;
-+        char* p = NULL;
-+
-+        /*
-+         * Check that Linux kernel is compatible
-+         *
-+         * Compatibility list:
-+         *  1) Perf exclude_callchain_kernel requires kernel >= 3.7
-+         *     TODO: Runtime logic to disable it for unsupported kernels
-+         *           if it doesn't affect perf counters processing
-+         *  2) If 'PERF_TYPE_HARDWARE' is not supported by kernel, ENOENT
-+         *     is returned from perf_event_open(). Unfortunately, no reliable
-+         *     way to detect it here. libperf exports some list functions,
-+         *     although small guarantees it's installed. Maybe a more targeted
-+         *     message at perf_event_open() error handling will help.
-+         *  3) Intel's PT and new Intel BTS format require kernel >= 4.1
-+         */
-+        unsigned long checkMajor = 3, checkMinor = 7;
-+        if ((hfuzz->feedback.dynFileMethod & _HF_DYNFILE_BTS_EDGE) ||
-+            (hfuzz->feedback.dynFileMethod & _HF_DYNFILE_IPT_BLOCK)) {
-+            checkMajor = 4;
-+            checkMinor = 1;
-+        }
-+
-+        struct utsname uts;
-+        if (uname(&uts) == -1) {
-+            PLOG_F("uname() failed");
-+            return false;
-+        }
-+
-+        p = uts.release;
-+        major = strtoul(p, &p, 10);
-+        if (*p++ != '.') {
-+            LOG_F("Unsupported kernel version (%s)", uts.release);
-+            return false;
-+        }
-+
-+        minor = strtoul(p, &p, 10);
-+        if ((major < checkMajor) || ((major == checkMajor) && (minor < checkMinor))) {
-+            LOG_E("Kernel version '%s' not supporting chosen perf method", uts.release);
-+            return false;
-+        }
-+
-+        if (arch_perfInit(hfuzz) == false) {
-+            return false;
-+        }
-+    }
-+#if defined(__ANDROID__) && defined(__arm__) && defined(OPENSSL_ARMCAP_ABI)
-+    /*
-+     * For ARM kernels running Android API <= 21, if fuzzing target links to
-+     * libcrypto (OpenSSL), OPENSSL_cpuid_setup initialization is triggering a
-+     * SIGILL/ILLOPC at armv7_tick() due to  "mrrc p15, #1, r0, r1, c14)" instruction.
-+     * Setups using BoringSSL (API >= 22) are not affected.
-+     */
-+    if (setenv("OPENSSL_armcap", OPENSSL_ARMCAP_ABI, 1) == -1) {
-+        PLOG_E("setenv(OPENSSL_armcap) failed");
-+        return false;
-+    }
-+#endif
 +
 +    /* If read PID from file enable - read current value */
 +    if (hfuzz->netbsd.pidFile) {
@@ -459,11 +360,6 @@ $NetBSD$
 +     */
 +    if (hfuzz->sanitizer.enable && hfuzz->cfg.monitorSIGABRT) {
 +        hfuzz->netbsd.numMajorFrames = 14;
-+    }
-+
-+    if (hfuzz->netbsd.cloneFlags && unshare(hfuzz->netbsd.cloneFlags) == -1) {
-+        LOG_E("unshare(%tx)", hfuzz->netbsd.cloneFlags);
-+        return false;
 +    }
 +
 +    return true;

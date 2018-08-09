@@ -1,8 +1,8 @@
 $NetBSD$
 
---- netbsd/trace.c.orig	2018-08-09 02:18:25.365145159 +0000
+--- netbsd/trace.c.orig	2018-08-09 12:21:21.879179398 +0000
 +++ netbsd/trace.c
-@@ -0,0 +1,1399 @@
+@@ -0,0 +1,1401 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD/PTRACE)
@@ -286,29 +286,31 @@ $NetBSD$
 +
 +extern const char* sys_sigabbrev[];
 +
-+static __thread char arch_signame[32];
 +static const char* arch_sigName(int signo) {
-+    if (signo < 0 || signo > _NSIG) {
-+        snprintf(arch_signame, sizeof(arch_signame), "UNKNOWN-%d", signo);
-+        return arch_signame;
-+    }
-+    if (signo > __SIGRTMIN) {
-+        snprintf(arch_signame, sizeof(arch_signame), "SIG%d-RTMIN+%d", signo, signo - __SIGRTMIN);
-+        return arch_signame;
-+    }
-+#ifdef __ANDROID__
-+    return arch_sigs[signo].descr;
-+#else
-+    if (sys_sigabbrev[signo] == NULL) {
-+        snprintf(arch_signame, sizeof(arch_signame), "SIG%d", signo);
-+    } else {
-+        snprintf(arch_signame, sizeof(arch_signame), "SIG%s", sys_sigabbrev[signo]);
-+    }
-+    return arch_signame;
-+#endif /* __ANDROID__ */
++    return signalname(signo);
 +}
 +
 +static size_t arch_getProcMem(pid_t pid, uint8_t* buf, size_t len, REG_TYPE pc) {
++    struct ptrace_io_desc io;
++    size_t bytes_read;
++
++    bytes_read = 0;
++    io.piod_op = PIOD_READ_D;
++    io.piod_len = len;
++
++    do {
++        io.piod_offs = (void *)(buf + bytes_read);
++        io.piod_addr = dst + bytes_read;
++    }
++
++{
++                                 int     piod_op;
++                                 void    *piod_offs;
++                                 void    *piod_addr;
++                                 size_t  piod_len;
++                         };
++
++
 +    /*
 +     * Let's try process_vm_readv first
 +     */
