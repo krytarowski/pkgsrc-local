@@ -12,7 +12,7 @@ $NetBSD$
 +    ARCH_SRCS := $(sort $(wildcard netbsd/*.c))
 +    ARCH_CFLAGS := -std=c11 -I/usr/local/include \
 +                   -Wextra -Wno-override-init \
-+                   -funroll-loops
++                   -funroll-loops -D_KERNTYPES
 +    ARCH_LDFLAGS := -L/usr/local/include \
 +                    -pthread -lbfd -lopcodes -lrt
 +

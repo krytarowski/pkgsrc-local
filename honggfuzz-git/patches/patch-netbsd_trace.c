@@ -1,6 +1,6 @@
 $NetBSD$
 
---- netbsd/trace.c.orig	2018-08-09 17:30:27.952827248 +0000
+--- netbsd/trace.c.orig	2018-08-09 21:49:50.941925143 +0000
 +++ netbsd/trace.c
 @@ -0,0 +1,993 @@
 +/*
@@ -28,7 +28,7 @@ $NetBSD$
 +
 +#include "netbsd/trace.h"
 +
-+#define _KERNTYPES
++#include <sys/types.h>
 +
 +#include <ctype.h>
 +#include <dirent.h>
@@ -68,7 +68,7 @@ $NetBSD$
 + * Size in characters required to store a string representation of a
 + * register value (0xdeadbeef style))
 + */
-+#define REGSIZEINCHAR (2 * sizeof(REG_TYPE) + 3)
++#define REGSIZEINCHAR (2 * sizeof(register_t) + 3)
 +
 +#if defined(__i386__) || defined(__x86_64__)
 +#define MAX_INSTR_SZ 16
@@ -123,7 +123,7 @@ $NetBSD$
 +    return signalname(signo);
 +}
 +
-+static size_t arch_getProcMem(pid_t pid, uint8_t* buf, size_t len, REG_TYPE pc) {
++static size_t arch_getProcMem(pid_t pid, uint8_t* buf, size_t len, register_t pc) {
 +    struct ptrace_io_desc io;
 +    size_t bytes_read;
 +
@@ -149,7 +149,7 @@ $NetBSD$
 +    return bytes_read;
 +}
 +
-+static size_t arch_getPC(pid_t pid, REG_TYPE* pc, REG_TYPE* status_reg HF_ATTR_UNUSED) {
++static size_t arch_getPC(pid_t pid, register_t* pc, register_t* status_reg HF_ATTR_UNUSED) {
 +    struct reg r;
 +
 +    if (ptrace(PT_GETREGS, pid, &r, 0) != -1) {
@@ -168,14 +168,14 @@ $NetBSD$
 +    return sizeof(r);
 +}
 +
-+static void arch_getInstrStr(pid_t pid, REG_TYPE* pc, char* instr) {
++static void arch_getInstrStr(pid_t pid, register_t* pc, char* instr) {
 +    /*
 +     * We need a value aligned to 8
 +     * which is sizeof(long) on 64bit CPU archs (on most of them, I hope;)
 +     */
 +    uint8_t buf[MAX_INSTR_SZ];
 +    size_t memsz;
-+    REG_TYPE status_reg = 0;
++    register_t status_reg = 0;
 +
 +    snprintf(instr, _HF_INSTR_SZ, "%s", "[UNKNOWN]");
 +
@@ -207,7 +207,7 @@ $NetBSD$
 +         * Convert PC to char array to be compatible with hash function
 +         */
 +        char pcStr[REGSIZEINCHAR] = {0};
-+        snprintf(pcStr, REGSIZEINCHAR, REG_PD REG_PM, (REG_TYPE)(long)funcs[i].pc);
++        snprintf(pcStr, REGSIZEINCHAR, REG_PD REG_PM, (register_t)(long)funcs[i].pc);
 +
 +        /*
 +         * Hash the last three nibbles
@@ -243,14 +243,14 @@ $NetBSD$
 +    util_ssnprintf(run->report, sizeof(run->report), "STACK:\n");
 +    for (size_t i = 0; i < funcCnt; i++) {
 +        util_ssnprintf(run->report, sizeof(run->report), " <" REG_PD REG_PM "> [%s():%zu at %s]\n",
-+            (REG_TYPE)(long)funcs[i].pc, funcs[i].func, funcs[i].line, funcs[i].mapName);
++            (register_t)(long)funcs[i].pc, funcs[i].func, funcs[i].line, funcs[i].mapName);
 +    }
 +
 +    return;
 +}
 +
 +static void arch_traceAnalyzeData(run_t* run, pid_t pid) {
-+    REG_TYPE pc = 0, status_reg = 0;
++    register_t pc = 0, status_reg = 0;
 +    size_t pcRegSz = arch_getPC(pid, &pc, &status_reg);
 +    if (!pcRegSz) {
 +        LOG_W("ptrace arch_getPC failed");
@@ -290,7 +290,7 @@ $NetBSD$
 +}
 +
 +static void arch_traceSaveData(run_t* run, pid_t pid) {
-+    REG_TYPE pc = 0;
++    register_t pc = 0;
 +    struct ptrace_siginfo info;
 +
 +    /* Local copy since flag is overridden for some crashes */
@@ -619,7 +619,7 @@ $NetBSD$
 + * the same format for compatibility with post campaign tools.
 + */
 +static void arch_traceExitSaveData(run_t* run, pid_t pid) {
-+    REG_TYPE pc = 0;
++    register_t pc = 0;
 +    void* crashAddr = 0;
 +    char* op = "UNKNOWN";
 +    pid_t targetPid = (run->global->netbsd.pid > 0) ? run->global->netbsd.pid : run->pid;
@@ -750,7 +750,7 @@ $NetBSD$
 +        util_ssnprintf(run->report, sizeof(run->report), "STACK:\n");
 +        for (int i = 0; i < funcCnt; i++) {
 +            util_ssnprintf(run->report, sizeof(run->report), " <" REG_PD REG_PM "> ",
-+                (REG_TYPE)(long)funcs[i].pc);
++                (register_t)(long)funcs[i].pc);
 +            if (funcs[i].mapName[0] != '\0') {
 +                util_ssnprintf(run->report, sizeof(run->report), "[%s + 0x%zx]\n", funcs[i].mapName,
 +                    funcs[i].line);
