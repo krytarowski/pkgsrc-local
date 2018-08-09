@@ -1,6 +1,6 @@
 $NetBSD$
 
---- netbsd/trace.h.orig	2018-08-09 01:52:22.083969070 +0000
+--- netbsd/trace.h.orig	2018-08-09 02:18:25.370258325 +0000
 +++ netbsd/trace.h
 @@ -0,0 +1,46 @@
 +/*

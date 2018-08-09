@@ -29,25 +29,22 @@ $NetBSD$
  DIRS := . $(shell find $(SUBDIR_ROOTS) -type d)
  CLEAN_PATTERNS := *.o *~ core *.a *.dSYM *.la *.so *.dylib
  SUBDIR_GARBAGE := $(foreach DIR,$(DIRS),$(addprefix $(DIR)/,$(CLEAN_PATTERNS)))
-@@ -449,6 +460,22 @@ linux/unwind.o: libhfcommon/common.h lib
+@@ -449,6 +460,19 @@ linux/unwind.o: libhfcommon/common.h lib
  mac/arch.o: arch.h honggfuzz.h libhfcommon/util.h fuzz.h libhfcommon/common.h
  mac/arch.o: libhfcommon/files.h libhfcommon/common.h libhfcommon/log.h
  mac/arch.o: sancov.h subproc.h
 +netbsd/arch.o: arch.h honggfuzz.h libhfcommon/util.h fuzz.h
 +netbsd/arch.o: libhfcommon/common.h libhfcommon/files.h libhfcommon/common.h
-+netbsd/arch.o: libhfcommon/log.h libhfcommon/ns.h linux/perf.h linux/trace.h
++netbsd/arch.o: libhfcommon/log.h libhfcommon/ns.h netbsd/trace.h
 +netbsd/arch.o: sancov.h sanitizers.h subproc.h
-+netbsd/bfd.o: linux/bfd.h linux/unwind.h honggfuzz.h libhfcommon/util.h
++netbsd/bfd.o: netbsd/bfd.h netbsd/unwind.h honggfuzz.h libhfcommon/util.h
 +netbsd/bfd.o: libhfcommon/common.h libhfcommon/files.h libhfcommon/common.h
 +netbsd/bfd.o: libhfcommon/log.h
-+netbsd/perf.o: linux/perf.h honggfuzz.h libhfcommon/util.h
-+netbsd/perf.o: libhfcommon/common.h libhfcommon/files.h libhfcommon/common.h
-+netbsd/perf.o: libhfcommon/log.h linux/pt.h
-+netbsd/trace.o: linux/trace.h honggfuzz.h libhfcommon/util.h
++netbsd/trace.o: netbsd/trace.h honggfuzz.h libhfcommon/util.h
 +netbsd/trace.o: libhfcommon/common.h libhfcommon/files.h libhfcommon/common.h
-+netbsd/trace.o: libhfcommon/log.h linux/bfd.h linux/unwind.h sancov.h
++netbsd/trace.o: libhfcommon/log.h netbsd/bfd.h netbsd/unwind.h sancov.h
 +netbsd/trace.o: sanitizers.h socketfuzzer.h subproc.h
-+netbsd/unwind.o: linux/unwind.h honggfuzz.h libhfcommon/util.h
++netbsd/unwind.o: netbsd/unwind.h honggfuzz.h libhfcommon/util.h
 +netbsd/unwind.o: libhfcommon/common.h libhfcommon/log.h
  posix/arch.o: arch.h honggfuzz.h libhfcommon/util.h fuzz.h
  posix/arch.o: libhfcommon/common.h libhfcommon/files.h libhfcommon/common.h

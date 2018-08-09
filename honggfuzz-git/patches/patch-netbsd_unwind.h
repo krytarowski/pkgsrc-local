@@ -1,6 +1,6 @@
 $NetBSD$
 
---- netbsd/unwind.h.orig	2018-08-09 01:52:22.093683506 +0000
+--- netbsd/unwind.h.orig	2018-08-09 02:18:25.379876041 +0000
 +++ netbsd/unwind.h
 @@ -0,0 +1,58 @@
 +/*
