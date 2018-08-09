@@ -1,8 +1,8 @@
 $NetBSD$
 
---- netbsd/trace.c.orig	2018-08-09 12:21:21.879179398 +0000
+--- netbsd/trace.c.orig	2018-08-09 17:30:27.952827248 +0000
 +++ netbsd/trace.c
-@@ -0,0 +1,1401 @@
+@@ -0,0 +1,1163 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD/PTRACE)
@@ -299,172 +299,40 @@ $NetBSD$
 +    io.piod_len = len;
 +
 +    do {
-+        io.piod_offs = (void *)(buf + bytes_read);
-+        io.piod_addr = dst + bytes_read;
-+    }
++        io.piod_offs = (void *)(pc + bytes_read);
++        io.piod_addr = buf + bytes_read;
 +
-+{
-+                                 int     piod_op;
-+                                 void    *piod_offs;
-+                                 void    *piod_addr;
-+                                 size_t  piod_len;
-+                         };
-+
-+
-+    /*
-+     * Let's try process_vm_readv first
-+     */
-+    const struct iovec local_iov = {
-+        .iov_base = buf,
-+        .iov_len = len,
-+    };
-+    const struct iovec remote_iov = {
-+        .iov_base = (void*)(uintptr_t)pc,
-+        .iov_len = len,
-+    };
-+    if (process_vm_readv(pid, &local_iov, 1, &remote_iov, 1, 0) == (ssize_t)len) {
-+        return len;
-+    }
-+    // Debug if failed since it shouldn't happen very often
-+    PLOG_D("process_vm_readv() failed");
-+
-+    /*
-+     * Ok, let's do it via ptrace() then.
-+     * len must be aligned to the sizeof(long)
-+     */
-+    int cnt = len / sizeof(long);
-+    size_t memsz = 0;
-+
-+    for (int x = 0; x < cnt; x++) {
-+        uint8_t* addr = (uint8_t*)(uintptr_t)pc + (int)(x * sizeof(long));
-+        long ret = ptrace(PTRACE_PEEKDATA, pid, addr, NULL);
-+
-+        if (errno != 0) {
-+            PLOG_W("Couldn't PT_READ_D on pid %d, addr: %p", pid, addr);
++        if (ptrace(PT_IO, pid, &io, 0) == -1) {
++            PLOG_W("Couldn't read process memory on pid %d, "
++	           "piod_op: %d offs: %p addr: %p piod_len: %zu",
++                   pid, io.piod_op, io.piod_offs, io.piod_addr, io.piod_len);
 +            break;
 +        }
 +
-+        memsz += sizeof(long);
-+        memcpy(&buf[x * sizeof(long)], &ret, sizeof(long));
-+    }
-+    return memsz;
++        bytes_read = io.piod_len;
++        io.piod_len = len - bytes_read;
++    } while (bytes_read < len);
++
++    return bytes_read;
 +}
 +
 +static size_t arch_getPC(pid_t pid, REG_TYPE* pc, REG_TYPE* status_reg HF_ATTR_UNUSED) {
-+/*
-+ * Some old ARM android kernels are failing with PTRACE_GETREGS to extract
-+ * the correct register values if struct size is bigger than expected. As such the
-+ * 32/64-bit multiplexing trick is not working for them in case PTRACE_GETREGSET
-+ * fails or is not implemented. To cover such cases we explicitly define
-+ * the struct size to 32bit version for arm CPU.
-+ */
-+#if defined(__arm__)
-+    struct user_regs_struct_32 regs;
-+#else
-+    HEADERS_STRUCT regs;
-+#endif
-+    const struct iovec pt_iov = {
-+        .iov_base = &regs,
-+        .iov_len = sizeof(regs),
-+    };
++    struct reg r;
 +
-+    if (ptrace(PTRACE_GETREGSET, pid, NT_PRSTATUS, &pt_iov) == -1L) {
-+        PLOG_D("ptrace(PTRACE_GETREGSET) failed");
-+
-+// If PTRACE_GETREGSET fails, try PTRACE_GETREGS if available
-+#if PTRACE_GETREGS_AVAILABLE
-+        if (ptrace(PTRACE_GETREGS, pid, 0, &regs)) {
-+            PLOG_D("ptrace(PTRACE_GETREGS) failed");
-+            LOG_W("ptrace PTRACE_GETREGSET & PTRACE_GETREGS failed to extract target registers");
-+            return 0;
-+        }
-+#else
++    if (ptrace(PT_GETREGS, pid, &r, 0) != -1) {
++        PLOG_D("ptrace(PT_GETREGS) failed");
 +        return 0;
-+#endif
 +    }
-+#if defined(__i386__) || defined(__x86_64__)
-+    /*
-+     * 32-bit
-+     */
-+    if (pt_iov.iov_len == sizeof(struct user_regs_struct_32)) {
-+        struct user_regs_struct_32* r32 = (struct user_regs_struct_32*)&regs;
-+        *pc = r32->eip;
-+        *status_reg = r32->eflags;
-+        return pt_iov.iov_len;
-+    }
-+
-+    /*
-+     * 64-bit
-+     */
-+    if (pt_iov.iov_len == sizeof(struct user_regs_struct_64)) {
-+        struct user_regs_struct_64* r64 = (struct user_regs_struct_64*)&regs;
-+        *pc = r64->ip;
-+        *status_reg = r64->flags;
-+        return pt_iov.iov_len;
-+    }
-+    LOG_W("Unknown registers structure size: '%zd'", pt_iov.iov_len);
-+    return 0;
-+#endif /* defined(__i386__) || defined(__x86_64__) */
-+
-+#if defined(__arm__) || defined(__aarch64__)
-+    /*
-+     * 32-bit
-+     */
-+    if (pt_iov.iov_len == sizeof(struct user_regs_struct_32)) {
-+        struct user_regs_struct_32* r32 = (struct user_regs_struct_32*)&regs;
-+#ifdef __ANDROID__
-+        *pc = r32->ARM_pc;
-+        *status_reg = r32->ARM_cpsr;
++    *pc = PTRACE_REG_PC(r);
++#if defined(__i386__)
++    *status_reg = r->regs[_REG_EFLAGS];
++#elif defined(__x86_64__)
++    *status_reg = r->regs[_REG_RFLAGS];
 +#else
-+        *pc = r32->uregs[ARM_pc];
-+        *status_reg = r32->uregs[ARM_cpsr];
++#   error unsupported CPU architecture
 +#endif
-+        return pt_iov.iov_len;
-+    }
 +
-+    /*
-+     * 64-bit
-+     */
-+    if (pt_iov.iov_len == sizeof(struct user_regs_struct_64)) {
-+        struct user_regs_struct_64* r64 = (struct user_regs_struct_64*)&regs;
-+        *pc = r64->pc;
-+        *status_reg = r64->pstate;
-+        return pt_iov.iov_len;
-+    }
-+    LOG_W("Unknown registers structure size: '%zd'", pt_iov.iov_len);
-+    return 0;
-+#endif /* defined(__arm__) || defined(__aarch64__) */
-+
-+#if defined(__powerpc64__) || defined(__powerpc__)
-+    /*
-+     * 32-bit
-+     */
-+    if (pt_iov.iov_len == sizeof(struct user_regs_struct_32)) {
-+        struct user_regs_struct_32* r32 = (struct user_regs_struct_32*)&regs;
-+        *pc = r32->nip;
-+        return pt_iov.iov_len;
-+    }
-+
-+    /*
-+     * 64-bit
-+     */
-+    if (pt_iov.iov_len == sizeof(struct user_regs_struct_64)) {
-+        struct user_regs_struct_64* r64 = (struct user_regs_struct_64*)&regs;
-+        *pc = r64->nip;
-+        return pt_iov.iov_len;
-+    }
-+
-+    LOG_W("Unknown registers structure size: '%zd'", pt_iov.iov_len);
-+    return 0;
-+#endif /* defined(__powerpc64__) || defined(__powerpc__) */
-+
-+#if defined(__mips__) || defined(__mips64__)
-+    *pc = regs.cp0_epc;
-+    return pt_iov.iov_len;
-+#endif /* defined(__mips__) || defined(__mips64__) */
-+
-+    LOG_D("Unknown/unsupported CPU architecture");
-+    return 0;
++    return sizeof(r);
 +}
 +
 +static void arch_getInstrStr(pid_t pid, REG_TYPE* pc, char* instr) {
@@ -488,46 +356,7 @@ $NetBSD$
 +        snprintf(instr, _HF_INSTR_SZ, "%s", "[NOT_MMAPED]");
 +        return;
 +    }
-+#if !defined(__ANDROID__)
 +    arch_bfdDisasm(pid, buf, memsz, instr);
-+#else
-+    cs_arch arch;
-+    cs_mode mode;
-+#if defined(__arm__) || defined(__aarch64__)
-+    arch = (pcRegSz == sizeof(struct user_regs_struct_64)) ? CS_ARCH_ARM64 : CS_ARCH_ARM;
-+    if (arch == CS_ARCH_ARM) {
-+        mode = (status_reg & 0x20) ? CS_MODE_THUMB : CS_MODE_ARM;
-+    } else {
-+        mode = CS_MODE_ARM;
-+    }
-+#elif defined(__i386__) || defined(__x86_64__)
-+    arch = CS_ARCH_X86;
-+    mode = (pcRegSz == sizeof(struct user_regs_struct_64)) ? CS_MODE_64 : CS_MODE_32;
-+#else
-+    LOG_E("Unknown/Unsupported Android CPU architecture");
-+#endif
-+
-+    csh handle;
-+    cs_err err = cs_open(arch, mode, &handle);
-+    if (err != CS_ERR_OK) {
-+        LOG_W("Capstone initialization failed: '%s'", cs_strerror(err));
-+        return;
-+    }
-+
-+    cs_insn* insn;
-+    size_t count = cs_disasm(handle, buf, sizeof(buf), *pc, 0, &insn);
-+
-+    if (count < 1) {
-+        LOG_W("Couldn't disassemble the assembler instructions' stream: '%s'",
-+            cs_strerror(cs_errno(handle)));
-+        cs_close(&handle);
-+        return;
-+    }
-+
-+    snprintf(instr, _HF_INSTR_SZ, "%s %s", insn[0].mnemonic, insn[0].op_str);
-+    cs_free(insn, count);
-+    cs_close(&handle);
-+#endif /* defined(__ANDROID__) */
 +
 +    for (int x = 0; instr[x] && x < _HF_INSTR_SZ; x++) {
 +        if (instr[x] == '/' || instr[x] == '\\' || isspace(instr[x]) || !isprint(instr[x])) {
@@ -540,7 +369,7 @@ $NetBSD$
 +
 +static void arch_hashCallstack(run_t* run, funcs_t* funcs, size_t funcCnt, bool enableMasking) {
 +    uint64_t hash = 0;
-+    for (size_t i = 0; i < funcCnt && i < run->global->linux.numMajorFrames; i++) {
++    for (size_t i = 0; i < funcCnt && i < run->global->netbsd.numMajorFrames; i++) {
 +        /*
 +         * Convert PC to char array to be compatible with hash function
 +         */
@@ -580,28 +409,9 @@ $NetBSD$
 +        run->report, sizeof(run->report), "STACK HASH: %016" PRIx64 "\n", run->backtrace);
 +    util_ssnprintf(run->report, sizeof(run->report), "STACK:\n");
 +    for (size_t i = 0; i < funcCnt; i++) {
-+#ifdef __HF_USE_CAPSTONE__
-+        util_ssnprintf(
-+            run->report, sizeof(run->report), " <" REG_PD REG_PM "> ", (REG_TYPE)(long)funcs[i].pc);
-+        if (funcs[i].func[0] != '\0')
-+            util_ssnprintf(run->report, sizeof(run->report), "[%s() + 0x%x at %s]\n", funcs[i].func,
-+                funcs[i].line, funcs[i].mapName);
-+        else
-+            util_ssnprintf(run->report, sizeof(run->report), "[]\n");
-+#else
 +        util_ssnprintf(run->report, sizeof(run->report), " <" REG_PD REG_PM "> [%s():%zu at %s]\n",
 +            (REG_TYPE)(long)funcs[i].pc, funcs[i].func, funcs[i].line, funcs[i].mapName);
-+#endif
 +    }
-+
-+// libunwind is not working for 32bit targets in 64bit systems
-+#if defined(__aarch64__)
-+    if (funcCnt == 0) {
-+        util_ssnprintf(run->report, sizeof(run->report),
-+            " !ERROR: If 32bit fuzz target"
-+            " in aarch64 system, try ARM 32bit build\n");
-+    }
-+#endif
 +
 +    return;
 +}
@@ -623,12 +433,8 @@ $NetBSD$
 +    };
 +    memset(funcs, 0, _HF_MAX_FUNCS * sizeof(funcs_t));
 +
-+#if !defined(__ANDROID__)
 +    size_t funcCnt = arch_unwindStack(pid, funcs);
 +    arch_bfdResolveSyms(pid, funcs, funcCnt);
-+#else
-+    size_t funcCnt = arch_unwindStack(pid, funcs);
-+#endif
 +
 +    /*
 +     * If unwinder failed (zero frames), use PC from ptrace GETREGS if not zero.
@@ -669,9 +475,9 @@ $NetBSD$
 +    LOG_D("Pid: %d, signo: %d, errno: %d, code: %d, addr: %p, pc: %" REG_PM ", instr: '%s'", pid,
 +        si.si_signo, si.si_errno, si.si_code, si.si_addr, pc, instr);
 +
-+    if (!SI_FROMUSER(&si) && pc && si.si_addr < run->global->linux.ignoreAddr) {
++    if (!SI_FROMUSER(&si) && pc && si.si_addr < run->global->netbsd.ignoreAddr) {
 +        LOG_I("Input is interesting (%s), but the si.si_addr is %p (below %p), skipping",
-+            arch_sigName(si.si_signo), si.si_addr, run->global->linux.ignoreAddr);
++            arch_sigName(si.si_signo), si.si_addr, run->global->netbsd.ignoreAddr);
 +        return;
 +    }
 +
@@ -684,12 +490,8 @@ $NetBSD$
 +    };
 +    memset(funcs, 0, _HF_MAX_FUNCS * sizeof(funcs_t));
 +
-+#if !defined(__ANDROID__)
 +    size_t funcCnt = arch_unwindStack(pid, funcs);
 +    arch_bfdResolveSyms(pid, funcs, funcCnt);
-+#else
-+    size_t funcCnt = arch_unwindStack(pid, funcs);
-+#endif
 +
 +    /*
 +     * If unwinder failed (zero frames), use PC from ptrace GETREGS if not zero.
@@ -758,9 +560,9 @@ $NetBSD$
 +     * both stackhash and symbol blacklist. Crash is always kept regardless
 +     * of the status of uniqueness flag.
 +     */
-+    if (run->global->linux.symsWl) {
++    if (run->global->netbsd.symsWl) {
 +        char* wlSymbol = arch_btContainsSymbol(
-+            run->global->linux.symsWlCnt, run->global->linux.symsWl, funcCnt, funcs);
++            run->global->netbsd.symsWlCnt, run->global->netbsd.symsWl, funcCnt, funcs);
 +        if (wlSymbol != NULL) {
 +            saveUnique = false;
 +            LOG_D("Whitelisted symbol '%s' found, skipping blacklist checks", wlSymbol);
@@ -781,7 +583,7 @@ $NetBSD$
 +         * Check if backtrace contains blacklisted symbol
 +         */
 +        char* blSymbol = arch_btContainsSymbol(
-+            run->global->linux.symsBlCnt, run->global->linux.symsBl, funcCnt, funcs);
++            run->global->netbsd.symsBlCnt, run->global->netbsd.symsBl, funcCnt, funcs);
 +        if (blSymbol != NULL) {
 +            LOG_I("Blacklisted symbol '%s' found, skipping", blSymbol);
 +            ATOMIC_POST_INC(run->global->cnts.blCrashesCnt);
@@ -793,7 +595,7 @@ $NetBSD$
 +    ATOMIC_POST_ADD(run->global->cfg.dynFileIterExpire, _HF_DYNFILE_SUB_MASK);
 +
 +    void* sig_addr = si.si_addr;
-+    if (!run->global->linux.disableRandomization) {
++    if (!run->global->netbsd.disableRandomization) {
 +        pc = 0UL;
 +        sig_addr = NULL;
 +    }
@@ -987,7 +789,7 @@ $NetBSD$
 +    REG_TYPE pc = 0;
 +    void* crashAddr = 0;
 +    char* op = "UNKNOWN";
-+    pid_t targetPid = (run->global->linux.pid > 0) ? run->global->linux.pid : run->pid;
++    pid_t targetPid = (run->global->netbsd.pid > 0) ? run->global->netbsd.pid : run->pid;
 +
 +    /* Save only the first hit for each worker */
 +    if (run->crashFileName[0] != '\0') {
@@ -1031,9 +833,9 @@ $NetBSD$
 +    }
 +
 +    /* Since crash address is available, apply ignoreAddr filters */
-+    if (crashAddr < run->global->linux.ignoreAddr) {
++    if (crashAddr < run->global->netbsd.ignoreAddr) {
 +        LOG_I("Input is interesting, but the crash addr is %p (below %p), skipping", crashAddr,
-+            run->global->linux.ignoreAddr);
++            run->global->netbsd.ignoreAddr);
 +        return;
 +    }
 +
@@ -1325,56 +1127,26 @@ $NetBSD$
 +    }
 +}
 +
-+#define MAX_THREAD_IN_TASK 4096
 +bool arch_traceAttach(run_t* run, pid_t pid) {
-+/*
-+ * It should be present since, at least, Linux kernel 3.8, but
-+ * not always defined in kernel-headers
-+ */
-+#if !defined(PTRACE_O_EXITKILL)
-+#define PTRACE_O_EXITKILL (1 << 20)
-+#endif /* !defined(PTRACE_O_EXITKILL) */
-+    long seize_options = PTRACE_O_TRACECLONE | PTRACE_O_TRACEFORK | PTRACE_O_TRACEVFORK;
-+    if (run->global->linux.pid == 0) {
-+        seize_options |= PTRACE_O_EXITKILL;
-+    }
-+    /* The event is only used with sanitizers */
-+    if (run->global->sanitizer.enable) {
-+        seize_options |= PTRACE_O_TRACEEXIT;
-+    }
++    ptrace_event_t event;
 +
-+    if (run->global->linux.pid == 0 && !arch_traceWaitForPidStop(pid)) {
++    event.pe_set_event = PTRACE_FORK | PTRACE_VFORK | PTRACE_VFORK_DONE;
++
++    if (ptrace(PT_ATTACH, pid, NULL, 0) == -1) {
++        PLOG_W("Couldn't ptrace(PT_ATTACH) to pid: %d", pid);
 +        return false;
 +    }
 +
-+    if (ptrace(PTRACE_SEIZE, pid, NULL, seize_options) == -1) {
-+        PLOG_W("Couldn't ptrace(PTRACE_SEIZE) to pid: %d", pid);
++    arch_traceWaitForPidStop(pid)
++
++    if (ptrace(PT_SET_EVENT_MASK, pid, &event, sizeof(event)) == -1) {
++        PLOG_W("Couldn't ptrace(PT_SET_EVENT_MASK) to pid: %d", pid);
++        ptrace(PT_DETACH, pid, NULL, 0);
 +        return false;
 +    }
 +
 +    LOG_D("Attached to PID: %d", pid);
 +
-+    /* It only makes sense to attach to threads with -p */
-+    if (run->global->linux.pid == 0) {
-+        return true;
-+    }
-+
-+    int tasks[MAX_THREAD_IN_TASK + 1] = {0};
-+    if (!arch_listThreads(tasks, MAX_THREAD_IN_TASK, pid)) {
-+        LOG_E("Couldn't read thread list for pid '%d'", pid);
-+        return false;
-+    }
-+
-+    for (int i = 0; i < MAX_THREAD_IN_TASK && tasks[i]; i++) {
-+        if (tasks[i] == pid) {
-+            continue;
-+        }
-+        if (ptrace(PTRACE_SEIZE, tasks[i], NULL, seize_options) == -1) {
-+            PLOG_W("Couldn't ptrace(PTRACE_SEIZE) to pid: %d", tasks[i]);
-+            continue;
-+        }
-+        LOG_D("Attached to PID: %d (thread_group:%d)", tasks[i], pid);
-+    }
 +    return true;
 +}
 +
@@ -1384,21 +1156,11 @@ $NetBSD$
 +        return;
 +    }
 +
-+    int tasks[MAX_THREAD_IN_TASK + 1] = {0};
-+    if (!arch_listThreads(tasks, MAX_THREAD_IN_TASK, pid)) {
-+        LOG_E("Couldn't read thread list for pid '%d'", pid);
-+        return;
-+    }
-+
-+    for (int i = 0; i < MAX_THREAD_IN_TASK && tasks[i]; i++) {
-+        ptrace(PTRACE_INTERRUPT, tasks[i], NULL, NULL);
-+        arch_traceWaitForPidStop(tasks[i]);
-+        ptrace(PTRACE_DETACH, tasks[i], NULL, NULL);
-+    }
++    ptrace(PTRACE_DETACH, pid, NULL, 0);
 +}
 +
 +void arch_traceSignalsInit(honggfuzz_t* hfuzz) {
-+    /* Default is true for all platforms except Android */
++    /* Default is true */
 +    arch_sigs[SIGABRT].important = hfuzz->cfg.monitorSIGABRT;
 +
 +    /* Default is false */

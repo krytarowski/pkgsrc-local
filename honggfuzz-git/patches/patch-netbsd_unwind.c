@@ -1,8 +1,8 @@
 $NetBSD$
 
---- netbsd/unwind.c.orig	2018-08-09 12:18:48.774926397 +0000
+--- netbsd/unwind.c.orig	2018-08-09 17:30:27.962762052 +0000
 +++ netbsd/unwind.c
-@@ -0,0 +1,283 @@
+@@ -0,0 +1,148 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD/UNWIND)
@@ -123,141 +123,6 @@ $NetBSD$
 +    }
 +    return NULL;
 +}
-+
-+#ifndef __ANDROID__
-+size_t arch_unwindStack(pid_t pid, funcs_t* funcs) {
-+    size_t num_frames = 0, mapsCnt = 0;
-+    procMap_t* mapsList = arch_parsePidMaps(pid, &mapsCnt);
-+    defer {
-+        free(mapsList);
-+    };
-+
-+    unw_addr_space_t as = unw_create_addr_space(&_UPT_accessors, __BYTE_ORDER);
-+    if (!as) {
-+        LOG_E("[pid='%d'] unw_create_addr_space failed", pid);
-+        return num_frames;
-+    }
-+    defer {
-+        unw_destroy_addr_space(as);
-+    };
-+
-+    void* ui = _UPT_create(pid);
-+    if (ui == NULL) {
-+        LOG_E("[pid='%d'] _UPT_create failed", pid);
-+        return num_frames;
-+    }
-+    defer {
-+        _UPT_destroy(ui);
-+    };
-+
-+    unw_cursor_t c;
-+    int ret = unw_init_remote(&c, as, ui);
-+    if (ret < 0) {
-+        LOG_E("[pid='%d'] unw_init_remote failed (%s)", pid, UNW_ER[-ret]);
-+        return num_frames;
-+    }
-+
-+    for (num_frames = 0; unw_step(&c) > 0 && num_frames < _HF_MAX_FUNCS; num_frames++) {
-+        unw_word_t ip;
-+        char* mapName = NULL;
-+        ret = unw_get_reg(&c, UNW_REG_IP, &ip);
-+        if (ret < 0) {
-+            LOG_E("[pid='%d'] [%zd] failed to read IP (%s)", pid, num_frames, UNW_ER[-ret]);
-+            funcs[num_frames].pc = 0;
-+        } else {
-+            funcs[num_frames].pc = (void*)(uintptr_t)ip;
-+        }
-+        if (mapsCnt > 0 && (mapName = arch_searchMaps(ip, mapsCnt, mapsList)) != NULL) {
-+            memcpy(funcs[num_frames].mapName, mapName, sizeof(funcs[num_frames].mapName));
-+        } else {
-+            strncpy(funcs[num_frames].mapName, "UNKNOWN", sizeof(funcs[num_frames].mapName));
-+        }
-+    }
-+
-+    return num_frames;
-+}
-+
-+#else  /* !defined(__ANDROID__) */
-+size_t arch_unwindStack(pid_t pid, funcs_t* funcs) {
-+    size_t num_frames = 0, mapsCnt = 0;
-+    procMap_t* mapsList = arch_parsePidMaps(pid, &mapsCnt);
-+    defer {
-+        free(mapsList);
-+    };
-+
-+    unw_addr_space_t as = unw_create_addr_space(&_UPT_accessors, __BYTE_ORDER);
-+    if (!as) {
-+        LOG_E("[pid='%d'] unw_create_addr_space failed", pid);
-+        return num_frames;
-+    }
-+    defer {
-+        unw_destroy_addr_space(as);
-+    };
-+
-+    struct UPT_info* ui = (struct UPT_info*)_UPT_create(pid);
-+    if (ui == NULL) {
-+        LOG_E("[pid='%d'] _UPT_create failed", pid);
-+        return num_frames;
-+    }
-+    defer {
-+        _UPT_destroy(ui);
-+    };
-+
-+    unw_cursor_t cursor;
-+    int ret = unw_init_remote(&cursor, as, ui);
-+    if (ret < 0) {
-+        LOG_E("[pid='%d'] unw_init_remote failed (%s)", pid, UNW_ER[-ret]);
-+        return num_frames;
-+    }
-+
-+    do {
-+        char* mapName = NULL;
-+        unw_word_t pc = 0, offset = 0;
-+        char buf[_HF_FUNC_NAME_SZ] = {0};
-+
-+        ret = unw_get_reg(&cursor, UNW_REG_IP, &pc);
-+        if (ret < 0) {
-+            LOG_E("[pid='%d'] [%zd] failed to read IP (%s)", pid, num_frames, UNW_ER[-ret]);
-+            // We don't want to try to extract info from an arbitrary IP
-+            // TODO: Maybe abort completely (goto out))
-+            goto skip_frame_info;
-+        }
-+
-+        unw_proc_info_t frameInfo;
-+        ret = unw_get_proc_info(&cursor, &frameInfo);
-+        if (ret < 0) {
-+            LOG_D("[pid='%d'] [%zd] unw_get_proc_info (%s)", pid, num_frames, UNW_ER[-ret]);
-+            // Not safe to keep parsing frameInfo
-+            goto skip_frame_info;
-+        }
-+
-+        ret = unw_get_proc_name(&cursor, buf, sizeof(buf), &offset);
-+        if (ret < 0) {
-+            LOG_D(
-+                "[pid='%d'] [%zd] unw_get_proc_name() failed (%s)", pid, num_frames, UNW_ER[-ret]);
-+            buf[0] = '\0';
-+        }
-+
-+    skip_frame_info:
-+        // Compared to bfd, line var plays the role of offset from func_name
-+        // Reports format is adjusted accordingly to reflect in saved file
-+        funcs[num_frames].line = offset;
-+        funcs[num_frames].pc = (void*)pc;
-+        memcpy(funcs[num_frames].func, buf, sizeof(funcs[num_frames].func));
-+        if (mapsCnt > 0 && (mapName = arch_searchMaps(pc, mapsCnt, mapsList)) != NULL) {
-+            memcpy(funcs[num_frames].mapName, mapName, sizeof(funcs[num_frames].mapName));
-+        } else {
-+            strncpy(funcs[num_frames].mapName, "UNKNOWN", sizeof(funcs[num_frames].mapName));
-+        }
-+
-+        num_frames++;
-+
-+        ret = unw_step(&cursor);
-+    } while (ret > 0 && num_frames < _HF_MAX_FUNCS);
-+
-+    return num_frames;
-+}
-+#endif /* defined(__ANDROID__) */
 +
 +/*
 + * Nested loop not most efficient approach, although it's assumed that list is

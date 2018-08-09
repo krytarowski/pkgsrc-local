@@ -1,6 +1,6 @@
 $NetBSD$
 
---- honggfuzz.h.orig	2018-08-09 12:21:21.703612055 +0000
+--- honggfuzz.h.orig	2018-08-09 17:30:27.770673662 +0000
 +++ honggfuzz.h
 @@ -298,6 +298,27 @@ typedef struct {
          bool useClone;
