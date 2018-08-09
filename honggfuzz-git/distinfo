@@ -12,5 +12,5 @@ SHA1 (patch-netbsd_bfd.c) = 7561ef888a12ff8562be9bc708501ff838b23bcc
 SHA1 (patch-netbsd_bfd.h) = dd1649f2aeb9593f0ffca94f682079a390e5a253
 SHA1 (patch-netbsd_trace.c) = eb85677866b0701b1ddeb0c7c65ebd2749456188
 SHA1 (patch-netbsd_trace.h) = 13c7ec6eabd1c9403c7d247e166d3e9f092207be
-SHA1 (patch-netbsd_unwind.c) = bf694a2cebf4d54e9b2cafd284563a52aadfa6e5
+SHA1 (patch-netbsd_unwind.c) = 6ebd4ad94a15950196d4d689abd0f0f3b5a36da4
 SHA1 (patch-netbsd_unwind.h) = a6bd349fa4aa1728a8ddc0ac17a3a77b3ed24a35
