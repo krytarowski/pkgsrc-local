@@ -2,7 +2,7 @@ $NetBSD$
 
 --- netbsd/trace.c.orig	2018-08-09 17:30:27.952827248 +0000
 +++ netbsd/trace.c
-@@ -0,0 +1,1163 @@
+@@ -0,0 +1,993 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD/PTRACE)
@@ -27,6 +27,8 @@ $NetBSD$
 + */
 +
 +#include "netbsd/trace.h"
++
++#define _KERNTYPES
 +
 +#include <ctype.h>
 +#include <dirent.h>
@@ -62,17 +64,6 @@ $NetBSD$
 +#include "socketfuzzer.h"
 +#include "subproc.h"
 +
-+#if defined(__i386__) || defined(__arm__) || defined(__powerpc__)
-+#define REG_TYPE uint32_t
-+#define REG_PM PRIx32
-+#define REG_PD "0x%08"
-+#elif defined(__x86_64__) || defined(__aarch64__) || defined(__powerpc64__) || \
-+    defined(__mips__) || defined(__mips64__)
-+#define REG_TYPE uint64_t
-+#define REG_PM PRIx64
-+#define REG_PD "0x%016"
-+#endif
-+
 +/*
 + * Size in characters required to store a string representation of a
 + * register value (0xdeadbeef style))
@@ -88,162 +79,6 @@ $NetBSD$
 +#elif defined(__mips__) || defined(__mips64__)
 +#define MAX_INSTR_SZ 8
 +#endif
-+
-+#if defined(__i386__) || defined(__x86_64__)
-+struct user_regs_struct_32 {
-+    uint32_t ebx;
-+    uint32_t ecx;
-+    uint32_t edx;
-+    uint32_t esi;
-+    uint32_t edi;
-+    uint32_t ebp;
-+    uint32_t eax;
-+    uint16_t ds, __ds;
-+    uint16_t es, __es;
-+    uint16_t fs, __fs;
-+    uint16_t gs, __gs;
-+    uint32_t orig_eax;
-+    uint32_t eip;
-+    uint16_t cs, __cs;
-+    uint32_t eflags;
-+    uint32_t esp;
-+    uint16_t ss, __ss;
-+};
-+
-+struct user_regs_struct_64 {
-+    uint64_t r15;
-+    uint64_t r14;
-+    uint64_t r13;
-+    uint64_t r12;
-+    uint64_t bp;
-+    uint64_t bx;
-+    uint64_t r11;
-+    uint64_t r10;
-+    uint64_t r9;
-+    uint64_t r8;
-+    uint64_t ax;
-+    uint64_t cx;
-+    uint64_t dx;
-+    uint64_t si;
-+    uint64_t di;
-+    uint64_t orig_ax;
-+    uint64_t ip;
-+    uint64_t cs;
-+    uint64_t flags;
-+    uint64_t sp;
-+    uint64_t ss;
-+    uint64_t fs_base;
-+    uint64_t gs_base;
-+    uint64_t ds;
-+    uint64_t es;
-+    uint64_t fs;
-+    uint64_t gs;
-+};
-+#define HEADERS_STRUCT struct user_regs_struct_64
-+#endif /* defined(__i386__) || defined(__x86_64__) */
-+
-+#if defined(__arm__) || defined(__aarch64__)
-+#ifndef ARM_pc
-+#ifdef __ANDROID__ /* Building with NDK headers */
-+#define ARM_pc uregs[15]
-+#else /* Building with glibc headers */
-+#define ARM_pc 15
-+#endif
-+#endif /* ARM_pc */
-+#ifndef ARM_cpsr
-+#ifdef __ANDROID__ /* Building with NDK headers */
-+#define ARM_cpsr uregs[16]
-+#else /* Building with glibc headers */
-+#define ARM_cpsr 16
-+#endif
-+#endif /* ARM_cpsr */
-+struct user_regs_struct_32 {
-+    uint32_t uregs[18];
-+};
-+
-+struct user_regs_struct_64 {
-+    uint64_t regs[31];
-+    uint64_t sp;
-+    uint64_t pc;
-+    uint64_t pstate;
-+};
-+#define HEADERS_STRUCT struct user_regs_struct_64
-+#endif /* defined(__arm__) || defined(__aarch64__) */
-+
-+#if defined(__powerpc64__) || defined(__powerpc__)
-+#define HEADERS_STRUCT struct pt_regs
-+struct user_regs_struct_32 {
-+    uint32_t gpr[32];
-+    uint32_t nip;
-+    uint32_t msr;
-+    uint32_t orig_gpr3;
-+    uint32_t ctr;
-+    uint32_t link;
-+    uint32_t xer;
-+    uint32_t ccr;
-+    uint32_t mq;
-+    uint32_t trap;
-+    uint32_t dar;
-+    uint32_t dsisr;
-+    uint32_t result;
-+    /*
-+     * elf.h's ELF_NGREG says it's 48 registers, so kernel fills it in
-+     * with some zeros
-+     */
-+    uint32_t zero0;
-+    uint32_t zero1;
-+    uint32_t zero2;
-+    uint32_t zero3;
-+};
-+struct user_regs_struct_64 {
-+    uint64_t gpr[32];
-+    uint64_t nip;
-+    uint64_t msr;
-+    uint64_t orig_gpr3;
-+    uint64_t ctr;
-+    uint64_t link;
-+    uint64_t xer;
-+    uint64_t ccr;
-+    uint64_t softe;
-+    uint64_t trap;
-+    uint64_t dar;
-+    uint64_t dsisr;
-+    uint64_t result;
-+    /*
-+     * elf.h's ELF_NGREG says it's 48 registers, so kernel fills it in
-+     * with some zeros
-+     */
-+    uint64_t zero0;
-+    uint64_t zero1;
-+    uint64_t zero2;
-+    uint64_t zero3;
-+};
-+#endif /* defined(__powerpc64__) || defined(__powerpc__) */
-+
-+#if defined(__mips__) || defined(__mips64__)
-+struct user_regs_struct {
-+    uint64_t regs[32];
-+
-+    uint64_t lo;
-+    uint64_t hi;
-+    uint64_t cp0_epc;
-+    uint64_t cp0_badvaddr;
-+    uint64_t cp0_status;
-+    uint64_t cp0_cause;
-+};
-+#define HEADERS_STRUCT struct user_regs_struct
-+#endif /* defined(__mips__) || defined(__mips64__) */
-+
-+#if defined(__ANDROID__)
-+/*
-+ * Some Android ABIs don't implement PTRACE_GETREGS (e.g. aarch64)
-+ */
-+#if defined(PTRACE_GETREGS)
-+#define PTRACE_GETREGS_AVAILABLE 1
-+#else
-+#define PTRACE_GETREGS_AVAILABLE 0
-+#endif /* defined(PTRACE_GETREGS) */
-+#endif /* defined(__ANDROID__) */
 +
 +static struct {
 +    const char* descr;
@@ -280,9 +115,7 @@ $NetBSD$
 +    [SIGSYS].descr = "SIGSYS",
 +};
 +
-+#ifndef SI_FROMUSER
-+#define SI_FROMUSER(siptr) ((siptr)->si_code <= 0)
-+#endif /* SI_FROMUSER */
++#define SI_FROMUSER(siptr) ((siptr)->si_code == SI_USER)
 +
 +extern const char* sys_sigabbrev[];
 +
@@ -323,11 +156,11 @@ $NetBSD$
 +        PLOG_D("ptrace(PT_GETREGS) failed");
 +        return 0;
 +    }
-+    *pc = PTRACE_REG_PC(r);
++    *pc = PTRACE_REG_PC(&r);
 +#if defined(__i386__)
-+    *status_reg = r->regs[_REG_EFLAGS];
++    *status_reg = r.regs[_REG_EFLAGS];
 +#elif defined(__x86_64__)
-+    *status_reg = r->regs[_REG_RFLAGS];
++    *status_reg = r.regs[_REG_RFLAGS];
 +#else
 +#   error unsupported CPU architecture
 +#endif
@@ -359,7 +192,7 @@ $NetBSD$
 +    arch_bfdDisasm(pid, buf, memsz, instr);
 +
 +    for (int x = 0; instr[x] && x < _HF_INSTR_SZ; x++) {
-+        if (instr[x] == '/' || instr[x] == '\\' || isspace(instr[x]) || !isprint(instr[x])) {
++        if (instr[x] == '/' || instr[x] == '\\' || isspace((unsigned char)instr[x]) || !isprint((unsigned char)instr[x])) {
 +            instr[x] = '_';
 +        }
 +    }
@@ -458,26 +291,26 @@ $NetBSD$
 +
 +static void arch_traceSaveData(run_t* run, pid_t pid) {
 +    REG_TYPE pc = 0;
++    struct ptrace_siginfo info;
 +
 +    /* Local copy since flag is overridden for some crashes */
 +    bool saveUnique = run->global->io.saveUnique;
 +
 +    char instr[_HF_INSTR_SZ] = "\x00";
-+    siginfo_t si;
-+    bzero(&si, sizeof(si));
++    memset(&info, 0, sizeof(info));
 +
-+    if (ptrace(PTRACE_GETSIGINFO, pid, 0, &si) == -1) {
++    if (ptrace(PT_GET_SIGINFO, pid, &info, sizeof(info)) == -1) {
 +        PLOG_W("Couldn't get siginfo for pid %d", pid);
 +    }
 +
 +    arch_getInstrStr(pid, &pc, instr);
 +
 +    LOG_D("Pid: %d, signo: %d, errno: %d, code: %d, addr: %p, pc: %" REG_PM ", instr: '%s'", pid,
-+        si.si_signo, si.si_errno, si.si_code, si.si_addr, pc, instr);
++        info.psi_siginfo.si_signo, info.psi_siginfo.si_errno, info.psi_siginfo.si_code, info.psi_siginfo.si_addr, pc, instr);
 +
-+    if (!SI_FROMUSER(&si) && pc && si.si_addr < run->global->netbsd.ignoreAddr) {
++    if (!SI_FROMUSER(&info.psi_siginfo) && pc && info.psi_siginfo.si_addr < run->global->netbsd.ignoreAddr) {
 +        LOG_I("Input is interesting (%s), but the si.si_addr is %p (below %p), skipping",
-+            arch_sigName(si.si_signo), si.si_addr, run->global->netbsd.ignoreAddr);
++            arch_sigName(info.psi_siginfo.si_signo), info.psi_siginfo.si_addr, run->global->netbsd.ignoreAddr);
 +        return;
 +    }
 +
@@ -594,14 +427,14 @@ $NetBSD$
 +    /* If non-blacklisted crash detected, zero set two MSB */
 +    ATOMIC_POST_ADD(run->global->cfg.dynFileIterExpire, _HF_DYNFILE_SUB_MASK);
 +
-+    void* sig_addr = si.si_addr;
++    void* sig_addr = info.psi_siginfo.si_addr;
 +    if (!run->global->netbsd.disableRandomization) {
 +        pc = 0UL;
 +        sig_addr = NULL;
 +    }
 +
 +    /* User-induced signals don't set si.si_addr */
-+    if (SI_FROMUSER(&si)) {
++    if (SI_FROMUSER(&info.psi_siginfo)) {
 +        sig_addr = NULL;
 +    }
 +
@@ -612,14 +445,14 @@ $NetBSD$
 +    } else if (saveUnique) {
 +        snprintf(run->crashFileName, sizeof(run->crashFileName),
 +            "%s/%s.PC.%" REG_PM ".STACK.%" PRIx64 ".CODE.%d.ADDR.%p.INSTR.%s.%s",
-+            run->global->io.crashDir, arch_sigName(si.si_signo), pc, run->backtrace, si.si_code,
++            run->global->io.crashDir, arch_sigName(info.psi_siginfo.si_signo), pc, run->backtrace, info.psi_siginfo.si_code,
 +            sig_addr, instr, run->global->io.fileExtn);
 +    } else {
 +        char localtmstr[PATH_MAX];
 +        util_getLocalTime("%F.%H:%M:%S", localtmstr, sizeof(localtmstr), time(NULL));
 +        snprintf(run->crashFileName, sizeof(run->crashFileName),
 +            "%s/%s.PC.%" REG_PM ".STACK.%" PRIx64 ".CODE.%d.ADDR.%p.INSTR.%s.%s.%d.%s",
-+            run->global->io.crashDir, arch_sigName(si.si_signo), pc, run->backtrace, si.si_code,
++            run->global->io.crashDir, arch_sigName(info.psi_siginfo.si_signo), pc, run->backtrace, info.psi_siginfo.si_code,
 +            sig_addr, instr, localtmstr, pid, run->global->io.fileExtn);
 +    }
 +
@@ -653,7 +486,7 @@ $NetBSD$
 +    /* If unique crash found, reset dynFile counter */
 +    ATOMIC_CLEAR(run->global->cfg.dynFileIterExpire);
 +
-+    arch_traceGenerateReport(pid, run, funcs, funcCnt, &si, instr);
++    arch_traceGenerateReport(pid, run, funcs, funcCnt, &info.psi_siginfo, instr);
 +}
 +
 +/* TODO: Add report parsing support for other sanitizers too */
@@ -715,7 +548,7 @@ $NetBSD$
 +        } else {
 +            char* pLineLC = lineptr;
 +            /* Trim leading spaces */
-+            while (*pLineLC != '\0' && isspace(*pLineLC)) {
++            while (*pLineLC != '\0' && isspace((unsigned char)*pLineLC)) {
 +                ++pLineLC;
 +            }
 +
@@ -992,7 +825,7 @@ $NetBSD$
 +            break;
 +    }
 +
-+    ptrace(PTRACE_CONT, pid, 0, 0);
++    ptrace(PT_CONTINUE, pid, (void *)-1, 0);
 +}
 +
 +void arch_traceAnalyze(run_t* run, int status, pid_t pid) {
@@ -1020,7 +853,7 @@ $NetBSD$
 +        }
 +        /* Do not deliver SIGSTOP, as we don't support PTRACE_LISTEN anyway */
 +        int sig = (WSTOPSIG(status) != SIGSTOP) ? WSTOPSIG(status) : 0;
-+        ptrace(PTRACE_CONT, pid, 0, sig);
++        ptrace(PT_CONTINUE, pid, (void *)-1, sig);
 +        return;
 +    }
 +
@@ -1151,12 +984,9 @@ $NetBSD$
 +}
 +
 +void arch_traceDetach(pid_t pid) {
-+    if (syscall(__NR_kill, pid, 0) == -1 && errno == ESRCH) {
++    if (ptrace(PT_DETACH, pid, NULL, 0) == -1 && errno == ESRCH) {
 +        LOG_D("PID: %d no longer exists", pid);
-+        return;
 +    }
-+
-+    ptrace(PTRACE_DETACH, pid, NULL, 0);
 +}
 +
 +void arch_traceSignalsInit(honggfuzz_t* hfuzz) {
