@@ -6,7 +6,6 @@ SHA512 (honggfuzz-1.6.tar.gz) = db4f0f31d36080db983068435be82b3e1132145e0bad5c4e
 Size (honggfuzz-1.6.tar.gz) = 79322453 bytes
 SHA1 (patch-Makefile) = d3c66e5ce79942cbe90da66942d90457acc23348
 SHA1 (patch-cmdline.c) = 97a860f2242936f34d497bd4e8f9f4c2ec33c5c8
-SHA1 (patch-hfuzz__cc_hfuzz-cc.c) = 1351c251a5aa58cfbe510de6f92362cc4c465e4e
 SHA1 (patch-honggfuzz.h) = 231a231c3aef3fd3ff648fc53238bfe8113db625
 SHA1 (patch-netbsd_arch.c) = 71194ea946d566d40f79a481ed0e5aa786353888
 SHA1 (patch-netbsd_bfd.c) = f77d1253f5aeded81a1c2884acc7135a3a01bd0b
