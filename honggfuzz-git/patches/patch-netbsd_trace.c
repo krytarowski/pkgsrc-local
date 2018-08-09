@@ -2,7 +2,7 @@ $NetBSD$
 
 --- netbsd/trace.c.orig	2018-08-09 21:49:50.941925143 +0000
 +++ netbsd/trace.c
-@@ -0,0 +1,977 @@
+@@ -0,0 +1,920 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD/PTRACE)
@@ -797,9 +797,9 @@ $NetBSD$
 +    }
 +}
 +
-+static void arch_traceEvent(run_t* run, pid_t pid) {
++static void arch_traceEvent(run_t* run __unused, pid_t pid) {
 +    ptrace_state_t state;
-+    LOG_D("PID: %d, ptrace event");
++    LOG_D("PID: %d, ptrace event", pid);
 +
 +    if (ptrace(PT_GET_PROCESS_STATE, pid, &state, sizeof(state)) != -1) {
 +        PLOG_E("ptrace(PT_GET_PROCESS_STATE,%d) failed", pid);
@@ -868,63 +868,6 @@ $NetBSD$
 +    abort(); /* NOTREACHED */
 +}
 +
-+static bool arch_listThreads(int tasks[], size_t thrSz, int pid) {
-+    char path[512];
-+    snprintf(path, sizeof(path), "/proc/%d/task", pid);
-+
-+    /* An optimization, the number of threads is st.st_nlink - 2 (. and ..) */
-+    struct stat st;
-+    if (stat(path, &st) != -1) {
-+        if (st.st_nlink == 3) {
-+            tasks[0] = pid;
-+            tasks[1] = 0;
-+            return true;
-+        }
-+    }
-+
-+    size_t count = 0;
-+    DIR* dir = opendir(path);
-+    if (!dir) {
-+        PLOG_E("Couldn't open dir '%s'", path);
-+        return false;
-+    }
-+    defer {
-+        closedir(dir);
-+    };
-+
-+    for (;;) {
-+        errno = 0;
-+        const struct dirent* res = readdir(dir);
-+        if (res == NULL && errno != 0) {
-+            PLOG_E("Couldn't read contents of '%s'", path);
-+            return false;
-+        }
-+
-+        if (res == NULL) {
-+            break;
-+        }
-+
-+        pid_t pid = (pid_t)strtol(res->d_name, (char**)NULL, 10);
-+        if (pid == 0) {
-+            LOG_D("The following dir entry couldn't be converted to pid_t '%s'", res->d_name);
-+            continue;
-+        }
-+
-+        tasks[count++] = pid;
-+        LOG_D("Added pid '%d' from '%s/%s'", pid, path, res->d_name);
-+
-+        if (count >= thrSz) {
-+            break;
-+        }
-+    }
-+    PLOG_D("Total number of threads in pid '%d': '%zd'", pid, count);
-+    tasks[count + 1] = 0;
-+    if (count < 1) {
-+        return false;
-+    }
-+    return true;
-+}
-+
 +bool arch_traceWaitForPidStop(pid_t pid) {
 +    for (;;) {
 +        int status;
@@ -944,7 +887,7 @@ $NetBSD$
 +    }
 +}
 +
-+bool arch_traceAttach(run_t* run, pid_t pid) {
++bool arch_traceAttach(run_t* run __unused, pid_t pid) {
 +    ptrace_event_t event;
 +
 +    event.pe_set_event = PTRACE_FORK | PTRACE_VFORK | PTRACE_VFORK_DONE;
@@ -954,7 +897,7 @@ $NetBSD$
 +        return false;
 +    }
 +
-+    arch_traceWaitForPidStop(pid)
++    arch_traceWaitForPidStop(pid);
 +
 +    if (ptrace(PT_SET_EVENT_MASK, pid, &event, sizeof(event)) == -1) {
 +        PLOG_W("Couldn't ptrace(PT_SET_EVENT_MASK) to pid: %d", pid);
