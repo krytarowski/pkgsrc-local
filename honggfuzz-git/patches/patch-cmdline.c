@@ -1,6 +1,6 @@
 $NetBSD$
 
---- cmdline.c.orig	2018-08-10 22:23:20.099977066 +0000
+--- cmdline.c.orig	2018-08-10 22:39:27.061721400 +0000
 +++ cmdline.c
 @@ -384,6 +384,21 @@ bool cmdlineParse(int argc, char* argv[]
                  .kernelOnly = false,
@@ -40,16 +40,13 @@ $NetBSD$
          { { 0, 0, 0, 0 }, NULL },
      };
      // clang-format on
-@@ -671,6 +695,20 @@ bool cmdlineParse(int argc, char* argv[]
+@@ -671,6 +695,17 @@ bool cmdlineParse(int argc, char* argv[]
                  hfuzz->linux.cloneFlags |= (CLONE_NEWUSER | CLONE_NEWIPC);
                  break;
  #endif /* defined(_HF_ARCH_LINUX) */
 +#if defined(_HF_ARCH_NETBSD)
 +            case 0x500:
 +                hfuzz->netbsd.ignoreAddr = (void*)strtoul(optarg, NULL, 0);
-+                break;
-+            case 0x501:
-+                hfuzz->netbsd.disableRandomization = false;
 +                break;
 +            case 0x504:
 +                hfuzz->netbsd.symsBlFile = optarg;
