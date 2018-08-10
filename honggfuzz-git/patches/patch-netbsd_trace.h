@@ -1,6 +1,6 @@
 $NetBSD$
 
---- netbsd/trace.h.orig	2018-08-09 02:18:25.370258325 +0000
+--- netbsd/trace.h.orig	2018-08-10 21:05:24.942043265 +0000
 +++ netbsd/trace.h
 @@ -0,0 +1,46 @@
 +/*
@@ -26,8 +26,8 @@ $NetBSD$
 + *
 + */
 +
-+#ifndef _HF_LINUX_TRACE_H_
-+#define _HF_LINUX_TRACE_H_
++#ifndef _HF_NETBSD_TRACE_H_
++#define _HF_NETBSD_TRACE_H_
 +
 +#include <inttypes.h>
 +
