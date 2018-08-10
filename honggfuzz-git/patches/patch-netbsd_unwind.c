@@ -1,8 +1,8 @@
 $NetBSD$
 
---- netbsd/unwind.c.orig	2018-08-09 21:49:50.951661439 +0000
+--- netbsd/unwind.c.orig	2018-08-10 00:06:20.432335085 +0000
 +++ netbsd/unwind.c
-@@ -0,0 +1,77 @@
+@@ -0,0 +1,81 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD/UNWIND)
@@ -52,6 +52,10 @@ $NetBSD$
 +    unsigned long inode;
 +    char name[PATH_MAX];
 +} procMap_t;
++
++size_t arch_unwindStack(pid_t pid __unused, funcs_t* funcs __unused) {
++    return 0;
++}
 +
 +/*
 + * Nested loop not most efficient approach, although it's assumed that list is
