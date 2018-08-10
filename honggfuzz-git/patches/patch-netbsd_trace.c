@@ -1,8 +1,8 @@
 $NetBSD$
 
---- netbsd/trace.c.orig	2018-08-10 00:06:20.422562086 +0000
+--- netbsd/trace.c.orig	2018-08-10 00:35:12.817134592 +0000
 +++ netbsd/trace.c
-@@ -0,0 +1,920 @@
+@@ -0,0 +1,954 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD/PTRACE)
@@ -57,18 +57,21 @@ $NetBSD$
 +#include "libhfcommon/files.h"
 +#include "libhfcommon/log.h"
 +#include "libhfcommon/util.h"
-+#include "netbsd/bfd.h"
 +#include "netbsd/unwind.h"
 +#include "sancov.h"
 +#include "sanitizers.h"
 +#include "socketfuzzer.h"
 +#include "subproc.h"
 +
++#include <capstone/capstone.h>
++
 +/*
 + * Size in characters required to store a string representation of a
 + * register value (0xdeadbeef style))
 + */
 +#define REGSIZEINCHAR (2 * sizeof(register_t) + 3)
++
++#define _HF_INSTR_SZ 64
 +
 +#if defined(__i386__) || defined(__x86_64__)
 +#define MAX_INSTR_SZ 16
@@ -189,7 +192,40 @@ $NetBSD$
 +        snprintf(instr, _HF_INSTR_SZ, "%s", "[NOT_MMAPED]");
 +        return;
 +    }
-+    arch_bfdDisasm(pid, buf, memsz, instr);
++
++    cs_arch arch;
++    cs_mode mode;
++
++#if defined(__i386__)
++    arch = CS_ARCH_X86;
++    mode = CS_MODE_32;
++#elif defined(__x86_64__)
++    arch = CS_ARCH_X86;
++    mode = CS_MODE_64;
++#else
++#   error Unsupported CPU architecture
++#endif
++
++    csh handle;
++    cs_err err = cs_open(arch, mode, &handle);
++    if (err != CS_ERR_OK) {
++        LOG_W("Capstone initialization failed: '%s'", cs_strerror(err));
++        return;
++    }
++
++    cs_insn* insn;
++    size_t count = cs_disasm(handle, buf, sizeof(buf), *pc, 0, &insn);
++
++    if (count < 1) {
++        LOG_W("Couldn't disassemble the assembler instructions' stream: '%s'",
++            cs_strerror(cs_errno(handle)));
++        cs_close(&handle);
++        return;
++    }
++
++    snprintf(instr, _HF_INSTR_SZ, "%s %s", insn[0].mnemonic, insn[0].op_str);
++    cs_free(insn, count);
++    cs_close(&handle);
 +
 +    for (int x = 0; instr[x] && x < _HF_INSTR_SZ; x++) {
 +        if (instr[x] == '/' || instr[x] == '\\' || isspace((unsigned char)instr[x]) || !isprint((unsigned char)instr[x])) {
@@ -267,7 +303,6 @@ $NetBSD$
 +    memset(funcs, 0, _HF_MAX_FUNCS * sizeof(funcs_t));
 +
 +    size_t funcCnt = arch_unwindStack(pid, funcs);
-+    arch_bfdResolveSyms(pid, funcs, funcCnt);
 +
 +    /*
 +     * If unwinder failed (zero frames), use PC from ptrace GETREGS if not zero.
@@ -324,7 +359,6 @@ $NetBSD$
 +    memset(funcs, 0, _HF_MAX_FUNCS * sizeof(funcs_t));
 +
 +    size_t funcCnt = arch_unwindStack(pid, funcs);
-+    arch_bfdResolveSyms(pid, funcs, funcCnt);
 +
 +    /*
 +     * If unwinder failed (zero frames), use PC from ptrace GETREGS if not zero.
