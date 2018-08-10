@@ -18,5 +18,5 @@ USE_TOOLS+=	bash:run gmake
 .include "../../wip/mk/git-package.mk"
 .include "../../lang/libBlocksRuntime/buildlink3.mk"
 .include "../../lang/libunwind/buildlink3.mk"
-.include "../../devel/binutils/buildlink3.mk"
+.include "../../devel/capstone/buildlink3.mk"
 .include "../../mk/bsd.pkg.mk"
