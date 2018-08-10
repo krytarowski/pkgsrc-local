@@ -1,8 +1,8 @@
 $NetBSD$
 
---- netbsd/trace.c.orig	2018-08-10 00:35:12.817134592 +0000
+--- netbsd/trace.c.orig	2018-08-10 22:23:20.270351285 +0000
 +++ netbsd/trace.c
-@@ -0,0 +1,954 @@
+@@ -0,0 +1,952 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD/PTRACE)
@@ -462,10 +462,8 @@ $NetBSD$
 +    ATOMIC_POST_ADD(run->global->cfg.dynFileIterExpire, _HF_DYNFILE_SUB_MASK);
 +
 +    void* sig_addr = info.psi_siginfo.si_addr;
-+    if (!run->global->netbsd.disableRandomization) {
-+        pc = 0UL;
-+        sig_addr = NULL;
-+    }
++    pc = 0UL;
++    sig_addr = NULL;
 +
 +    /* User-induced signals don't set si.si_addr */
 +    if (SI_FROMUSER(&info.psi_siginfo)) {

@@ -1,8 +1,8 @@
 $NetBSD$
 
---- netbsd/arch.c.orig	2018-08-10 17:49:02.272932178 +0000
+--- netbsd/arch.c.orig	2018-08-10 22:23:20.265236503 +0000
 +++ netbsd/arch.c
-@@ -0,0 +1,366 @@
+@@ -0,0 +1,358 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD)
@@ -87,14 +87,6 @@ $NetBSD$
 +}
 +
 +bool arch_launchChild(run_t* run) {
-+    /*
-+     * Disable ASLR:
-+     */
-+    if (run->global->netbsd.disableRandomization) {
-+        /* TODO */
-+        PLOG_D(" failed");
-+    }
-+
 +#define ARGS_MAX 512
 +    const char* args[ARGS_MAX + 2];
 +    char argData[PATH_MAX];
