@@ -1,14 +1,13 @@
 $NetBSD$
 
---- honggfuzz.h.orig	2018-08-10 17:49:01.979530295 +0000
+--- honggfuzz.h.orig	2018-08-10 17:54:53.116567126 +0000
 +++ honggfuzz.h
-@@ -298,6 +298,24 @@ typedef struct {
+@@ -298,6 +298,23 @@ typedef struct {
          bool useClone;
          sigset_t waitSigSet;
      } linux;
 +    /* For the NetBSD code */
 +    struct {
-+        hwcnt_t hwCnts;
 +        uint64_t dynamicCutOffAddr;
 +        bool disableRandomization;
 +        void* ignoreAddr;
@@ -27,7 +26,7 @@ $NetBSD$
  } honggfuzz_t;
  
  typedef struct {
-@@ -339,6 +357,17 @@ typedef struct {
+@@ -339,6 +356,17 @@ typedef struct {
          int cpuIptBtsFd;
      } linux;
  

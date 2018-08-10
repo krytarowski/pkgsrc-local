@@ -1,23 +1,14 @@
 $NetBSD$
 
---- cmdline.c.orig	2018-08-10 17:49:01.979043090 +0000
+--- cmdline.c.orig	2018-08-10 17:54:53.116097250 +0000
 +++ cmdline.c
-@@ -384,6 +384,32 @@ bool cmdlineParse(int argc, char* argv[]
+@@ -384,6 +384,23 @@ bool cmdlineParse(int argc, char* argv[]
                  .kernelOnly = false,
                  .useClone = true,
              },
 +        /* NetBSD code */
 +        .netbsd =
 +            {
-+                .hwCnts =
-+                    {
-+                        .cpuInstrCnt = 0ULL,
-+                        .cpuBranchCnt = 0ULL,
-+                        .bbCnt = 0ULL,
-+                        .newBBCnt = 0ULL,
-+                        .softCntPc = 0ULL,
-+                        .softCntCmp = 0ULL,
-+                    },
 +                .dynamicCutOffAddr = ~(0ULL),
 +                .disableRandomization = true,
 +                .ignoreAddr = NULL,
@@ -35,7 +26,7 @@ $NetBSD$
      };
  
      TAILQ_INIT(&hfuzz->io.dynfileq);
-@@ -452,6 +478,15 @@ bool cmdlineParse(int argc, char* argv[]
+@@ -452,6 +469,15 @@ bool cmdlineParse(int argc, char* argv[]
          { { "linux_ns_pid", no_argument, NULL, 0x0531 }, "Use Linux PID namespace isolation" },
          { { "linux_ns_ipc", no_argument, NULL, 0x0532 }, "Use Linux IPC namespace isolation" },
  #endif // defined(_HF_ARCH_LINUX)
@@ -51,7 +42,7 @@ $NetBSD$
          { { 0, 0, 0, 0 }, NULL },
      };
      // clang-format on
-@@ -671,6 +706,23 @@ bool cmdlineParse(int argc, char* argv[]
+@@ -671,6 +697,23 @@ bool cmdlineParse(int argc, char* argv[]
                  hfuzz->linux.cloneFlags |= (CLONE_NEWUSER | CLONE_NEWIPC);
                  break;
  #endif /* defined(_HF_ARCH_LINUX) */
