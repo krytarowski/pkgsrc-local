@@ -14,7 +14,7 @@ $NetBSD$
 +                   -Wextra -Wno-override-init \
 +                   -funroll-loops -D_KERNTYPES
 +    ARCH_LDFLAGS := -L/usr/local/include \
-+                    -pthread -lbfd -lopcodes -lrt
++                    -pthread -lcapstone -lrt
 +
 +    # OS NetBSD
  else
@@ -29,7 +29,7 @@ $NetBSD$
  DIRS := . $(shell find $(SUBDIR_ROOTS) -type d)
  CLEAN_PATTERNS := *.o *~ core *.a *.dSYM *.la *.so *.dylib
  SUBDIR_GARBAGE := $(foreach DIR,$(DIRS),$(addprefix $(DIR)/,$(CLEAN_PATTERNS)))
-@@ -449,6 +460,19 @@ linux/unwind.o: libhfcommon/common.h lib
+@@ -449,6 +460,16 @@ linux/unwind.o: libhfcommon/common.h lib
  mac/arch.o: arch.h honggfuzz.h libhfcommon/util.h fuzz.h libhfcommon/common.h
  mac/arch.o: libhfcommon/files.h libhfcommon/common.h libhfcommon/log.h
  mac/arch.o: sancov.h subproc.h
@@ -37,12 +37,9 @@ $NetBSD$
 +netbsd/arch.o: libhfcommon/common.h libhfcommon/files.h libhfcommon/common.h
 +netbsd/arch.o: libhfcommon/log.h libhfcommon/ns.h netbsd/trace.h
 +netbsd/arch.o: sancov.h sanitizers.h subproc.h
-+netbsd/bfd.o: netbsd/bfd.h netbsd/unwind.h honggfuzz.h libhfcommon/util.h
-+netbsd/bfd.o: libhfcommon/common.h libhfcommon/files.h libhfcommon/common.h
-+netbsd/bfd.o: libhfcommon/log.h
 +netbsd/trace.o: netbsd/trace.h honggfuzz.h libhfcommon/util.h
 +netbsd/trace.o: libhfcommon/common.h libhfcommon/files.h libhfcommon/common.h
-+netbsd/trace.o: libhfcommon/log.h netbsd/bfd.h netbsd/unwind.h sancov.h
++netbsd/trace.o: libhfcommon/log.h netbsd/unwind.h sancov.h
 +netbsd/trace.o: sanitizers.h socketfuzzer.h subproc.h
 +netbsd/unwind.o: netbsd/unwind.h honggfuzz.h libhfcommon/util.h
 +netbsd/unwind.o: libhfcommon/common.h libhfcommon/log.h
