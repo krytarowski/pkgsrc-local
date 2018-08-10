@@ -1,8 +1,8 @@
 $NetBSD$
 
---- honggfuzz.h.orig	2018-08-09 17:30:27.770673662 +0000
+--- honggfuzz.h.orig	2018-08-10 00:35:12.644823483 +0000
 +++ honggfuzz.h
-@@ -298,6 +298,27 @@ typedef struct {
+@@ -298,6 +298,25 @@ typedef struct {
          bool useClone;
          sigset_t waitSigSet;
      } linux;
@@ -23,14 +23,12 @@ $NetBSD$
 +        const char* symsWlFile;
 +        char** symsWl;
 +        size_t symsWlCnt;
-+        uintptr_t cloneFlags;
-+        bool kernelOnly;
 +        sigset_t waitSigSet;
 +    } netbsd;
  } honggfuzz_t;
  
  typedef struct {
-@@ -339,6 +360,17 @@ typedef struct {
+@@ -339,6 +358,17 @@ typedef struct {
          int cpuIptBtsFd;
      } linux;
  
