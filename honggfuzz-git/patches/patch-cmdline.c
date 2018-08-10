@@ -1,6 +1,6 @@
 $NetBSD$
 
---- cmdline.c.orig	2018-08-10 00:35:12.644331607 +0000
+--- cmdline.c.orig	2018-08-10 01:37:29.671778790 +0000
 +++ cmdline.c
 @@ -384,6 +384,33 @@ bool cmdlineParse(int argc, char* argv[]
                  .kernelOnly = false,
@@ -52,7 +52,7 @@ $NetBSD$
          { { 0, 0, 0, 0 }, NULL },
      };
      // clang-format on
-@@ -671,6 +707,38 @@ bool cmdlineParse(int argc, char* argv[]
+@@ -671,6 +707,23 @@ bool cmdlineParse(int argc, char* argv[]
                  hfuzz->linux.cloneFlags |= (CLONE_NEWUSER | CLONE_NEWIPC);
                  break;
  #endif /* defined(_HF_ARCH_LINUX) */
@@ -71,21 +71,6 @@ $NetBSD$
 +                break;
 +            case 0x505:
 +                hfuzz->netbsd.symsWlFile = optarg;
-+                break;
-+            case 0x510:
-+                hfuzz->feedback.dynFileMethod |= _HF_DYNFILE_INSTR_COUNT;
-+                break;
-+            case 0x511:
-+                hfuzz->feedback.dynFileMethod |= _HF_DYNFILE_BRANCH_COUNT;
-+                break;
-+            case 0x513:
-+                hfuzz->feedback.dynFileMethod |= _HF_DYNFILE_BTS_EDGE;
-+                break;
-+            case 0x514:
-+                hfuzz->feedback.dynFileMethod |= _HF_DYNFILE_IPT_BLOCK;
-+                break;
-+            case 0x515:
-+                hfuzz->netbsd.kernelOnly = true;
 +                break;
 +#endif /* defined(_HF_ARCH_NETBSD) */
              default:
