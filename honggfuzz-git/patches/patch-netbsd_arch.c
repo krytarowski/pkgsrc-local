@@ -187,9 +187,9 @@ $NetBSD$
 +    }
 +
 +    if (childPid != ptracePid) {
-+        if (arch_traceWaitForPidStop(childPid) == false) {
-+            LOG_F("PID: %d not in a stopped state", childPid);
-+        }
++//        if (arch_traceWaitForPidStop(childPid) == false) {
++//            LOG_F("PID: %d not in a stopped state", childPid);
++//        }
 +        if (kill(childPid, SIGCONT) == -1) {
 +            PLOG_F("Restarting PID: %d failed", childPid);
 +        }
