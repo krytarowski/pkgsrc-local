@@ -1,8 +1,8 @@
 $NetBSD$
 
---- netbsd/arch.c.orig	2018-08-10 22:39:27.226387718 +0000
+--- netbsd/arch.c.orig	2018-08-11 00:56:50.877318782 +0000
 +++ netbsd/arch.c
-@@ -0,0 +1,360 @@
+@@ -0,0 +1,364 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD)
@@ -27,6 +27,10 @@ $NetBSD$
 + */
 +
 +#include "arch.h"
++
++#include <sys/param.h>
++#include <sys/types.h>
++#include <sys/ptrace.h>
 +
 +#include <ctype.h>
 +#include <dlfcn.h>

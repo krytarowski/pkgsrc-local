@@ -1,6 +1,6 @@
 $NetBSD$
 
---- cmdline.c.orig	2018-08-10 22:39:27.061721400 +0000
+--- cmdline.c.orig	2018-08-11 00:56:50.711807882 +0000
 +++ cmdline.c
 @@ -384,6 +384,21 @@ bool cmdlineParse(int argc, char* argv[]
                  .kernelOnly = false,

@@ -1,6 +1,6 @@
 $NetBSD$
 
---- netbsd/trace.c.orig	2018-08-10 22:39:27.231479092 +0000
+--- netbsd/trace.c.orig	2018-08-11 00:56:50.882454148 +0000
 +++ netbsd/trace.c
 @@ -0,0 +1,987 @@
 +/*
@@ -920,7 +920,7 @@ $NetBSD$
 +    case TRAP_SCX:
 +        return "TRAP_SCX";
 +    default:
-+        return atoi(code);
++        return "TRAP_???";
 +    }
 +}
 +
@@ -949,7 +949,7 @@ $NetBSD$
 +        return false;
 +    }
 +
-+    if (ptrace(PT_GET_SIGINFO, child, &info, sizeof(info)) == -1) {
++    if (ptrace(PT_GET_SIGINFO, pid, &info, sizeof(info)) == -1) {
 +        PLOG_W("ptrace(PT_GET_SIGINFO, pid=%d) failed", pid);
 +        return false;
 +    }
