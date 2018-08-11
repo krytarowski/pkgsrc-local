@@ -2,7 +2,7 @@ $NetBSD$
 
 --- netbsd/trace.c.orig	2018-08-11 00:56:50.882454148 +0000
 +++ netbsd/trace.c
-@@ -0,0 +1,987 @@
+@@ -0,0 +1,1033 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD/PTRACE)
@@ -968,7 +968,53 @@ $NetBSD$
 +
 +    if (ptrace(PT_SET_EVENT_MASK, pid, &event, sizeof(event)) == -1) {
 +        PLOG_W("Couldn't ptrace(PT_SET_EVENT_MASK) to pid: %d", pid);
-+        ptrace(PT_DETACH, pid, NULL, 0);
++        return false;
++    }
++
++    if (ptrace(PT_CONTINUE, pid, (void *)1, 0) == -1) {
++        PLOG_W("Couldn't ptrace(PT_CONTINUE) to pid: %d", pid);
++        return false;
++    }
++
++    LOG_D("Attached to PID: %d", pid);
++
++    return true;
++}
++
++bool arch_traceAttachToNewProcess(run_t* run __unused, pid_t pid) {
++    int status;
++    pid_t wpid;
++    ptrace_event_t event;
++    struct ptrace_siginfo info;
++
++    if (ptrace(PT_ATTACH, pid, NULL, 0) == -1) {
++        PLOG_W("waitpid(pid=%d) failed", pid);
++        return false;
++    }
++
++    do {
++        wpid = waitpid(pid, &status, 0);
++    } while(wpid == -1 && errno == EINTR);
++
++    if (wpid == -1) {
++        PLOG_W("waitpid(pid=%d) failed", pid);
++        return false;
++    }
++
++    if (!WIFSTOPPED(status)) {
++        LOG_W("PID %d not in a stopped state - status:%#x", pid, status);
++        return false;
++    }
++
++    if (WSTOPSIG(status) != SIGSTOP) {
++        LOG_W("PID %d stopped by unexpected signal, expected: SIGSTOP, received: SIG%s", pid, signalname(WSTOPSIG(status)));
++        return false;
++    }
++
++    event.pe_set_event = PTRACE_FORK | PTRACE_VFORK | PTRACE_VFORK_DONE;
++
++    if (ptrace(PT_SET_EVENT_MASK, pid, &event, sizeof(event)) == -1) {
++        PLOG_W("Couldn't ptrace(PT_SET_EVENT_MASK) to pid: %d", pid);
 +        return false;
 +    }
 +

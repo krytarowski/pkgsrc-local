@@ -2,7 +2,7 @@ $NetBSD$
 
 --- netbsd/arch.c.orig	2018-08-11 00:56:50.877318782 +0000
 +++ netbsd/arch.c
-@@ -0,0 +1,364 @@
+@@ -0,0 +1,384 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD)
@@ -146,6 +146,9 @@ $NetBSD$
 +}
 +
 +static bool arch_attachToNewPid(run_t* run, pid_t pid) {
++    int status;
++    pid_t wpid;
++
 +    if (!arch_shouldAttach(run)) {
 +        return true;
 +    }
@@ -153,20 +156,27 @@ $NetBSD$
 +    if (!arch_traceAttach(run, pid)) {
 +        LOG_W("arch_traceAttach(pid=%d) failed", pid);
 +        kill(pid, SIGKILL);
++        /* Collect the dead process */
++        do {
++            wpid = waitpid(pid, &status, 0);
++        } while (wpid == -1 && errno == EINTR);
 +        return false;
 +    }
 +
 +    return true;
 +}
 +
-+void arch_prepareParent(run_t* run) {
-+    pid_t ptracePid = (run->global->netbsd.pid > 0) ? run->global->netbsd.pid : run->pid;
-+    pid_t childPid = run->pid;
-+
++static bool
++arch_attachToStoppedChild(run_t* run, pid_t ptracePid)
++{
 +    if (!arch_attachToNewPid(run, ptracePid)) {
 +        LOG_E("Couldn't attach to PID=%d", (int)ptracePid);
 +    }
++}
 +
++static bool
++arch_attachToNewProcess(run_t* run, pid_t pid)
++{
 +    /* A long-lived process could have already exited, and we wouldn't know */
 +    if (childPid != ptracePid && kill(ptracePid, 0) == -1) {
 +        if (run->global->netbsd.pidFile) {
@@ -190,13 +200,23 @@ $NetBSD$
 +        }
 +    }
 +
-+    if (childPid != ptracePid) {
-+//        if (arch_traceWaitForPidStop(childPid) == false) {
-+//            LOG_F("PID: %d not in a stopped state", childPid);
-+//        }
++
++        if (arch_traceWaitForPidStop(childPid) == false) {
++            LOG_F("PID: %d not in a stopped state", childPid);
++        }
 +        if (kill(childPid, SIGCONT) == -1) {
 +            PLOG_F("Restarting PID: %d failed", childPid);
 +        }
++}
++
++void arch_prepareParent(run_t* run) {
++    pid_t ptracePid = (run->global->netbsd.pid > 0) ? run->global->netbsd.pid : run->pid;
++    pid_t childPid = run->pid;
++
++    if (childPid == ptracePid) {
++        arch_attachToStoppedChild(run, ptracePid);
++    } else {
++        arch_attachToNewProcess(run, ptracePid);
 +    }
 +}
 +
