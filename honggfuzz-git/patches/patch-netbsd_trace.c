@@ -2,7 +2,7 @@ $NetBSD$
 
 --- netbsd/trace.c.orig	2018-08-10 22:39:27.231479092 +0000
 +++ netbsd/trace.c
-@@ -0,0 +1,952 @@
+@@ -0,0 +1,987 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD/PTRACE)
@@ -900,36 +900,71 @@ $NetBSD$
 +    abort(); /* NOTREACHED */
 +}
 +
-+bool arch_traceWaitForPidStop(pid_t pid) {
-+    for (;;) {
-+        int status;
-+        pid_t ret = wait4(pid, &status, __WALL | WUNTRACED, NULL);
-+        if (ret == -1 && errno == EINTR) {
-+            continue;
-+        }
-+        if (ret == -1) {
-+            PLOG_W("wait4(pid=%d) failed", pid);
-+            return false;
-+        }
-+        if (!WIFSTOPPED(status)) {
-+            LOG_W("PID %d not in a stopped state - status:%d", pid, status);
-+            return false;
-+        }
-+        return true;
++const char *
++arch_trapcode(int code) {
++    switch (code) {
++    case TRAP_BRKPT:
++        return "TRAP_BRKPT";
++    case TRAP_TRACE:
++        return "TRAP_TRACE";
++    case TRAP_EXEC:
++        return "TRAP_EXEC";
++    case TRAP_CHLD:
++        return "TRAP_CHLD";
++    case TRAP_LWP:
++        return "TRAP_LWP";
++    case TRAP_DBREG:
++        return "TRAP_DBREG";
++    case TRAP_SCE:
++        return "TRAP_SCE";
++    case TRAP_SCX:
++        return "TRAP_SCX";
++    default:
++        return atoi(code);
 +    }
 +}
 +
 +bool arch_traceAttach(run_t* run __unused, pid_t pid) {
++    int status;
++    pid_t wpid;
 +    ptrace_event_t event;
++    struct ptrace_siginfo info;
 +
-+    event.pe_set_event = PTRACE_FORK | PTRACE_VFORK | PTRACE_VFORK_DONE;
++    do {
++        wpid = waitpid(pid, &status, 0);
++    } while(wpid == -1 && errno == EINTR);
 +
-+    if (ptrace(PT_ATTACH, pid, NULL, 0) == -1) {
-+        PLOG_W("Couldn't ptrace(PT_ATTACH) to pid: %d", pid);
++    if (wpid == -1) {
++        PLOG_W("waitpid(pid=%d) failed", pid);
 +        return false;
 +    }
 +
-+    arch_traceWaitForPidStop(pid);
++    if (!WIFSTOPPED(status)) {
++        LOG_W("PID %d not in a stopped state - status:%#x", pid, status);
++        return false;
++    }
++
++    if (WSTOPSIG(status) != SIGTRAP) {
++        LOG_W("PID %d stopped by unexpected signal, expected: SIGTRAP, received: SIG%s", pid, signalname(WSTOPSIG(status)));
++        return false;
++    }
++
++    if (ptrace(PT_GET_SIGINFO, child, &info, sizeof(info)) == -1) {
++        PLOG_W("ptrace(PT_GET_SIGINFO, pid=%d) failed", pid);
++        return false;
++    }
++
++    if (info.psi_siginfo.si_signo == SIGTRAP) {
++        LOG_W("PID %d stopped by unexpected signal, expected: SIGTRAP, received: SIG%s", pid, signalname(WSTOPSIG(info.psi_siginfo.si_signo)));
++        return false;
++    }
++
++    if (info.psi_siginfo.si_code == TRAP_EXEC) {
++        LOG_W("PID %d stopped by unexpected signal, expected: SIGTRAP:TRAP_EXEC, received: SIGTRAP:%s", pid, arch_trapcode(info.psi_siginfo.si_code));
++        return false;
++    }
++
++    event.pe_set_event = PTRACE_FORK | PTRACE_VFORK | PTRACE_VFORK_DONE;
 +
 +    if (ptrace(PT_SET_EVENT_MASK, pid, &event, sizeof(event)) == -1) {
 +        PLOG_W("Couldn't ptrace(PT_SET_EVENT_MASK) to pid: %d", pid);

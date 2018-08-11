@@ -2,7 +2,7 @@ $NetBSD$
 
 --- netbsd/arch.c.orig	2018-08-10 22:39:27.226387718 +0000
 +++ netbsd/arch.c
-@@ -0,0 +1,358 @@
+@@ -0,0 +1,360 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD)
@@ -74,7 +74,7 @@ $NetBSD$
 +    return true;
 +}
 +
-+pid_t arch_fork(run_t* run __unused) {
++pid_t arch_fork(run_t* run HF_ATTR_UNUSED) {
 +    pid_t pid = fork();
 +    if (pid == -1) {
 +        return pid;
@@ -117,10 +117,12 @@ $NetBSD$
 +    /* alarms persist across execve(), so disable it here */
 +    alarm(0);
 +
-+    /* Wait for the ptrace to attach now */
-+    if (raise(SIGSTOP) == -1) {
++    /* Set us a traced child and */
++    if (ptrace(PT_TRACE_ME, 0, NULL, 0) == -1) {
 +        LOG_F("Couldn't stop itself");
 +    }
++
++    /* exec() will trigger an event received as a signal by the parent */
 +    execve(args[0], (char* const*)args, environ);
 +    int errno_cpy = errno;
 +    alarm(1);
