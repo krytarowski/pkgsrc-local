@@ -4,3 +4,7 @@ SHA1 (honggfuzz-1.6.tar.gz) = e6ab2a411fe8726e57815209d6fb1b6f4268538c
 RMD160 (honggfuzz-1.6.tar.gz) = 8ef15a0e38cd09a26f82a3683da6a363257ddce1
 SHA512 (honggfuzz-1.6.tar.gz) = db4f0f31d36080db983068435be82b3e1132145e0bad5c4e8e6504563f10ce66df4f977fbd0a9f1cbcd262e479f635a68ab7c1df70d23e8437164734ea562c90
 Size (honggfuzz-1.6.tar.gz) = 79322453 bytes
+SHA1 (patch-Makefile) = e52bb719ab0f22a89d94cad1bc4a8ebee9008126
+SHA1 (patch-cmdline.c) = 18c507663f52f098d5bb5cf6acf7c46e67b95162
+SHA1 (patch-fuzz.c) = 14725fc0c539d8549f50ed871f05acb2e49e8ba6
+SHA1 (patch-honggfuzz.h) = 58b896bc38b358eb9dc5755f720132c0f9f531fd
