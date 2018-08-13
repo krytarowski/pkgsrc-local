@@ -2,10 +2,10 @@ $NetBSD$
 
 --- netbsd/arch.c.orig	2018-08-13 23:48:25.047872776 +0000
 +++ netbsd/arch.c
-@@ -0,0 +1,544 @@
+@@ -0,0 +1,541 @@
 +/*
 + *
-+ * honggfuzz - architecture dependent code (LINUX)
++ * honggfuzz - architecture dependent code (NETBSD)
 + * -----------------------------------------
 + *
 + * Author: Robert Swiecki <swiecki@google.com>
@@ -40,8 +40,6 @@ $NetBSD$
 +#include <stdlib.h>
 +#include <string.h>
 +#include <sys/cdefs.h>
-+#include <sys/personality.h>
-+#include <sys/prctl.h>
 +#include <sys/syscall.h>
 +#include <sys/time.h>
 +#include <sys/types.h>
@@ -57,20 +55,19 @@ $NetBSD$
 +#include "libhfcommon/log.h"
 +#include "libhfcommon/ns.h"
 +#include "libhfcommon/util.h"
-+#include "linux/perf.h"
-+#include "linux/trace.h"
++#include "netbsd/trace.h"
 +#include "sancov.h"
 +#include "sanitizers.h"
 +#include "subproc.h"
 +
 +static inline bool arch_shouldAttach(run_t* run) {
-+    if (run->global->exe.persistent && run->linux.attachedPid == run->pid) {
++    if (run->global->exe.persistent && run->netbsd.attachedPid == run->pid) {
 +        return false;
 +    }
-+    if (run->global->linux.pid > 0 && run->linux.attachedPid == run->global->linux.pid) {
++    if (run->global->netbsd.pid > 0 && run->netbsd.attachedPid == run->global->netbsd.pid) {
 +        return false;
 +    }
-+    if (run->global->socketFuzzer.enabled && run->linux.attachedPid == run->pid) {
++    if (run->global->socketFuzzer.enabled && run->netbsd.attachedPid == run->pid) {
 +        return false;
 +    }
 +    return true;
@@ -104,7 +101,7 @@ $NetBSD$
 +}
 +
 +pid_t arch_fork(run_t* run) {
-+    pid_t pid = run->global->linux.useClone ? arch_clone(CLONE_UNTRACED | SIGCHLD) : fork();
++    pid_t pid = run->global->netbsd.useClone ? arch_clone(CLONE_UNTRACED | SIGCHLD) : fork();
 +    if (pid == -1) {
 +        return pid;
 +    }
@@ -119,7 +116,7 @@ $NetBSD$
 +}
 +
 +bool arch_launchChild(run_t* run) {
-+    if ((run->global->linux.cloneFlags & CLONE_NEWNET) && (nsIfaceUp("lo") == false)) {
++    if ((run->global->netbsd.cloneFlags & CLONE_NEWNET) && (nsIfaceUp("lo") == false)) {
 +        LOG_W("Cannot bring interface 'lo' up");
 +    }
 +
@@ -148,7 +145,7 @@ $NetBSD$
 +     * This might fail in Docker, as Docker blocks __NR_personality. Consequently
 +     * it's just a debug warning
 +     */
-+    if (run->global->linux.disableRandomization &&
++    if (run->global->netbsd.disableRandomization &&
 +        syscall(__NR_personality, ADDR_NO_RANDOMIZE) == -1) {
 +        PLOG_D("personality(ADDR_NO_RANDOMIZE) failed");
 +    }
@@ -188,13 +185,13 @@ $NetBSD$
 +        LOG_F("Couldn't stop itself");
 +    }
 +#if defined(__NR_execveat)
-+    syscall(__NR_execveat, run->global->linux.exeFd, "", args, environ, AT_EMPTY_PATH);
++    syscall(__NR_execveat, run->global->netbsd.exeFd, "", args, environ, AT_EMPTY_PATH);
 +#endif /* defined__NR_execveat) */
 +    execve(args[0], (char* const*)args, environ);
 +    int errno_cpy = errno;
 +    alarm(1);
 +
-+    LOG_E("execve('%s', fd=%d): %s", args[0], run->global->linux.exeFd, strerror(errno_cpy));
++    LOG_E("execve('%s', fd=%d): %s", args[0], run->global->netbsd.exeFd, strerror(errno_cpy));
 +
 +    return false;
 +}
@@ -222,7 +219,7 @@ $NetBSD$
 +    if (!arch_shouldAttach(run)) {
 +        return true;
 +    }
-+    run->linux.attachedPid = pid;
++    run->netbsd.attachedPid = pid;
 +    if (!arch_traceAttach(run, pid)) {
 +        LOG_W("arch_traceAttach(pid=%d) failed", pid);
 +        kill(pid, SIGKILL);
@@ -239,7 +236,7 @@ $NetBSD$
 +}
 +
 +void arch_prepareParent(run_t* run) {
-+    pid_t ptracePid = (run->global->linux.pid > 0) ? run->global->linux.pid : run->pid;
++    pid_t ptracePid = (run->global->netbsd.pid > 0) ? run->global->netbsd.pid : run->pid;
 +    pid_t childPid = run->pid;
 +
 +    if (!arch_attachToNewPid(run, ptracePid)) {
@@ -248,22 +245,22 @@ $NetBSD$
 +
 +    /* A long-lived process could have already exited, and we wouldn't know */
 +    if (childPid != ptracePid && kill(ptracePid, 0) == -1) {
-+        if (run->global->linux.pidFile) {
++        if (run->global->netbsd.pidFile) {
 +            /* If pid from file, check again for cases of auto-restart daemons that update it */
 +            /*
 +             * TODO: Investigate if we need to delay here, so that target process has
 +             * enough time to restart. Tricky to answer since is target dependent.
 +             */
-+            if (files_readPidFromFile(run->global->linux.pidFile, &run->global->linux.pid) ==
++            if (files_readPidFromFile(run->global->netbsd.pidFile, &run->global->netbsd.pid) ==
 +                false) {
 +                LOG_F("Failed to read new PID from file - abort");
 +            } else {
-+                if (kill(run->global->linux.pid, 0) == -1) {
++                if (kill(run->global->netbsd.pid, 0) == -1) {
 +                    PLOG_F("Liveness of PID %d read from file questioned - abort",
-+                        run->global->linux.pid);
++                        run->global->netbsd.pid);
 +                } else {
-+                    LOG_D("Monitor PID has been updated (pid=%d)", run->global->linux.pid);
-+                    ptracePid = run->global->linux.pid;
++                    LOG_D("Monitor PID has been updated (pid=%d)", run->global->netbsd.pid);
++                    ptracePid = run->global->netbsd.pid;
 +                }
 +            }
 +        }
@@ -283,7 +280,7 @@ $NetBSD$
 +}
 +
 +static bool arch_checkWait(run_t* run) {
-+    pid_t ptracePid = (run->global->linux.pid > 0) ? run->global->linux.pid : run->pid;
++    pid_t ptracePid = (run->global->netbsd.pid > 0) ? run->global->netbsd.pid : run->pid;
 +    pid_t childPid = run->pid;
 +
 +    /* All queued wait events must be tested when SIGCHLD was delivered */
@@ -336,7 +333,7 @@ $NetBSD$
 +            .tv_sec = 0L,
 +            .tv_nsec = 250000000L,
 +        };
-+        int sig = sigtimedwait(&run->global->linux.waitSigSet, NULL, &ts);
++        int sig = sigtimedwait(&run->global->netbsd.waitSigSet, NULL, &ts);
 +        if (sig == -1 && (errno != EAGAIN && errno != EINTR)) {
 +            PLOG_F("sigtimedwait(SIGIO|SIGCHLD, 0.25s)");
 +        }
@@ -359,7 +356,7 @@ $NetBSD$
 +    }
 +
 +    if (run->global->sanitizer.enable) {
-+        pid_t ptracePid = (run->global->linux.pid > 0) ? run->global->linux.pid : run->pid;
++        pid_t ptracePid = (run->global->netbsd.pid > 0) ? run->global->netbsd.pid : run->pid;
 +        char crashReport[PATH_MAX];
 +        snprintf(crashReport, sizeof(crashReport), "%s/%s.%d", run->global->io.workDir, kLOGPREFIX,
 +            ptracePid);
@@ -387,7 +384,7 @@ $NetBSD$
 +        PLOG_E("File '%s' doesn't seem to be executable", hfuzz->exe.cmdline[0]);
 +        return false;
 +    }
-+    if ((hfuzz->linux.exeFd =
++    if ((hfuzz->netbsd.exeFd =
 +                TEMP_FAILURE_RETRY(open(hfuzz->exe.cmdline[0], O_RDONLY | O_CLOEXEC))) == -1) {
 +        PLOG_E("Cannot open the executable binary: %s)", hfuzz->exe.cmdline[0]);
 +        return false;
@@ -398,9 +395,9 @@ $NetBSD$
 +     * (with sigsuspend). Do it once here, to save precious CPU cycles, as this cannot be
 +     * a statically initialized const variable
 +     */
-+    sigemptyset(&hfuzz->linux.waitSigSet);
-+    sigaddset(&hfuzz->linux.waitSigSet, SIGIO);
-+    sigaddset(&hfuzz->linux.waitSigSet, SIGCHLD);
++    sigemptyset(&hfuzz->netbsd.waitSigSet);
++    sigaddset(&hfuzz->netbsd.waitSigSet, SIGIO);
++    sigaddset(&hfuzz->netbsd.waitSigSet, SIGCHLD);
 +
 +    for (;;) {
 +        __attribute__((weak)) const char* gnu_get_libc_version(void);
@@ -424,7 +421,7 @@ $NetBSD$
 +            break;
 +        }
 +        LOG_D("Glibc version:'%s', OK", gversion);
-+        hfuzz->linux.useClone = false;
++        hfuzz->netbsd.useClone = false;
 +        break;
 +    }
 +
@@ -433,7 +430,7 @@ $NetBSD$
 +        char* p = NULL;
 +
 +        /*
-+         * Check that Linux kernel is compatible
++         * Check that netbsd kernel is compatible
 +         *
 +         * Compatibility list:
 +         *  1) Perf exclude_callchain_kernel requires kernel >= 3.7
@@ -490,20 +487,20 @@ $NetBSD$
 +#endif
 +
 +    /* If read PID from file enable - read current value */
-+    if (hfuzz->linux.pidFile) {
-+        if (files_readPidFromFile(hfuzz->linux.pidFile, &hfuzz->linux.pid) == false) {
++    if (hfuzz->netbsd.pidFile) {
++        if (files_readPidFromFile(hfuzz->netbsd.pidFile, &hfuzz->netbsd.pid) == false) {
 +            LOG_E("Failed to read PID from file");
 +            return false;
 +        }
 +    }
 +
 +    /* If remote pid, resolve command using procfs */
-+    if (hfuzz->linux.pid > 0) {
++    if (hfuzz->netbsd.pid > 0) {
 +        char procCmd[PATH_MAX] = {0};
-+        snprintf(procCmd, sizeof(procCmd), "/proc/%d/cmdline", hfuzz->linux.pid);
++        snprintf(procCmd, sizeof(procCmd), "/proc/%d/cmdline", hfuzz->netbsd.pid);
 +
 +        ssize_t sz = files_readFileToBufMax(
-+            procCmd, (uint8_t*)hfuzz->linux.pidCmd, sizeof(hfuzz->linux.pidCmd) - 1);
++            procCmd, (uint8_t*)hfuzz->netbsd.pidCmd, sizeof(hfuzz->netbsd.pidCmd) - 1);
 +        if (sz < 1) {
 +            LOG_E("Couldn't read '%s'", procCmd);
 +            return false;
@@ -511,11 +508,11 @@ $NetBSD$
 +
 +        /* Make human readable */
 +        for (size_t i = 0; i < ((size_t)sz - 1); i++) {
-+            if (hfuzz->linux.pidCmd[i] == '\0') {
-+                hfuzz->linux.pidCmd[i] = ' ';
++            if (hfuzz->netbsd.pidCmd[i] == '\0') {
++                hfuzz->netbsd.pidCmd[i] = ' ';
 +            }
 +        }
-+        hfuzz->linux.pidCmd[sz] = '\0';
++        hfuzz->netbsd.pidCmd[sz] = '\0';
 +    }
 +
 +    /* Updates the important signal array based on input args */
@@ -527,11 +524,11 @@ $NetBSD$
 +     * with sanitizer runtime library & libc symbols
 +     */
 +    if (hfuzz->sanitizer.enable && hfuzz->cfg.monitorSIGABRT) {
-+        hfuzz->linux.numMajorFrames = 14;
++        hfuzz->netbsd.numMajorFrames = 14;
 +    }
 +
-+    if (hfuzz->linux.cloneFlags && unshare(hfuzz->linux.cloneFlags) == -1) {
-+        LOG_E("unshare(%tx)", hfuzz->linux.cloneFlags);
++    if (hfuzz->netbsd.cloneFlags && unshare(hfuzz->netbsd.cloneFlags) == -1) {
++        LOG_E("unshare(%tx)", hfuzz->netbsd.cloneFlags);
 +        return false;
 +    }
 +
@@ -539,11 +536,11 @@ $NetBSD$
 +}
 +
 +bool arch_archThreadInit(run_t* run) {
-+    run->linux.perfMmapBuf = NULL;
-+    run->linux.perfMmapAux = NULL;
-+    run->linux.cpuInstrFd = -1;
-+    run->linux.cpuBranchFd = -1;
-+    run->linux.cpuIptBtsFd = -1;
++    run->netbsd.perfMmapBuf = NULL;
++    run->netbsd.perfMmapAux = NULL;
++    run->netbsd.cpuInstrFd = -1;
++    run->netbsd.cpuBranchFd = -1;
++    run->netbsd.cpuIptBtsFd = -1;
 +
 +    return true;
 +}
