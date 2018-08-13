@@ -1,8 +1,8 @@
 $NetBSD$
 
---- netbsd/arch.c.orig	2018-08-11 00:56:50.877318782 +0000
+--- netbsd/arch.c.orig	2018-08-13 17:28:29.247021889 +0000
 +++ netbsd/arch.c
-@@ -0,0 +1,384 @@
+@@ -0,0 +1,388 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD)
@@ -166,19 +166,23 @@ $NetBSD$
 +    return true;
 +}
 +
-+static bool
++static void
 +arch_attachToStoppedChild(run_t* run, pid_t ptracePid)
 +{
-+    if (!arch_attachToNewPid(run, ptracePid)) {
++    if (!arch_traceAttach(run, ptracePid)) {
 +        LOG_E("Couldn't attach to PID=%d", (int)ptracePid);
 +    }
 +}
 +
-+static bool
-+arch_attachToNewProcess(run_t* run, pid_t pid)
++static void
++arch_attachToNewProcess(run_t* run, pid_t ptracePid, pid_t childPid)
 +{
++    if (!arch_traceAttachToNewProcess(run, ptracePid)) {
++        LOG_E("Couldn't attach to PID=%d", (int)ptracePid);
++    }
++
 +    /* A long-lived process could have already exited, and we wouldn't know */
-+    if (childPid != ptracePid && kill(ptracePid, 0) == -1) {
++    if (kill(pid, 0) == -1) {
 +        if (run->global->netbsd.pidFile) {
 +            /* If pid from file, check again for cases of auto-restart daemons that update it */
 +            /*
@@ -201,12 +205,12 @@ $NetBSD$
 +    }
 +
 +
-+        if (arch_traceWaitForPidStop(childPid) == false) {
-+            LOG_F("PID: %d not in a stopped state", childPid);
-+        }
-+        if (kill(childPid, SIGCONT) == -1) {
-+            PLOG_F("Restarting PID: %d failed", childPid);
-+        }
++    if (arch_traceWaitForPidStop(childPid) == false) {
++        LOG_F("PID: %d not in a stopped state", childPid);
++    }
++    if (kill(childPid, SIGCONT) == -1) {
++        PLOG_F("Restarting PID: %d failed", childPid);
++    }
 +}
 +
 +void arch_prepareParent(run_t* run) {

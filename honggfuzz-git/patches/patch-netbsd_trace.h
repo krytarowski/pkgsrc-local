@@ -1,8 +1,8 @@
 $NetBSD$
 
---- netbsd/trace.h.orig	2018-08-11 00:56:50.887455277 +0000
+--- netbsd/trace.h.orig	2018-08-13 17:28:29.284912416 +0000
 +++ netbsd/trace.h
-@@ -0,0 +1,45 @@
+@@ -0,0 +1,46 @@
 +/*
 + *
 + * honggfuzz - tracing processes with ptrace()
@@ -42,6 +42,7 @@ $NetBSD$
 +extern void arch_traceAnalyze(run_t* run, int status, pid_t pid);
 +extern void arch_traceExitAnalyze(run_t* run, pid_t pid);
 +extern bool arch_traceAttach(run_t* run, pid_t pid);
++extern bool arch_traceAttachToNewProcess(run_t* run, pid_t pid);
 +extern void arch_traceDetach(pid_t pid);
 +extern void arch_traceGetCustomPerf(run_t* run, pid_t pid, uint64_t* cnt);
 +extern void arch_traceSetCustomPerf(run_t* run, pid_t pid, uint64_t cnt);
