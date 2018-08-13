@@ -1,8 +1,8 @@
 $NetBSD$
 
---- netbsd/trace.c.orig	2018-08-11 00:56:50.882454148 +0000
+--- netbsd/trace.c.orig	2018-08-13 17:28:29.279383868 +0000
 +++ netbsd/trace.c
-@@ -0,0 +1,1033 @@
+@@ -0,0 +1,1032 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD/PTRACE)
@@ -985,7 +985,6 @@ $NetBSD$
 +    int status;
 +    pid_t wpid;
 +    ptrace_event_t event;
-+    struct ptrace_siginfo info;
 +
 +    if (ptrace(PT_ATTACH, pid, NULL, 0) == -1) {
 +        PLOG_W("waitpid(pid=%d) failed", pid);

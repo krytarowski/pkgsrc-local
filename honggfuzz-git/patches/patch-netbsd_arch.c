@@ -2,7 +2,7 @@ $NetBSD$
 
 --- netbsd/arch.c.orig	2018-08-13 17:28:29.247021889 +0000
 +++ netbsd/arch.c
-@@ -0,0 +1,388 @@
+@@ -0,0 +1,385 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD)
@@ -182,7 +182,7 @@ $NetBSD$
 +    }
 +
 +    /* A long-lived process could have already exited, and we wouldn't know */
-+    if (kill(pid, 0) == -1) {
++    if (kill(ptracePid, 0) == -1) {
 +        if (run->global->netbsd.pidFile) {
 +            /* If pid from file, check again for cases of auto-restart daemons that update it */
 +            /*
@@ -205,10 +205,7 @@ $NetBSD$
 +    }
 +
 +
-+    if (arch_traceWaitForPidStop(childPid) == false) {
-+        LOG_F("PID: %d not in a stopped state", childPid);
-+    }
-+    if (kill(childPid, SIGCONT) == -1) {
++    if (ptrace(PT_CONTINUE, childPid, (void *)1, 0) == -1) {
 +        PLOG_F("Restarting PID: %d failed", childPid);
 +    }
 +}
@@ -220,7 +217,7 @@ $NetBSD$
 +    if (childPid == ptracePid) {
 +        arch_attachToStoppedChild(run, ptracePid);
 +    } else {
-+        arch_attachToNewProcess(run, ptracePid);
++        arch_attachToNewProcess(run, ptracePid, childPid);
 +    }
 +}
 +
