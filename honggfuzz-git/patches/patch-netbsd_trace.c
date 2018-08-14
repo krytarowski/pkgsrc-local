@@ -2,7 +2,7 @@ $NetBSD$
 
 --- netbsd/trace.c.orig	2018-08-14 05:00:25.032919011 +0000
 +++ netbsd/trace.c
-@@ -0,0 +1,1013 @@
+@@ -0,0 +1,1019 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD/PTRACE)
@@ -155,10 +155,10 @@ $NetBSD$
 +    return bytes_read;
 +}
 +
-+static size_t arch_getPC(pid_t pid, register_t* pc, register_t* status_reg HF_ATTR_UNUSED) {
++static size_t arch_getPC(pid_t pid, lwpid_t lwp, register_t* pc, register_t* status_reg HF_ATTR_UNUSED) {
 +    struct reg r;
 +
-+    if (ptrace(PT_GETREGS, pid, &r, 0) != -1) {
++    if (ptrace(PT_GETREGS, pid, &r, lwp) != 0) {
 +        PLOG_D("ptrace(PT_GETREGS) failed");
 +        return 0;
 +    }
@@ -174,7 +174,7 @@ $NetBSD$
 +    return sizeof(r);
 +}
 +
-+static void arch_getInstrStr(pid_t pid, register_t* pc, char* instr) {
++static void arch_getInstrStr(pid_t pid, lwpid_t lwp, register_t* pc, char* instr) {
 +    /*
 +     * We need a value aligned to 8
 +     * which is sizeof(long) on 64bit CPU archs (on most of them, I hope;)
@@ -185,7 +185,7 @@ $NetBSD$
 +
 +    snprintf(instr, _HF_INSTR_SZ, "%s", "[UNKNOWN]");
 +
-+    size_t pcRegSz = arch_getPC(pid, pc, &status_reg);
++    size_t pcRegSz = arch_getPC(pid, lwp, pc, &status_reg);
 +    if (!pcRegSz) {
 +        LOG_W("Current architecture not supported for disassembly");
 +        return;
@@ -289,8 +289,14 @@ $NetBSD$
 +}
 +
 +static void arch_traceAnalyzeData(run_t* run, pid_t pid) {
++    ptrace_siginfo_t info;
 +    register_t pc = 0, status_reg = 0;
-+    size_t pcRegSz = arch_getPC(pid, &pc, &status_reg);
++
++    if (ptrace(PT_GET_SIGINFO, pid, &info, sizeof(info)) == -1) {
++        PLOG_W("Couldn't get siginfo for pid %d", pid);
++    }
++
++    size_t pcRegSz = arch_getPC(pid, info.psi_lwpid, &pc, &status_reg);
 +    if (!pcRegSz) {
 +        LOG_W("ptrace arch_getPC failed");
 +        return;
@@ -339,7 +345,7 @@ $NetBSD$
 +        PLOG_W("Couldn't get siginfo for pid %d", pid);
 +    }
 +
-+    arch_getInstrStr(pid, &pc, instr);
++    arch_getInstrStr(pid, info.psi_lwpid, &pc, instr);
 +
 +    LOG_D("Pid: %d, signo: %d, errno: %d, code: %d, addr: %p, pc: %" PRIxREGISTER ", instr: '%s'", pid,
 +        info.psi_siginfo.si_signo, info.psi_siginfo.si_errno, info.psi_siginfo.si_code, info.psi_siginfo.si_addr, pc, instr);
