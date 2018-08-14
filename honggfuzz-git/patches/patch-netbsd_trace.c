@@ -1,6 +1,6 @@
 $NetBSD$
 
---- netbsd/trace.c.orig	2018-08-14 02:27:26.833459321 +0000
+--- netbsd/trace.c.orig	2018-08-14 02:32:13.638569294 +0000
 +++ netbsd/trace.c
 @@ -0,0 +1,1010 @@
 +/*
@@ -239,14 +239,14 @@ $NetBSD$
 +    return;
 +}
 +
-+static void arch_hashCallstack(run_t* run, funcs_t* funcs, size_t funcCnt, bool enableMasking) {
++static void arch_hashCallstack(run_t* run, funcs_t* funcs HF_ATTR_UNUSED, size_t funcCnt, bool enableMasking) {
 +    uint64_t hash = 0;
 +    for (size_t i = 0; i < funcCnt && i < run->global->netbsd.numMajorFrames; i++) {
 +        /*
 +         * Convert PC to char array to be compatible with hash function
 +         */
 +        char pcStr[REGSIZEINCHAR] = {0};
-+        snprintf(pcStr, REGSIZEINCHAR, REG_PD REG_PM, (register_t)(long)funcs[i].pc);
++        snprintf(pcStr, REGSIZEINCHAR, "%" PRIxREGISTER, (register_t)(long)funcs[i].pc);
 +
 +        /*
 +         * Hash the last three nibbles
