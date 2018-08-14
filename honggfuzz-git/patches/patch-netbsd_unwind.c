@@ -1,8 +1,8 @@
 $NetBSD$
 
---- netbsd/unwind.c.orig	2018-08-13 23:48:25.052779918 +0000
+--- netbsd/unwind.c.orig	2018-08-14 02:35:37.180945427 +0000
 +++ netbsd/unwind.c
-@@ -0,0 +1,63 @@
+@@ -0,0 +1,61 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD/UNWIND)
@@ -32,8 +32,6 @@ $NetBSD$
 +#include <stdio.h>
 +#include <stdlib.h>
 +#include <string.h>
-+
-+#include <libunwind.h>
 +
 +#include "honggfuzz.h"
 +#include "libhfcommon/common.h"
