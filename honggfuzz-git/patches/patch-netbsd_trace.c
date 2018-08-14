@@ -1,6 +1,6 @@
 $NetBSD$
 
---- netbsd/trace.c.orig	2018-08-14 02:45:14.460391973 +0000
+--- netbsd/trace.c.orig	2018-08-14 05:00:25.032919011 +0000
 +++ netbsd/trace.c
 @@ -0,0 +1,1013 @@
 +/*
@@ -919,7 +919,7 @@ $NetBSD$
 +        }
 +        /* Do not deliver SIGSTOP */
 +        int sig = (WSTOPSIG(status) != SIGSTOP) ? WSTOPSIG(status) : 0;
-+        ptrace(PT_CONTINUE, pid, 0, sig);
++        ptrace(PT_CONTINUE, pid, (void *)1, sig);
 +        return;
 +    }
 +
