@@ -2,7 +2,7 @@ $NetBSD$
 
 --- netbsd/trace.c.orig	2018-08-13 23:48:25.050862699 +0000
 +++ netbsd/trace.c
-@@ -0,0 +1,1103 @@
+@@ -0,0 +1,1011 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD/PTRACE)
@@ -26,7 +26,7 @@ $NetBSD$
 + *
 + */
 +
-+#include "linux/trace.h"
++#include "netbsd/trace.h"
 +
 +#include <sys/param.h>
 +#include <sys/types.h>
@@ -57,8 +57,8 @@ $NetBSD$
 +#include "libhfcommon/files.h"
 +#include "libhfcommon/log.h"
 +#include "libhfcommon/util.h"
-+#include "linux/bfd.h"
-+#include "linux/unwind.h"
++#include "netbsd/bfd.h"
++#include "netbsd/unwind.h"
 +#include "sancov.h"
 +#include "sanitizers.h"
 +#include "socketfuzzer.h"
@@ -242,7 +242,7 @@ $NetBSD$
 +
 +static void arch_hashCallstack(run_t* run, funcs_t* funcs, size_t funcCnt, bool enableMasking) {
 +    uint64_t hash = 0;
-+    for (size_t i = 0; i < funcCnt && i < run->global->linux.numMajorFrames; i++) {
++    for (size_t i = 0; i < funcCnt && i < run->global->netbsd.numMajorFrames; i++) {
 +        /*
 +         * Convert PC to char array to be compatible with hash function
 +         */
@@ -345,9 +345,9 @@ $NetBSD$
 +    LOG_D("Pid: %d, signo: %d, errno: %d, code: %d, addr: %p, pc: %" PRIxREGISTER ", instr: '%s'", pid,
 +        info.psi_siginfo.si_signo, info.psi_siginfo.si_errno, info.psi_siginfo.si_code, info.psi_siginfo.si_addr, pc, instr);
 +
-+    if (!SI_FROMUSER(&info.psi_siginfo) && pc && info.psi_siginfo.si_addr < run->global->linux.ignoreAddr) {
++    if (!SI_FROMUSER(&info.psi_siginfo) && pc && info.psi_siginfo.si_addr < run->global->netbsd.ignoreAddr) {
 +        LOG_I("Input is interesting (%s), but the si.si_addr is %p (below %p), skipping",
-+            arch_sigName(info.psi_siginfo.si_signo), info.psi_siginfo.si_addr, run->global->linux.ignoreAddr);
++            arch_sigName(info.psi_siginfo.si_signo), info.psi_siginfo.si_addr, run->global->netbsd.ignoreAddr);
 +        return;
 +    }
 +
@@ -427,9 +427,9 @@ $NetBSD$
 +     * both stackhash and symbol blacklist. Crash is always kept regardless
 +     * of the status of uniqueness flag.
 +     */
-+    if (run->global->linux.symsWl) {
++    if (run->global->netbsd.symsWl) {
 +        char* wlSymbol = arch_btContainsSymbol(
-+            run->global->linux.symsWlCnt, run->global->linux.symsWl, funcCnt, funcs);
++            run->global->netbsd.symsWlCnt, run->global->netbsd.symsWl, funcCnt, funcs);
 +        if (wlSymbol != NULL) {
 +            saveUnique = false;
 +            LOG_D("Whitelisted symbol '%s' found, skipping blacklist checks", wlSymbol);
@@ -450,7 +450,7 @@ $NetBSD$
 +         * Check if backtrace contains blacklisted symbol
 +         */
 +        char* blSymbol = arch_btContainsSymbol(
-+            run->global->linux.symsBlCnt, run->global->linux.symsBl, funcCnt, funcs);
++            run->global->netbsd.symsBlCnt, run->global->netbsd.symsBl, funcCnt, funcs);
 +        if (blSymbol != NULL) {
 +            LOG_I("Blacklisted symbol '%s' found, skipping", blSymbol);
 +            ATOMIC_POST_INC(run->global->cnts.blCrashesCnt);
@@ -654,7 +654,7 @@ $NetBSD$
 +    REG_TYPE pc = 0;
 +    void* crashAddr = 0;
 +    char* op = "UNKNOWN";
-+    pid_t targetPid = (run->global->linux.pid > 0) ? run->global->linux.pid : run->pid;
++    pid_t targetPid = (run->global->netbsd.pid > 0) ? run->global->netbsd.pid : run->pid;
 +
 +    /* Save only the first hit for each worker */
 +    if (run->crashFileName[0] != '\0') {
@@ -698,9 +698,9 @@ $NetBSD$
 +    }
 +
 +    /* Since crash address is available, apply ignoreAddr filters */
-+    if (crashAddr < run->global->linux.ignoreAddr) {
++    if (crashAddr < run->global->netbsd.ignoreAddr) {
 +        LOG_I("Input is interesting, but the crash addr is %p (below %p), skipping", crashAddr,
-+            run->global->linux.ignoreAddr);
++            run->global->netbsd.ignoreAddr);
 +        return;
 +    }
 +
@@ -951,63 +951,6 @@ $NetBSD$
 +    abort(); /* NOTREACHED */
 +}
 +
-+static bool arch_listThreads(int tasks[], size_t thrSz, int pid) {
-+    char path[512];
-+    snprintf(path, sizeof(path), "/proc/%d/task", pid);
-+
-+    /* An optimization, the number of threads is st.st_nlink - 2 (. and ..) */
-+    struct stat st;
-+    if (stat(path, &st) != -1) {
-+        if (st.st_nlink == 3) {
-+            tasks[0] = pid;
-+            tasks[1] = 0;
-+            return true;
-+        }
-+    }
-+
-+    size_t count = 0;
-+    DIR* dir = opendir(path);
-+    if (!dir) {
-+        PLOG_E("Couldn't open dir '%s'", path);
-+        return false;
-+    }
-+    defer {
-+        closedir(dir);
-+    };
-+
-+    for (;;) {
-+        errno = 0;
-+        const struct dirent* res = readdir(dir);
-+        if (res == NULL && errno != 0) {
-+            PLOG_E("Couldn't read contents of '%s'", path);
-+            return false;
-+        }
-+
-+        if (res == NULL) {
-+            break;
-+        }
-+
-+        pid_t pid = (pid_t)strtol(res->d_name, (char**)NULL, 10);
-+        if (pid == 0) {
-+            LOG_D("The following dir entry couldn't be converted to pid_t '%s'", res->d_name);
-+            continue;
-+        }
-+
-+        tasks[count++] = pid;
-+        LOG_D("Added pid '%d' from '%s/%s'", pid, path, res->d_name);
-+
-+        if (count >= thrSz) {
-+            break;
-+        }
-+    }
-+    PLOG_D("Total number of threads in pid '%d': '%zd'", pid, count);
-+    tasks[count + 1] = 0;
-+    if (count < 1) {
-+        return false;
-+    }
-+    return true;
-+}
-+
 +bool arch_traceWaitForPidStop(pid_t pid) {
 +    for (;;) {
 +        int status;
@@ -1027,75 +970,40 @@ $NetBSD$
 +    }
 +}
 +
-+#define MAX_THREAD_IN_TASK 4096
 +bool arch_traceAttach(run_t* run, pid_t pid) {
-+/*
-+ * It should be present since, at least, Linux kernel 3.8, but
-+ * not always defined in kernel-headers
-+ */
-+#if !defined(PTRACE_O_EXITKILL)
-+#define PTRACE_O_EXITKILL (1 << 20)
-+#endif /* !defined(PTRACE_O_EXITKILL) */
-+    long seize_options = PTRACE_O_TRACECLONE | PTRACE_O_TRACEFORK | PTRACE_O_TRACEVFORK;
-+    if (run->global->linux.pid == 0) {
-+        seize_options |= PTRACE_O_EXITKILL;
-+    }
-+    /* The event is only used with sanitizers */
-+    if (run->global->sanitizer.enable) {
-+        seize_options |= PTRACE_O_TRACEEXIT;
-+    }
++    int status;
++    pid_t wpid;
++    ptrace_event_t event;
 +
-+    if (run->global->linux.pid == 0 && !arch_traceWaitForPidStop(pid)) {
++    if (ptrace(PT_ATTACH, pid, NULL, 0) == -1) {
++        PLOG_W("Couldn't ptrace(PT_ATTACH) to pid: %d", pid);
 +        return false;
 +    }
 +
-+    if (ptrace(PTRACE_SEIZE, pid, NULL, seize_options) == -1) {
-+        PLOG_W("Couldn't ptrace(PTRACE_SEIZE) to pid: %d", pid);
++    if (run->global->netbsd.pid == 0 && !arch_traceWaitForPidStop(pid)) {
++        return false;
++    }
++
++    event.pe_set_event = PTRACE_FORK | PTRACE_VFORK | PTRACE_VFORK_DONE;
++
++    if (ptrace(PT_SET_EVENT_MASK, pid, &event, sizeof(event)) == -1) {
++        PLOG_W("Couldn't ptrace(PT_SET_EVENT_MASK) to pid: %d", pid);
 +        return false;
 +    }
 +
 +    LOG_D("Attached to PID: %d", pid);
 +
 +    /* It only makes sense to attach to threads with -p */
-+    if (run->global->linux.pid == 0) {
++    if (run->global->netbsd.pid == 0) {
 +        return true;
 +    }
 +
-+    int tasks[MAX_THREAD_IN_TASK + 1] = {0};
-+    if (!arch_listThreads(tasks, MAX_THREAD_IN_TASK, pid)) {
-+        LOG_E("Couldn't read thread list for pid '%d'", pid);
-+        return false;
-+    }
-+
-+    for (int i = 0; i < MAX_THREAD_IN_TASK && tasks[i]; i++) {
-+        if (tasks[i] == pid) {
-+            continue;
-+        }
-+        if (ptrace(PTRACE_SEIZE, tasks[i], NULL, seize_options) == -1) {
-+            PLOG_W("Couldn't ptrace(PTRACE_SEIZE) to pid: %d", tasks[i]);
-+            continue;
-+        }
-+        LOG_D("Attached to PID: %d (thread_group:%d)", tasks[i], pid);
-+    }
 +    return true;
 +}
 +
 +void arch_traceDetach(pid_t pid) {
-+    if (syscall(__NR_kill, pid, 0) == -1 && errno == ESRCH) {
-+        LOG_D("PID: %d no longer exists", pid);
-+        return;
-+    }
-+
-+    int tasks[MAX_THREAD_IN_TASK + 1] = {0};
-+    if (!arch_listThreads(tasks, MAX_THREAD_IN_TASK, pid)) {
-+        LOG_E("Couldn't read thread list for pid '%d'", pid);
-+        return;
-+    }
-+
-+    for (int i = 0; i < MAX_THREAD_IN_TASK && tasks[i]; i++) {
-+        ptrace(PTRACE_INTERRUPT, tasks[i], NULL, NULL);
-+        arch_traceWaitForPidStop(tasks[i]);
-+        ptrace(PTRACE_DETACH, tasks[i], NULL, NULL);
++    if (ptrace(PT_DETACH, pid, NULL, 0) == -1) {
++        PLOG_E("PID: %d ptrace(PT_DETACH) failed", pid);
 +    }
 +}
 +
