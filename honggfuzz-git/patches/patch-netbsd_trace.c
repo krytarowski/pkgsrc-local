@@ -2,7 +2,7 @@ $NetBSD$
 
 --- netbsd/trace.c.orig	2018-08-13 23:48:25.050862699 +0000
 +++ netbsd/trace.c
-@@ -0,0 +1,1069 @@
+@@ -0,0 +1,1103 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD/PTRACE)
@@ -829,44 +829,78 @@ $NetBSD$
 +    }
 +}
 +
-+static void arch_traceEvent(run_t* run, int status, pid_t pid) {
-+    
++static void arch_traceEvent(run_t* run HF_ATTR_UNUSED, pid_t pid) {
++    ptrace_state_t state;
++    ptrace_siginfo_t info;
++    int sig = 0;
 +
-+    LOG_D("PID: %d, Ptrace event: %d", pid, __WEVENT(status));
-+    switch (__WEVENT(status)) {
-+        case PTRACE_EVENT_EXIT: {
-+            unsigned long event_msg;
-+            if (ptrace(PTRACE_GETEVENTMSG, pid, NULL, &event_msg) == -1) {
-+                PLOG_E("ptrace(PTRACE_GETEVENTMSG,%d) failed", pid);
-+                return;
++    ptrace(PT_GET_SIGINFO, pid, &info, sizeof(info));
++    switch (info.psi_siginfo.si_code) {
++    case TRAP_BRKPT:
++        /* Software breakpoint trap, pass it over to tracee */
++        sig = SIGTRAP;
++        LOG_D("PID: %d breakpoint software trap (TRAP_BRKPT)", pid);
++        break;
++    case TRAP_TRACE:
++        /* Single step unused */
++        LOG_E("PID: %d unexpected single step trace trap (TRAP_TRACE)", pid);
++        break;
++    case TRAP_EXEC:
++        /* exec(3) trap, ignore */
++        LOG_D("PID: %d breakpoint software trap (TRAP_EXEC)", pid);
++        break;
++    case TRAP_CHLD:
++    case TRAP_LWP:
++        /* Child/LWP trap, ignore */
++        if (ptrace(PT_GET_PROCESS_STATE, pid, &state, sizeof(state)) != -1) {
++            switch (state.pe_report_event) {
++            case PTRACE_FORK:
++                LOG_D("PID: %d child trap (TRAP_CHLD) : fork (PTRACE_FORK)", pid);
++                break;
++            case PTRACE_VFORK:
++                LOG_D("PID: %d child trap (TRAP_CHLD) : vfork (PTRACE_VFORK)", pid);
++                break;
++            case PTRACE_VFORK_DONE:
++                LOG_D("PID: %d child trap (TRAP_CHLD) : vfork (PTRACE_VFORK_DONE)", pid);
++                break;
++            case PTRACE_LWP_CREATE:
++                LOG_E("PID: %d unexpected lwp trap (TRAP_LWP) : create (PTRACE_LWP_CREATE)", pid);
++                break;
++            case PTRACE_LWP_EXIT:
++                LOG_E("PID: %d unexpected lwp trap (TRAP_LWP) : exit (PTRACE_LWP_EXIT)", pid);
++                break;
++            default:
++                LOG_D("PID: %d unknown child/lwp trap (TRAP_LWP/TRAP_CHLD) : unknown pe_report_event=%d", pid, state.pe_report_event);
++                break;
 +            }
-+
-+            if (WIFEXITED(event_msg)) {
-+                LOG_D("PID: %d exited with exit_code: %lu", pid,
-+                    (unsigned long)WEXITSTATUS(event_msg));
-+                if (WEXITSTATUS(event_msg) == (unsigned long)HF_SAN_EXIT_CODE) {
-+                    arch_traceExitAnalyze(run, pid);
-+                }
-+            } else if (WIFSIGNALED(event_msg)) {
-+                LOG_D(
-+                    "PID: %d terminated with signal: %lu", pid, (unsigned long)WTERMSIG(event_msg));
-+            } else {
-+                LOG_D("PID: %d exited with unknown status: %lu", pid, event_msg);
-+            }
-+        } break;
-+        default:
-+            break;
++        }
++        break;
++    case TRAP_DBREG:
++        /* Debug Register trap unused */
++        LOG_E("PID: %d unexpected debug register trap (TRAP_DBREG)", pid);
++        break;
++    case TRAP_SCE:
++        /* Syscall Enter trap unused */
++        LOG_E("PID: %d unexpected syscall enter trap (TRAP_SCE)", pid);
++        break;
++    case TRAP_SCX:
++        /* Syscall Exit trap unused */
++        LOG_E("PID: %d unexpected syscall exit trap (TRAP_SCX)", pid);
++        break;
++    default:
++        LOG_D("PID: %d unknown trap si_code=%d", pid, info.psi_siginfo.si_code);
++        break;
 +    }
 +
-+    ptrace(PT_CONTINUE, pid, (void *)1, 0);
++    ptrace(PT_CONTINUE, pid, (void *)1, sig);
 +}
 +
 +void arch_traceAnalyze(run_t* run, int status, pid_t pid) {
 +    /*
 +     * It's a ptrace event, deal with it elsewhere
 +     */
-+    if (WIFSTOPPED(status) && __WEVENT(status)) {
-+        return arch_traceEvent(run, status, pid);
++    if (WIFSTOPPED(status) && WSTOPSIG(status) == SIGTRAP) {
++        return arch_traceEvent(run, pid);
 +    }
 +
 +    if (WIFSTOPPED(status)) {
@@ -886,7 +920,7 @@ $NetBSD$
 +        }
 +        /* Do not deliver SIGSTOP, as we don't support PTRACE_LISTEN anyway */
 +        int sig = (WSTOPSIG(status) != SIGSTOP) ? WSTOPSIG(status) : 0;
-+        ptrace(PTRACE_CONT, pid, 0, sig);
++        ptrace(PT_CONTINUE, pid, 0, sig);
 +        return;
 +    }
 +
