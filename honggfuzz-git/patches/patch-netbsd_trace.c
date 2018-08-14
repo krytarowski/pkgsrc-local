@@ -2,10 +2,10 @@ $NetBSD$
 
 --- netbsd/trace.c.orig	2018-08-13 23:48:25.050862699 +0000
 +++ netbsd/trace.c
-@@ -0,0 +1,1405 @@
+@@ -0,0 +1,1069 @@
 +/*
 + *
-+ * honggfuzz - architecture dependent code (LINUX/PTRACE)
++ * honggfuzz - architecture dependent code (NETBSD/PTRACE)
 + * -----------------------------------------
 + *
 + * Author: Robert Swiecki <swiecki@google.com>
@@ -28,6 +28,17 @@ $NetBSD$
 +
 +#include "linux/trace.h"
 +
++#include <sys/param.h>
++#include <sys/types.h>
++#include <sys/ptrace.h>
++#include <sys/resource.h>
++#include <sys/stat.h>
++#include <sys/syscall.h>
++#include <sys/time.h>
++#include <sys/types.h>
++#include <sys/uio.h>
++#include <sys/wait.h>
++
 +#include <ctype.h>
 +#include <dirent.h>
 +#include <elf.h>
@@ -39,17 +50,6 @@ $NetBSD$
 +#include <stdio.h>
 +#include <stdlib.h>
 +#include <string.h>
-+#include <sys/cdefs.h>
-+#include <sys/personality.h>
-+#include <sys/ptrace.h>
-+#include <sys/resource.h>
-+#include <sys/stat.h>
-+#include <sys/syscall.h>
-+#include <sys/time.h>
-+#include <sys/types.h>
-+#include <sys/uio.h>
-+#include <sys/user.h>
-+#include <sys/wait.h>
 +#include <time.h>
 +#include <unistd.h>
 +
@@ -64,26 +64,15 @@ $NetBSD$
 +#include "socketfuzzer.h"
 +#include "subproc.h"
 +
-+#if defined(__ANDROID__)
-+#include "capstone.h"
-+#endif
-+
-+#if defined(__i386__) || defined(__arm__) || defined(__powerpc__)
-+#define REG_TYPE uint32_t
-+#define REG_PM PRIx32
-+#define REG_PD "0x%08"
-+#elif defined(__x86_64__) || defined(__aarch64__) || defined(__powerpc64__) || \
-+    defined(__mips__) || defined(__mips64__)
-+#define REG_TYPE uint64_t
-+#define REG_PM PRIx64
-+#define REG_PD "0x%016"
-+#endif
++#include <capstone/capstone.h>
 +
 +/*
 + * Size in characters required to store a string representation of a
 + * register value (0xdeadbeef style))
 + */
 +#define REGSIZEINCHAR (2 * sizeof(REG_TYPE) + 3)
++
++#define _HF_INSTR_SZ 64
 +
 +#if defined(__i386__) || defined(__x86_64__)
 +#define MAX_INSTR_SZ 16
@@ -94,162 +83,6 @@ $NetBSD$
 +#elif defined(__mips__) || defined(__mips64__)
 +#define MAX_INSTR_SZ 8
 +#endif
-+
-+#if defined(__i386__) || defined(__x86_64__)
-+struct user_regs_struct_32 {
-+    uint32_t ebx;
-+    uint32_t ecx;
-+    uint32_t edx;
-+    uint32_t esi;
-+    uint32_t edi;
-+    uint32_t ebp;
-+    uint32_t eax;
-+    uint16_t ds, __ds;
-+    uint16_t es, __es;
-+    uint16_t fs, __fs;
-+    uint16_t gs, __gs;
-+    uint32_t orig_eax;
-+    uint32_t eip;
-+    uint16_t cs, __cs;
-+    uint32_t eflags;
-+    uint32_t esp;
-+    uint16_t ss, __ss;
-+};
-+
-+struct user_regs_struct_64 {
-+    uint64_t r15;
-+    uint64_t r14;
-+    uint64_t r13;
-+    uint64_t r12;
-+    uint64_t bp;
-+    uint64_t bx;
-+    uint64_t r11;
-+    uint64_t r10;
-+    uint64_t r9;
-+    uint64_t r8;
-+    uint64_t ax;
-+    uint64_t cx;
-+    uint64_t dx;
-+    uint64_t si;
-+    uint64_t di;
-+    uint64_t orig_ax;
-+    uint64_t ip;
-+    uint64_t cs;
-+    uint64_t flags;
-+    uint64_t sp;
-+    uint64_t ss;
-+    uint64_t fs_base;
-+    uint64_t gs_base;
-+    uint64_t ds;
-+    uint64_t es;
-+    uint64_t fs;
-+    uint64_t gs;
-+};
-+#define HEADERS_STRUCT struct user_regs_struct_64
-+#endif /* defined(__i386__) || defined(__x86_64__) */
-+
-+#if defined(__arm__) || defined(__aarch64__)
-+#ifndef ARM_pc
-+#ifdef __ANDROID__ /* Building with NDK headers */
-+#define ARM_pc uregs[15]
-+#else /* Building with glibc headers */
-+#define ARM_pc 15
-+#endif
-+#endif /* ARM_pc */
-+#ifndef ARM_cpsr
-+#ifdef __ANDROID__ /* Building with NDK headers */
-+#define ARM_cpsr uregs[16]
-+#else /* Building with glibc headers */
-+#define ARM_cpsr 16
-+#endif
-+#endif /* ARM_cpsr */
-+struct user_regs_struct_32 {
-+    uint32_t uregs[18];
-+};
-+
-+struct user_regs_struct_64 {
-+    uint64_t regs[31];
-+    uint64_t sp;
-+    uint64_t pc;
-+    uint64_t pstate;
-+};
-+#define HEADERS_STRUCT struct user_regs_struct_64
-+#endif /* defined(__arm__) || defined(__aarch64__) */
-+
-+#if defined(__powerpc64__) || defined(__powerpc__)
-+#define HEADERS_STRUCT struct pt_regs
-+struct user_regs_struct_32 {
-+    uint32_t gpr[32];
-+    uint32_t nip;
-+    uint32_t msr;
-+    uint32_t orig_gpr3;
-+    uint32_t ctr;
-+    uint32_t link;
-+    uint32_t xer;
-+    uint32_t ccr;
-+    uint32_t mq;
-+    uint32_t trap;
-+    uint32_t dar;
-+    uint32_t dsisr;
-+    uint32_t result;
-+    /*
-+     * elf.h's ELF_NGREG says it's 48 registers, so kernel fills it in
-+     * with some zeros
-+     */
-+    uint32_t zero0;
-+    uint32_t zero1;
-+    uint32_t zero2;
-+    uint32_t zero3;
-+};
-+struct user_regs_struct_64 {
-+    uint64_t gpr[32];
-+    uint64_t nip;
-+    uint64_t msr;
-+    uint64_t orig_gpr3;
-+    uint64_t ctr;
-+    uint64_t link;
-+    uint64_t xer;
-+    uint64_t ccr;
-+    uint64_t softe;
-+    uint64_t trap;
-+    uint64_t dar;
-+    uint64_t dsisr;
-+    uint64_t result;
-+    /*
-+     * elf.h's ELF_NGREG says it's 48 registers, so kernel fills it in
-+     * with some zeros
-+     */
-+    uint64_t zero0;
-+    uint64_t zero1;
-+    uint64_t zero2;
-+    uint64_t zero3;
-+};
-+#endif /* defined(__powerpc64__) || defined(__powerpc__) */
-+
-+#if defined(__mips__) || defined(__mips64__)
-+struct user_regs_struct {
-+    uint64_t regs[32];
-+
-+    uint64_t lo;
-+    uint64_t hi;
-+    uint64_t cp0_epc;
-+    uint64_t cp0_badvaddr;
-+    uint64_t cp0_status;
-+    uint64_t cp0_cause;
-+};
-+#define HEADERS_STRUCT struct user_regs_struct
-+#endif /* defined(__mips__) || defined(__mips64__) */
-+
-+#if defined(__ANDROID__)
-+/*
-+ * Some Android ABIs don't implement PTRACE_GETREGS (e.g. aarch64)
-+ */
-+#if defined(PTRACE_GETREGS)
-+#define PTRACE_GETREGS_AVAILABLE 1
-+#else
-+#define PTRACE_GETREGS_AVAILABLE 0
-+#endif /* defined(PTRACE_GETREGS) */
-+#endif /* defined(__ANDROID__) */
 +
 +static struct {
 +    const char* descr;
@@ -287,188 +120,59 @@ $NetBSD$
 +};
 +
 +#ifndef SI_FROMUSER
-+#define SI_FROMUSER(siptr) ((siptr)->si_code <= 0)
++#define SI_FROMUSER(siptr) ((siptr)->si_code == SI_USER)
 +#endif /* SI_FROMUSER */
 +
-+extern const char* sys_sigabbrev[];
 +
 +static __thread char arch_signame[32];
 +static const char* arch_sigName(int signo) {
-+    if (signo < 0 || signo > _NSIG) {
-+        snprintf(arch_signame, sizeof(arch_signame), "UNKNOWN-%d", signo);
-+        return arch_signame;
-+    }
-+    if (signo > __SIGRTMIN) {
-+        snprintf(arch_signame, sizeof(arch_signame), "SIG%d-RTMIN+%d", signo, signo - __SIGRTMIN);
-+        return arch_signame;
-+    }
-+#ifdef __ANDROID__
-+    return arch_sigs[signo].descr;
-+#else
-+    if (sys_sigabbrev[signo] == NULL) {
-+        snprintf(arch_signame, sizeof(arch_signame), "SIG%d", signo);
-+    } else {
-+        snprintf(arch_signame, sizeof(arch_signame), "SIG%s", sys_sigabbrev[signo]);
-+    }
++    snprintf(arch_signame, sizeof(arch_signame), "SIG%s", signalname(signo));
 +    return arch_signame;
-+#endif /* __ANDROID__ */
 +}
 +
 +static size_t arch_getProcMem(pid_t pid, uint8_t* buf, size_t len, REG_TYPE pc) {
-+    /*
-+     * Let's try process_vm_readv first
-+     */
-+    const struct iovec local_iov = {
-+        .iov_base = buf,
-+        .iov_len = len,
-+    };
-+    const struct iovec remote_iov = {
-+        .iov_base = (void*)(uintptr_t)pc,
-+        .iov_len = len,
-+    };
-+    if (process_vm_readv(pid, &local_iov, 1, &remote_iov, 1, 0) == (ssize_t)len) {
-+        return len;
-+    }
-+    // Debug if failed since it shouldn't happen very often
-+    PLOG_D("process_vm_readv() failed");
++    struct ptrace_io_desc io;
++    size_t bytes_read;
 +
-+    /*
-+     * Ok, let's do it via ptrace() then.
-+     * len must be aligned to the sizeof(long)
-+     */
-+    int cnt = len / sizeof(long);
-+    size_t memsz = 0;
++    bytes_read = 0;
++    io.piod_op = PIOD_READ_D;
++    io.piod_len = len;
 +
-+    for (int x = 0; x < cnt; x++) {
-+        uint8_t* addr = (uint8_t*)(uintptr_t)pc + (int)(x * sizeof(long));
-+        long ret = ptrace(PTRACE_PEEKDATA, pid, addr, NULL);
++    do {
++        io.piod_offs = (void *)(pc + bytes_read);
++        io.piod_addr = buf + bytes_read;
 +
-+        if (errno != 0) {
-+            PLOG_W("Couldn't PT_READ_D on pid %d, addr: %p", pid, addr);
++        if (ptrace(PT_IO, pid, &io, 0) == -1) {
++            PLOG_W("Couldn't read process memory on pid %d, "
++                  "piod_op: %d offs: %p addr: %p piod_len: %zu",
++                   pid, io.piod_op, io.piod_offs, io.piod_addr, io.piod_len);
 +            break;
 +        }
 +
-+        memsz += sizeof(long);
-+        memcpy(&buf[x * sizeof(long)], &ret, sizeof(long));
-+    }
-+    return memsz;
++        bytes_read = io.piod_len;
++        io.piod_len = len - bytes_read;
++    } while (bytes_read < len);
++
++    return bytes_read;
 +}
 +
 +static size_t arch_getPC(pid_t pid, REG_TYPE* pc, REG_TYPE* status_reg HF_ATTR_UNUSED) {
-+/*
-+ * Some old ARM android kernels are failing with PTRACE_GETREGS to extract
-+ * the correct register values if struct size is bigger than expected. As such the
-+ * 32/64-bit multiplexing trick is not working for them in case PTRACE_GETREGSET
-+ * fails or is not implemented. To cover such cases we explicitly define
-+ * the struct size to 32bit version for arm CPU.
-+ */
-+#if defined(__arm__)
-+    struct user_regs_struct_32 regs;
-+#else
-+    HEADERS_STRUCT regs;
-+#endif
-+    const struct iovec pt_iov = {
-+        .iov_base = &regs,
-+        .iov_len = sizeof(regs),
-+    };
++    struct reg r;
 +
-+    if (ptrace(PTRACE_GETREGSET, pid, NT_PRSTATUS, &pt_iov) == -1L) {
-+        PLOG_D("ptrace(PTRACE_GETREGSET) failed");
-+
-+// If PTRACE_GETREGSET fails, try PTRACE_GETREGS if available
-+#if PTRACE_GETREGS_AVAILABLE
-+        if (ptrace(PTRACE_GETREGS, pid, 0, &regs)) {
-+            PLOG_D("ptrace(PTRACE_GETREGS) failed");
-+            LOG_W("ptrace PTRACE_GETREGSET & PTRACE_GETREGS failed to extract target registers");
-+            return 0;
-+        }
-+#else
++    if (ptrace(PT_GETREGS, pid, &r, 0) != -1) {
++        PLOG_D("ptrace(PT_GETREGS) failed");
 +        return 0;
-+#endif
 +    }
-+#if defined(__i386__) || defined(__x86_64__)
-+    /*
-+     * 32-bit
-+     */
-+    if (pt_iov.iov_len == sizeof(struct user_regs_struct_32)) {
-+        struct user_regs_struct_32* r32 = (struct user_regs_struct_32*)&regs;
-+        *pc = r32->eip;
-+        *status_reg = r32->eflags;
-+        return pt_iov.iov_len;
-+    }
-+
-+    /*
-+     * 64-bit
-+     */
-+    if (pt_iov.iov_len == sizeof(struct user_regs_struct_64)) {
-+        struct user_regs_struct_64* r64 = (struct user_regs_struct_64*)&regs;
-+        *pc = r64->ip;
-+        *status_reg = r64->flags;
-+        return pt_iov.iov_len;
-+    }
-+    LOG_W("Unknown registers structure size: '%zd'", pt_iov.iov_len);
-+    return 0;
-+#endif /* defined(__i386__) || defined(__x86_64__) */
-+
-+#if defined(__arm__) || defined(__aarch64__)
-+    /*
-+     * 32-bit
-+     */
-+    if (pt_iov.iov_len == sizeof(struct user_regs_struct_32)) {
-+        struct user_regs_struct_32* r32 = (struct user_regs_struct_32*)&regs;
-+#ifdef __ANDROID__
-+        *pc = r32->ARM_pc;
-+        *status_reg = r32->ARM_cpsr;
++    *pc = PTRACE_REG_PC(&r);
++#if defined(__i386__)
++    *status_reg = r.regs[_REG_EFLAGS];
++#elif defined(__x86_64__)
++    *status_reg = r.regs[_REG_RFLAGS];
 +#else
-+        *pc = r32->uregs[ARM_pc];
-+        *status_reg = r32->uregs[ARM_cpsr];
++#   error unsupported CPU architecture
 +#endif
-+        return pt_iov.iov_len;
-+    }
 +
-+    /*
-+     * 64-bit
-+     */
-+    if (pt_iov.iov_len == sizeof(struct user_regs_struct_64)) {
-+        struct user_regs_struct_64* r64 = (struct user_regs_struct_64*)&regs;
-+        *pc = r64->pc;
-+        *status_reg = r64->pstate;
-+        return pt_iov.iov_len;
-+    }
-+    LOG_W("Unknown registers structure size: '%zd'", pt_iov.iov_len);
-+    return 0;
-+#endif /* defined(__arm__) || defined(__aarch64__) */
-+
-+#if defined(__powerpc64__) || defined(__powerpc__)
-+    /*
-+     * 32-bit
-+     */
-+    if (pt_iov.iov_len == sizeof(struct user_regs_struct_32)) {
-+        struct user_regs_struct_32* r32 = (struct user_regs_struct_32*)&regs;
-+        *pc = r32->nip;
-+        return pt_iov.iov_len;
-+    }
-+
-+    /*
-+     * 64-bit
-+     */
-+    if (pt_iov.iov_len == sizeof(struct user_regs_struct_64)) {
-+        struct user_regs_struct_64* r64 = (struct user_regs_struct_64*)&regs;
-+        *pc = r64->nip;
-+        return pt_iov.iov_len;
-+    }
-+
-+    LOG_W("Unknown registers structure size: '%zd'", pt_iov.iov_len);
-+    return 0;
-+#endif /* defined(__powerpc64__) || defined(__powerpc__) */
-+
-+#if defined(__mips__) || defined(__mips64__)
-+    *pc = regs.cp0_epc;
-+    return pt_iov.iov_len;
-+#endif /* defined(__mips__) || defined(__mips64__) */
-+
-+    LOG_D("Unknown/unsupported CPU architecture");
-+    return 0;
++    return sizeof(r);
 +}
 +
 +static void arch_getInstrStr(pid_t pid, REG_TYPE* pc, char* instr) {
@@ -492,23 +196,18 @@ $NetBSD$
 +        snprintf(instr, _HF_INSTR_SZ, "%s", "[NOT_MMAPED]");
 +        return;
 +    }
-+#if !defined(__ANDROID__)
-+    arch_bfdDisasm(pid, buf, memsz, instr);
-+#else
++
 +    cs_arch arch;
 +    cs_mode mode;
-+#if defined(__arm__) || defined(__aarch64__)
-+    arch = (pcRegSz == sizeof(struct user_regs_struct_64)) ? CS_ARCH_ARM64 : CS_ARCH_ARM;
-+    if (arch == CS_ARCH_ARM) {
-+        mode = (status_reg & 0x20) ? CS_MODE_THUMB : CS_MODE_ARM;
-+    } else {
-+        mode = CS_MODE_ARM;
-+    }
-+#elif defined(__i386__) || defined(__x86_64__)
++
++#if defined(__i386__)
 +    arch = CS_ARCH_X86;
-+    mode = (pcRegSz == sizeof(struct user_regs_struct_64)) ? CS_MODE_64 : CS_MODE_32;
++    mode = CS_MODE_32;
++#elif defined(__x86_64__)
++    arch = CS_ARCH_X86;
++    mode = CS_MODE_64;
 +#else
-+    LOG_E("Unknown/Unsupported Android CPU architecture");
++#   error Unsupported CPU architecture
 +#endif
 +
 +    csh handle;
@@ -531,10 +230,9 @@ $NetBSD$
 +    snprintf(instr, _HF_INSTR_SZ, "%s %s", insn[0].mnemonic, insn[0].op_str);
 +    cs_free(insn, count);
 +    cs_close(&handle);
-+#endif /* defined(__ANDROID__) */
 +
 +    for (int x = 0; instr[x] && x < _HF_INSTR_SZ; x++) {
-+        if (instr[x] == '/' || instr[x] == '\\' || isspace(instr[x]) || !isprint(instr[x])) {
++        if (instr[x] == '/' || instr[x] == '\\' || isspace((unsigned char)instr[x]) || !isprint((unsigned char)instr[x])) {
 +            instr[x] = '_';
 +        }
 +    }
@@ -584,34 +282,15 @@ $NetBSD$
 +        run->report, sizeof(run->report), "STACK HASH: %016" PRIx64 "\n", run->backtrace);
 +    util_ssnprintf(run->report, sizeof(run->report), "STACK:\n");
 +    for (size_t i = 0; i < funcCnt; i++) {
-+#ifdef __HF_USE_CAPSTONE__
-+        util_ssnprintf(
-+            run->report, sizeof(run->report), " <" REG_PD REG_PM "> ", (REG_TYPE)(long)funcs[i].pc);
-+        if (funcs[i].func[0] != '\0')
-+            util_ssnprintf(run->report, sizeof(run->report), "[%s() + 0x%x at %s]\n", funcs[i].func,
-+                funcs[i].line, funcs[i].mapName);
-+        else
-+            util_ssnprintf(run->report, sizeof(run->report), "[]\n");
-+#else
-+        util_ssnprintf(run->report, sizeof(run->report), " <" REG_PD REG_PM "> [%s():%zu at %s]\n",
-+            (REG_TYPE)(long)funcs[i].pc, funcs[i].func, funcs[i].line, funcs[i].mapName);
-+#endif
++        util_ssnprintf(run->report, sizeof(run->report), " <%" PRIxREGISTER "> [%s():%zu at %s]\n",
++            (register_t)(long)funcs[i].pc, funcs[i].func, funcs[i].line, funcs[i].mapName);
 +    }
-+
-+// libunwind is not working for 32bit targets in 64bit systems
-+#if defined(__aarch64__)
-+    if (funcCnt == 0) {
-+        util_ssnprintf(run->report, sizeof(run->report),
-+            " !ERROR: If 32bit fuzz target"
-+            " in aarch64 system, try ARM 32bit build\n");
-+    }
-+#endif
 +
 +    return;
 +}
 +
 +static void arch_traceAnalyzeData(run_t* run, pid_t pid) {
-+    REG_TYPE pc = 0, status_reg = 0;
++    register_t pc = 0, status_reg = 0;
 +    size_t pcRegSz = arch_getPC(pid, &pc, &status_reg);
 +    if (!pcRegSz) {
 +        LOG_W("ptrace arch_getPC failed");
@@ -627,25 +306,18 @@ $NetBSD$
 +    };
 +    memset(funcs, 0, _HF_MAX_FUNCS * sizeof(funcs_t));
 +
-+#if !defined(__ANDROID__)
-+    size_t funcCnt = arch_unwindStack(pid, funcs);
-+    arch_bfdResolveSyms(pid, funcs, funcCnt);
-+#else
-+    size_t funcCnt = arch_unwindStack(pid, funcs);
-+#endif
++    size_t funcCnt = 0;
 +
 +    /*
-+     * If unwinder failed (zero frames), use PC from ptrace GETREGS if not zero.
++     * Use PC from ptrace GETREGS if not zero.
 +     * If PC reg zero return and callers should handle zero hash case.
 +     */
-+    if (funcCnt == 0) {
-+        if (pc) {
-+            /* Manually update major frame PC & frames counter */
-+            funcs[0].pc = (void*)(uintptr_t)pc;
-+            funcCnt = 1;
-+        } else {
-+            return;
-+        }
++    if (pc) {
++        /* Manually update major frame PC & frames counter */
++        funcs[0].pc = (void*)(uintptr_t)pc;
++        funcCnt = 1;
++    } else {
++        return;
 +    }
 +
 +    /*
@@ -655,27 +327,27 @@ $NetBSD$
 +}
 +
 +static void arch_traceSaveData(run_t* run, pid_t pid) {
-+    REG_TYPE pc = 0;
++    register_t pc = 0;
 +
 +    /* Local copy since flag is overridden for some crashes */
 +    bool saveUnique = run->global->io.saveUnique;
 +
 +    char instr[_HF_INSTR_SZ] = "\x00";
-+    siginfo_t si;
-+    bzero(&si, sizeof(si));
++    struct ptrace_siginfo info;
++    memset(&info, 0, sizeof(info));
 +
-+    if (ptrace(PTRACE_GETSIGINFO, pid, 0, &si) == -1) {
++    if (ptrace(PT_GET_SIGINFO, pid, &info, sizeof(info)) == -1) {
 +        PLOG_W("Couldn't get siginfo for pid %d", pid);
 +    }
 +
 +    arch_getInstrStr(pid, &pc, instr);
 +
-+    LOG_D("Pid: %d, signo: %d, errno: %d, code: %d, addr: %p, pc: %" REG_PM ", instr: '%s'", pid,
-+        si.si_signo, si.si_errno, si.si_code, si.si_addr, pc, instr);
++    LOG_D("Pid: %d, signo: %d, errno: %d, code: %d, addr: %p, pc: %" PRIxREGISTER ", instr: '%s'", pid,
++        info.psi_siginfo.si_signo, info.psi_siginfo.si_errno, info.psi_siginfo.si_code, info.psi_siginfo.si_addr, pc, instr);
 +
-+    if (!SI_FROMUSER(&si) && pc && si.si_addr < run->global->linux.ignoreAddr) {
++    if (!SI_FROMUSER(&info.psi_siginfo) && pc && info.psi_siginfo.si_addr < run->global->linux.ignoreAddr) {
 +        LOG_I("Input is interesting (%s), but the si.si_addr is %p (below %p), skipping",
-+            arch_sigName(si.si_signo), si.si_addr, run->global->linux.ignoreAddr);
++            arch_sigName(info.psi_siginfo.si_signo), info.psi_siginfo.si_addr, run->global->linux.ignoreAddr);
 +        return;
 +    }
 +
@@ -688,26 +360,19 @@ $NetBSD$
 +    };
 +    memset(funcs, 0, _HF_MAX_FUNCS * sizeof(funcs_t));
 +
-+#if !defined(__ANDROID__)
-+    size_t funcCnt = arch_unwindStack(pid, funcs);
-+    arch_bfdResolveSyms(pid, funcs, funcCnt);
-+#else
-+    size_t funcCnt = arch_unwindStack(pid, funcs);
-+#endif
++    size_t funcCnt = 0;
 +
 +    /*
-+     * If unwinder failed (zero frames), use PC from ptrace GETREGS if not zero.
++     * Use PC from ptrace GETREGS if not zero.
 +     * If PC reg zero, temporarily disable uniqueness flag since callstack
 +     * hash will be also zero, thus not safe for unique decisions.
 +     */
-+    if (funcCnt == 0) {
-+        if (pc) {
-+            /* Manually update major frame PC & frames counter */
-+            funcs[0].pc = (void*)(uintptr_t)pc;
-+            funcCnt = 1;
-+        } else {
-+            saveUnique = false;
-+        }
++    if (pc) {
++        /* Manually update major frame PC & frames counter */
++        funcs[0].pc = (void*)(uintptr_t)pc;
++        funcCnt = 1;
++    } else {
++        saveUnique = false;
 +    }
 +
 +    /*
@@ -796,14 +461,12 @@ $NetBSD$
 +    /* If non-blacklisted crash detected, zero set two MSB */
 +    ATOMIC_POST_ADD(run->global->cfg.dynFileIterExpire, _HF_DYNFILE_SUB_MASK);
 +
-+    void* sig_addr = si.si_addr;
-+    if (!run->global->linux.disableRandomization) {
-+        pc = 0UL;
-+        sig_addr = NULL;
-+    }
++    void* sig_addr = info.psi_siginfo.si_addr;
++    pc = 0UL;
++    sig_addr = NULL;
 +
 +    /* User-induced signals don't set si.si_addr */
-+    if (SI_FROMUSER(&si)) {
++    if (SI_FROMUSER(&info.psi_siginfo)) {
 +        sig_addr = NULL;
 +    }
 +
@@ -814,14 +477,14 @@ $NetBSD$
 +    } else if (saveUnique) {
 +        snprintf(run->crashFileName, sizeof(run->crashFileName),
 +            "%s/%s.PC.%" REG_PM ".STACK.%" PRIx64 ".CODE.%d.ADDR.%p.INSTR.%s.%s",
-+            run->global->io.crashDir, arch_sigName(si.si_signo), pc, run->backtrace, si.si_code,
++            run->global->io.crashDir, arch_sigName(si.si_signo), pc, run->backtrace, info.psi_siginfo.si_code,
 +            sig_addr, instr, run->global->io.fileExtn);
 +    } else {
 +        char localtmstr[PATH_MAX];
 +        util_getLocalTime("%F.%H:%M:%S", localtmstr, sizeof(localtmstr), time(NULL));
 +        snprintf(run->crashFileName, sizeof(run->crashFileName),
 +            "%s/%s.PC.%" REG_PM ".STACK.%" PRIx64 ".CODE.%d.ADDR.%p.INSTR.%s.%s.%d.%s",
-+            run->global->io.crashDir, arch_sigName(si.si_signo), pc, run->backtrace, si.si_code,
++            run->global->io.crashDir, arch_sigName(info.psi_siginfo.si_signo), pc, run->backtrace, info.psi_siginfo.si_code,
 +            sig_addr, instr, localtmstr, pid, run->global->io.fileExtn);
 +    }
 +
@@ -1064,7 +727,7 @@ $NetBSD$
 +        /* Keep the crashes file name format identical */
 +        if (run->backtrace != 0ULL && run->global->io.saveUnique) {
 +            snprintf(run->crashFileName, sizeof(run->crashFileName),
-+                "%s/%s.PC.%" REG_PM ".STACK.%" PRIx64 ".CODE.%s.ADDR.%p.INSTR.%s.%s",
++                "%s/%s.PC.%" PRIxREGISTER ".STACK.%" PRIx64 ".CODE.%s.ADDR.%p.INSTR.%s.%s",
 +                run->global->io.crashDir, "SAN", pc, run->backtrace, op, crashAddr, "[UNKNOWN]",
 +                run->global->io.fileExtn);
 +        } else {
@@ -1072,7 +735,7 @@ $NetBSD$
 +            char localtmstr[PATH_MAX];
 +            util_getLocalTime("%F.%H:%M:%S", localtmstr, sizeof(localtmstr), time(NULL));
 +            snprintf(run->crashFileName, sizeof(run->crashFileName),
-+                "%s/%s.PC.%" REG_PM ".STACK.%" PRIx64 ".CODE.%s.ADDR.%p.INSTR.%s.%s.%s",
++                "%s/%s.PC.%" PRIxREGISTER ".STACK.%" PRIx64 ".CODE.%s.ADDR.%p.INSTR.%s.%s.%s",
 +                run->global->io.crashDir, "SAN", pc, run->backtrace, op, crashAddr, "[UNKNOWN]",
 +                localtmstr, run->global->io.fileExtn);
 +        }
@@ -1118,8 +781,8 @@ $NetBSD$
 +            run->report, sizeof(run->report), "STACK HASH: %016" PRIx64 "\n", run->backtrace);
 +        util_ssnprintf(run->report, sizeof(run->report), "STACK:\n");
 +        for (int i = 0; i < funcCnt; i++) {
-+            util_ssnprintf(run->report, sizeof(run->report), " <" REG_PD REG_PM "> ",
-+                (REG_TYPE)(long)funcs[i].pc);
++            util_ssnprintf(run->report, sizeof(run->report), " <" PRIxREGISTER "> ",
++                (register_t)(long)funcs[i].pc);
 +            if (funcs[i].mapName[0] != '\0') {
 +                util_ssnprintf(run->report, sizeof(run->report), "[%s + 0x%zx]\n", funcs[i].mapName,
 +                    funcs[i].line);
@@ -1166,8 +829,9 @@ $NetBSD$
 +    }
 +}
 +
-+#define __WEVENT(status) ((status & 0xFF0000) >> 16)
 +static void arch_traceEvent(run_t* run, int status, pid_t pid) {
++    
++
 +    LOG_D("PID: %d, Ptrace event: %d", pid, __WEVENT(status));
 +    switch (__WEVENT(status)) {
 +        case PTRACE_EVENT_EXIT: {
@@ -1194,7 +858,7 @@ $NetBSD$
 +            break;
 +    }
 +
-+    ptrace(PTRACE_CONT, pid, 0, 0);
++    ptrace(PT_CONTINUE, pid, (void *)1, 0);
 +}
 +
 +void arch_traceAnalyze(run_t* run, int status, pid_t pid) {
