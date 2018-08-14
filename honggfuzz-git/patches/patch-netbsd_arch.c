@@ -1,8 +1,8 @@
 $NetBSD$
 
---- netbsd/arch.c.orig	2018-08-14 02:32:13.633137087 +0000
+--- netbsd/arch.c.orig	2018-08-14 02:45:14.455013334 +0000
 +++ netbsd/arch.c
-@@ -0,0 +1,355 @@
+@@ -0,0 +1,358 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD)
@@ -206,7 +206,7 @@ $NetBSD$
 +    /* All queued wait events must be tested when SIGCHLD was delivered */
 +    for (;;) {
 +        int status;
-+        pid_t pid = TEMP_FAILURE_RETRY(waitpid(-1, &status, __WALL | WNOHANG));
++        pid_t pid = TEMP_FAILURE_RETRY(waitpid(WAIT_ANY, &status, WALLSIG | WNOHANG));
 +        if (pid == 0) {
 +            return false;
 +        }
@@ -232,13 +232,16 @@ $NetBSD$
 +            }
 +            return true;
 +        }
++
 +        if (ptracePid == childPid) {
 +            arch_traceAnalyze(run, status, pid);
 +            continue;
 +        }
++
 +        if (pid == childPid && (WIFEXITED(status) || WIFSIGNALED(status))) {
 +            return true;
 +        }
++
 +        if (pid == childPid) {
 +            continue;
 +        }

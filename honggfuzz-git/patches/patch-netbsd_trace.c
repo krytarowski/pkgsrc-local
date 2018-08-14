@@ -1,8 +1,8 @@
 $NetBSD$
 
---- netbsd/trace.c.orig	2018-08-14 02:35:37.153576180 +0000
+--- netbsd/trace.c.orig	2018-08-14 02:45:14.460391973 +0000
 +++ netbsd/trace.c
-@@ -0,0 +1,1008 @@
+@@ -0,0 +1,1013 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD/PTRACE)
@@ -989,6 +989,11 @@ $NetBSD$
 +    }
 +
 +    LOG_D("Attached to PID: %d", pid);
++
++    if (ptrace(PT_CONTINUE, pid, (void *)1, 0) == -1) {
++        PLOG_W("Couldn't ptrace(PT_CONTINUE) to pid: %d", pid);
++        return false;
++    }
 +
 +    /* It only makes sense to attach to threads with -p */
 +    if (run->global->netbsd.pid == 0) {

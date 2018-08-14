@@ -1,6 +1,6 @@
 $NetBSD$
 
---- cmdline.c.orig	2018-08-13 23:34:18.801519169 +0000
+--- cmdline.c.orig	2018-08-14 02:45:14.303361443 +0000
 +++ cmdline.c
 @@ -384,6 +384,21 @@ bool cmdlineParse(int argc, char* argv[]
                  .kernelOnly = false,
@@ -24,7 +24,7 @@ $NetBSD$
      };
  
      TAILQ_INIT(&hfuzz->io.dynfileq);
-@@ -452,6 +467,15 @@ bool cmdlineParse(int argc, char* argv[]
+@@ -452,6 +467,14 @@ bool cmdlineParse(int argc, char* argv[]
          { { "linux_ns_pid", no_argument, NULL, 0x0531 }, "Use Linux PID namespace isolation" },
          { { "linux_ns_ipc", no_argument, NULL, 0x0532 }, "Use Linux IPC namespace isolation" },
  #endif // defined(_HF_ARCH_LINUX)
@@ -35,12 +35,11 @@ $NetBSD$
 +        { { "netbsd_pid", required_argument, NULL, 'p' }, "Attach to a pid (and its thread group)" },
 +        { { "netbsd_file_pid", required_argument, NULL, 0x502 }, "Attach to pid (and its thread group) read from file" },
 +        { { "netbsd_addr_low_limit", required_argument, NULL, 0x500 }, "Address limit (from si.si_addr) below which crashes are not reported, (default: 0)" },
-+        { { "netbsd_keep_aslr", no_argument, NULL, 0x501 }, "Don't disable ASLR randomization, might be useful with MSAN" },
 +#endif // defined(_HF_ARCH_NETBSD)
          { { 0, 0, 0, 0 }, NULL },
      };
      // clang-format on
-@@ -671,6 +695,17 @@ bool cmdlineParse(int argc, char* argv[]
+@@ -671,6 +694,17 @@ bool cmdlineParse(int argc, char* argv[]
                  hfuzz->linux.cloneFlags |= (CLONE_NEWUSER | CLONE_NEWIPC);
                  break;
  #endif /* defined(_HF_ARCH_LINUX) */
