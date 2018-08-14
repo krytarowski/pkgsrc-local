@@ -1,8 +1,8 @@
 $NetBSD$
 
---- netbsd/trace.c.orig	2018-08-14 02:32:13.638569294 +0000
+--- netbsd/trace.c.orig	2018-08-14 02:35:37.153576180 +0000
 +++ netbsd/trace.c
-@@ -0,0 +1,1010 @@
+@@ -0,0 +1,1008 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD/PTRACE)
@@ -475,14 +475,14 @@ $NetBSD$
 +            run->origFileName);
 +    } else if (saveUnique) {
 +        snprintf(run->crashFileName, sizeof(run->crashFileName),
-+            "%s/%s.PC.%" REG_PM ".STACK.%" PRIx64 ".CODE.%d.ADDR.%p.INSTR.%s.%s",
-+            run->global->io.crashDir, arch_sigName(si.si_signo), pc, run->backtrace, info.psi_siginfo.si_code,
++            "%s/%s.PC.%" PRIxREGISTER ".STACK.%" PRIx64 ".CODE.%d.ADDR.%p.INSTR.%s.%s",
++            run->global->io.crashDir, arch_sigName(info.psi_siginfo.si_signo), pc, run->backtrace, info.psi_siginfo.si_code,
 +            sig_addr, instr, run->global->io.fileExtn);
 +    } else {
 +        char localtmstr[PATH_MAX];
 +        util_getLocalTime("%F.%H:%M:%S", localtmstr, sizeof(localtmstr), time(NULL));
 +        snprintf(run->crashFileName, sizeof(run->crashFileName),
-+            "%s/%s.PC.%" REG_PM ".STACK.%" PRIx64 ".CODE.%d.ADDR.%p.INSTR.%s.%s.%d.%s",
++            "%s/%s.PC.%" PRIxREGISTER ".STACK.%" PRIx64 ".CODE.%d.ADDR.%p.INSTR.%s.%s.%d.%s",
 +            run->global->io.crashDir, arch_sigName(info.psi_siginfo.si_signo), pc, run->backtrace, info.psi_siginfo.si_code,
 +            sig_addr, instr, localtmstr, pid, run->global->io.fileExtn);
 +    }
@@ -517,7 +517,7 @@ $NetBSD$
 +    /* If unique crash found, reset dynFile counter */
 +    ATOMIC_CLEAR(run->global->cfg.dynFileIterExpire);
 +
-+    arch_traceGenerateReport(pid, run, funcs, funcCnt, &si, instr);
++    arch_traceGenerateReport(pid, run, funcs, funcCnt, &info.psi_siginfo, instr);
 +}
 +
 +/* TODO: Add report parsing support for other sanitizers too */
@@ -579,7 +579,7 @@ $NetBSD$
 +        } else {
 +            char* pLineLC = lineptr;
 +            /* Trim leading spaces */
-+            while (*pLineLC != '\0' && isspace(*pLineLC)) {
++            while (*pLineLC != '\0' && isspace((unsigned char)*pLineLC)) {
 +                ++pLineLC;
 +            }
 +
@@ -780,7 +780,7 @@ $NetBSD$
 +            run->report, sizeof(run->report), "STACK HASH: %016" PRIx64 "\n", run->backtrace);
 +        util_ssnprintf(run->report, sizeof(run->report), "STACK:\n");
 +        for (int i = 0; i < funcCnt; i++) {
-+            util_ssnprintf(run->report, sizeof(run->report), " <" PRIxREGISTER "> ",
++            util_ssnprintf(run->report, sizeof(run->report), " <%" PRIxREGISTER "> ",
 +                (register_t)(long)funcs[i].pc);
 +            if (funcs[i].mapName[0] != '\0') {
 +                util_ssnprintf(run->report, sizeof(run->report), "[%s + 0x%zx]\n", funcs[i].mapName,
@@ -970,8 +970,6 @@ $NetBSD$
 +}
 +
 +bool arch_traceAttach(run_t* run, pid_t pid) {
-+    int status;
-+    pid_t wpid;
 +    ptrace_event_t event;
 +
 +    if (ptrace(PT_ATTACH, pid, NULL, 0) == -1) {
