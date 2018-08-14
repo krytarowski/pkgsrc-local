@@ -1,8 +1,8 @@
 $NetBSD$
 
---- netbsd/arch.c.orig	2018-08-13 23:48:25.047872776 +0000
+--- netbsd/arch.c.orig	2018-08-14 02:27:26.828014376 +0000
 +++ netbsd/arch.c
-@@ -0,0 +1,360 @@
+@@ -0,0 +1,355 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD)
@@ -129,7 +129,7 @@ $NetBSD$
 +    int errno_cpy = errno;
 +    alarm(1);
 +
-+    LOG_E("execve('%s', fd=%d): %s", args[0], run->global->netbsd.exeFd, strerror(errno_cpy));
++    LOG_E("execve('%s'): %s", args[0], strerror(errno_cpy));
 +
 +    return false;
 +}
@@ -301,11 +301,6 @@ $NetBSD$
 +
 +    if (access(hfuzz->exe.cmdline[0], X_OK) == -1) {
 +        PLOG_E("File '%s' doesn't seem to be executable", hfuzz->exe.cmdline[0]);
-+        return false;
-+    }
-+    if ((hfuzz->netbsd.exeFd =
-+                TEMP_FAILURE_RETRY(open(hfuzz->exe.cmdline[0], O_RDONLY | O_CLOEXEC))) == -1) {
-+        PLOG_E("Cannot open the executable binary: %s)", hfuzz->exe.cmdline[0]);
 +        return false;
 +    }
 +
