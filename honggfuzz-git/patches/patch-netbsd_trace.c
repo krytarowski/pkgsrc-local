@@ -918,7 +918,7 @@ $NetBSD$
 +                arch_traceAnalyzeData(run, pid);
 +            }
 +        }
-+        /* Do not deliver SIGSTOP, as we don't support PTRACE_LISTEN anyway */
++        /* Do not deliver SIGSTOP */
 +        int sig = (WSTOPSIG(status) != SIGSTOP) ? WSTOPSIG(status) : 0;
 +        ptrace(PT_CONTINUE, pid, 0, sig);
 +        return;
