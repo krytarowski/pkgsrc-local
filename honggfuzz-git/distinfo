@@ -8,6 +8,7 @@ SHA1 (patch-Makefile) = e52bb719ab0f22a89d94cad1bc4a8ebee9008126
 SHA1 (patch-cmdline.c) = 18c507663f52f098d5bb5cf6acf7c46e67b95162
 SHA1 (patch-fuzz.c) = 14725fc0c539d8549f50ed871f05acb2e49e8ba6
 SHA1 (patch-honggfuzz.h) = 58b896bc38b358eb9dc5755f720132c0f9f531fd
+SHA1 (patch-libhfcommon_log.c) = 982838206d1aa3a08cb35c1acbd8eded2f57b5c1
 SHA1 (patch-netbsd_arch.c) = 1f40ad1b66ec8c775a4481b53e8b906a063e6481
 SHA1 (patch-netbsd_trace.c) = 54b68ebdfe7453d1d7eb7257c76a562b8dddfd53
 SHA1 (patch-netbsd_trace.h) = 5aee8a7c0327bd2239ce288034ae835966c44b42
