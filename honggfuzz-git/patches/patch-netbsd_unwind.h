@@ -2,7 +2,7 @@ $NetBSD$
 
 --- netbsd/unwind.h.orig	2018-08-13 23:48:25.053732334 +0000
 +++ netbsd/unwind.h
-@@ -0,0 +1,58 @@
+@@ -0,0 +1,57 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code
@@ -26,10 +26,10 @@ $NetBSD$
 + *
 + */
 +
-+#ifndef _HF_LINUX_UNWIND_H_
-+#define _HF_LINUX_UNWIND_H_
++#ifndef _HF_NETBSD_UNWIND_H_
++#define _HF_NETBSD_UNWIND_H_
 +
-+#include <linux/limits.h>
++#include <sys/param.h>
 +#include <sys/types.h>
 +
 +/* String buffer size for function names in stack traces produced from libunwind */
@@ -56,7 +56,6 @@ $NetBSD$
 +    size_t line;
 +} funcs_t;
 +
-+extern size_t arch_unwindStack(pid_t pid, funcs_t* funcs);
 +extern char* arch_btContainsSymbol(
 +    size_t symbolsListSz, char** symbolsList, size_t num_frames, funcs_t* funcs);
 +

@@ -2,7 +2,7 @@ $NetBSD$
 
 --- netbsd/trace.c.orig	2018-08-13 23:48:25.050862699 +0000
 +++ netbsd/trace.c
-@@ -0,0 +1,1011 @@
+@@ -0,0 +1,1010 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD/PTRACE)
@@ -57,7 +57,6 @@ $NetBSD$
 +#include "libhfcommon/files.h"
 +#include "libhfcommon/log.h"
 +#include "libhfcommon/util.h"
-+#include "netbsd/bfd.h"
 +#include "netbsd/unwind.h"
 +#include "sancov.h"
 +#include "sanitizers.h"

@@ -26,8 +26,8 @@ $NetBSD$
 + *
 + */
 +
-+#ifndef _HF_LINUX_TRACE_H_
-+#define _HF_LINUX_TRACE_H_
++#ifndef _HF_NETBSD_TRACE_H_
++#define _HF_NETBSD_TRACE_H_
 +
 +#include <inttypes.h>
 +
