@@ -2,7 +2,7 @@ $NetBSD$
 
 --- netbsd/arch.c.orig	2018-08-13 23:48:25.047872776 +0000
 +++ netbsd/arch.c
-@@ -0,0 +1,541 @@
+@@ -0,0 +1,360 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD)
@@ -28,6 +28,15 @@ $NetBSD$
 +
 +#include "arch.h"
 +
++#include <sys/param.h>
++#include <sys/types.h>
++#include <sys/ptrace.h>
++#include <sys/syscall.h>
++#include <sys/time.h>
++#include <sys/types.h>
++#include <sys/utsname.h>
++#include <sys/wait.h>
++
 +#include <ctype.h>
 +#include <dlfcn.h>
 +#include <errno.h>
@@ -39,13 +48,6 @@ $NetBSD$
 +#include <stdio.h>
 +#include <stdlib.h>
 +#include <string.h>
-+#include <sys/cdefs.h>
-+#include <sys/syscall.h>
-+#include <sys/time.h>
-+#include <sys/types.h>
-+#include <sys/user.h>
-+#include <sys/utsname.h>
-+#include <sys/wait.h>
 +#include <time.h>
 +#include <unistd.h>
 +
@@ -60,6 +62,8 @@ $NetBSD$
 +#include "sanitizers.h"
 +#include "subproc.h"
 +
++extern char **environ;
++
 +static inline bool arch_shouldAttach(run_t* run) {
 +    if (run->global->exe.persistent && run->netbsd.attachedPid == run->pid) {
 +        return false;
@@ -73,83 +77,19 @@ $NetBSD$
 +    return true;
 +}
 +
-+static uint8_t arch_clone_stack[128 * 1024];
-+static __thread jmp_buf env;
-+
-+HF_ATTR_NO_SANITIZE_ADDRESS
-+HF_ATTR_NO_SANITIZE_MEMORY
-+static int arch_cloneFunc(void* arg HF_ATTR_UNUSED) {
-+    longjmp(env, 1);
-+    abort();
-+    return 0;
-+}
-+
-+/* Avoid problem with caching of PID/TID in glibc */
-+static pid_t arch_clone(uintptr_t flags) {
-+    if (flags & CLONE_VM) {
-+        LOG_E("Cannot use clone(flags & CLONE_VM)");
-+        return -1;
-+    }
-+
-+    if (setjmp(env) == 0) {
-+        void* stack_mid = &arch_clone_stack[sizeof(arch_clone_stack) / 2];
-+        /* Parent */
-+        return clone(arch_cloneFunc, stack_mid, flags, NULL, NULL, NULL);
-+    }
-+    /* Child */
-+    return 0;
-+}
-+
-+pid_t arch_fork(run_t* run) {
-+    pid_t pid = run->global->netbsd.useClone ? arch_clone(CLONE_UNTRACED | SIGCHLD) : fork();
++pid_t arch_fork(run_t* run HF_ATTR_UNUSED) {
++    pid_t pid = fork();
 +    if (pid == -1) {
 +        return pid;
 +    }
 +    if (pid == 0) {
 +        logMutexReset();
-+        if (prctl(PR_SET_PDEATHSIG, (unsigned long)SIGKILL, 0UL, 0UL, 0UL) == -1) {
-+            PLOG_W("prctl(PR_SET_PDEATHSIG, SIGKILL)");
-+        }
 +        return pid;
 +    }
 +    return pid;
 +}
 +
 +bool arch_launchChild(run_t* run) {
-+    if ((run->global->netbsd.cloneFlags & CLONE_NEWNET) && (nsIfaceUp("lo") == false)) {
-+        LOG_W("Cannot bring interface 'lo' up");
-+    }
-+
-+    /*
-+     * Make it attach-able by ptrace()
-+     */
-+    if (prctl(PR_SET_DUMPABLE, 1UL, 0UL, 0UL, 0UL) == -1) {
-+        PLOG_E("prctl(PR_SET_DUMPABLE, 1)");
-+        return false;
-+    }
-+
-+    /*
-+     * Kill a process which corrupts its own heap (with ABRT)
-+     */
-+    if (setenv("MALLOC_CHECK_", "7", 0) == -1) {
-+        PLOG_E("setenv(MALLOC_CHECK_=7) failed");
-+        return false;
-+    }
-+    if (setenv("MALLOC_PERTURB_", "85", 0) == -1) {
-+        PLOG_E("setenv(MALLOC_PERTURB_=85) failed");
-+        return false;
-+    }
-+
-+    /*
-+     * Disable ASLR:
-+     * This might fail in Docker, as Docker blocks __NR_personality. Consequently
-+     * it's just a debug warning
-+     */
-+    if (run->global->netbsd.disableRandomization &&
-+        syscall(__NR_personality, ADDR_NO_RANDOMIZE) == -1) {
-+        PLOG_D("personality(ADDR_NO_RANDOMIZE) failed");
-+    }
-+
 +#define ARGS_MAX 512
 +    const char* args[ARGS_MAX + 2];
 +    char argData[PATH_MAX];
@@ -181,12 +121,10 @@ $NetBSD$
 +    alarm(0);
 +
 +    /* Wait for the ptrace to attach now */
-+    if (kill(syscall(__NR_getpid), SIGSTOP) == -1) {
++    if (raise(SIGSTOP) == -1) {
 +        LOG_F("Couldn't stop itself");
 +    }
-+#if defined(__NR_execveat)
-+    syscall(__NR_execveat, run->global->netbsd.exeFd, "", args, environ, AT_EMPTY_PATH);
-+#endif /* defined__NR_execveat) */
++
 +    execve(args[0], (char* const*)args, environ);
 +    int errno_cpy = errno;
 +    alarm(1);
@@ -199,16 +137,6 @@ $NetBSD$
 +void arch_prepareParentAfterFork(run_t* run) {
 +    /* Parent */
 +    if (run->global->exe.persistent) {
-+        const struct f_owner_ex fown = {
-+            .type = F_OWNER_TID,
-+            .pid = syscall(__NR_gettid),
-+        };
-+        if (fcntl(run->persistentSock, F_SETOWN_EX, &fown)) {
-+            PLOG_F("fcntl(%d, F_SETOWN_EX)", run->persistentSock);
-+        }
-+        if (fcntl(run->persistentSock, F_SETSIG, SIGIO) == -1) {
-+            PLOG_F("fcntl(%d, F_SETSIG, SIGIO)", run->persistentSock);
-+        }
 +        if (fcntl(run->persistentSock, F_SETFL, O_ASYNC) == -1) {
 +            PLOG_F("fcntl(%d, F_SETFL, O_ASYNC)", run->persistentSock);
 +        }
@@ -223,12 +151,7 @@ $NetBSD$
 +    if (!arch_traceAttach(run, pid)) {
 +        LOG_W("arch_traceAttach(pid=%d) failed", pid);
 +        kill(pid, SIGKILL);
-+        return false;
-+    }
-+
-+    arch_perfClose(run);
-+    if (arch_perfOpen(pid, run) == false) {
-+        kill(pid, SIGKILL);
++	/* TODO: missing wait(2)? */
 +        return false;
 +    }
 +
@@ -266,9 +189,6 @@ $NetBSD$
 +        }
 +    }
 +
-+    if (arch_perfEnable(run) == false) {
-+        LOG_E("Couldn't enable perf counters for pid %d", ptracePid);
-+    }
 +    if (childPid != ptracePid) {
 +        if (arch_traceWaitForPidStop(childPid) == false) {
 +            LOG_F("PID: %d not in a stopped state", childPid);
@@ -286,7 +206,7 @@ $NetBSD$
 +    /* All queued wait events must be tested when SIGCHLD was delivered */
 +    for (;;) {
 +        int status;
-+        pid_t pid = TEMP_FAILURE_RETRY(waitpid(-1, &status, __WALL | __WNOTHREAD | WNOHANG));
++        pid_t pid = TEMP_FAILURE_RETRY(waitpid(-1, &status, __WALL | WNOHANG));
 +        if (pid == 0) {
 +            return false;
 +        }
@@ -372,7 +292,6 @@ $NetBSD$
 +        }
 +    }
 +
-+    arch_perfAnalyze(run);
 +    sancov_Analyze(run);
 +}
 +
@@ -398,101 +317,6 @@ $NetBSD$
 +    sigemptyset(&hfuzz->netbsd.waitSigSet);
 +    sigaddset(&hfuzz->netbsd.waitSigSet, SIGIO);
 +    sigaddset(&hfuzz->netbsd.waitSigSet, SIGCHLD);
-+
-+    for (;;) {
-+        __attribute__((weak)) const char* gnu_get_libc_version(void);
-+        if (!gnu_get_libc_version) {
-+            LOG_W("Unknown libc implementation. Using clone() instead of fork()");
-+            break;
-+        }
-+        const char* gversion = gnu_get_libc_version();
-+        int major, minor;
-+        if (sscanf(gversion, "%d.%d", &major, &minor) != 2) {
-+            LOG_W("Unknown glibc version:'%s'. Using clone() instead of fork()", gversion);
-+            break;
-+        }
-+        if ((major < 2) || (major == 2 && minor < 23)) {
-+            LOG_W(
-+                "Your glibc version:'%s' will most likely result in malloc()-related "
-+                "deadlocks. Min. version 2.24 (Or, Ubuntu's 2.23-0ubuntu6) suggested. "
-+                "See https://sourceware.org/bugzilla/show_bug.cgi?id=19431 for explanation. "
-+                "Using clone() instead of fork()",
-+                gversion);
-+            break;
-+        }
-+        LOG_D("Glibc version:'%s', OK", gversion);
-+        hfuzz->netbsd.useClone = false;
-+        break;
-+    }
-+
-+    if (hfuzz->feedback.dynFileMethod != _HF_DYNFILE_NONE) {
-+        unsigned long major = 0, minor = 0;
-+        char* p = NULL;
-+
-+        /*
-+         * Check that netbsd kernel is compatible
-+         *
-+         * Compatibility list:
-+         *  1) Perf exclude_callchain_kernel requires kernel >= 3.7
-+         *     TODO: Runtime logic to disable it for unsupported kernels
-+         *           if it doesn't affect perf counters processing
-+         *  2) If 'PERF_TYPE_HARDWARE' is not supported by kernel, ENOENT
-+         *     is returned from perf_event_open(). Unfortunately, no reliable
-+         *     way to detect it here. libperf exports some list functions,
-+         *     although small guarantees it's installed. Maybe a more targeted
-+         *     message at perf_event_open() error handling will help.
-+         *  3) Intel's PT and new Intel BTS format require kernel >= 4.1
-+         */
-+        unsigned long checkMajor = 3, checkMinor = 7;
-+        if ((hfuzz->feedback.dynFileMethod & _HF_DYNFILE_BTS_EDGE) ||
-+            (hfuzz->feedback.dynFileMethod & _HF_DYNFILE_IPT_BLOCK)) {
-+            checkMajor = 4;
-+            checkMinor = 1;
-+        }
-+
-+        struct utsname uts;
-+        if (uname(&uts) == -1) {
-+            PLOG_F("uname() failed");
-+            return false;
-+        }
-+
-+        p = uts.release;
-+        major = strtoul(p, &p, 10);
-+        if (*p++ != '.') {
-+            LOG_F("Unsupported kernel version (%s)", uts.release);
-+            return false;
-+        }
-+
-+        minor = strtoul(p, &p, 10);
-+        if ((major < checkMajor) || ((major == checkMajor) && (minor < checkMinor))) {
-+            LOG_E("Kernel version '%s' not supporting chosen perf method", uts.release);
-+            return false;
-+        }
-+
-+        if (arch_perfInit(hfuzz) == false) {
-+            return false;
-+        }
-+    }
-+#if defined(__ANDROID__) && defined(__arm__) && defined(OPENSSL_ARMCAP_ABI)
-+    /*
-+     * For ARM kernels running Android API <= 21, if fuzzing target links to
-+     * libcrypto (OpenSSL), OPENSSL_cpuid_setup initialization is triggering a
-+     * SIGILL/ILLOPC at armv7_tick() due to  "mrrc p15, #1, r0, r1, c14)" instruction.
-+     * Setups using BoringSSL (API >= 22) are not affected.
-+     */
-+    if (setenv("OPENSSL_armcap", OPENSSL_ARMCAP_ABI, 1) == -1) {
-+        PLOG_E("setenv(OPENSSL_armcap) failed");
-+        return false;
-+    }
-+#endif
-+
-+    /* If read PID from file enable - read current value */
-+    if (hfuzz->netbsd.pidFile) {
-+        if (files_readPidFromFile(hfuzz->netbsd.pidFile, &hfuzz->netbsd.pid) == false) {
-+            LOG_E("Failed to read PID from file");
-+            return false;
-+        }
-+    }
 +
 +    /* If remote pid, resolve command using procfs */
 +    if (hfuzz->netbsd.pid > 0) {
@@ -525,11 +349,6 @@ $NetBSD$
 +     */
 +    if (hfuzz->sanitizer.enable && hfuzz->cfg.monitorSIGABRT) {
 +        hfuzz->netbsd.numMajorFrames = 14;
-+    }
-+
-+    if (hfuzz->netbsd.cloneFlags && unshare(hfuzz->netbsd.cloneFlags) == -1) {
-+        LOG_E("unshare(%tx)", hfuzz->netbsd.cloneFlags);
-+        return false;
 +    }
 +
 +    return true;
