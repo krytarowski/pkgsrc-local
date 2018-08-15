@@ -1,8 +1,8 @@
 $NetBSD$
 
---- netbsd/arch.c.orig	2018-08-14 02:45:14.455013334 +0000
+--- netbsd/arch.c.orig	2018-08-15 02:38:07.053806110 +0000
 +++ netbsd/arch.c
-@@ -0,0 +1,358 @@
+@@ -0,0 +1,362 @@
 +/*
 + *
 + * honggfuzz - architecture dependent code (NETBSD)
@@ -50,6 +50,7 @@ $NetBSD$
 +#include <string.h>
 +#include <time.h>
 +#include <unistd.h>
++#include <poll.h>
 +
 +#include "fuzz.h"
 +#include "libhfcommon/common.h"
@@ -252,18 +253,21 @@ $NetBSD$
 +
 +void arch_reapChild(run_t* run) {
 +    for (;;) {
-+        static const struct timespec ts = {
-+            .tv_sec = 0L,
-+            .tv_nsec = 250000000L,
-+        };
-+        int sig = sigtimedwait(&run->global->netbsd.waitSigSet, NULL, &ts);
-+        if (sig == -1 && (errno != EAGAIN && errno != EINTR)) {
-+            PLOG_F("sigtimedwait(SIGIO|SIGCHLD, 0.25s)");
++        if (run->global->exe.persistent) {
++            struct pollfd pfd = {
++                .fd = run->persistentSock,
++                .events = POLLIN,
++            };
++            int r = poll(&pfd, 1, 250 /* 0.25s */);
++            if (r == 0 || (r == -1 && errno == EINTR)) {
++                subproc_checkTimeLimit(run);
++                subproc_checkTermination(run);
++            }
++            if (r == -1 && errno != EINTR) {
++                PLOG_F("poll(fd=%d)", run->persistentSock);
++            }
 +        }
-+        if (sig == -1) {
-+            subproc_checkTimeLimit(run);
-+            subproc_checkTermination(run);
-+        }
++
 +        if (subproc_persistentModeRoundDone(run)) {
 +            break;
 +        }
