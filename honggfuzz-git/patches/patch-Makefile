@@ -2,6 +2,15 @@ $NetBSD$
 
 --- Makefile.orig	2018-08-08 23:14:16.000000000 +0000
 +++ Makefile
+@@ -50,7 +50,7 @@ ifeq ($(OS)$(findstring Microsoft,$(KERN
+                    -funroll-loops \
+                    -D_FILE_OFFSET_BITS=64
+     ARCH_LDFLAGS := -L/usr/local/include \
+-                    -lpthread -lunwind-ptrace -lunwind-generic -lbfd -lopcodes -lrt -ldl
++                    -pthread -lunwind-ptrace -lunwind-generic -lbfd -lopcodes -lrt -ldl
+     ARCH_SRCS := $(sort $(wildcard linux/*.c))
+     LIBS_CFLAGS += -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0
+ 
 @@ -137,6 +137,17 @@ else ifeq ($(OS),Darwin)
      endif
      ARCH_SRCS := $(sort $(wildcard mac/*.c))
