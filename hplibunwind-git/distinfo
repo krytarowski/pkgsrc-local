@@ -19,5 +19,6 @@ SHA1 (patch-src_x86_Gos-netbsd.c) = 90e0113706b26bb43b6839aaf75cfb6f21e0af2b
 SHA1 (patch-src_x86_Los-netbsd.c) = 8f41769bea723bb988b3c1b8d933e7d044cdacb6
 SHA1 (patch-src_x86__64_Gos-netbsd.c) = ec4c0c4b4c28915a1d7d1ab5a687f9ee2a05dda3
 SHA1 (patch-src_x86__64_Los-netbsd.c) = 7c2d292a91b726b2aa93b719138f918fa48a0039
-SHA1 (patch-src_x86__64_setcontext.S) = df5250e6ce0f38cd7b7c017e52e74dce71053645
+SHA1 (patch-src_x86__64_setcontext.S) = 29ef5a8183fe6b650f74d3f87aba8d80a403c92f
+SHA1 (patch-src_x86__64_ucontext__i.h) = 328c36a4d0149f8ce204c77d1efe6df2e6555a0e
 SHA1 (patch-src_x86_getcontext-netbsd.S) = 8e1b8a561e87cde1fa088a8070c604ee3536f00e

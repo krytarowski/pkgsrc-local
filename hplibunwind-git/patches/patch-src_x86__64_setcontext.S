@@ -10,3 +10,12 @@ $NetBSD$
  
  This file is part of libunwind.
  
+@@ -50,6 +51,8 @@ _Ux86_64_setcontext:
+ 	jne 1f
+ 	fxrstor UC_MCONTEXT_FPSTATE(%rdi)
+ 1:
++#elif defined __NetBSD__
++	fxrstor UC_MCONTEXT_FPREGS(%rdi)
+ #else
+ #error Port me
+ #endif
