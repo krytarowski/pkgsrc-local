@@ -47,6 +47,6 @@ $NetBSD$
 +#define UC_FLAGS_STACK           0x2
 +#define UC_FLAGS_CPU             0x4
 +#define UC_FLAGS_FPU             0x8
-+#define UC_FLAGS_TLSBASE         0x80000O
++#define UC_FLAGS_TLSBASE         0x80000
  
  #endif
