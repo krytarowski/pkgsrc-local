@@ -1,6 +1,6 @@
 # $NetBSD: Makefile.common,v 1.7 2015/07/20 05:49:53 adam Exp $
 
-PKGNAME=	nongnu-libunwind-1.1.0
+PKGNAME=	hplibunwind-1.1.0
 CATEGORIES=	lang devel
 
 GIT_REPOSITORIES=	libunwind
