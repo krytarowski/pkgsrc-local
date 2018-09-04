@@ -10,17 +10,16 @@ $NetBSD$
  
  This file is part of libunwind.
  
-@@ -86,6 +87,9 @@ _Ux86_64_getcontext:
+@@ -86,6 +87,8 @@ _Ux86_64_getcontext:
  	movw %gs, UC_MCONTEXT_GS(%rdi)
  #endif
  	movq $UC_MCONTEXT_MC_LEN_VAL, UC_MCONTEXT_MC_LEN(%rdi)
 +#elif defined __NetBSD__
 +	fxsave UC_MCONTEXT_FPREGS(%rdi)
-+	movl $8000f, UC_FLAGS(%rdi)
  #else
  #error Port me
  #endif
-@@ -130,5 +134,7 @@ _Ux86_64_getcontext_trace:
+@@ -130,5 +133,7 @@ _Ux86_64_getcontext_trace:
  	.cfi_endproc
  	.size _Ux86_64_getcontext_trace, . - _Ux86_64_getcontext_trace
  

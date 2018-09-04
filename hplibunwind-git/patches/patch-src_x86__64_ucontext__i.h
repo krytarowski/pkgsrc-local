@@ -9,7 +9,7 @@ $NetBSD$
  
  This file is part of libunwind.
  
-@@ -78,5 +79,36 @@ WITH THE SOFTWARE OR THE USE OR OTHER DE
+@@ -78,5 +79,40 @@ WITH THE SOFTWARE OR THE USE OR OTHER DE
  #define UC_MCONTEXT_FPOWNED_FPU 0x20001
  #define UC_MCONTEXT_FPFMT_XMM   0x10002
  #define UC_MCONTEXT_MC_LEN_VAL  0x320
@@ -41,8 +41,12 @@ $NetBSD$
 +#define UC_MCONTEXT_GREGS_RFLAGS 0xf0
 +#define UC_MCONTEXT_GREGS_RSP    0xf8
 +#define UC_MCONTEXT_GREGS_SS     0x100
-+#define UC_MCONTEXT_FPREGS       0x110 /* FXSAVE */
++#define UC_MCONTEXT_FPREGS       0x110 /* FXSAVE layout */
 +#define UC_MCONTEXT_MC_TLSBASE   0x108
-+#define UC_FLAGS_AMD64           0x8000f /* SIGMASK|STACK|CPU|FPU|TLSBASE */
++#define UC_FLAGS_SIGMASK         0x1
++#define UC_FLAGS_STACK           0x2
++#define UC_FLAGS_CPU             0x4
++#define UC_FLAGS_FPU             0x8
++#define UC_FLAGS_TLSBASE         0x80000O
  
  #endif
