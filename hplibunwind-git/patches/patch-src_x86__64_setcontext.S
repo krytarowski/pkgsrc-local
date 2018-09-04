@@ -19,3 +19,11 @@ $NetBSD$
  #else
  #error Port me
  #endif
+@@ -79,5 +82,7 @@ _Ux86_64_setcontext:
+ 
+ 	.size _Ux86_64_setcontext, . - _Ux86_64_setcontext
+ 
++#ifndef __NetBSD__
+       /* We do not need executable stack.  */
+       .section        .note.GNU-stack,"",@progbits
++#endif
