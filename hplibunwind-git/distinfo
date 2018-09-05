@@ -13,6 +13,7 @@ SHA1 (llvm-3.6.2.src.tar.xz) = 7a00257eb2bc9431e4c77c3a36b033072c54bc7e
 RMD160 (llvm-3.6.2.src.tar.xz) = 521cbc5fe2925ea3c6e90c7a31f752a04045c972
 Size (llvm-3.6.2.src.tar.xz) = 12802380 bytes
 SHA1 (patch-configure.ac) = b989360cb443b8ce31499e84ea6f84192b9fc305
+SHA1 (patch-include_tdep-x86__64_jmpbuf.h) = a2c8f1894c3476e6efb4e3f47145a235a31d2e83
 SHA1 (patch-include_tdep-x86__64_libunwind__i.h) = cc36cb94e9b807794c041096fd8eadfd4cb45da5
 SHA1 (patch-src_Makefile.am) = 663e12ea40e58058a2e0473c5ef5f6b8ed1e6881
 SHA1 (patch-src_coredump___UCD__create.c) = 154b87069833adb922f4d1353ac62e2ebac8879e
