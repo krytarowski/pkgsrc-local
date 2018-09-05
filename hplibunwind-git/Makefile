@@ -20,6 +20,8 @@ USE_TOOLS+=	autoreconf autoconf automake
 USE_LIBTOOL=	yes
 USE_LANGUAGES=	c c++
 
+CONFIGURE_ARGS+=	--disable-coredump
+
 pre-configure:
 	${RUN} cd ${WRKSRC} && pwd && ./autogen.sh
 
