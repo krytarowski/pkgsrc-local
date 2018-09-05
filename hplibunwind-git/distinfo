@@ -21,6 +21,7 @@ SHA1 (patch-src_os-netbsd.c) = 65bf98a33289a21a6af012a62631faf9ceff568a
 SHA1 (patch-src_ptrace___UPT__access__fpreg.c) = be943875cdc5049e6ff2bb59beda63ce9be1379b
 SHA1 (patch-src_ptrace___UPT__access__reg.c) = 0341a6a879905852814ee233452e305840af1c6b
 SHA1 (patch-src_ptrace___UPT__reg__offset.c) = d8ba12ce138cba7f7dd909291c0a64411755a36f
+SHA1 (patch-src_setjmp_siglongjmp.c) = 03e2b4328662d44bed16c58916a772b26b5c6577
 SHA1 (patch-src_x86_Gos-netbsd.c) = c9310e02439b731e6d5ecec7d84875abe4cdc6b1
 SHA1 (patch-src_x86_Los-netbsd.c) = 3a1a888bde4c416ddc355cb6b5e776401561ee0a
 SHA1 (patch-src_x86__64_Gos-netbsd.c) = ff6e1f76f50a988f5be288047d27095cf322c16c
