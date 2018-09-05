@@ -67,7 +67,7 @@ $NetBSD$
 +  mib[1] = VM_PROC;
 +  mib[2] = VM_PROC_MAP;
 +  mib[3] = pid;
-+  mib[4] = sizeof(struct kinfo_vmentry)
++  mib[4] = sizeof(struct kinfo_vmentry);
 +
 +  error = sysctl(mib, 4, NULL, &len, NULL, 0);
 +  if (error == -1)
