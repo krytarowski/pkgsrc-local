@@ -8,7 +8,7 @@ $NetBSD$
  #undef UNW_R_OFF
 +#elif defined __NetBSD__
 +#define UNW_R_OFF(R, r) \
-+    [UNW_X86_64_##R]    = offsetof(__gregset_t, _REG_##R),
++    [UNW_X86_64_##R]    = _REG_##R * 8,
 +    UNW_R_OFF(RAX, rax)
 +    UNW_R_OFF(RDX, rdx)
 +    UNW_R_OFF(RCX, rcx)
