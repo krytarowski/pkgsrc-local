@@ -2,9 +2,12 @@ $NetBSD$
 
 --- src/x86_64/Gos-netbsd.c.orig	2018-09-05 10:31:53.514510455 +0000
 +++ src/x86_64/Gos-netbsd.c
-@@ -0,0 +1,218 @@
+@@ -0,0 +1,158 @@
 +/* libunwind - a platform-independent unwind library
-+   Copyright (C) 2010 Kamil Rytarowski <n54@gmx.com>
++   Copyright (C) 2002-2003 Hewlett-Packard Co
++        Contributed by David Mosberger-Tang <davidm@hpl.hp.com>
++
++   Modified for x86_64 by Max Asbock <masbock@us.ibm.com>
 +
 +This file is part of libunwind.
 +
@@ -27,134 +30,78 @@ $NetBSD$
 +OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 +WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
 +
-+#ifdef HAVE_CONFIG_H
-+#include "config.h"
-+#endif
-+
-+#include <sys/ucontext.h>
-+#include <machine/sigframe.h>
-+#include <signal.h>
-+#include <stddef.h>
 +#include "unwind_i.h"
 +#include "ucontext_i.h"
++
++#include <sys/syscall.h>
++
++HIDDEN void
++tdep_fetch_frame (struct dwarf_cursor *dw, unw_word_t ip, int need_unwind_info)
++{
++  struct cursor *c = (struct cursor *) dw;
++  assert(! need_unwind_info || dw->pi_valid);
++  assert(! need_unwind_info || dw->pi.unwind_info);
++  if (dw->pi_valid
++      && dw->pi.unwind_info
++      && ((struct dwarf_cie_info *) dw->pi.unwind_info)->signal_frame)
++    c->sigcontext_format = X86_64_SCF_LINUX_RT_SIGFRAME;
++  else
++    c->sigcontext_format = X86_64_SCF_NONE;
++
++  Debug(5, "fetch frame ip=0x%lx cfa=0x%lx format=%d\n",
++        dw->ip, dw->cfa, c->sigcontext_format);
++}
++
++HIDDEN int
++tdep_cache_frame (struct dwarf_cursor *dw)
++{
++  struct cursor *c = (struct cursor *) dw;
++
++  Debug(5, "cache frame ip=0x%lx cfa=0x%lx format=%d\n",
++        dw->ip, dw->cfa, c->sigcontext_format);
++  return c->sigcontext_format;
++}
++
++HIDDEN void
++tdep_reuse_frame (struct dwarf_cursor *dw, int frame)
++{
++  struct cursor *c = (struct cursor *) dw;
++  c->sigcontext_format = frame;
++  if (c->sigcontext_format == X86_64_SCF_LINUX_RT_SIGFRAME)
++  {
++    c->frame_info.frame_type = UNW_X86_64_FRAME_SIGRETURN;
++    /* Offset from cfa to ucontext_t in signal frame.  */
++    c->frame_info.cfa_reg_offset = 0;
++    c->sigcontext_addr = dw->cfa;
++  }
++
++  Debug(5, "reuse frame ip=0x%lx cfa=0x%lx format=%d addr=0x%lx offset=%+d\n",
++        dw->ip, dw->cfa, c->sigcontext_format, c->sigcontext_addr,
++        (c->sigcontext_format == X86_64_SCF_LINUX_RT_SIGFRAME
++         ? c->frame_info.cfa_reg_offset : 0));
++}
 +
 +int
 +unw_is_signal_frame (unw_cursor_t *cursor)
 +{
-+  /* XXXKIB */
 +  struct cursor *c = (struct cursor *) cursor;
-+  unw_word_t w0, w1, w2, b0, ip;
-+  unw_addr_space_t as;
-+  unw_accessors_t *a;
-+  void *arg;
-+  int ret;
-+
-+  as = c->dwarf.as;
-+  a = unw_get_accessors_int (as);
-+  arg = c->dwarf.as_arg;
-+
-+  /* Check if RIP points at sigreturn sequence.
-+48 8d 7c 24 10          lea     SIGF_UC(%rsp),%rdi
-+6a 00                   pushq   $0
-+48 c7 c0 a1 01 00 00    movq    $SYS_sigreturn,%rax
-+0f 05                   syscall
-+f4              0:      hlt
-+eb fd                   jmp     0b
-+  */
-+
-+  ip = c->dwarf.ip;
-+  c->sigcontext_format = X86_64_SCF_NONE;
-+  if ((ret = (*a->access_mem) (as, ip, &w0, 0, arg)) < 0
-+      || (ret = (*a->access_mem) (as, ip + 8, &w1, 0, arg)) < 0
-+      || (ret = (*a->access_mem) (as, ip + 16, &w2, 0, arg)) < 0)
-+    return 0;
-+  w2 &= 0xffffff;
-+  if (w0 == 0x48006a10247c8d48 &&
-+      w1 == 0x050f000001a1c0c7 &&
-+      w2 == 0x0000000000fdebf4)
-+   {
-+     c->sigcontext_format = X86_64_SCF_FREEBSD_SIGFRAME;
-+     return (c->sigcontext_format);
-+   }
-+  /* Check if RIP points at standard syscall sequence.
-+49 89 ca        mov    %rcx,%r10
-+0f 05           syscall
-+  */
-+  if ((ret = (*a->access_mem) (as, ip - 5, &b0, 0, arg)) < 0)
-+    return (0);
-+  Debug (12, "b0 0x%lx\n", b0);
-+  if ((b0 & 0xffffffffffffff) == 0x050fca89490000 ||
-+      (b0 & 0xffffffffff) == 0x050fca8949)
-+   {
-+    c->sigcontext_format = X86_64_SCF_FREEBSD_SYSCALL;
-+    return (c->sigcontext_format);
-+   }
-+  return (X86_64_SCF_NONE);
++  return c->sigcontext_format != X86_64_SCF_NONE;
 +}
 +
 +HIDDEN int
 +x86_64_handle_signal_frame (unw_cursor_t *cursor)
 +{
++#if UNW_DEBUG /* To silence compiler warnings */
++  /* Should not get here because we now use kernel-provided dwarf
++     information for the signal trampoline and dwarf_step() works.
++     Hence unw_step() should never call this function. Maybe
++     restore old non-dwarf signal handling here, but then the
++     gating on unw_is_signal_frame() needs to be removed. */
 +  struct cursor *c = (struct cursor *) cursor;
-+  unw_word_t ucontext;
-+  int ret;
-+
-+  if (c->sigcontext_format == X86_64_SCF_FREEBSD_SIGFRAME)
-+   {
-+    ucontext = c->dwarf.cfa + offsetof(struct sigframe, sf_uc);
-+    c->sigcontext_addr = c->dwarf.cfa;
-+    Debug(1, "signal frame, skip over trampoline\n");
-+
-+    struct dwarf_loc rsp_loc = DWARF_LOC (ucontext + UC_MCONTEXT_GREGS_RSP, 0);
-+    ret = dwarf_get (&c->dwarf, rsp_loc, &c->dwarf.cfa);
-+    if (ret < 0)
-+     {
-+       Debug (2, "returning %d\n", ret);
-+       return ret;
-+     }
-+
-+    c->dwarf.loc[RAX] = DWARF_LOC (ucontext + UC_MCONTEXT_GREGS_RAX, 0);
-+    c->dwarf.loc[RDX] = DWARF_LOC (ucontext + UC_MCONTEXT_GREGS_RDX, 0);
-+    c->dwarf.loc[RCX] = DWARF_LOC (ucontext + UC_MCONTEXT_GREGS_RCX, 0);
-+    c->dwarf.loc[RBX] = DWARF_LOC (ucontext + UC_MCONTEXT_GREGS_RBX, 0);
-+    c->dwarf.loc[RSI] = DWARF_LOC (ucontext + UC_MCONTEXT_GREGS_RSI, 0);
-+    c->dwarf.loc[RDI] = DWARF_LOC (ucontext + UC_MCONTEXT_GREGS_RDI, 0);
-+    c->dwarf.loc[RBP] = DWARF_LOC (ucontext + UC_MCONTEXT_GREGS_RBP, 0);
-+    c->dwarf.loc[RSP] = DWARF_LOC (ucontext + UC_MCONTEXT_GREGS_RSP, 0);
-+    c->dwarf.loc[ R8] = DWARF_LOC (ucontext + UC_MCONTEXT_GREGS_R8, 0);
-+    c->dwarf.loc[ R9] = DWARF_LOC (ucontext + UC_MCONTEXT_GREGS_R9, 0);
-+    c->dwarf.loc[R10] = DWARF_LOC (ucontext + UC_MCONTEXT_GREGS_R10, 0);
-+    c->dwarf.loc[R11] = DWARF_LOC (ucontext + UC_MCONTEXT_GREGS_R11, 0);
-+    c->dwarf.loc[R12] = DWARF_LOC (ucontext + UC_MCONTEXT_GREGS_R12, 0);
-+    c->dwarf.loc[R13] = DWARF_LOC (ucontext + UC_MCONTEXT_GREGS_R13, 0);
-+    c->dwarf.loc[R14] = DWARF_LOC (ucontext + UC_MCONTEXT_GREGS_R14, 0);
-+    c->dwarf.loc[R15] = DWARF_LOC (ucontext + UC_MCONTEXT_GREGS_R15, 0);
-+    c->dwarf.loc[RIP] = DWARF_LOC (ucontext + UC_MCONTEXT_GREGS_RIP, 0);
-+
-+    return 0;
-+   }
-+  else if (c->sigcontext_format == X86_64_SCF_FREEBSD_SYSCALL)
-+   {
-+    c->dwarf.loc[RCX] = c->dwarf.loc[R10];
-+    /*  rsp_loc = DWARF_LOC(c->dwarf.cfa - 8, 0);       */
-+    /*  rbp_loc = c->dwarf.loc[RBP];                    */
-+    c->dwarf.loc[RIP] = DWARF_LOC (c->dwarf.cfa, 0);
-+    ret = dwarf_get (&c->dwarf, c->dwarf.loc[RIP], &c->dwarf.ip);
-+    Debug (1, "Frame Chain [RIP=0x%Lx] = 0x%Lx\n",
-+           (unsigned long long) DWARF_GET_LOC (c->dwarf.loc[RIP]),
-+           (unsigned long long) c->dwarf.ip);
-+    if (ret < 0)
-+     {
-+       Debug (2, "returning %d\n", ret);
-+       return ret;
-+     }
-+    c->dwarf.cfa += 8;
-+    c->dwarf.use_prev_instr = 1;
-+    return 1;
-+   }
-+  else
-+    return -UNW_EBADFRAME;
-+
++  Debug(1, "old format signal frame? format=%d addr=0x%lx cfa=0x%lx\n",
++        c->sigcontext_format, c->sigcontext_addr, c->dwarf.cfa);
++#endif
++  return -UNW_EBADFRAME;
 +}
 +
 +#ifndef UNW_REMOTE_ONLY
@@ -166,23 +113,23 @@ $NetBSD$
 +
 +  switch (reg)
 +    {
-+    case UNW_X86_64_R8: addr = &uc->uc_mcontext.mc_r8; break;
-+    case UNW_X86_64_R9: addr = &uc->uc_mcontext.mc_r9; break;
-+    case UNW_X86_64_R10: addr = &uc->uc_mcontext.mc_r10; break;
-+    case UNW_X86_64_R11: addr = &uc->uc_mcontext.mc_r11; break;
-+    case UNW_X86_64_R12: addr = &uc->uc_mcontext.mc_r12; break;
-+    case UNW_X86_64_R13: addr = &uc->uc_mcontext.mc_r13; break;
-+    case UNW_X86_64_R14: addr = &uc->uc_mcontext.mc_r14; break;
-+    case UNW_X86_64_R15: addr = &uc->uc_mcontext.mc_r15; break;
-+    case UNW_X86_64_RDI: addr = &uc->uc_mcontext.mc_rdi; break;
-+    case UNW_X86_64_RSI: addr = &uc->uc_mcontext.mc_rsi; break;
-+    case UNW_X86_64_RBP: addr = &uc->uc_mcontext.mc_rbp; break;
-+    case UNW_X86_64_RBX: addr = &uc->uc_mcontext.mc_rbx; break;
-+    case UNW_X86_64_RDX: addr = &uc->uc_mcontext.mc_rdx; break;
-+    case UNW_X86_64_RAX: addr = &uc->uc_mcontext.mc_rax; break;
-+    case UNW_X86_64_RCX: addr = &uc->uc_mcontext.mc_rcx; break;
-+    case UNW_X86_64_RSP: addr = &uc->uc_mcontext.mc_rsp; break;
-+    case UNW_X86_64_RIP: addr = &uc->uc_mcontext.mc_rip; break;
++    case UNW_X86_64_R8: addr = &uc->uc_mcontext.__gregs[_REG_R8]; break;
++    case UNW_X86_64_R9: addr = &uc->uc_mcontext.__gregs[_REG_R9]; break;
++    case UNW_X86_64_R10: addr = &uc->uc_mcontext.__gregs[_REG_R10]; break;
++    case UNW_X86_64_R11: addr = &uc->uc_mcontext.__gregs[_REG_R11]; break;
++    case UNW_X86_64_R12: addr = &uc->uc_mcontext.__gregs[_REG_R12]; break;
++    case UNW_X86_64_R13: addr = &uc->uc_mcontext.__gregs[_REG_R13]; break;
++    case UNW_X86_64_R14: addr = &uc->uc_mcontext.__gregs[_REG_R14]; break;
++    case UNW_X86_64_R15: addr = &uc->uc_mcontext.__gregs[_REG_R15]; break;
++    case UNW_X86_64_RDI: addr = &uc->uc_mcontext.__gregs[_REG_RDI]; break;
++    case UNW_X86_64_RSI: addr = &uc->uc_mcontext.__gregs[_REG_RSI]; break;
++    case UNW_X86_64_RBP: addr = &uc->uc_mcontext.__gregs[_REG_RBP]; break;
++    case UNW_X86_64_RBX: addr = &uc->uc_mcontext.__gregs[_REG_RBX]; break;
++    case UNW_X86_64_RDX: addr = &uc->uc_mcontext.__gregs[_REG_RDX]; break;
++    case UNW_X86_64_RAX: addr = &uc->uc_mcontext.__gregs[_REG_RAX]; break;
++    case UNW_X86_64_RCX: addr = &uc->uc_mcontext.__gregs[_REG_RCX]; break;
++    case UNW_X86_64_RSP: addr = &uc->uc_mcontext.__gregs[_REG_RSP]; break;
++    case UNW_X86_64_RIP: addr = &uc->uc_mcontext.__gregs[_REG_RIP]; break;
 +
 +    default:
 +      addr = NULL;
@@ -190,34 +137,27 @@ $NetBSD$
 +  return addr;
 +}
 +
++/* sigreturn() is a no-op on x86_64 glibc.  */
 +HIDDEN NORETURN void
 +x86_64_sigreturn (unw_cursor_t *cursor)
 +{
 +  struct cursor *c = (struct cursor *) cursor;
-+  ucontext_t *uc = (ucontext_t *)(c->sigcontext_addr +
-+    offsetof(struct sigframe, sf_uc));
-+
-+  uc->uc_mcontext.mc_r8 = c->uc->uc_mcontext.mc_r8;
-+  uc->uc_mcontext.mc_r9 = c->uc->uc_mcontext.mc_r9;
-+  uc->uc_mcontext.mc_r10 = c->uc->uc_mcontext.mc_r10;
-+  uc->uc_mcontext.mc_r11 = c->uc->uc_mcontext.mc_r11;
-+  uc->uc_mcontext.mc_r12 = c->uc->uc_mcontext.mc_r12;
-+  uc->uc_mcontext.mc_r13 = c->uc->uc_mcontext.mc_r13;
-+  uc->uc_mcontext.mc_r14 = c->uc->uc_mcontext.mc_r14;
-+  uc->uc_mcontext.mc_r15 = c->uc->uc_mcontext.mc_r15;
-+  uc->uc_mcontext.mc_rdi = c->uc->uc_mcontext.mc_rdi;
-+  uc->uc_mcontext.mc_rsi = c->uc->uc_mcontext.mc_rsi;
-+  uc->uc_mcontext.mc_rbp = c->uc->uc_mcontext.mc_rbp;
-+  uc->uc_mcontext.mc_rbx = c->uc->uc_mcontext.mc_rbx;
-+  uc->uc_mcontext.mc_rdx = c->uc->uc_mcontext.mc_rdx;
-+  uc->uc_mcontext.mc_rax = c->uc->uc_mcontext.mc_rax;
-+  uc->uc_mcontext.mc_rcx = c->uc->uc_mcontext.mc_rcx;
-+  uc->uc_mcontext.mc_rsp = c->uc->uc_mcontext.mc_rsp;
-+  uc->uc_mcontext.mc_rip = c->uc->uc_mcontext.mc_rip;
++  struct sigcontext *sc = (struct sigcontext *) c->sigcontext_addr;
++  mcontext_t *sc_mcontext = &((ucontext_t*)sc)->uc_mcontext;
++  /* Copy in saved uc - all preserved regs are at the start of sigcontext */
++  memcpy(sc_mcontext, &c->uc->uc_mcontext,
++         DWARF_NUM_PRESERVED_REGS * sizeof(unw_word_t));
 +
 +  Debug (8, "resuming at ip=%llx via sigreturn(%p)\n",
-+             (unsigned long long) c->dwarf.ip, uc);
-+  sigreturn(uc);
++             (unsigned long long) c->dwarf.ip, sc);
++#if 0
++  __asm__ __volatile__ ("mov %0, %%rsp;"
++                        "mov %1, %%rax;"
++                        "syscall"
++                        :: "r"(sc), "i"(SYS_rt_sigreturn)
++                        : "memory");
++#endif
 +  abort();
 +}
++
 +#endif
