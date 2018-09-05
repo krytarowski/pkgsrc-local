@@ -1,6 +1,6 @@
 $NetBSD$
 
---- src/x86_64/Gos-netbsd.c.orig	2018-09-04 16:44:56.530652336 +0000
+--- src/x86_64/Gos-netbsd.c.orig	2018-09-05 10:31:53.514510455 +0000
 +++ src/x86_64/Gos-netbsd.c
 @@ -0,0 +1,218 @@
 +/* libunwind - a platform-independent unwind library

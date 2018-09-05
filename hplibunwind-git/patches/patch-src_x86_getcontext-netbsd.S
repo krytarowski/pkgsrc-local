@@ -1,6 +1,6 @@
 $NetBSD$
 
---- src/x86/getcontext-netbsd.S.orig	2018-09-04 16:43:32.201985569 +0000
+--- src/x86/getcontext-netbsd.S.orig	2018-09-05 10:31:53.543786767 +0000
 +++ src/x86/getcontext-netbsd.S
 @@ -0,0 +1,112 @@
 +/* libunwind - a platform-independent unwind library

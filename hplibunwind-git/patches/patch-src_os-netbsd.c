@@ -1,8 +1,8 @@
 $NetBSD$
 
---- src/os-netbsd.c.orig	2018-09-04 16:38:16.831057630 +0000
+--- src/os-netbsd.c.orig	2018-09-05 10:31:53.462583014 +0000
 +++ src/os-netbsd.c
-@@ -0,0 +1,166 @@
+@@ -0,0 +1,119 @@
 +/* libunwind - a platform-independent unwind library
 +   Copyright (C) 2018 Kamil Rytarowski <n54@gmx.com>
 +
@@ -31,7 +31,6 @@ $NetBSD$
 +#include <sys/types.h>
 +#include <sys/mman.h>
 +#include <sys/sysctl.h>
-+#include <sys/user.h>
 +#include <stdio.h>
 +#include <errno.h>
 +
@@ -54,71 +53,25 @@ $NetBSD$
 +  munmap(ptr, sz);
 +}
 +
-+static int
-+get_pid_by_tid(int tid)
-+{
-+  int mib[3], error;
-+  size_t len, len1;
-+  char *buf;
-+  struct kinfo_proc *kv;
-+  unsigned i, pid;
-+
-+  len = 0;
-+  mib[0] = CTL_KERN;
-+  mib[1] = KERN_PROC;
-+  mib[2] = KERN_PROC_ALL;
-+
-+  error = sysctl(mib, 3, NULL, &len, NULL, 0);
-+  if (error == -1)
-+    return (-1);
-+  len1 = len * 4 / 3;
-+  buf = get_mem(len1);
-+  if (buf == NULL)
-+    return (-1);
-+  len = len1;
-+  error = sysctl(mib, 3, buf, &len, NULL, 0);
-+  if (error == -1) {
-+    free_mem(buf, len1);
-+    return (-1);
-+  }
-+  pid = -1;
-+  for (i = 0, kv = (struct kinfo_proc *)buf; i < len / sizeof(*kv);
-+   i++, kv++) {
-+    if (kv->ki_tid == tid) {
-+      pid = kv->ki_pid;
-+      break;
-+    }
-+  }
-+  free_mem(buf, len1);
-+  return (pid);
-+}
-+
 +int
 +tdep_get_elf_image (struct elf_image *ei, pid_t pid, unw_word_t ip,
 +                    unsigned long *segbase, unsigned long *mapoff, char *path, size_t pathlen)
 +{
-+  int mib[4], error, ret;
++  int mib[5], error, ret;
 +  size_t len, len1;
 +  char *buf, *bp, *eb;
 +  struct kinfo_vmentry *kv;
 +
 +  len = 0;
-+  mib[0] = CTL_KERN;
-+  mib[1] = KERN_PROC;
-+  mib[2] = KERN_PROC_VMMAP;
++  mib[0] = CTL_VM;
++  mib[1] = VM_PROC;
++  mib[2] = VM_PROC_MAP;
 +  mib[3] = pid;
++  mib[4] = sizeof(struct kinfo_vmentry)
 +
 +  error = sysctl(mib, 4, NULL, &len, NULL, 0);
-+  if (error == -1) {
-+    if (errno == ESRCH) {
-+      mib[3] = get_pid_by_tid(pid);
-+      if (mib[3] != -1)
-+        error = sysctl(mib, 4, NULL, &len, NULL, 0);
-+      if (error == -1)
-+        return (-UNW_EUNSPEC);
-+    } else
++  if (error == -1)
 +      return (-UNW_EUNSPEC);
-+  }
 +  len1 = len * 4 / 3;
 +  buf = get_mem(len1);
 +  if (buf == NULL)
@@ -130,7 +83,7 @@ $NetBSD$
 +    return (-UNW_EUNSPEC);
 +  }
 +  ret = -UNW_EUNSPEC;
-+  for (bp = buf, eb = buf + len; bp < eb; bp += kv->kve_structsize) {
++  for (bp = buf, eb = buf + len; bp < eb; bp += sizeof(struct kinfo_vmentry)) {
 +     kv = (struct kinfo_vmentry *)(uintptr_t)bp;
 +     if (ip < kv->kve_start || ip >= kv->kve_end)
 +       continue;
@@ -159,9 +112,9 @@ $NetBSD$
 +
 +  len = 0;
 +  mib[0] = CTL_KERN;
-+  mib[1] = KERN_PROC;
-+  mib[2] = KERN_PROC_PATHNAME;
-+  mib[3] = getpid();
++  mib[1] = KERN_PROC_ARGS;
++  mib[2] = -1;
++  mib[3] = KERN_PROC_PATHNAME;
 +
 +  error = sysctl(mib, 4, path, &len, NULL, 0);
 +  if (error == -1)
