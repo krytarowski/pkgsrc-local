@@ -43,6 +43,6 @@ CONFIGURE_ARGS+=	--enable-only64bit
 .endif
 
 pre-configure:
-	${RUN} cd ${WRKDIR} && ${SH} ./autogen.sh
+	${RUN} cd ${WRKSRC} && ${SH} ./autogen.sh
 
 .include "../../mk/bsd.pkg.mk"
