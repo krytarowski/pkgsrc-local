@@ -5,5 +5,6 @@ RMD160 (valgrind-3.14.0.tar.bz2) = 562359c6222acd8546eedf6f0b6db964e91bd434
 SHA512 (valgrind-3.14.0.tar.bz2) = 68e548c42df31dc2b883a403e0faff7480c49b3054841870f5d2f742141ba199eca5d83c96bbf283115f0633f2bdb0860161d422f98e3ec720ec65760d250f97
 Size (valgrind-3.14.0.tar.bz2) = 16602858 bytes
 SHA1 (patch-configure.ac) = f8a4935a1fd77e743eb6ad7587f877f6642619b7
+SHA1 (patch-coregrind_Makefile.am) = 4bf9341f0ad114639be25164f4aeb39afac5fd2f
 SHA1 (patch-coregrind_link__tool__exe__netbsd.in) = ebf427931d24239fb04880a01b5ad9f1c86b5f62
 SHA1 (patch-netbsd.supp) = 8e8d0c59c59b6d47ca75aa99d330043ebbd15215
