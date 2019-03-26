@@ -8,7 +8,7 @@ $NetBSD$
  endif
 +if VGCONF_OS_IS_NETBSD
 +valgrind_SOURCES = \
-+	launcher-netbsd.c \
++	launcher-linux.c \
 +	m_debuglog.c
 +endif
  if VGCONF_OS_IS_SOLARIS
