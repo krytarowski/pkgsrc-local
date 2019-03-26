@@ -1,7 +1,7 @@
 # $NetBSD: Makefile,v 1.22 2016/01/16 20:30:11 ryoon Exp $
 #
 
-DISTNAME=		valgrind-3.11.0
+DISTNAME=		valgrind-3.14.0
 CATEGORIES=		devel
 MASTER_SITES=		http://valgrind.org/downloads/
 EXTRACT_SUFX=		.tar.bz2
@@ -19,7 +19,8 @@ ONLY_FOR_PLATFORM=	Darwin-*-i386 Darwin-*-x86_64 \
 			Linux-*-x86_64 \
 			Linux-*-i386   \
 			Linux-*-arm*   \
-			SunOS-*-i386 SunOS-*-x86_64
+			SunOS-*-i386 SunOS-*-x86_64 \
+			NetBSD-*-x86_64
 
 USE_TOOLS+=		gmake perl
 USE_LANGUAGES=		c c++
