@@ -1,6 +1,8 @@
 # $NetBSD: Makefile,v 1.22 2016/01/16 20:30:11 ryoon Exp $
 #
 
+MAKE_JOBS_SAFE=		no
+
 DISTNAME=		valgrind-3.14.0
 CATEGORIES=		devel
 MASTER_SITES=		http://valgrind.org/downloads/

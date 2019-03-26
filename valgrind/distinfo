@@ -8,4 +8,5 @@ SHA1 (patch-configure.ac) = f8a4935a1fd77e743eb6ad7587f877f6642619b7
 SHA1 (patch-coregrind_Makefile.am) = f570bbc7ad2befe850f439927d68d812d587112d
 SHA1 (patch-coregrind_launcher-linux.c) = d71aeb3b34e058cca911b4b6ecf152fafc64beae
 SHA1 (patch-coregrind_link__tool__exe__netbsd.in) = ebf427931d24239fb04880a01b5ad9f1c86b5f62
+SHA1 (patch-include_pub__tool__basics.h) = 345494a2055d2ba982e877cb7b9edd229c67e3f5
 SHA1 (patch-netbsd.supp) = 8e8d0c59c59b6d47ca75aa99d330043ebbd15215
