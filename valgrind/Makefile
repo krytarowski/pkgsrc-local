@@ -22,7 +22,7 @@ ONLY_FOR_PLATFORM=	Darwin-*-i386 Darwin-*-x86_64 \
 			SunOS-*-i386 SunOS-*-x86_64 \
 			NetBSD-*-x86_64
 
-USE_TOOLS+=		gmake perl
+USE_TOOLS+=		gmake perl aclocal autoheader automake autoconf
 USE_LANGUAGES=		c c++
 TEST_TARGET=		regtest
 
@@ -41,5 +41,8 @@ PLIST_SUBST+=		VGCONF_ARCH_PRI=amd64
 #PLIST_SUBST+=		VGCONF_ARCH_SEC=x86
 CONFIGURE_ARGS+=	--enable-only64bit
 .endif
+
+pre-configure:
+	${RUN} cd ${WRKDIR} && ${SH} ./autogen.sh
 
 .include "../../mk/bsd.pkg.mk"
