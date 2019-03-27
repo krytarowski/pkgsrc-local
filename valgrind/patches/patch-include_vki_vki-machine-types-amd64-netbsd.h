@@ -1,19 +1,20 @@
 $NetBSD$
 
---- include/vki/vki-netbsd.h.orig	2019-03-27 07:22:17.776503145 +0000
-+++ include/vki/vki-netbsd.h
-@@ -0,0 +1,72 @@
+--- include/vki/vki-machine-types-amd64-netbsd.h.orig	2019-03-27 07:40:44.340511934 +0000
++++ include/vki/vki-machine-types-amd64-netbsd.h
+@@ -0,0 +1,54 @@
 +
 +/*--------------------------------------------------------------------*/
-+/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
++/*--- amd64/NetBSD-specific kernel interface: posix types.         ---*/
++/*---                                vki_posixtypes-amd64-netbsd.h ---*/
 +/*--------------------------------------------------------------------*/
 +
 +/*
 +   This file is part of Valgrind, a dynamic binary instrumentation
 +   framework.
 +
-+   Copyright (C) 2011-2017 Petr Pavlu
-+      setup@dagobah.cz
++   Copyright (C) 2000-2005 Julian Seward 
++      jseward@acm.org
 +
 +   This program is free software; you can redistribute it and/or
 +   modify it under the terms of the GNU General Public License as
@@ -33,44 +34,25 @@ $NetBSD$
 +   The GNU General Public License is contained in the file COPYING.
 +*/
 +
-+/* Copyright 2013-2017, Ivo Raisr <ivosh@ivosh.net> */
-+
-+/* Copyright 2013, OmniTI Computer Consulting, Inc. All rights reserved. */
-+
-+/* The purpose of this file is described in vki-linux.h.
-+
-+   To avoid any copyright issues, vki-netbsd.h follows the same approach as
-+   vki-darwin.h (not copying anything from kernel header files but instead
-+   just including them).
-+ */
-+
-+#ifndef __VKI_NETBSD_H
-+#define __VKI_NETBSD_H
++#ifndef __VKI_MACHINE_TYPES_AMD64_NETBSD_H
++#define __VKI_MACHINE_TYPES_AMD64_NETBSD_H
 +
 +//----------------------------------------------------------------------
-+// Arch-specific POSIX types
++// From sys/arch/amd64/include/int_types.h
 +//----------------------------------------------------------------------
 +
-+#if defined(VGA_amd64)                                                                                                                                     
-+#  include "vki-machine-types-amd64-netbsd.h"
-+#else
-+#  error Unknown platform
-+#endif
++typedef signed char	vki_int8_t;
++typedef unsigned char	vki_uint8_t;
++typedef short		vki_int16_t;
++typedef unsigned short	vki_uint16_t;
++typedef int		vki_int32_t;
++typedef unsigned int	vki_uint32_t;
++typedef long		vki_int64_t;
++typedef unsigned long	vki_uint64_t;
++typedef unsigned long	vki_uintptr_t;
++typedef long		vki_intptr_t;
 +
-+#include <sys/param.h>
-+#include <sys/types.h>
-+
-+//----------------------------------------------------------------------
-+// Now the rest of the arch-specific stuff
-+//----------------------------------------------------------------------
-+
-+if defined(VGA_amd64)
-+#  include "vki-amd64-netbsd.h"
-+#else
-+#  error Unknown platform
-+#endif
-+
-+#endif // __VKI_NETBSD_H
++#endif // __VKI_MACHINE_TYPES_AMD64_NETBSD_H
 +
 +/*--------------------------------------------------------------------*/
 +/*--- end                                                          ---*/
