@@ -1,8 +1,8 @@
 $NetBSD$
 
---- include/vki/vki-netbsd.h.orig	2019-03-27 10:28:25.173085904 +0000
+--- include/vki/vki-netbsd.h.orig	2019-03-27 10:50:38.193404521 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,226 @@
+@@ -0,0 +1,265 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -57,8 +57,8 @@ $NetBSD$
 +#  error Unknown platform
 +#endif
 +
-+#include <sys/param.h>
-+#include <sys/types.h>
++//#include <sys/param.h>
++//#include <sys/types.h>
 +
 +//----------------------------------------------------------------------
 +// sys/ansi.h
@@ -184,6 +184,45 @@ $NetBSD$
 +#else
 +#  error Unknown platform
 +#endif
++
++//----------------------------------------------------------------------
++// sys/timespec.h
++//----------------------------------------------------------------------
++
++struct vki_timespec {
++        vki_time_t  tv_sec;         /* seconds */
++        long    tv_nsec;        /* and nanoseconds */
++};
++
++//----------------------------------------------------------------------
++// sys/time.h
++//----------------------------------------------------------------------
++
++struct vki_timeval {
++        vki_time_t          tv_sec;         /* seconds */
++        vki_suseconds_t     tv_usec;        /* and microseconds */
++};
++
++struct vki_timezone {
++        int     tz_minuteswest; /* minutes west of Greenwich */
++        int     tz_dsttime;     /* type of dst correction */
++};
++
++struct vki_bintime {
++        vki_time_t  sec;
++        vki_uint64_t frac;
++};
++
++struct  vki_itimerval {
++        struct  vki_timeval it_interval;    /* timer interval */
++        struct  vki_timeval it_value;       /* current value */
++};
++
++struct  vki_itimerspec {
++        struct  vki_timespec it_interval;
++        struct  vki_timespec it_value;
++};
++
 +
 +//----------------------------------------------------------------------
 +// From sys/resource.h

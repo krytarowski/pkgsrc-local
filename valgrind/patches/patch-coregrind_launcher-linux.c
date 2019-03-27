@@ -2,7 +2,20 @@ $NetBSD$
 
 --- coregrind/launcher-linux.c.orig	2018-07-13 08:52:05.000000000 +0000
 +++ coregrind/launcher-linux.c
-@@ -276,6 +276,13 @@ static const char *select_platform(const
+@@ -53,6 +53,12 @@
+ #include <string.h>
+ #include <unistd.h>
+ 
++#if defined(VGO_netbsd)
++#include <sys/param.h>
++#include <sys/types.h>
++#include <sys/sysctl.h>
++#endif
++
+ #ifndef EM_X86_64
+ #define EM_X86_64 62    // elf.h doesn't define this on some older systems
+ #endif
+@@ -276,6 +282,13 @@ static const char *select_platform(const
                 platform = "amd64-solaris";
              }
              else
@@ -16,7 +29,7 @@ $NetBSD$
  #           endif
              if (header.ehdr64.e_machine == EM_X86_64 &&
                  (header.ehdr64.e_ident[EI_OSABI] == ELFOSABI_SYSV ||
-@@ -397,6 +404,9 @@ int main(int argc, char** argv, char** e
+@@ -397,6 +410,9 @@ int main(int argc, char** argv, char** e
     if ((0==strcmp(VG_PLATFORM,"x86-solaris")) ||
         (0==strcmp(VG_PLATFORM,"amd64-solaris")))
        default_platform = SOLARIS_LAUNCHER_DEFAULT_PLATFORM;
@@ -26,7 +39,7 @@ $NetBSD$
  #  else
  #    error Unknown OS
  #  endif
-@@ -422,6 +432,18 @@ int main(int argc, char** argv, char** e
+@@ -422,6 +438,18 @@ int main(int argc, char** argv, char** e
     /* Figure out the name of this executable (viz, the launcher), so
        we can tell stage2.  stage2 will use the name for recursive
        invocations of valgrind on child processes. */
@@ -45,7 +58,7 @@ $NetBSD$
  #  if defined(VGO_linux)
     linkname = "/proc/self/exe";
  #  elif defined(VGO_solaris)
-@@ -458,7 +480,7 @@ int main(int argc, char** argv, char** e
+@@ -458,7 +486,7 @@ int main(int argc, char** argv, char** e
        launcher_name = buf;
        break;
     }
