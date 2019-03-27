@@ -1,6 +1,6 @@
 $NetBSD$
 
---- include/vki/vki-netbsd.h.orig	2019-03-27 07:22:17.776503145 +0000
+--- include/vki/vki-netbsd.h.orig	2019-03-27 08:27:00.547921039 +0000
 +++ include/vki/vki-netbsd.h
 @@ -0,0 +1,72 @@
 +
@@ -64,7 +64,7 @@ $NetBSD$
 +// Now the rest of the arch-specific stuff
 +//----------------------------------------------------------------------
 +
-+if defined(VGA_amd64)
++#if defined(VGA_amd64)
 +#  include "vki-amd64-netbsd.h"
 +#else
 +#  error Unknown platform
