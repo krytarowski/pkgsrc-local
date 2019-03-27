@@ -193,12 +193,12 @@ $NetBSD$
 +#define VKI_CHILD_MAX           160
 +#define VKI_GID_MAX             2147483647U
 +#define VKI_LINK_MAX            32767
-+#defien VKI_MAX_CANON           255
++#define VKI_MAX_CANON           255
 +#define VKI_MAX_INPUT           255
-+#defien VKI_NAME_MAX            511
++#define VKI_NAME_MAX            511
 +#define VKI_NGROUPS_MAX         16
 +#define VKI_UID_MAX             2147483647U
-+#defien VKI_OPEN_MAX            128
++#define VKI_OPEN_MAX            128
 +#define VKI_PATH_MAX            1024
 +#define VKI_PIPE_BUF            512
 +#define VKI_BC_BASE_MAX         VKI_INT_MAX
