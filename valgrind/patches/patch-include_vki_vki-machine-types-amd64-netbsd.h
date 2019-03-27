@@ -1,8 +1,8 @@
 $NetBSD$
 
---- include/vki/vki-machine-types-amd64-netbsd.h.orig	2019-03-27 07:40:44.340511934 +0000
+--- include/vki/vki-machine-types-amd64-netbsd.h.orig	2019-03-27 08:51:35.158301294 +0000
 +++ include/vki/vki-machine-types-amd64-netbsd.h
-@@ -0,0 +1,54 @@
+@@ -0,0 +1,84 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- amd64/NetBSD-specific kernel interface: posix types.         ---*/
@@ -51,6 +51,36 @@ $NetBSD$
 +typedef unsigned long	vki_uint64_t;
 +typedef unsigned long	vki_uintptr_t;
 +typedef long		vki_intptr_t;
++
++//----------------------------------------------------------------------
++// From sys/arch/amd64/include/types.h
++//----------------------------------------------------------------------
++
++typedef unsigned long   vki_paddr_t;
++typedef unsigned long   vki_psize_t;
++typedef unsigned long   vki_vaddr_t;
++typedef unsigned long   vki_vsize_t;
++typedef long int        vki_register_t;
++typedef int             vki_register32_t;
++
++typedef long int        vki___register_t;
++typedef unsigned char   vki___cpu_simple_lock_nv_t;
++
++//----------------------------------------------------------------------
++// From sys/arch/amd64/include/ansi.h
++//----------------------------------------------------------------------
++
++typedef unsigned int    vki_bsd_clock_t;
++typedef long            vki_bsd_ptrdiff_t;
++typedef unsigned long   vki_bsd_size_t;
++typedef long            vki_bsd_ssize_t;
++typedef vki_int64_t     vki_bsd_time_t;
++typedef int             vki_bsd_clockid_t;
++typedef int             vki_bsd_timer_t;
++typedef int             vki_bsd_suseconds_t;
++typedef unsigned int    vki_bsd_useconds_t;
++typedef int             vki_bsd_wchar_t;
++typedef int             vki_bsd_wint_t;
 +
 +#endif // __VKI_MACHINE_TYPES_AMD64_NETBSD_H
 +

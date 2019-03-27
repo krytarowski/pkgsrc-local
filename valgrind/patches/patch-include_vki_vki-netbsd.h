@@ -1,8 +1,8 @@
 $NetBSD$
 
---- include/vki/vki-netbsd.h.orig	2019-03-27 08:27:00.547921039 +0000
+--- include/vki/vki-netbsd.h.orig	2019-03-27 08:51:35.190773884 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,72 @@
+@@ -0,0 +1,224 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -61,6 +61,119 @@ $NetBSD$
 +#include <sys/types.h>
 +
 +//----------------------------------------------------------------------
++// sys/ansi.h
++//----------------------------------------------------------------------
++
++typedef char *                  vki___caddr_t;
++typedef vki_uint32_t            vki___gid_t;
++typedef vki_uint32_t            vki___in_addr_t;
++typedef vki_uint16_t            vki___in_port_t;
++typedef vki_uint32_t            vki___mode_t;
++typedef vki_int64_t             vki___off_t;
++typedef vki_int32_t             vki___pid_t;
++typedef vki_uint8_t             vki___sa_family_t;
++typedef unsigned int            vki___socklen_t;
++typedef vki_uint32_t            vki___uid_t;
++typedef vki_uint64_t            vki___fsblkcnt_t;
++typedef vki_uint64_t            vki___fsfilcnt_t;
++
++struct vki___tag_wctrans_t;
++typedef struct vki___tag_wctrans_t *vki___wctrans_t;
++
++struct vki___tag_wctype_t;
++typedef struct vki___tag_wctype_t *vki___wctype_t;
++
++typedef union {
++        vki_int64_t __mbstateL; /* for alignment */
++        char __mbstate8[128];
++} vki___mbstate_t;
++
++//----------------------------------------------------------------------
++// sys/types.h
++//----------------------------------------------------------------------
++
++typedef vki_uint8_t             vki_u_int8_t;
++typedef vki_uint16_t            vki_u_int16_t;
++typedef vki_uint32_t            vki_u_int32_t;                                                                                                               
++typedef vki_uint64_t            vki_u_int64_t;
++
++typedef unsigned char           vki_u_char;
++typedef unsigned short          vki_u_short;
++typedef unsigned int            vki_u_int;
++typedef unsigned long           vki_u_long;
++
++typedef unsigned char           vki_unchar;
++typedef unsigned short          vki_ushort;
++typedef unsigned int            vki_uint;
++typedef unsigned long           vki_ulong;
++
++typedef vki_uint64_t            vki_u_quad_t;
++typedef vki_int64_t             vki_quad_t;
++typedef vki_quad_t *            vki_qaddr_t;
++
++typedef vki_int64_t             vki_longlong_t;
++typedef vki_uint64_t            vki_u_longlong_t;
++
++typedef vki_int64_t             vki_blkcnt_t;
++typedef vki_int32_t             vki_blksize_t;
++
++typedef vki___fsblkcnt_t        vki_fsblkcnt_t;
++typedef vki___fsfilcnt_t        vki_fsfilcnt_t;
++typedef vki___caddr_t           vki_caddr_t;
++typedef vki_int64_t             vki_daddr_t;
++
++typedef vki_uint64_t            vki_dev_t;
++typedef vki_uint32_t            vki_fixpt_t;
++typedef vki___gid_t             vki_gid_t;
++
++typedef vki_uint32_t            vki_id_t;
++typedef vki_uint64_t            vki_ino_t;
++typedef long                    vki_key_t;
++
++typedef vki___mode_t            vki_mode_t;
++
++typedef vki_uint32_t            vki_nlink_t;
++
++typedef vki___off_t             vki_off_t;
++typedef vki___pid_t             vki_pid_t;
++typedef vki_int32_t             vki_lwpid_t;
++typedef vki_uint64_t            vki_rlim_t;
++typedef vki_int32_t             vki_segsz_t;
++typedef vki_int32_t             vki_swblk_t;
++
++typedef vki___uid_t             vki_uid_t;
++
++typedef int                     vki_mqd_t;
++
++typedef usigned long            vki_cpuid_t;
++
++typedef int                     vki_psetid_t;
++
++typedef volatile vki___cpu_simple_lock_nv_t vki___cpu_simple_lock_t;
++
++typedef int                     vki_boolean_t;
++
++typedef vki_int32_t             vki___devmajor_t;
++typedef vki_int32_t             vki___devminor_t;
++
++typedef vki___devmajor_t        vki_devmajor_t;
++typedef vki___devminor_t        vki_devminor_t;
++
++typedef vki_bsd_clock_t         vki_clock_t;
++typedef vki_bsd_ptrdiff_t       vki_ptrdiff_t;
++typedef vki_bsd_size_t          vki_size_t;
++typedef vki_bsd_ssize_t         vki_ssize_t;
++typedef vki_bsd_time_t          vki_time_t;
++typedef vki_bsd_clockid_t       vki_clockid_t;
++typedef vki_bsd_timer_t         vki_timer_t;
++typedef vki_bsd_suseconds_t     vki_suseconds_t;
++typedef vki_bsd_useconds_t      vki_useconds_t;
++
++typedef struct vki_kauth_cred * vki_kauth_cred_t;
++
++typedef int                     vki_pri_t;
++
++//----------------------------------------------------------------------
 +// Now the rest of the arch-specific stuff
 +//----------------------------------------------------------------------
 +
@@ -69,6 +182,45 @@ $NetBSD$
 +#else
 +#  error Unknown platform
 +#endif
++
++//----------------------------------------------------------------------
++// From sys/resource.h
++//----------------------------------------------------------------------
++
++struct  vki_rusage {
++        struct vki_timeval ru_utime;    /* user time used */
++        struct vki_timeval ru_stime;    /* system time used */
++        long    ru_maxrss;              /* maximum resident set size */                                                                                      
++        long    ru_ixrss;               /* integral shared memory size */
++        long    ru_idrss;               /* integral unshared data size */
++        long    ru_isrss;               /* integral unshared stack size */
++        long    ru_minflt;              /* page reclaims */                                                                                                  
++        long    ru_majflt;              /* page faults */                                                                                                    
++        long    ru_nswap;               /* swaps */
++        long    ru_inblock;             /* block input operations */
++        long    ru_oublock;             /* block output operations */
++        long    ru_msgsnd;              /* messages sent */
++        long    ru_msgrcv;              /* messages received */
++        long    ru_nsignals;            /* signals received */
++        long    ru_nvcsw;               /* voluntary context switches */
++        long    ru_nivcsw;              /* involuntary " */
++};
++
++struct vki_wrusage {
++        struct vki_rusage   wru_self;
++        struct vki_rusage   wru_children;
++};
++
++struct vki_rlimit {
++        vki_rlim_t  rlim_cur;               /* current (soft) limit */
++        vki_rlim_t  rlim_max;               /* maximum value for rlim_cur */
++};
++
++struct vki_loadavg {
++        vki_fixpt_t ldavg[3];
++        long    fscale;
++};
++
 +
 +#endif // __VKI_NETBSD_H
 +
