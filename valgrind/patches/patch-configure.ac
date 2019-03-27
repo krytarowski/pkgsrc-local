@@ -38,7 +38,7 @@ $NetBSD$
          AC_MSG_RESULT([ok (${ARCH_MAX}-${VGCONF_OS})])
          ;;
 +     amd64-netbsd)
-+        VGCONF_ARCH_PRI="x86"
++        VGCONF_ARCH_PRI="amd64"
 +        VGCONF_ARCH_SEC=""
 +        VGCONF_PLATFORM_PRI_CAPS="AMD64_NETBSD"
 +        VGCONF_PLATFORM_SEC_CAPS=""
