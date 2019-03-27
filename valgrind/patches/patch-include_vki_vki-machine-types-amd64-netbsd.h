@@ -1,8 +1,8 @@
 $NetBSD$
 
---- include/vki/vki-machine-types-amd64-netbsd.h.orig	2019-03-27 08:51:35.158301294 +0000
+--- include/vki/vki-machine-types-amd64-netbsd.h.orig	2019-03-27 11:12:36.093302548 +0000
 +++ include/vki/vki-machine-types-amd64-netbsd.h
-@@ -0,0 +1,84 @@
+@@ -0,0 +1,130 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- amd64/NetBSD-specific kernel interface: posix types.         ---*/
@@ -81,6 +81,52 @@ $NetBSD$
 +typedef unsigned int    vki_bsd_useconds_t;
 +typedef int             vki_bsd_wchar_t;
 +typedef int             vki_bsd_wint_t;
++
++//----------------------------------------------------------------------
++// From sys/arch/amd64/include/limits.h
++//----------------------------------------------------------------------
++
++#define VKI_CHAR_BIT        8
++
++#define VKI_UCHAR_MAX       0xff
++#define VKI_SCHAR_MAX       0x7f
++#define VKI_SCHAR_MIN       (-0x7f-1)
++
++#define VKI_USHRT_MAX       0xffff
++#define VKI_SHRT_MAX        0x7fff
++#define VKI_SHRT_MIN        (-0x7fff-1)
++
++#define VKI_UINT_MAX        0xffffffffU
++#define VKI_INT_MAX         0x7fffffff
++#define VKI_INT_MIN         (-0x7fffffff-1)
++
++#define VKI_ULONG_MAX       0xffffffffffffffffUL
++#define VKI_LONG_MAX        0x7fffffffffffffffL
++#define VKI_LONG_MIN        (-0x7fffffffffffffffL-1)
++
++#define VKI_SSIZE_MAX       VKI_LONG_MAX
++
++#define VKI_ULLONG_MAX      0xffffffffffffffffULL
++#define VKI_LLONG_MAX       0x7fffffffffffffffLL
++#define VKI_LLONG_MIN       (-0x7fffffffffffffffLL-1)
++
++#define VKI_SSIZE_MIN       VKI_LONG_MIN
++#define VKI_SIZE_T_MAX      VKI_ULONG_MAX
++
++#define VKI_UQUAD_MAX       0xffffffffffffffffULL
++#define VKI_QUAD_MAX        0x7fffffffffffffffLL
++#define VKI_QUAD_MIN        (-0x7fffffffffffffffLL-1)
++
++#define VKI_LONG_BIT        64
++#define VKI_WORD_BIT        32
++
++#define VKI_DBL_DIG         __DBL_DIG__
++#define VKI_DBL_MAX         __DBL_MAX__
++#define VKI_DBL_MIN         __DBL_MIN__
++
++#define VKI_FLT_DIG         __FLT_DIG__
++#define VKI_FLT_MAX         __FLT_MAX__
++#define VKI_FLT_MIN         __FLT_MIN__
 +
 +#endif // __VKI_MACHINE_TYPES_AMD64_NETBSD_H
 +

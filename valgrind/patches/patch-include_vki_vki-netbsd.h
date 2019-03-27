@@ -1,8 +1,8 @@
 $NetBSD$
 
---- include/vki/vki-netbsd.h.orig	2019-03-27 10:50:38.193404521 +0000
+--- include/vki/vki-netbsd.h.orig	2019-03-27 11:12:36.100291230 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,265 @@
+@@ -0,0 +1,293 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -184,6 +184,34 @@ $NetBSD$
 +#else
 +#  error Unknown platform
 +#endif
++
++//----------------------------------------------------------------------
++// sys/syslimits.h
++//----------------------------------------------------------------------
++
++#define VKI_ARG_MAX             (256 * 1024)
++#define VKI_CHILD_MAX           160
++#define VKI_GID_MAX             2147483647U
++#define VKI_LINK_MAX            32767
++#defien VKI_MAX_CANON           255
++#define VKI_MAX_INPUT           255
++#defien VKI_NAME_MAX            511
++#define VKI_NGROUPS_MAX         16
++#define VKI_UID_MAX             2147483647U
++#defien VKI_OPEN_MAX            128
++#define VKI_PATH_MAX            1024
++#define VKI_PIPE_BUF            512
++#define VKI_BC_BASE_MAX         VKI_INT_MAX
++#define VKI_BC_DIM_MAX          65535
++#define VKI_BC_SCALE_MAX        VKI_INT_MAX
++#define VKI_BC_STRING_MAX       VKI_INT_MAX
++#define VKI_COLL_WEIGHTS_MAX    2
++#define VKI_EXPR_NEST_MAX       32
++#define VKI_LINE_MAX            2048
++#define VKI_RE_DUP_MAX          255
++#define VKI_LOGIN_NAME_MAX      17
++#define VKI_IOV_MAX             1024
++#define VKI_NZERO               20
 +
 +//----------------------------------------------------------------------
 +// sys/timespec.h
