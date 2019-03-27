@@ -1,8 +1,8 @@
 $NetBSD$
 
---- include/vki/vki-netbsd.h.orig	2019-03-27 08:51:35.190773884 +0000
+--- include/vki/vki-netbsd.h.orig	2019-03-27 10:28:25.173085904 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,224 @@
+@@ -0,0 +1,226 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -88,6 +88,8 @@ $NetBSD$
 +        char __mbstate8[128];
 +} vki___mbstate_t;
 +
++typedef vki_uint64_t            vki___fsfilcnt_t;
++
 +//----------------------------------------------------------------------
 +// sys/types.h
 +//----------------------------------------------------------------------
@@ -145,7 +147,7 @@ $NetBSD$
 +
 +typedef int                     vki_mqd_t;
 +
-+typedef usigned long            vki_cpuid_t;
++typedef unsigned long           vki_cpuid_t;
 +
 +typedef int                     vki_psetid_t;
 +
