@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-28 13:36:58.539662750 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,464 @@
+@@ -0,0 +1,574 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -461,6 +461,116 @@ $NetBSD$
 +#define VKI_POLLNVAL        0x0020
 +
 +#define VKI_INFTIM          -1
++
++//----------------------------------------------------------------------
++// From sys/socket.h
++//----------------------------------------------------------------------
++
++typedef vki___sa_family_t   vki_sa_family_t;
++
++typedef vki___socklen_t     vki_socklen_t;
++
++struct  vki_linger {
++        int     l_onoff;                /* option on/off */
++        int     l_linger;               /* linger time in seconds */
++};
++
++struct  vki_accept_filter_arg {
++        char    af_name[16];
++        char    af_arg[256-16];
++};
++
++struct vki_sockaddr {
++        vki_uint8_t       sa_len;         /* total length */
++        vki_sa_family_t     sa_family;      /* address family */
++        char            sa_data[14];    /* actually longer; address value */
++};
++
++#define VKI__SS_MAXSIZE     128
++#define VKI__SS_ALIGNSIZE   (sizeof(vki_int64_t))
++#define VKI__SS_PAD1SIZE    (VKI__SS_ALIGNSIZE - 2)
++#define VKI__SS_PAD2SIZE    (VKI__SS_MAXSIZE - 2 - \
++                                VKI__SS_PAD1SIZE - VKI__SS_ALIGNSIZE)
++
++struct vki_sockaddr_storage {
++        vki_uint8_t       ss_len;         /* address length */
++        vki_sa_family_t     ss_family;      /* address family */
++        char            __ss_pad1[VKI__SS_PAD1SIZE];
++        vki_int64_t     __ss_align;/* force desired structure storage alignment */                                                                             
++        char            __ss_pad2[VKI__SS_PAD2SIZE];
++};
++
++struct vki_sockcred {
++        vki_pid_t   sc_pid;                 /* process id */
++        vki_uid_t   sc_uid;                 /* real user id */
++        vki_uid_t   sc_euid;                /* effective user id */
++        vki_gid_t   sc_gid;                 /* real group id */
++        vki_gid_t   sc_egid;                /* effective group id */
++        int     sc_ngroups;             /* number of supplemental groups */
++        vki_gid_t   sc_groups[1];           /* variable length */
++};
++
++struct vki_kinfo_pcb {
++        vki_uint64_t      ki_pcbaddr;     /* PTR: pcb addr */
++        vki_uint64_t      ki_ppcbaddr;    /* PTR: ppcb addr */
++        vki_uint64_t      ki_sockaddr;    /* PTR: socket addr */
++
++        vki_uint32_t      ki_family;      /* INT: protocol family */
++        vki_uint32_t      ki_type;        /* INT: socket type */
++        vki_uint32_t      ki_protocol;    /* INT: protocol */
++        vki_uint32_t      ki_pflags;      /* INT: generic protocol flags */
++
++        vki_uint32_t      ki_sostate;     /* INT: socket state */
++        vki_uint32_t      ki_prstate;     /* INT: protocol state */
++        vki_int32_t       ki_tstate;      /* INT: tcp state */
++        vki_uint32_t      ki_tflags;      /* INT: tcp flags */
++
++        vki_uint64_t      ki_rcvq;        /* U_LONG: receive queue len */
++        vki_uint64_t      ki_sndq;        /* U_LONG: send queue len */
++
++        union {
++                struct vki_sockaddr _kis_src; /* STRUCT: local address */
++                char _kis_pad[256 + 8];         /* pad to max addr length */
++        } ki_s;
++        union {
++                struct vki_sockaddr _kid_dst; /* STRUCT: remote address */
++                char _kid_pad[256 + 8];         /* pad to max addr length */
++        } ki_d;
++
++        vki_uint64_t      ki_inode;       /* INO_T: fake inode number */                                                                                       
++        vki_uint64_t      ki_vnode;       /* PTR: if associated with file */
++        vki_uint64_t      ki_conn;        /* PTR: control block of peer */
++        vki_uint64_t      ki_refs;        /* PTR: referencing socket */
++        vki_uint64_t      ki_nextref;     /* PTR: link in refs list */
++};
++
++#define vki_ki_src ki_s._kis_src
++#define vki_ki_dst ki_d._kid_dst
++#define vki_ki_spad ki_s._kis_pad
++#define vki_ki_dpad ki_d._kid_pad
++
++struct vki_msghdr {
++        void            *msg_name;      /* optional address */
++        vki_socklen_t       msg_namelen;    /* size of address */
++        struct vki_iovec    *msg_iov;       /* scatter/gather array */
++        int             msg_iovlen;     /* # elements in msg_iov */
++        void            *msg_control;   /* ancillary data, see below */
++        vki_socklen_t       msg_controllen; /* ancillary data buffer len */
++        int             msg_flags;      /* flags on received message */
++};
++
++struct vki_mmsghdr {
++        struct vki_msghdr msg_hdr;
++        unsigned int msg_len;
++};
++
++struct vki_cmsghdr {
++        vki_socklen_t       cmsg_len;       /* data byte count, including hdr */
++        int             cmsg_level;     /* originating protocol */
++        int             cmsg_type;      /* protocol-specific type */
++/* followed by  u_char  cmsg_data[]; */
++};
++
 +
 +#endif // __VKI_NETBSD_H
 +
