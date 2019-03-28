@@ -7,7 +7,7 @@ $NetBSD$
  /* --- Soname of the standard C library. --- */
  
 -#if defined(VGO_linux) || defined(VGO_solaris)
-+#if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_freebsd)
++#if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_netbsd)
  # if defined(MUSL_LIBC)
  #  define  VG_Z_LIBC_SONAME  libcZdZa              // libc.*
  #else
