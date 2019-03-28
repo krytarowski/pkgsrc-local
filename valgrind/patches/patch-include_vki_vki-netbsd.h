@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-28 13:36:58.539662750 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,682 @@
+@@ -0,0 +1,700 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -679,6 +679,24 @@ $NetBSD$
 +#define VKI_SIGEV_THREAD    2
 +
 +#define VKI_SIGEV_SA        3
++
++//----------------------------------------------------------------------
++// From sys/ucontext.h
++//----------------------------------------------------------------------
++
++typedef struct vki___ucontext       vki_ucontext_t;
++
++struct vki___ucontext {
++        unsigned int    uc_flags;       /* properties */
++        vki_ucontext_t *    uc_link;        /* context to resume */
++        vki_sigset_t        uc_sigmask;     /* signals blocked in this context */ 
++        vki_stack_t         uc_stack;       /* the stack used by this context */ 
++        vki_mcontext_t      uc_mcontext;    /* machine state */
++#if defined(VKI__UC_MACHINE_PAD)
++        long            __uc_pad[VKI__UC_MACHINE_PAD];
++#endif
++};
++
 +
 +#endif // __VKI_NETBSD_H
 +

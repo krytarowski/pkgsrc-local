@@ -1,8 +1,8 @@
 $NetBSD$
 
---- include/vki/vki-machine-types-amd64-netbsd.h.orig	2019-03-27 11:12:36.093302548 +0000
+--- include/vki/vki-machine-types-amd64-netbsd.h.orig	2019-03-28 13:36:58.532544133 +0000
 +++ include/vki/vki-machine-types-amd64-netbsd.h
-@@ -0,0 +1,130 @@
+@@ -0,0 +1,216 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- amd64/NetBSD-specific kernel interface: posix types.         ---*/
@@ -127,6 +127,92 @@ $NetBSD$
 +#define VKI_FLT_DIG         __FLT_DIG__
 +#define VKI_FLT_MAX         __FLT_MAX__
 +#define VKI_FLT_MIN         __FLT_MIN__
++
++//----------------------------------------------------------------------
++// From sys/arch/amd64/include/frame_regs.h
++//----------------------------------------------------------------------
++
++#define VKI__FRAME_REG(greg, freg)  \
++        greg(rdi, RDI, 0)       /* tf_rdi */ \
++        greg(rsi, RSI, 1)       /* tf_rsi */ \
++        greg(rdx, RDX, 2)       /* tf_rdx */ \
++        greg(r10, R10, 6)       /* tf_r10 */ \                                                                                                               
++        greg(r8,  R8,  4)       /* tf_r8 */ \
++        greg(r9,  R9,  5)       /* tf_r9 */ \
++        freg(arg6, @,  @)       /* tf_arg6: syscall arg from stack */ \
++        freg(arg7, @,  @)       /* tf_arg7: syscall arg from stack */ \
++        freg(arg8, @,  @)       /* tf_arg8: syscall arg from stack */ \
++        freg(arg9, @,  @)       /* tf_arg9: syscall arg from stack */ \
++        greg(rcx, RCX, 3)       /* tf_rcx */ \
++        greg(r11, R11, 7)       /* tf_r11 */ \
++        greg(r12, R12, 8)       /* tf_r12 */ \                                                                                                               
++        greg(r13, R13, 9)       /* tf_r13 */ \
++        greg(r14, R14, 10)      /* tf_r14 */ \
++        greg(r15, R15, 11)      /* tf_r15 */ \
++        greg(rbp, RBP, 12)      /* tf_rbp */ \
++        greg(rbx, RBX, 13)      /* tf_rbx */ \
++        greg(rax, RAX, 14)      /* tf_rax */ \
++        greg(gs,  GS,  15)      /* tf_gs */ \
++        greg(fs,  FS,  16)      /* tf_fs */ \
++        greg(es,  ES,  17)      /* tf_es */ \                                                                                                                
++        greg(ds,  DS,  18)      /* tf_ds */ \
++        greg(trapno, TRAPNO,    /* tf_trapno */ \
++            19) \
++        /* Below portion defined in hardware */ \
++        greg(err, ERR, 20)      /* tf_err: Dummy inserted if not defined */ \
++        greg(rip, RIP, 21)      /* tf_rip */ \
++        greg(cs,  CS,  22)      /* tf_cs */ \
++        greg(rflags, RFLAGS,    /* tf_rflags */ \
++            23) \
++        /* These are pushed unconditionally on the x86-64 */ \
++        greg(rsp, RSP, 24)      /* tf_rsp */ \   
++        greg(ss,  SS,  25)      /* tf_ss */
++
++#define VKI__FRAME_NOREG(reg, REG, idx)
++
++#define VKI__FRAME_GREG(greg) VKI__FRAME_REG(greg, VKI__FRAME_NOREG)
++
++//----------------------------------------------------------------------
++// From sys/arch/amd64/include/mcontext.h
++//----------------------------------------------------------------------
++
++#define VKI_GREG_OFFSETS(reg, REG, idx) VKI__REG_##REG = idx,
++enum { VKI__FRAME_GREG(VKI_GREG_OFFSETS) VKI__NGREG = 26 };
++#undef VKI_GREG_OFFSETS
++
++typedef unsigned long   vki___greg_t;
++typedef vki___greg_t        vki___gregset_t[VKI__NGREG];
++  
++#define VKI__REG_URSP       VKI__REG_RSP
++#define VKI__REG_RFL        VKI__REG_RFLAGS
++
++typedef char vki___fpregset_t[512] __attribute__((__aligned__(8)));
++                                                                                                                                                             
++typedef struct {
++        vki___gregset_t     __gregs;
++        vki___greg_t        _mc_tlsbase;
++        vki___fpregset_t    __fpregs;
++} vki_mcontext_t;
++
++#define VKI__UC_UCONTEXT_ALIGN      (~0xf)
++
++/* AMD64 ABI 128-bytes "red zone". */                                                                                                                        
++#define VKI__UC_MACHINE_SP(uc)      ((uc)->uc_mcontext.__gregs[_REG_RSP] - 128)
++#define VKI__UC_MACHINE_FP(uc)      ((uc)->uc_mcontext.__gregs[_REG_RBP])
++#define VKI__UC_MACHINE_PC(uc)      ((uc)->uc_mcontext.__gregs[_REG_RIP])
++#define VKI__UC_MACHINE_INTRV(uc)   ((uc)->uc_mcontext.__gregs[_REG_RAX])
++
++#define VKI__UC_MACHINE_SET_PC(uc, pc)      _UC_MACHINE_PC(uc) = (pc)
++
++#define VKI__UC_TLSBASE     0x00080000
++                                                                                                                                                             
++/*
++ * mcontext extensions to handle signal delivery.
++ */
++#define VKI__UC_SETSTACK    0x00010000
++#define VKI__UC_CLRSTACK    0x00020000
++
++#define VKI___UCONTEXT_SIZE 784
 +
 +#endif // __VKI_MACHINE_TYPES_AMD64_NETBSD_H
 +
