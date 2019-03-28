@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-28 13:36:58.539662750 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,699 @@
+@@ -0,0 +1,731 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -256,10 +256,21 @@ $NetBSD$
 +// From sys/resource.h
 +//----------------------------------------------------------------------
 +
++#define VKI_PRIO_MIN        -20
++#define VKI_PRIO_MAX        20
++
++#define VKI_PRIO_PROCESS    0
++#define VKI_PRIO_PGRP       1
++#define VKI_PRIO_USER       2
++
++#define VKI_RUSAGE_SELF     0
++#define VKI_RUSAGE_CHILDREN -1
++
 +struct  vki_rusage {
 +        struct vki_timeval ru_utime;    /* user time used */
 +        struct vki_timeval ru_stime;    /* system time used */
 +        long    ru_maxrss;              /* maximum resident set size */                                                                                      
++#define ru_first        ru_ixrss
 +        long    ru_ixrss;               /* integral shared memory size */
 +        long    ru_idrss;               /* integral unshared data size */
 +        long    ru_isrss;               /* integral unshared stack size */
@@ -273,12 +284,33 @@ $NetBSD$
 +        long    ru_nsignals;            /* signals received */
 +        long    ru_nvcsw;               /* voluntary context switches */
 +        long    ru_nivcsw;              /* involuntary " */
++#define ru_last         ru_nivcsw
 +};
 +
 +struct vki_wrusage {
 +        struct vki_rusage   wru_self;
 +        struct vki_rusage   wru_children;
 +};
++
++#define VKI_RLIMIT_CPU      0               /* cpu time in milliseconds */
++#define VKI_RLIMIT_FSIZE    1               /* maximum file size */
++#define VKI_RLIMIT_DATA     2               /* data size */
++#define VKI_RLIMIT_STACK    3               /* stack size */
++#define VKI_RLIMIT_CORE     4               /* core file size */
++#define VKI_RLIMIT_RSS      5               /* resident set size */
++#define VKI_RLIMIT_MEMLOCK  6               /* locked-in-memory address space */
++#define VKI_RLIMIT_NPROC    7               /* number of processes */
++#define VKI_RLIMIT_NOFILE   8               /* number of open files */
++#define VKI_RLIMIT_SBSIZE   9               /* maximum size of all socket buffers */
++#define VKI_RLIMIT_AS       10              /* virtual process size (inclusive of mmap) */
++#define VKI_RLIMIT_VMEM     VKI_RLIMIT_AS       /* common alias */
++#define VKI_RLIMIT_NTHR     11              /* number of threads */
++
++define VKI_RLIM_NLIMITS    12              /* number of resource limits */
++
++#define VKI_RLIM_INFINITY   (~((vki_u_quad_t)1 << 63))  /* no limit */
++#define VKI_RLIM_SAVED_MAX  VKI_RLIM_INFINITY   /* unrepresentable hard limit */
++#define VKI_RLIM_SAVED_CUR  VKI_RLIM_INFINITY   /* unrepresentable soft limit */
 +
 +struct vki_rlimit {
 +        vki_rlim_t  rlim_cur;               /* current (soft) limit */
