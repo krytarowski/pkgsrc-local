@@ -136,7 +136,7 @@ $NetBSD$
 +        greg(rdi, RDI, 0)       /* tf_rdi */ \
 +        greg(rsi, RSI, 1)       /* tf_rsi */ \
 +        greg(rdx, RDX, 2)       /* tf_rdx */ \
-+        greg(r10, R10, 6)       /* tf_r10 */ \                                                                                                               
++        greg(r10, R10, 6)       /* tf_r10 */ \
 +        greg(r8,  R8,  4)       /* tf_r8 */ \
 +        greg(r9,  R9,  5)       /* tf_r9 */ \
 +        freg(arg6, @,  @)       /* tf_arg6: syscall arg from stack */ \
@@ -145,7 +145,7 @@ $NetBSD$
 +        freg(arg9, @,  @)       /* tf_arg9: syscall arg from stack */ \
 +        greg(rcx, RCX, 3)       /* tf_rcx */ \
 +        greg(r11, R11, 7)       /* tf_r11 */ \
-+        greg(r12, R12, 8)       /* tf_r12 */ \                                                                                                               
++        greg(r12, R12, 8)       /* tf_r12 */ \
 +        greg(r13, R13, 9)       /* tf_r13 */ \
 +        greg(r14, R14, 10)      /* tf_r14 */ \
 +        greg(r15, R15, 11)      /* tf_r15 */ \
@@ -154,7 +154,7 @@ $NetBSD$
 +        greg(rax, RAX, 14)      /* tf_rax */ \
 +        greg(gs,  GS,  15)      /* tf_gs */ \
 +        greg(fs,  FS,  16)      /* tf_fs */ \
-+        greg(es,  ES,  17)      /* tf_es */ \                                                                                                                
++        greg(es,  ES,  17)      /* tf_es */ \
 +        greg(ds,  DS,  18)      /* tf_ds */ \
 +        greg(trapno, TRAPNO,    /* tf_trapno */ \
 +            19) \
@@ -165,7 +165,7 @@ $NetBSD$
 +        greg(rflags, RFLAGS,    /* tf_rflags */ \
 +            23) \
 +        /* These are pushed unconditionally on the x86-64 */ \
-+        greg(rsp, RSP, 24)      /* tf_rsp */ \   
++        greg(rsp, RSP, 24)      /* tf_rsp */ \
 +        greg(ss,  SS,  25)      /* tf_ss */
 +
 +#define VKI__FRAME_NOREG(reg, REG, idx)
