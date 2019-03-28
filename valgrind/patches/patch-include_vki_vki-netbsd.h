@@ -306,7 +306,7 @@ $NetBSD$
 +#define VKI_RLIMIT_VMEM     VKI_RLIMIT_AS       /* common alias */
 +#define VKI_RLIMIT_NTHR     11              /* number of threads */
 +
-+define VKI_RLIM_NLIMITS    12              /* number of resource limits */
++#define VKI_RLIM_NLIMITS    12              /* number of resource limits */
 +
 +#define VKI_RLIM_INFINITY   (~((vki_u_quad_t)1 << 63))  /* no limit */
 +#define VKI_RLIM_SAVED_MAX  VKI_RLIM_INFINITY   /* unrepresentable hard limit */
