@@ -1,8 +1,8 @@
 $NetBSD$
 
---- include/vki/vki-netbsd.h.orig	2019-03-27 11:12:36.100291230 +0000
+--- include/vki/vki-netbsd.h.orig	2019-03-28 08:57:32.830138397 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,293 @@
+@@ -0,0 +1,438 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -290,6 +290,151 @@ $NetBSD$
 +        long    fscale;
 +};
 +
++//----------------------------------------------------------------------
++// From sys/sigtypes.h
++//----------------------------------------------------------------------
++
++typedef struct {
++        vki_uint32_t __bits[4];
++} vki_sigset_t;
++
++typedef struct vki_sigaltstack {
++        void *ss_sp;
++        vki_size_t ss_size;
++        int ss_flags;
++} vki_stack_t;
++
++//----------------------------------------------------------------------
++// From sys/sigtypes.h
++//----------------------------------------------------------------------
++
++typedef union vki_sigval {
++        int sival_int;
++        void *sival_ptr;
++} vki_sigval_t;
++
++struct vki__ksiginfo {
++        int     _signo;
++        int     _code;
++        int     _errno;
++#ifdef _LP64
++        /* In _LP64 the union starts on an 8-byte boundary. */
++        int     _pad;
++#endif
++        union {
++                struct {
++                        vki_pid_t   _pid;  
++                        vki_uid_t   _uid;  
++                        vki_sigval_t        _value;
++                } _rt;
++                
++                struct {
++                        vki_pid_t   _pid;  
++                        vki_uid_t   _uid;
++                        int     _status;
++                        vki_clock_t _utime;
++                        vki_clock_t _stime;
++                } _child;
++
++                struct {
++                        void   *_addr;  
++                        int     _trap; 
++                        int     _trap2;
++                        int     _trap3;
++                } _fault;
++
++                struct {                                                                                                                                     
++                        long    _band;
++                        int     _fd;
++                } _poll;                                                                                                                                     
++        } _reason;
++};
++
++typedef union vki_siginfo {
++        char    si_pad[128];    /* Total size; for future expansion */   
++        struct vki__ksiginfo _info;
++} vki_siginfo_t;
++
++#define vki_si_signo        _info._signo
++#define vki_si_code         _info._code
++#define vki_si_errno        _info._errno
++
++#define vki_si_value        _info._reason._rt._value   
++#define vki_si_pid          _info._reason._child._pid
++#define vki_si_uid          _info._reason._child._uid   
++#define vki_si_status       _info._reason._child._status
++#define vki_si_utime        _info._reason._child._utime                                                                                                          
++#define vki_si_stime        _info._reason._child._stime
++
++#define vki_si_addr         _info._reason._fault._addr
++#define vki_si_trap         _info._reason._fault._trap
++#define vki_si_trap2        _info._reason._fault._trap2
++#define vki_si_trap3        _info._reason._fault._trap3
++
++#define vki_si_band         _info._reason._poll._band
++#define vki_si_fd           _info._reason._poll._fd 
++
++#define VKI_ILL_ILLOPC      1       /* Illegal opcode                       */
++#define VKI_ILL_ILLOPN      2       /* Illegal operand                      */
++#define VKI_ILL_ILLADR      3       /* Illegal addressing mode              */
++#define VKI_ILL_ILLTRP      4       /* Illegal trap                         */
++#define VKI_ILL_PRVOPC      5       /* Privileged opcode                    */
++#define VKI_ILL_PRVREG      6       /* Privileged register                  */
++#define VKI_ILL_COPROC      7       /* Coprocessor error                    */
++#define VKI_ILL_BADSTK      8       /* Internal stack error                 */
++
++#define VKI_FPE_INTDIV      1       /* Integer divide by zero               */
++#define VKI_FPE_INTOVF      2       /* Integer overflow                     */
++#define VKI_FPE_FLTDIV      3       /* Floating point divide by zero        */
++#define VKI_FPE_FLTOVF      4       /* Floating point overflow              */
++#define VKI_FPE_FLTUND      5       /* Floating point underflow             */
++#define VKI_FPE_FLTRES      6       /* Floating point inexact result        */
++#define VKI_FPE_FLTINV      7       /* Invalid Floating point operation     */
++#define VKI_FPE_FLTSUB      8       /* Subscript out of range               */
++
++#define VKI_SEGV_MAPERR     1       /* Address not mapped to object         */
++#define VKI_SEGV_ACCERR     2       /* Invalid permissions for mapped object*/
++
++#define VKI_BUS_ADRALN      1       /* Invalid address alignment            */
++#define VKI_BUS_ADRERR      2       /* Non-existent physical address        */
++#define VKI_BUS_OBJERR      3       /* Object specific hardware error       */
++
++#define VKI_TRAP_BRKPT      1       /* Process breakpoint                   */
++#define VKI_TRAP_TRACE      2       /* Process trace trap                   */
++#define VKI_TRAP_EXEC       3       /* Process exec trap                    */
++#define VKI_TRAP_CHLD       4       /* Process child trap                   */                                                                                   
++#define VKI_TRAP_LWP        5       /* Process lwp trap                     */
++#define VKI_TRAP_DBREG      6       /* Process hardware debug register trap */
++#define VKI_TRAP_SCE        7       /* Process syscall entry trap           */
++#define VKI_TRAP_SCX        8       /* Process syscall exit trap            */
++
++#define VKI_CLD_EXITED      1       /* Child has exited                     */
++#define VKI_CLD_KILLED      2       /* Child has terminated abnormally but  */
++                                /* did not create a core file           */                                                                                   
++#define VKI_CLD_DUMPED      3       /* Child has terminated abnormally and  */
++                                /* created a core file                  */
++#define VKI_CLD_TRAPPED     4       /* Traced child has trapped             */
++#define VKI_CLD_STOPPED     5       /* Child has stopped                    */
++#define VKI_CLD_CONTINUED   6       /* Stopped child has continued          */
++
++#define VKI_POLL_IN         1       /* Data input available                 */
++#define VKI_POLL_OUT        2       /* Output buffers available             */                                                                                   
++#define VKI_POLL_MSG        3       /* Input message available              */
++#define VKI_POLL_ERR        4       /* I/O Error                            */
++#define VKI_POLL_PRI        5       /* High priority input available        */
++#define VKI_POLL_HUP        6       /* Device disconnected                  */
++
++#define VKI_SI_USER         0       /* Sent by kill(2)                      */
++#define VKI_SI_QUEUE        -1      /* Sent by the sigqueue(2)              */                                                                                   
++#define VKI_SI_TIMER        -2      /* Generated by expiration of a timer   */
++                                /* set by timer_settime(2)              */
++#define VKI_SI_ASYNCIO      -3      /* Generated by completion of an        */
++                                /* asynchronous I/O signal              */
++#define VKI_SI_MESGQ        -4      /* Generated by arrival of a message on */
++                                /* an empty message queue               */
++
++#define VKI_SI_LWP          -5      /* Generated by _lwp_kill(2)            */
++#define VKI_SI_NOINFO       32767   /* No signal specific info available    */
 +
 +#endif // __VKI_NETBSD_H
 +
