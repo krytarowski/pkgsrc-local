@@ -14,7 +14,17 @@ $NetBSD$
  if VGCONF_OS_IS_SOLARIS
  valgrind_SOURCES = \
  	launcher-linux.c \
-@@ -276,6 +281,7 @@ noinst_HEADERS = \
+@@ -89,6 +94,9 @@ if VGCONF_OS_IS_DARWIN
+ # having access to Darwin, 'none' implementation is used.
+ vgdb_SOURCES += vgdb-invoker-none.c
+ endif
++if VGCONF_OS_IS_NETBSD
++vgdb_SOURCES += vgdb-invoker-none.c ## XXX
++endif
+ if VGCONF_OS_IS_SOLARIS
+ vgdb_SOURCES += vgdb-invoker-solaris.c
+ endif
+@@ -276,6 +284,7 @@ noinst_HEADERS = \
  	m_syswrap/priv_syswrap-generic.h \
  	m_syswrap/priv_syswrap-linux.h \
  	m_syswrap/priv_syswrap-linux-variants.h \
@@ -22,7 +32,7 @@ $NetBSD$
  	m_syswrap/priv_syswrap-darwin.h \
  	m_syswrap/priv_syswrap-solaris.h \
  	m_syswrap/priv_syswrap-main.h \
-@@ -376,6 +382,7 @@ COREGRIND_SOURCES_COMMON = \
+@@ -376,6 +385,7 @@ COREGRIND_SOURCES_COMMON = \
  	m_dispatch/dispatch-s390x-linux.S \
  	m_dispatch/dispatch-mips32-linux.S \
  	m_dispatch/dispatch-mips64-linux.S \
@@ -30,7 +40,7 @@ $NetBSD$
  	m_dispatch/dispatch-x86-darwin.S \
  	m_dispatch/dispatch-amd64-darwin.S \
  	m_dispatch/dispatch-x86-solaris.S \
-@@ -399,6 +406,7 @@ COREGRIND_SOURCES_COMMON = \
+@@ -399,6 +409,7 @@ COREGRIND_SOURCES_COMMON = \
  	m_gdbserver/valgrind-low-mips64.c \
  	m_gdbserver/version.c \
  	m_initimg/initimg-linux.c \
@@ -38,7 +48,7 @@ $NetBSD$
  	m_initimg/initimg-darwin.c \
  	m_initimg/initimg-solaris.c \
  	m_initimg/initimg-pathscan.c \
-@@ -423,6 +431,7 @@ COREGRIND_SOURCES_COMMON = \
+@@ -423,6 +434,7 @@ COREGRIND_SOURCES_COMMON = \
  	m_sigframe/sigframe-mips64-linux.c \
  	m_sigframe/sigframe-x86-darwin.c \
  	m_sigframe/sigframe-amd64-darwin.c \
@@ -46,7 +56,7 @@ $NetBSD$
  	m_sigframe/sigframe-solaris.c \
  	m_syswrap/syscall-x86-linux.S \
  	m_syswrap/syscall-amd64-linux.S \
-@@ -436,12 +445,15 @@ COREGRIND_SOURCES_COMMON = \
+@@ -436,12 +448,15 @@ COREGRIND_SOURCES_COMMON = \
  	m_syswrap/syscall-mips64-linux.S \
  	m_syswrap/syscall-x86-darwin.S \
  	m_syswrap/syscall-amd64-darwin.S \
@@ -62,7 +72,7 @@ $NetBSD$
  	m_syswrap/syswrap-darwin.c \
  	m_syswrap/syswrap-solaris.c \
  	m_syswrap/syswrap-x86-linux.c \
-@@ -455,6 +467,7 @@ COREGRIND_SOURCES_COMMON = \
+@@ -455,6 +470,7 @@ COREGRIND_SOURCES_COMMON = \
  	m_syswrap/syswrap-mips64-linux.c \
  	m_syswrap/syswrap-x86-darwin.c \
  	m_syswrap/syswrap-amd64-darwin.c \
