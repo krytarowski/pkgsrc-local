@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-28 13:36:58.539662750 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,574 @@
+@@ -0,0 +1,677 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -571,6 +571,109 @@ $NetBSD$
 +/* followed by  u_char  cmsg_data[]; */
 +};
 +
++//----------------------------------------------------------------------
++// From sys/signal.h
++//----------------------------------------------------------------------
++
++#define VKI__NSIG           64
++#define VKI_NSIG VKI__NSIG
++
++#define VKI_SIGHUP          1       /* hangup */   
++#define VKI_SIGINT          2       /* interrupt */
++#define VKI_SIGQUIT         3       /* quit */
++#define VKI_SIGILL          4       /* illegal instruction (not reset when caught) */
++#define VKI_SIGTRAP         5       /* trace trap (not reset when caught) */
++#define VKI_SIGABRT         6       /* abort() */                                                                                                                
++#define VKI_SIGIOT          VKI_SIGABRT /* compatibility */
++#define VKI_SIGEMT          7       /* EMT instruction */
++#define VKI_SIGFPE          8       /* floating point exception */
++#define VKI_SIGKILL         9       /* kill (cannot be caught or ignored) */
++#define VKI_SIGBUS          10      /* bus error */
++#define VKI_SIGSEGV         11      /* segmentation violation */
++#define VKI_SIGSYS          12      /* bad argument to system call */
++#define VKI_SIGPIPE         13      /* write on a pipe with no one to read it */
++#define VKI_SIGALRM         14      /* alarm clock */                                                                                                            
++#define VKI_SIGTERM         15      /* software termination signal from kill */
++#define VKI_SIGURG          16      /* urgent condition on IO channel */
++#define VKI_SIGSTOP         17      /* sendable stop signal not from tty */
++#define VKI_SIGTSTP         18      /* stop signal from tty */
++#define VKI_SIGCONT         19      /* continue a stopped process */
++#define VKI_SIGCHLD         20      /* to parent on child stop or exit */
++#define VKI_SIGTTIN         21      /* to readers pgrp upon background tty read */
++#define VKI_SIGTTOU         22      /* like TTIN for output if (tp->t_local&LTOSTOP) */
++#define VKI_SIGIO           23      /* input/output possible signal */                                                                                           
++#define VKI_SIGXCPU         24      /* exceeded CPU time limit */
++#define VKI_SIGXFSZ         25      /* exceeded file size limit */
++#define VKI_SIGVTALRM       26      /* virtual time alarm */
++#define VKI_SIGPROF         27      /* profiling time alarm */
++#define VKI_SIGWINCH        28      /* window size changes */
++#define VKI_SIGINFO         29      /* information request */
++#define VKI_SIGUSR1         30      /* user defined signal 1 */
++#define VKI_SIGUSR2         31      /* user defined signal 2 */
++#define VKI_SIGPWR          32      /* power fail/restart (not reset when caught) */                                                                             
++#define VKI_SIGRTMIN        33
++#define VKI_SIGRTMAX        63
++
++#define VKI_SIG_DFL         ((void (*)(int))  0)
++#define VKI_SIG_IGN         ((void (*)(int))  1)
++#define VKI_SIG_ERR         ((void (*)(int)) -1)
++#define VKI_SIG_HOLD        ((void (*)(int))  3)
++
++struct  vki_sigaction {
++        union {
++                void (*_sa_handler)(int);
++                void (*_sa_sigaction)(int, vki_siginfo_t *, void *);
++        } _sa_u;        /* signal handler */
++        vki_sigset_t sa_mask;               /* signal mask to apply */  
++        int     sa_flags;               /* see signal options below */
++};
++
++#define vki_sa_handler _sa_u._sa_handler
++
++#define VKI_SA_ONSTACK      0x0001  /* take signal on signal stack */
++#define VKI_SA_RESTART      0x0002  /* restart system call on signal return */
++#define VKI_SA_RESETHAND    0x0004  /* reset to SIG_DFL when taking signal */
++#define VKI_SA_NODEFER      0x0010  /* don't mask the signal we're delivering */
++
++#define VKI_SA_NOCLDSTOP    0x0008  /* do not generate SIGCHLD on child stop */
++#define VKI_SA_NOCLDWAIT    0x0020  /* do not generate zombies on unwaited child */
++
++#define VKI_SA_SIGINFO      0x0040  /* take sa_sigaction handler */
++
++#define VKI_SA_NOKERNINFO   0x0080  /* siginfo does not print kernel info on tty */
++
++#define VKI_SIG_BLOCK       1       /* block specified signal set */
++#define VKI_SIG_UNBLOCK     2       /* unblock specified signal set */
++#define VKI_SIG_SETMASK     3       /* set specified signal set */
++
++#define VKI_SS_INIT 
++
++#define VKI_SS_ONSTACK      0x0001  /* take signals on alternate stack */
++#define VKI_SS_DISABLE      0x0004  /* disable taking signals on alternate stack */
++
++#define VKI_MINSIGSTKSZ     8192                    /* minimum allowable stack */
++#define VKI_SIGSTKSZ        (VKI_MINSIGSTKSZ + 32768)   /* recommended stack size */
++
++struct  vki_sigstack {
++        void    *ss_sp;                 /* signal stack pointer */
++        int     ss_onstack;             /* current status */
++};
++
++#define VKI_BADSIG          VKI_SIG_ERR
++
++struct  vki_sigevent {
++        int     sigev_notify;                                                                                                                                
++        int     sigev_signo;
++        union vki_sigval    sigev_value;
++        void    (*sigev_notify_function)(union vki_sigval);
++        void /* pthread_attr_t */       *sigev_notify_attributes;
++};
++
++#define VKI_SIGEV_NONE      0  
++#define VKI_SIGEV_SIGNAL    1
++#define VKI_SIGEV_THREAD    2
++
++#define VKI_SIGEV_SA        3
 +
 +#endif // __VKI_NETBSD_H
 +
