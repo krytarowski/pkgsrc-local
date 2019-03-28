@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-28 13:36:58.539662750 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,700 @@
+@@ -0,0 +1,699 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -628,10 +628,8 @@ $NetBSD$
 +        int     sa_flags;               /* see signal options below */
 +};
 +
-+// compat with linux
-+typedef  struct vki_sigaction  vki_sigaction_toK_t;
-+typedef  struct vki_sigaction  vki_sigaction_fromK_t;
-+// end-of compat with linux
++typedef  struct vki_sigaction  vki_sigaction_toK_t; // compat with linux
++typedef  struct vki_sigaction  vki_sigaction_fromK_t; // compat with linux
 +
 +#define vki_sa_handler _sa_u._sa_handler
 +
@@ -697,6 +695,7 @@ $NetBSD$
 +#endif
 +};
 +
++#define vki_ucontext vki___ucontext // compat with linux
 +
 +#endif // __VKI_NETBSD_H
 +
