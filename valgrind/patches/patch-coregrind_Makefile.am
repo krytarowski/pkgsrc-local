@@ -80,3 +80,15 @@ $NetBSD$
  	m_syswrap/syswrap-xen.c \
  	m_syswrap/syswrap-x86-solaris.c \
  	m_syswrap/syswrap-amd64-solaris.c \
+@@ -588,6 +604,11 @@ vgpreload_core_@VGCONF_ARCH_SEC@_@VGCONF
+ endif
+ 
+ if VGCONF_OS_IS_SOLARIS
++vgpreload_core_@VGCONF_ARCH_PRI@_@VGCONF_OS@_so_LDFLAGS += \
++	-shared
++endif
++
++if VGCONF_OS_IS_SOLARIS
+ # Give the vgpreload_core library a proper soname so it can be easily
+ # recognized during reading of debug information.
+ vgpreload_core_@VGCONF_ARCH_PRI@_@VGCONF_OS@_so_LDFLAGS += \
