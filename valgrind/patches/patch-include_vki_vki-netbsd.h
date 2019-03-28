@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-28 13:36:58.539662750 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,858 @@
+@@ -0,0 +1,997 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -855,6 +855,145 @@ $NetBSD$
 +
 +#define VKI_UTIME_NOW       ((1 << 30) - 1)
 +#define VKI_UTIME_OMIT      ((1 << 30) - 2)
++
++//----------------------------------------------------------------------
++// From sys/fntl.h
++//----------------------------------------------------------------------
++
++#define VKI_O_RDONLY        0x00000000      /* open for reading only */
++#define VKI_O_WRONLY        0x00000001      /* open for writing only */
++#define VKI_O_RDWR          0x00000002      /* open for reading and writing */
++#define VKI_O_ACCMODE       0x00000003      /* mask for above modes */
++
++#define VKI_FREAD           0x00000001
++#define VKI_FWRITE          0x00000002
++
++#define VKI_O_NONBLOCK      0x00000004      /* no delay */
++#define VKI_O_APPEND        0x00000008      /* set append mode */
++
++#define VKI_O_SHLOCK        0x00000010      /* open with shared file lock */
++#define VKI_O_EXLOCK        0x00000020      /* open with exclusive file lock */
++#define VKI_O_ASYNC         0x00000040      /* signal pgrp when data ready */
++
++#define VKI_O_SYNC          0x00000080      /* synchronous writes */
++
++#define VKI_O_NOFOLLOW      0x00000100      /* don't follow symlinks on the last */
++
++#define VKI_O_CREAT         0x00000200      /* create if nonexistent */
++#define VKI_O_TRUNC         0x00000400      /* truncate to zero length */
++#define VKI_O_EXCL          0x00000800      /* error if already exists */
++
++#define VKI_O_NOCTTY        0x00008000      /* don't assign controlling terminal */
++
++#define VKI_O_DSYNC         0x00010000      /* write: I/O data completion */
++#define VKI_O_RSYNC         0x00020000      /* read: I/O completion as for write */
++
++#define VKI_O_ALT_IO        0x00040000      /* use alternate i/o semantics */
++#define VKI_O_DIRECT        0x00080000      /* direct I/O hint */
++
++#define VKI_O_DIRECTORY     0x00200000      /* fail if not a directory */
++#define VKI_O_CLOEXEC       0x00400000      /* set close on exec */
++
++#define VKI_O_SEARCH        0x00800000      /* skip search permission checks */
++
++#define VKI_O_NOSIGPIPE     0x01000000      /* don't deliver sigpipe */
++#define VKI_O_REGULAR       0x02000000      /* fail if not a regular file */
++
++#define VKI_FAPPEND         VKI_O_APPEND        /* kernel/compat */
++#define VKI_FASYNC          VKI_O_ASYNC         /* kernel/compat */
++#define VKI_O_FSYNC         VKI_O_SYNC          /* compat */
++#define VKI_FNDELAY         VKI_O_NONBLOCK      /* compat */
++#define VKI_O_NDELAY        VKI_O_NONBLOCK      /* compat */
++
++#define VKI_F_DUPFD         0               /* duplicate file descriptor */
++#define VKI_F_GETFD         1               /* get file descriptor flags */
++#define VKI_F_SETFD         2               /* set file descriptor flags */
++#define VKI_F_GETFL         3               /* get file status flags */                                                                                          
++#define VKI_F_SETFL         4               /* set file status flags */
++
++#define VKI_F_GETOWN        5               /* get SIGIO/SIGURG proc/pgrp */
++#define VKI_F_SETOWN        6               /* set SIGIO/SIGURG proc/pgrp */
++
++#define VKI_F_GETLK         7               /* get record locking information */
++#define VKI_F_SETLK         8               /* set record locking information */
++#define VKI_F_SETLKW        9               /* F_SETLK; wait if blocked */ 
++
++#define VKI_F_CLOSEM        10              /* close all fds >= to the one given */
++#define VKI_F_MAXFD         11              /* return the max open fd */
++#define VKI_F_DUPFD_CLOEXEC 12              /* close on exec duplicated fd */
++#define VKI_F_GETNOSIGPIPE  13              /* get SIGPIPE disposition */
++#define VKI_F_SETNOSIGPIPE  14              /* set SIGPIPE disposition */
++
++#define VKI_FD_CLOEXEC      1               /* close-on-exec flag */
++
++#define VKI_F_RDLCK         1               /* shared or read lock */
++#define VKI_F_UNLCK         2               /* unlock */
++#define VKI_F_WRLCK         3               /* exclusive or write lock */
++
++#define VKI_F_PARAM_MASK    0xfff
++#define VKI_F_PARAM_LEN(x)  (((x) >> 16) & VKI_F_PARAM_MASK)
++#define VKI_F_PARAM_MAX     4095
++#define VKI_F_FSCTL         (int)0x80000000 /* This fcntl goes to the fs */                                                                                      
++#define VKI_F_FSVOID        (int)0x40000000 /* no parameters */
++#define VKI_F_FSOUT         (int)0x20000000 /* copy out parameter */
++#define VKI_F_FSIN          (int)0x10000000 /* copy in parameter */
++#define VKI_F_FSINOUT       (VKI_F_FSIN | VKI_F_FSOUT)
++#define VKI_F_FSDIRMASK     (int)0x70000000 /* mask for IN/OUT/VOID */
++#define VKI_F_FSPRIV        (int)0x00008000 /* command is fs-specific */
++
++#define VKI__FCN(inout, num, len) \
++                (VKI_F_FSCTL | inout | ((len & VKI_F_PARAM_MASK) << 16) | (num))
++#define VKI__FCNO(c)        VKI__FCN(F_FSVOID,  (c), 0)
++#define VKI__FCNR(c, t)     VKI__FCN(F_FSIN,    (c), (int)sizeof(t))
++#define VKI__FCNW(c, t)     VKI__FCN(F_FSOUT,   (c), (int)sizeof(t))
++#define VKI__FCNRW(c, t)    VKI__FCN(F_FSINOUT, (c), (int)sizeof(t))
++
++#define VKI__FCN_FSPRIV(inout, fs, num, len) \
++        (VKI_F_FSCTL | VKI_F_FSPRIV | inout | ((len & VKI_F_PARAM_MASK) << 16) |    \
++         (fs) << 8 | (num))
++#define VKI__FCNO_FSPRIV(f, c)      VKI__FCN_FSPRIV(F_FSVOID,  (f), (c), 0)
++#define VKI__FCNR_FSPRIV(f, c, t)   VKI__FCN_FSPRIV(F_FSIN,    (f), (c), (int)sizeof(t))
++#define VKI__FCNW_FSPRIV(f, c, t)   VKI__FCN_FSPRIV(F_FSOUT,   (f), (c), (int)sizeof(t))                                                                             
++#define VKI__FCNRW_FSPRIV(f, c, t)  VKI__FCN_FSPRIV(F_FSINOUT, (f), (c), (int)sizeof(t))
++
++struct vki_flock {                                                                                                                                               
++        vki_off_t   l_start;        /* starting offset */
++        vki_off_t   l_len;          /* len = 0 means until end of file */
++        vki_pid_t   l_pid;          /* lock owner */
++        short   l_type;         /* lock type: read/write, etc. */
++        short   l_whence;       /* type of l_start */
++};
++
++#define VKI_LOCK_SH         0x01            /* shared file lock */
++#define VKI_LOCK_EX         0x02            /* exclusive file lock */
++#define VKI_LOCK_NB         0x04            /* don't block when locking */
++#define VKI_LOCK_UN         0x08            /* unlock file */
++
++/* Always ensure that these are consistent with <stdio.h> and <unistd.h>! */
++#ifndef VKI_SEEK_SET
++#define VKI_SEEK_SET        0       /* set file offset to offset */
++#endif
++
++#ifndef VKI_SEEK_CUR
++#define VKI_SEEK_CUR        1       /* set file offset to current plus offset */
++#endif
++
++#ifndef VKI_SEEK_END
++#define VKI_SEEK_END        2       /* set file offset to EOF plus offset */
++#endif
++
++#define VKI_POSIX_FADV_NORMAL       0       /* default advice / no advice */
++#define VKI_POSIX_FADV_RANDOM       1       /* random access */
++#define VKI_POSIX_FADV_SEQUENTIAL   2       /* sequential access(lower to higher) */
++#define VKI_POSIX_FADV_WILLNEED     3       /* be needed in near future */
++#define VKI_POSIX_FADV_DONTNEED     4       /* not be needed in near future */                                                                                   
++#define VKI_POSIX_FADV_NOREUSE      5       /* be accessed once */
++
++#define VKI_AT_FDCWD                -100    /* Use cwd for relative link target */                                                                               
++#define VKI_AT_EACCESS              0x100   /* Use euig/egid for access checks */
++#define VKI_AT_SYMLINK_NOFOLLOW     0x200   /* Do not follow symlinks */
++#define VKI_AT_SYMLINK_FOLLOW       0x400   /* Follow symlinks */
++#define VKI_AT_REMOVEDIR            0x800   /* Remove directory only */
 +
 +#endif // __VKI_NETBSD_H
 +
