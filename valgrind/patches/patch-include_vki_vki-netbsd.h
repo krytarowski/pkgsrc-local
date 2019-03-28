@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-28 13:36:58.539662750 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,731 @@
+@@ -0,0 +1,858 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -728,6 +728,133 @@ $NetBSD$
 +};
 +
 +#define vki_ucontext vki___ucontext // compat with linux
++
++//----------------------------------------------------------------------
++// From sys/stat.h
++//----------------------------------------------------------------------
++
++struct vki_stat {
++        vki_dev_t     st_dev;               /* inode's device */
++        vki_mode_t    st_mode;              /* inode protection mode */
++        vki_ino_t     st_ino;               /* inode's number */
++        vki_nlink_t   st_nlink;             /* number of hard links */
++        vki_uid_t     st_uid;               /* user ID of the file's owner */
++        vki_gid_t     st_gid;               /* group ID of the file's group */
++        vki_dev_t     st_rdev;              /* device type */
++        struct    vki_timespec st_atim;     /* time of last access */
++        struct    vki_timespec st_mtim;     /* time of last data modification */
++        struct    vki_timespec st_ctim;     /* time of last file status change */
++        struct    vki_timespec st_birthtim; /* time of creation */
++        vki_off_t     st_size;              /* file size, in bytes */
++        vki_blkcnt_t  st_blocks;            /* blocks allocated for file */
++        vki_blksize_t st_blksize;           /* optimal blocksize for I/O */
++        vki_uint32_t  st_flags;             /* user defined flags for file */
++        vki_uint32_t  st_gen;               /* file generation number */
++        vki_uint32_t  st_spare[2];
++};
++
++#define st_atime                st_atim.tv_sec
++#define st_mtime                st_mtim.tv_sec
++#define st_ctime                st_ctim.tv_sec
++#define st_birthtime            st_birthtim.tv_sec
++
++#define st_atimespec            st_atim
++#define st_atimensec            st_atim.tv_nsec
++#define st_mtimespec            st_mtim
++#define st_mtimensec            st_mtim.tv_nsec
++#define st_ctimespec            st_ctim
++#define st_ctimensec            st_ctim.tv_nsec
++#define st_birthtimespec        st_birthtim
++#define st_birthtimensec        st_birthtimespec.tv_nsec
++
++#define VKI_S_ISUID 0004000                 /* set user id on execution */
++#define VKI_S_ISGID 0002000                 /* set group id on execution */
++
++#define VKI_S_ISTXT 0001000                 /* sticky bit */
++
++#define VKI_S_IRWXU 0000700                 /* RWX mask for owner */
++#define VKI_S_IRUSR 0000400                 /* R for owner */                                                                                                    
++#define VKI_S_IWUSR 0000200                 /* W for owner */
++#define VKI_S_IXUSR 0000100                 /* X for owner */
++
++#define VKI_S_IREAD         VKI_S_IRUSR
++#define VKI_S_IWRITE        VKI_S_IWUSR
++#define VKI_S_IEXEC         VKI_S_IXUSR
++#define VKI_S_IRWXG 0000070                 /* RWX mask for group */
++#define VKI_S_IRGRP 0000040                 /* R for group */
++#define VKI_S_IWGRP 0000020                 /* W for group */
++#define VKI_S_IXGRP 0000010                 /* X for group */
++
++#define VKI_S_IRWXO 0000007                 /* RWX mask for other */
++#define VKI_S_IROTH 0000004                 /* R for other */
++#define VKI_S_IWOTH 0000002                 /* W for other */
++#define VKI_S_IXOTH 0000001                 /* X for other */                                                                                                    
++
++#define VKI__S_IFMT   0170000               /* type of file mask */
++#define VKI__S_IFIFO  0010000               /* named pipe (fifo) */
++#define VKI__S_IFCHR  0020000               /* character special */
++#define VKI__S_IFDIR  0040000               /* directory */
++#define VKI__S_IFBLK  0060000               /* block special */
++#define VKI__S_IFREG  0100000               /* regular */
++#define VKI__S_IFLNK  0120000               /* symbolic link */
++#define VKI__S_ISVTX  0001000               /* save swapped text even after use */                                                                               
++#define VKI__S_IFSOCK 0140000               /* socket */
++#define VKI__S_IFWHT  0160000               /* whiteout */
++#define VKI__S_ARCH1  0200000               /* Archive state 1, ls -l shows 'a' */
++#define VKI__S_ARCH2  0400000               /* Archive state 2, ls -l shows 'A' */
++
++#define VKI_S_IFMT   VKI__S_IFMT
++#define VKI_S_IFIFO  VKI__S_IFIFO
++#define VKI_S_IFCHR  VKI__S_IFCHR                                                                                                                                    
++#define VKI_S_IFDIR  VKI__S_IFDIR
++#define VKI_S_IFBLK  VKI__S_IFBLK
++#define VKI_S_IFREG  VKI__S_IFREG
++#define VKI_S_IFLNK  VKI__S_IFLNK
++#define VKI_S_ISVTX  VKI__S_ISVTX
++
++#define VKI_S_IFSOCK VKI__S_IFSOCK
++
++#define VKI_S_IFWHT  VKI__S_IFWHT
++
++#define VKI_S_ARCH1 VKI__S_ARCH1 
++#define VKI_S_ARCH2 VKI__S_ARCH2 
++
++#define VKI_S_ISCHR(m)      (((m) & VKI__S_IFMT) == VKI__S_IFCHR)   /* char special */
++#define VKI_S_ISBLK(m)      (((m) & VKI__S_IFMT) == VKI__S_IFBLK)   /* block special */
++#define VKI_S_ISREG(m)      (((m) & VKI__S_IFMT) == VKI__S_IFREG)   /* regular file */
++#define VKI_S_ISFIFO(m)     (((m) & VKI__S_IFMT) == VKI__S_IFIFO)   /* fifo */
++
++#define VKI_S_ISLNK(m)      (((m) & VKI__S_IFMT) == VKI__S_IFLNK)   /* symbolic link */
++
++#define VKI_S_ISSOCK(m)     (((m) & VKI__S_IFMT) == VKI__S_IFSOCK)  /* socket */
++
++#define VKI_S_ISWHT(m)      (((m) & VKI__S_IFMT) == VKI__S_IFWHT)   /* whiteout */
++
++#define VKI_ACCESSPERMS     (VKI_S_IRWXU|VKI_S_IRWXG|VKI_S_IRWXO)       /* 0777 */
++                                                        /* 7777 */                                                                                           
++#define VKI_ALLPERMS        (VKI_S_ISUID|VKI_S_ISGID|VKI_S_ISTXT|VKI_S_IRWXU|VKI_S_IRWXG|VKI_S_IRWXO)
++                                                        /* 0666 */
++#define VKI_DEFFILEMODE     (VKI_S_IRUSR|VKI_S_IWUSR|VKI_S_IRGRP|VKI_S_IWGRP|VKI_S_IROTH|VKI_S_IWOTH)
++
++#define VKI_S_BLKSIZE       512             /* block size used in the stat struct */
++
++#define VKI_UF_SETTABLE     0x0000ffff      /* mask of owner changeable flags */
++#define VKI_UF_NODUMP       0x00000001      /* do not dump file */
++#define VKI_UF_IMMUTABLE    0x00000002      /* file may not be changed */
++#define VKI_UF_APPEND       0x00000004      /* writes to file may only append */
++#define VKI_UF_OPAQUE       0x00000008      /* directory is opaque wrt. union */
++
++#define VKI_SF_SETTABLE     0xffff0000      /* mask of superuser changeable flags */
++#define VKI_SF_ARCHIVED     0x00010000      /* file is archived */
++#define VKI_SF_IMMUTABLE    0x00020000      /* file may not be changed */
++#define VKI_SF_APPEND       0x00040000      /* writes to file may only append */
++/*      VKI_SF_NOUNLINK     0x00100000         [NOT IMPLEMENTED] */
++#define VKI_SF_SNAPSHOT     0x00200000      /* snapshot inode */
++#define VKI_SF_LOG          0x00400000      /* WAPBL log file inode */                                                                                           
++#define VKI_SF_SNAPINVAL    0x00800000      /* snapshot is invalid */
++
++#define VKI_UTIME_NOW       ((1 << 30) - 1)
++#define VKI_UTIME_OMIT      ((1 << 30) - 2)
 +
 +#endif // __VKI_NETBSD_H
 +
