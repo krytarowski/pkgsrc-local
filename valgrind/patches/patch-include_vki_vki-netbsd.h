@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-29 17:03:24.566037184 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,2570 @@
+@@ -0,0 +1,2601 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -2567,6 +2567,37 @@ $NetBSD$
 +#define _VKI_IOC_READ           VKI_IOC_OUT
 +#define _VKI_IOC_WRITE          VKI_IOC_IN
 +
++//----------------------------------------------------------------------
++// From sys/fd_set.h
++//----------------------------------------------------------------------
++
++typedef vki_uint32_t      vki___fd_mask;
++
++#define VKI___NFDBITS       (32)
++#define VKI___NFDSHIFT      (5)
++#define VKI___NFDMASK       (VKI___NFDBITS - 1)
++
++#ifndef VKI_FD_SETSIZE
++#define VKI_FD_SETSIZE      256
++#endif
++
++#define VKI___NFD_LEN(a)    (((a) + (VKI___NFDBITS - 1)) / VKI___NFDBITS)
++#define VKI___NFD_SIZE      VKI___NFD_LEN(VKI_FD_SETSIZE)
++#define VKI___NFD_BYTES(a)  (VKI___NFD_LEN(a) * sizeof(vki___fd_mask))
++   
++typedef struct vki_fd_set {
++        vki___fd_mask       fds_bits[VKI___NFD_SIZE];
++} vki_fd_set;
++
++#define VKI_FD_SET(n, p)    \
++    ((p)->fds_bits[(unsigned)(n) >> VKI___NFDSHIFT] |= (1U << ((n) & VKI___NFDMASK)))
++#define VKI_FD_CLR(n, p)    \
++    ((p)->fds_bits[(unsigned)(n) >> VKI___NFDSHIFT] &= ~(1U << ((n) & VKI___NFDMASK)))
++#define VKI_FD_ISSET(n, p)  \
++    ((p)->fds_bits[(unsigned)(n) >> VKI___NFDSHIFT] & (1U << ((n) & VKI___NFDMASK)))
++
++#define vki_fd_mask         vki___fd_mask
++#define VKI_NFDBITS         VKI___NFDBITS
 +
 +#endif // __VKI_NETBSD_H
 +
