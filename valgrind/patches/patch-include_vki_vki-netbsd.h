@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-29 03:02:33.032190346 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,1807 @@
+@@ -0,0 +1,1810 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -327,7 +327,7 @@ $NetBSD$
 +//----------------------------------------------------------------------
 +
 +typedef struct {
-+        vki_uint32_t __bits[4];
++        vki_uint32_t sig/*__bits*/[4 /* _VKI_NSIG_WORDS */];
 +} vki_sigset_t;
 +
 +typedef struct vki_sigaltstack {
@@ -835,6 +835,9 @@ $NetBSD$
 +
 +#define VKI__NSIG           64
 +#define VKI_NSIG VKI__NSIG
++#define _VKI_NSIG VKI_NSIG // linux compat
++#define _VKI_NSIG_BPW   32 // linux compat?
++#define _VKI_NSIG_WORDS 4 // linux compat?
 +
 +#define VKI_SIGHUP          1       /* hangup */   
 +#define VKI_SIGINT          2       /* interrupt */
