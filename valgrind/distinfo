@@ -24,6 +24,7 @@ SHA1 (patch-coregrind_m__machine.c) = 661fb8baf42142bc0570f4db982d45cb5b21b4b7
 SHA1 (patch-coregrind_m__main.c) = e62bce8fdba5992c3d275405e1bfe33f52f6da6a
 SHA1 (patch-coregrind_m__redir.c) = 6515b4d388305797c0bb332cbbb940e000db2ba7
 SHA1 (patch-coregrind_m__scheduler_scheduler.c) = 8e54203a5bb92e542f14c9fb6d17130265db9ffe
+SHA1 (patch-coregrind_m__sigframe_sigframe-amd64-netbsd.c) = af0593d504fd7f18a51503bdc73dc5c81a491142
 SHA1 (patch-coregrind_m__sigframe_sigframe-common.c) = e70746f02ca2f6de086f17617b6e1cbb5caae79c
 SHA1 (patch-coregrind_m__signals.c) = ed59d1b7053a69e170021273c0c009009c3d3026
 SHA1 (patch-coregrind_m__syscall.c) = e7302c1df64eaf003765e4c99431096d90014c3e
