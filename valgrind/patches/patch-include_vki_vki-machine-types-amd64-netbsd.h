@@ -197,10 +197,10 @@ $NetBSD$
 +#define VKI__UC_UCONTEXT_ALIGN      (~0xf)
 +
 +/* AMD64 ABI 128-bytes "red zone". */                                                                                                                        
-+#define VKI__UC_MACHINE_SP(uc)      ((uc)->uc_mcontext.__gregs[_REG_RSP] - 128)
-+#define VKI__UC_MACHINE_FP(uc)      ((uc)->uc_mcontext.__gregs[_REG_RBP])
-+#define VKI__UC_MACHINE_PC(uc)      ((uc)->uc_mcontext.__gregs[_REG_RIP])
-+#define VKI__UC_MACHINE_INTRV(uc)   ((uc)->uc_mcontext.__gregs[_REG_RAX])
++#define VKI__UC_MACHINE_SP(uc)      ((uc)->uc_mcontext.__gregs[VKI__REG_RSP] - 128)
++#define VKI__UC_MACHINE_FP(uc)      ((uc)->uc_mcontext.__gregs[VKI__REG_RBP])
++#define VKI__UC_MACHINE_PC(uc)      ((uc)->uc_mcontext.__gregs[VKI__REG_RIP])
++#define VKI__UC_MACHINE_INTRV(uc)   ((uc)->uc_mcontext.__gregs[VKI__REG_RAX])
 +
 +#define VKI__UC_MACHINE_SET_PC(uc, pc)      _UC_MACHINE_PC(uc) = (pc)
 +

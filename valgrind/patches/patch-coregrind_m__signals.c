@@ -155,6 +155,15 @@ $NetBSD$
  #else
  #  error Unknown OS
  #endif
+@@ -2463,7 +2479,7 @@ void async_signalhandler ( Int sigNo,
+    /* (1) */
+    VG_(fixup_guest_state_after_syscall_interrupted)(
+       tid, 
+-      VG_UCONTEXT_INSTR_PTR(uc), 
++      VG_UCONTEXT_INSTR_PTR(uc),
+       sres,  
+       !!(scss.scss_per_sig[sigNo].scss_flags & VKI_SA_RESTART),
+       uc
 @@ -2904,7 +2920,7 @@ void pp_ksigaction ( vki_sigaction_toK_t
                 sa->ksa_handler, 
                 (UInt)sa->sa_flags, 
