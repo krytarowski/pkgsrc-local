@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-29 03:02:33.032190346 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,1580 @@
+@@ -0,0 +1,1806 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -495,12 +495,79 @@ $NetBSD$
 +#define VKI_INFTIM          -1
 +
 +//----------------------------------------------------------------------
++// From sys/uio.h
++//----------------------------------------------------------------------
++
++struct vki_iovec {
++        void    *iov_base;      /* Base address. */
++        vki_size_t   iov_len;       /* Length. */
++};
++
++enum    vki_uio_rw { VKI_UIO_READ, VKI_UIO_WRITE };
++
++enum vki_uio_seg {
++        VKI_UIO_USERSPACE,          /* from user data space */
++        VKI_UIO_SYSSPACE            /* from system space */
++};
++
++#define VKI_UIO_MAXIOV      1024            /* max 1K of iov's */
++
++//----------------------------------------------------------------------
 +// From sys/socket.h
 +//----------------------------------------------------------------------
 +
 +typedef vki___sa_family_t   vki_sa_family_t;
 +
 +typedef vki___socklen_t     vki_socklen_t;
++
++#define VKI_SOCK_STREAM     1               /* stream socket */
++#define VKI_SOCK_DGRAM      2               /* datagram socket */
++#define VKI_SOCK_RAW        3               /* raw-protocol interface */
++#define VKI_SOCK_RDM        4               /* reliably-delivered message */
++#define VKI_SOCK_SEQPACKET  5               /* sequenced packet stream */
++#define VKI_SOCK_CONN_DGRAM 6               /* connection-orientated datagram */
++#define VKI_SOCK_DCCP       VKI_SOCK_CONN_DGRAM
++
++#define VKI_SOCK_CLOEXEC    0x10000000      /* set close on exec on socket */
++#define VKI_SOCK_NONBLOCK   0x20000000      /* set non blocking i/o socket */
++#define VKI_SOCK_NOSIGPIPE  0x40000000      /* don't send sigpipe */
++#define VKI_SOCK_FLAGS_MASK 0xf0000000      /* flags mask */
++#define VKI_SO_DEBUG        0x0001          /* turn on debugging info recording */
++#define VKI_SO_ACCEPTCONN   0x0002          /* socket has had listen() */
++#define VKI_SO_REUSEADDR    0x0004          /* allow local address reuse */
++#define VKI_SO_KEEPALIVE    0x0008          /* keep connections alive */
++#define VKI_SO_DONTROUTE    0x0010          /* just use interface addresses */
++#define VKI_SO_BROADCAST    0x0020          /* permit sending of broadcast msgs */                                                                               
++#define VKI_SO_USELOOPBACK  0x0040          /* bypass hardware when possible */
++#define VKI_SO_LINGER       0x0080          /* linger on close if data present */
++#define VKI_SO_OOBINLINE    0x0100          /* leave received OOB data in line */
++#define VKI_SO_REUSEPORT    0x0200          /* allow local address & port reuse */
++/*      SO_OTIMESTAMP   0x0400          */
++#define VKI_SO_NOSIGPIPE    0x0800          /* no SIGPIPE from EPIPE */
++#define VKI_SO_ACCEPTFILTER 0x1000          /* there is an accept filter */
++#define VKI_SO_TIMESTAMP    0x2000          /* timestamp received dgram traffic */
++#define VKI_SO_RERROR       0x4000          /* Keep track of receive errors */                                                                                   
++
++#define VKI_SO_SNDBUF       0x1001          /* send buffer size */
++#define VKI_SO_RCVBUF       0x1002          /* receive buffer size */
++#define VKI_SO_SNDLOWAT     0x1003          /* send low-water mark */
++#define VKI_SO_RCVLOWAT     0x1004          /* receive low-water mark */
++/* SO_OSNDTIMEO         0x1005 */
++/* SO_ORCVTIMEO         0x1006 */
++#define VKI_SO_ERROR        0x1007          /* get error status and clear */                                                                                     
++#define VKI_SO_TYPE         0x1008          /* get socket type */
++#define VKI_SO_OVERFLOWED   0x1009          /* datagrams: return packets dropped */
++
++#define VKI_SO_NOHEADER     0x100a          /* user supplies no header to kernel;
++                                         * kernel removes header and supplies
++                                         * payload
++                                         */
++#define VKI_SO_SNDTIMEO     0x100b          /* send timeout */
++
++#define VKI_SO_RCVTIMEO     0x100c          /* receive timeout */
++/*
++ * Structure used for manipulating linger option.
++ */
 +
 +struct  vki_linger {
 +        int     l_onoff;                /* option on/off */
@@ -511,6 +578,55 @@ $NetBSD$
 +        char    af_name[16];
 +        char    af_arg[256-16];
 +};
++
++#define VKI_SOL_SOCKET      0xffff          /* options for socket level */
++
++/*
++ * Address families.
++ */
++#define VKI_AF_UNSPEC       0               /* unspecified */
++#define VKI_AF_LOCAL        1               /* local to host */
++#define VKI_AF_UNIX         VKI_AF_LOCAL        /* backward compatibility */
++#define VKI_AF_INET         2               /* internetwork: UDP, TCP, etc. */
++#define VKI_AF_IMPLINK      3               /* arpanet imp addresses */
++#define VKI_AF_PUP          4               /* pup protocols: e.g. BSP */
++#define VKI_AF_CHAOS        5               /* mit CHAOS protocols */
++#define VKI_AF_NS           6               /* XEROX NS protocols */
++#define VKI_AF_ISO          7               /* ISO protocols */
++#define VKI_AF_OSI          VKI_AF_ISO
++#define VKI_AF_ECMA         8               /* european computer manufacturers */
++#define VKI_AF_DATAKIT      9               /* datakit protocols */
++#define VKI_AF_CCITT        10              /* CCITT protocols, X.25 etc */
++
++#define VKI_AF_SNA          11              /* IBM SNA */                                                                                                        
++#define VKI_AF_DECnet       12              /* DECnet */
++#define VKI_AF_DLI          13              /* DEC Direct data link interface */
++#define VKI_AF_LAT          14              /* LAT */
++#define VKI_AF_HYLINK       15              /* NSC Hyperchannel */
++#define VKI_AF_APPLETALK    16              /* Apple Talk */
++#define VKI_AF_OROUTE       17              /* Internal Routing Protocol */
++#define VKI_AF_LINK         18              /* Link layer interface */
++#define VKI_pseudo_AF_XTP   19              /* eXpress Transfer Protocol (no AF) */                                                                              
++#define VKI_AF_COIP         20              /* connection-oriented IP, aka ST II */
++#define VKI_AF_CNT          21              /* Computer Network Technology */
++#define VKI_pseudo_AF_RTIP  22              /* Help Identify RTIP packets */
++#define VKI_AF_IPX          23              /* Novell Internet Protocol */
++#define VKI_AF_INET6        24              /* IP version 6 */
++#define VKI_pseudo_AF_PIP   25              /* Help Identify PIP packets */
++#define VKI_AF_ISDN         26              /* Integrated Services Digital Network*/
++#define VKI_AF_E164         VKI_AF_ISDN         /* CCITT E.164 recommendation */
++#define VKI_AF_NATM         27              /* native ATM access */
++#define VKI_AF_ARP          28              /* (rev.) addr. res. prot. (RFC 826) */
++#define VKI_pseudo_AF_KEY   29              /* Internal key management protocol  */
++#define VKI_pseudo_AF_HDRCMPLT 30           /* Used by BPF to not rewrite hdrs                                                                                   
++                                           in interface output routine */
++#define VKI_AF_BLUETOOTH    31              /* Bluetooth: HCI, SCO, L2CAP, RFCOMM */
++#define VKI_AF_IEEE80211    32              /* IEEE80211 */
++#define VKI_AF_MPLS         33              /* MultiProtocol Label Switching */
++#define VKI_AF_ROUTE        34              /* Internal Routing Protocol */
++#define VKI_AF_CAN          35
++#define VKI_AF_ETHER        36
++#define VKI_AF_MAX          37
 +
 +struct vki_sockaddr {
 +        vki_uint8_t       sa_len;         /* total length */
@@ -532,6 +648,65 @@ $NetBSD$
 +        char            __ss_pad2[VKI__SS_PAD2SIZE];
 +};
 +
++#define vki_sstosa(__ss)    ((struct vki_sockaddr *)(__ss))
++#define vki_sstocsa(__ss)   ((const struct vki_sockaddr *)(__ss))
++
++#define VKI_PF_UNSPEC       VKI_AF_UNSPEC
++#define VKI_PF_LOCAL        VKI_AF_LOCAL  
++#define VKI_PF_UNIX         VKI_PF_LOCAL        /* backward compatibility */
++#define VKI_PF_INET         VKI_AF_INET
++#define VKI_PF_IMPLINK      VKI_AF_IMPLINK
++#define VKI_PF_PUP          VKI_AF_PUP
++#define VKI_PF_CHAOS        VKI_AF_CHAOS                                                                                                                             
++#define VKI_PF_NS           VKI_AF_NS
++#define VKI_PF_ISO          VKI_AF_ISO
++#define VKI_PF_OSI          VKI_AF_ISO
++#define VKI_PF_ECMA         VKI_AF_ECMA
++#define VKI_PF_DATAKIT      VKI_AF_DATAKIT
++#define VKI_PF_CCITT        VKI_AF_CCITT
++#define VKI_PF_SNA          VKI_AF_SNA
++#define VKI_PF_DECnet       VKI_AF_DECnet
++#define VKI_PF_CHAOS        VKI_AF_CHAOS                                                                                                                             
++#define VKI_PF_NS           VKI_AF_NS
++#define VKI_PF_ISO          VKI_AF_ISO
++#define VKI_PF_OSI          VKI_AF_ISO
++#define VKI_PF_ECMA         VKI_AF_ECMA
++#define VKI_PF_DATAKIT      VKI_AF_DATAKIT
++#define VKI_PF_CCITT        VKI_AF_CCITT
++#define VKI_PF_SNA          VKI_AF_SNA
++#define VKI_PF_DECnet       VKI_AF_DECnet
++#define VKI_PF_DLI          VKI_AF_DLI                                                                                                                               
++#define VKI_PF_LAT          VKI_AF_LAT
++#define VKI_PF_HYLINK       VKI_AF_HYLINK
++#define VKI_PF_APPLETALK    VKI_AF_APPLETALK
++#define VKI_PF_OROUTE       VKI_AF_OROUTE
++#define VKI_PF_LINK         VKI_AF_LINK
++
++#define VKI_PF_XTP          VKI_pseudo_AF_XTP   /* really just proto family, no AF */
++
++#define VKI_PF_COIP         VKI_AF_COIP                                                                                                                              
++#define VKI_PF_CNT          VKI_AF_CNT
++#define VKI_PF_INET6        VKI_AF_INET6
++#define VKI_PF_IPX          VKI_AF_IPX          /* same format as AF_NS */
++
++#define VKI_PF_RTIP         VKI_pseudo_AF_RTIP  /* same format as AF_INET */
++#define VKI_PF_PIP          VKI_pseudo_AF_PIP
++
++#define VKI_PF_ISDN         VKI_AF_ISDN         /* same as E164 */
++#define VKI_PF_E164         VKI_AF_E164                                                                                                                              
++#define VKI_PF_NATM         VKI_AF_NATM
++#define VKI_PF_ARP          VKI_AF_ARP
++
++#define VKI_PF_KEY          VKI_pseudo_AF_KEY   /* like PF_ROUTE, only for key mgmt */
++
++#define VKI_PF_BLUETOOTH    VKI_AF_BLUETOOTH
++#define VKI_PF_MPLS         VKI_AF_MPLS
++#define VKI_PF_ROUTE        VKI_AF_ROUTE
++#define VKI_PF_CAN          VKI_AF_CAN                                                                                                                               
++#define VKI_PF_ETHER        VKI_AF_ETHER
++
++#define VKI_PF_MAX          VKI_AF_MAX
++
 +struct vki_sockcred {
 +        vki_pid_t   sc_pid;                 /* process id */
 +        vki_uid_t   sc_uid;                 /* real user id */
@@ -541,6 +716,10 @@ $NetBSD$
 +        int     sc_ngroups;             /* number of supplemental groups */
 +        vki_gid_t   sc_groups[1];           /* variable length */
 +};
++
++#define VKI_SOCKCREDSIZE(ngrps) \
++        (/*CONSTCOND*/sizeof(struct vki_sockcred) + (sizeof(vki_gid_t) * \
++            ((ngrps) ? ((ngrps) - 1) : 0)))
 +
 +struct vki_kinfo_pcb {
 +        vki_uint64_t      ki_pcbaddr;     /* PTR: pcb addr */
@@ -576,10 +755,24 @@ $NetBSD$
 +        vki_uint64_t      ki_nextref;     /* PTR: link in refs list */
 +};
 +
-+#define vki_ki_src ki_s._kis_src
-+#define vki_ki_dst ki_d._kid_dst
-+#define vki_ki_spad ki_s._kis_pad
-+#define vki_ki_dpad ki_d._kid_pad
++#define ki_src ki_s._kis_src
++#define ki_dst ki_d._kid_dst
++#define ki_spad ki_s._kis_pad
++#define ki_dpad ki_d._kid_pad
++
++#define VKI_PCB_SLOP                20
++#define VKI_PCB_ALL                 0
++
++#define VKI_NET_RT_DUMP             1       /* dump; may limit to a.f. */
++#define VKI_NET_RT_FLAGS            2       /* by flags, e.g. RESOLVING */
++#define VKI_NET_RT_OOOIFLIST        3       /* old NET_RT_IFLIST (pre 1.5) */
++#define VKI_NET_RT_OOIFLIST         4       /* old NET_RT_IFLIST (pre-64bit time) */
++#define VKI_NET_RT_OIFLIST          5       /* old NET_RT_IFLIST (pre 8.0) */
++#define VKI_NET_RT_IFLIST           6       /* survey interface list */
++
++#ifndef VKI_SOMAXCONN
++#define VKI_SOMAXCONN       128
++#endif
 +
 +struct vki_msghdr {
 +        void            *msg_name;      /* optional address */
@@ -591,10 +784,33 @@ $NetBSD$
 +        int             msg_flags;      /* flags on received message */
 +};
 +
++#define VKI_MSG_OOB         0x0001          /* process out-of-band data */
++#define VKI_MSG_PEEK        0x0002          /* peek at incoming message */                                                                                       
++#define VKI_MSG_DONTROUTE   0x0004          /* send without using routing tables */
++#define VKI_MSG_EOR         0x0008          /* data completes record */
++#define VKI_MSG_TRUNC       0x0010          /* data discarded before delivery */
++#define VKI_MSG_CTRUNC      0x0020          /* control data lost before delivery */
++#define VKI_MSG_WAITALL     0x0040          /* wait for full request or error */
++#define VKI_MSG_DONTWAIT    0x0080          /* this message should be nonblocking */
++#define VKI_MSG_BCAST       0x0100          /* this message was rcvd using link-level brdcst */
++#define VKI_MSG_MCAST       0x0200          /* this message was rcvd using link-level mcast */
++#define VKI_MSG_NOSIGNAL    0x0400          /* do not generate SIGPIPE on EOF */                                                                                 
++
++#define VKI_MSG_CMSG_CLOEXEC 0x0800         /* close on exec receiving fd */
++#define VKI_MSG_NBIO        0x1000          /* use non-blocking I/O */
++#define VKI_MSG_WAITFORONE  0x2000          /* recvmmsg() wait for one message */
++#define VKI_MSG_NOTIFICATION 0x4000         /* SCTP notification */
++
 +struct vki_mmsghdr {
 +        struct vki_msghdr msg_hdr;
 +        unsigned int msg_len;
 +};
++
++#define VKI_MSG_USERFLAGS   0x0ffffff
++#define VKI_MSG_NAMEMBUF    0x1000000       /* msg_name is an mbuf */
++#define VKI_MSG_CONTROLMBUF 0x2000000       /* msg_control is an mbuf */
++#define VKI_MSG_IOVUSRSPACE 0x4000000       /* msg_iov is in user space */                                                                                       
++#define VKI_MSG_LENUSRSPACE 0x8000000       /* address length is in user space */
 +
 +struct vki_cmsghdr {
 +        vki_socklen_t       cmsg_len;       /* data byte count, including hdr */
@@ -602,6 +818,16 @@ $NetBSD$
 +        int             cmsg_type;      /* protocol-specific type */
 +/* followed by  u_char  cmsg_data[]; */
 +};
++
++/* "Socket"-level control message types: */
++#define VKI_SCM_RIGHTS      0x01            /* access rights (array of int) */
++
++#define VKI_SCM_TIMESTAMP   0x08            /* timestamp (struct timeval) */
++#define VKI_SCM_CREDS       0x10            /* credentials (struct sockcred) */
++
++#define VKI_SHUT_RD         0               /* Disallow further receives. */
++#define VKI_SHUT_WR         1               /* Disallow further sends. */                                                                                        
++#define VKI_SHUT_RDWR       2               /* Disallow further sends/receives. */
 +
 +//----------------------------------------------------------------------
 +// From sys/signal.h
