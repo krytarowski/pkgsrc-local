@@ -133,3 +133,35 @@ $NetBSD$
     // RES is 0 for child, non-0 (the child's PID) for parent.
     is_child = ( RES == 0 ? True : False );
     child_pid = ( is_child ? -1 : RES );
+@@ -4429,6 +4449,7 @@ POST(sys_newstat)
+    POST_MEM_WRITE( ARG2, sizeof(struct vki_stat) );
+ }
+ 
++#if 0
+ PRE(sys_statfs)
+ {
+    FUSE_COMPATIBLE_MAY_BLOCK();
+@@ -4456,6 +4477,7 @@ POST(sys_statfs64)
+ {
+    POST_MEM_WRITE( ARG3, ARG2 );
+ }
++#endif
+ 
+ PRE(sys_symlink)
+ {
+@@ -4514,6 +4536,7 @@ PRE(sys_unlink)
+    PRE_MEM_RASCIIZ( "unlink(pathname)", ARG1 );
+ }
+ 
++#if 0
+ PRE(sys_newuname)
+ {
+    PRINT("sys_newuname ( %#" FMT_REGWORD "x )", ARG1);
+@@ -4527,6 +4550,7 @@ POST(sys_newuname)
+       POST_MEM_WRITE( ARG1, sizeof(struct vki_new_utsname) );
+    }
+ }
++#endif
+ 
+ PRE(sys_waitpid)
+ {

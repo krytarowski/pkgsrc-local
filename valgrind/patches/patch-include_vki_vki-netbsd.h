@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-29 17:03:24.566037184 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,2601 @@
+@@ -0,0 +1,2612 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -2598,6 +2598,17 @@ $NetBSD$
 +
 +#define vki_fd_mask         vki___fd_mask
 +#define VKI_NFDBITS         VKI___NFDBITS
++
++//----------------------------------------------------------------------
++// From sys/times.h
++//----------------------------------------------------------------------
++
++struct vki_tms {
++        vki_clock_t tms_utime;      /* User CPU time */
++        vki_clock_t tms_stime;      /* System CPU time */
++        vki_clock_t tms_cutime;     /* User CPU time of terminated child procs */
++        vki_clock_t tms_cstime;     /* System CPU time of terminated child procs */
++};
 +
 +#endif // __VKI_NETBSD_H
 +
