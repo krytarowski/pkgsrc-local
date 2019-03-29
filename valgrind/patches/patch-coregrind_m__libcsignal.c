@@ -19,7 +19,7 @@ $NetBSD$
     return sr_isError(res) ? -1 : 0;
  
 +#  elif defined(VGO_netbsd)
-+   SysRes res = VG_(do_syscall3)(__sigaction_sigtramp,
++   SysRes res = VG_(do_syscall3)(__NR___sigaction_sigtramp,
 +                                 signum, (UWord)act, (UWord)oldact);
 +   return sr_isError(res) ? -1 : 0;
 +
@@ -62,7 +62,7 @@ $NetBSD$
  
 +/* ---------- sigtimedwait_zero: Linux ----------- */
 +
-+#ekif defined(VGO_netbsd)
++#elif defined(VGO_netbsd)
 +Int VG_(sigtimedwait_zero)( const vki_sigset_t *set, 
 +                            vki_siginfo_t *info )
 +{
