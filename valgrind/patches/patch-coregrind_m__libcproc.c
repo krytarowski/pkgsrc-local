@@ -45,6 +45,42 @@ $NetBSD$
  #  elif defined(VGO_solaris)
     SysRes res = VG_(do_syscall0)(__NR_lwp_self);
     return sr_Res(res);
+@@ -710,7 +718,7 @@ Int VG_(getpgrp) ( void )
+    /* ASSUMES SYSCALL ALWAYS SUCCEEDS */
+ #  if defined(VGP_arm64_linux)
+    return sr_Res( VG_(do_syscall1)(__NR_getpgid, 0) );
+-#  elif defined(VGO_linux) || defined(VGO_darwin)
++#  elif defined(VGO_linux) || defined(VGO_darwin) || defined(VGO_netbsd)
+    return sr_Res( VG_(do_syscall0)(__NR_getpgrp) );
+ #  elif defined(VGO_solaris)
+    /* Uses the shared pgrpsys syscall, 0 for the getpgrp variant. */
+@@ -723,7 +731,7 @@ Int VG_(getpgrp) ( void )
+ Int VG_(getppid) ( void )
+ {
+    /* ASSUMES SYSCALL ALWAYS SUCCEEDS */
+-#  if defined(VGO_linux) || defined(VGO_darwin)
++#  if defined(VGO_linux) || defined(VGO_darwin) || defined(VGO_netbsd)
+    return sr_Res( VG_(do_syscall0)(__NR_getppid) );
+ #  elif defined(VGO_solaris)
+    /* Uses the shared getpid/getppid syscall, val2 contains a parent pid. */
+@@ -736,7 +744,7 @@ Int VG_(getppid) ( void )
+ Int VG_(geteuid) ( void )
+ {
+    /* ASSUMES SYSCALL ALWAYS SUCCEEDS */
+-#  if defined(VGO_linux) || defined(VGO_darwin)
++#  if defined(VGO_linux) || defined(VGO_darwin) || defined(VGO_netbsd)
+    {
+ #     if defined(__NR_geteuid32)
+       // We use the 32-bit version if it's supported.  Otherwise, IDs greater
+@@ -757,7 +765,7 @@ Int VG_(geteuid) ( void )
+ 
+ Int VG_(getegid) ( void )
+ {
+-#  if defined(VGO_linux) || defined(VGO_darwin)
++#  if defined(VGO_linux) || defined(VGO_darwin) || defined(VGO_netbsd)
+    /* ASSUMES SYSCALL ALWAYS SUCCEEDS */
+ #    if defined(__NR_getegid32)
+    // We use the 32-bit version if it's supported.  Otherwise, IDs greater
 @@ -804,7 +812,7 @@ Int VG_(getgroups)( Int size, UInt* list
          || defined(VGP_ppc64be_linux) || defined(VGP_ppc64le_linux)  \
          || defined(VGO_darwin) || defined(VGP_s390x_linux)    \
