@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-29 17:03:24.566037184 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,2530 @@
+@@ -0,0 +1,2570 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -2527,6 +2527,46 @@ $NetBSD$
 +        struct  vki_shminfo shminfo;
 +        struct  vki_shmid_ds_sysctl shmids[1];
 +};
++
++//----------------------------------------------------------------------
++// From sys/ioccom.h
++//----------------------------------------------------------------------
++
++#define VKI_IOCPARM_MASK    0x1fff          /* parameter length, at most 13 bits */
++#define VKI_IOCPARM_SHIFT   16
++#define VKI_IOCGROUP_SHIFT  8
++#define VKI_IOCPARM_LEN(x)  (((x) >> VKI_IOCPARM_SHIFT) & VKI_IOCPARM_MASK)
++#define VKI_IOCBASECMD(x)   ((x) & ~(VKI_IOCPARM_MASK << VKI_IOCPARM_SHIFT))                                                                                             
++#define VKI_IOCGROUP(x)     (((x) >> VKI_IOCGROUP_SHIFT) & 0xff)
++
++#define VKI_IOCPARM_MAX     VKI_NBPG    /* max size of ioctl args, mult. of NBPG */
++                                /* no parameters */
++#define VKI_IOC_VOID        (unsigned long)0x20000000
++                                /* copy parameters out */
++#define VKI_IOC_OUT         (unsigned long)0x40000000
++                                /* copy parameters in */
++#define VKI_IOC_IN          (unsigned long)0x80000000                                                                                                            
++                                /* copy parameters in and out */
++#define VKI_IOC_INOUT       (VKI_IOC_IN|VKI_IOC_OUT)
++                                /* mask for IN/OUT/VOID */
++#define VKI_IOC_DIRMASK     (unsigned long)0xe0000000
++
++#define VKI__IOC(inout, group, num, len) \
++    ((inout) | (((len) & VKI_IOCPARM_MASK) << VKI_IOCPARM_SHIFT) | \
++    ((group) << VKI_IOCGROUP_SHIFT) | (num))
++#define VKI__IO(g,n)        VKI__IOC(VKI_IOC_VOID,  (g), (n), 0) 
++#define VKI__IOR(g,n,t)     VKI__IOC(VKI_IOC_OUT,   (g), (n), sizeof(t))
++#define VKI__IOW(g,n,t)     VKI__IOC(VKI_IOC_IN,    (g), (n), sizeof(t))
++/* this should be _IORW, but stdio got there first */
++#define VKI__IOWR(g,n,t)    VKI__IOC(VKI_IOC_INOUT, (g), (n), sizeof(t))
++
++// linux-like ioctl flags
++#define _VKI_IOC_DIR(x)         ((x) & VKI_IOC_DIRMASK)
++#define _VKI_IOC_SIZE(x)        VKI_IOCPARM_LEN(x)
++#define _VKI_IOC_NONE           VKI_IOC_VOID  /* GrP fixme correct? */
++#define _VKI_IOC_READ           VKI_IOC_OUT
++#define _VKI_IOC_WRITE          VKI_IOC_IN
++
 +
 +#endif // __VKI_NETBSD_H
 +
