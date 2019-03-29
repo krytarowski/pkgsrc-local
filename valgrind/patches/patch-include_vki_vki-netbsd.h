@@ -1447,7 +1447,7 @@ $NetBSD$
 +#define VKI_IN_EXPERIMENTAL(i)      (((vki_uint32_t)(i) & VKI___IPADDR(0xf0000000)) == \
 +                                 VKI___IPADDR(0xf0000000))
 +
-+#define VKI_IN_BADCLASS(i)          (((vki_uint32_t)(i) & VKI___IPADDR(0xf0000000)) == \                                                                                 
++#define VKI_IN_BADCLASS(i)          (((vki_uint32_t)(i) & VKI___IPADDR(0xf0000000)) == \
 +                                 VKI___IPADDR(0xf0000000))
 +
 +#define VKI_IN_LINKLOCAL(i) (((vki_uint32_t)(i) & VKI___IPADDR(0xffff0000)) == \
@@ -1456,7 +1456,7 @@ $NetBSD$
 +#define VKI_IN_PRIVATE(i)   ((((vki_uint32_t)(i) & VKI___IPADDR(0xff000000)) ==     \
 +                          VKI___IPADDR(0x0a000000)) ||                      \
 +                         (((vki_uint32_t)(i) & VKI___IPADDR(0xfff00000)) ==     \
-+                          VKI___IPADDR(0xac100000)) ||                      \                                                                                    
++                          VKI___IPADDR(0xac100000)) ||                      \                                                                                
 +                         (((vki_uint32_t)(i) & VKI___IPADDR(0xffff0000)) ==     \
 +                          VKI___IPADDR(0xc0a80000)))
 +
