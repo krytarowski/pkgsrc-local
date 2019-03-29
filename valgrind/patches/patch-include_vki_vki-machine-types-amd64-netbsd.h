@@ -1,8 +1,8 @@
 $NetBSD$
 
---- include/vki/vki-machine-types-amd64-netbsd.h.orig	2019-03-29 10:08:50.858575967 +0000
+--- include/vki/vki-machine-types-amd64-netbsd.h.orig	2019-03-29 17:03:24.556848893 +0000
 +++ include/vki/vki-machine-types-amd64-netbsd.h
-@@ -0,0 +1,216 @@
+@@ -0,0 +1,222 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- amd64/NetBSD-specific kernel interface: posix types.         ---*/
@@ -213,6 +213,12 @@ $NetBSD$
 +#define VKI__UC_CLRSTACK    0x00020000
 +
 +#define VKI___UCONTEXT_SIZE 784
++
++//----------------------------------------------------------------------
++// From sys/arch/amd64/include/cdefs.h
++//----------------------------------------------------------------------
++
++#define VKI___ALIGNBYTES            (sizeof(long) - 1)
 +
 +#endif // __VKI_MACHINE_TYPES_AMD64_NETBSD_H
 +

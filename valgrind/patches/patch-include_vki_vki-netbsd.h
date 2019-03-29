@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-29 17:03:24.566037184 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,2410 @@
+@@ -0,0 +1,2467 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -57,9 +57,6 @@ $NetBSD$
 +#  error Unknown platform
 +#endif
 +
-+//#include <sys/param.h>
-+//#include <sys/types.h>
-+
 +//----------------------------------------------------------------------
 +// sys/ansi.h
 +//----------------------------------------------------------------------
@@ -89,6 +86,32 @@ $NetBSD$
 +} vki___mbstate_t;
 +
 +typedef vki_uint64_t            vki___fsfilcnt_t;
++
++//----------------------------------------------------------------------
++// sys/param.h
++//----------------------------------------------------------------------
++
++#define VKI_BSD     199506          /* System version (year & month). */
++#define VKI_BSD4_3  1
++#define VKI_BSD4_4  1
++
++#define VKI_MAXCOMLEN       16              /* max command name remembered */
++#define VKI_MAXINTERP       VKI_PATH_MAX        /* max interpreter file name length */
++/* DEPRECATED: use LOGIN_NAME_MAX instead. */
++#define VKI_MAXLOGNAME      (VKI_LOGIN_NAME_MAX - 1) /* max login name length */
++#define VKI_NCARGS          VKI_ARG_MAX         /* max bytes for an exec function */
++#define VKI_NGROUPS         VKI_NGROUPS_MAX     /* max number groups */
++#define VKI_NOGROUP         65535           /* marker for empty group set member */
++#define VKI_MAXHOSTNAMELEN  256             /* max hostname size */
++
++#ifndef VKI_NOFILE
++#define VKI_NOFILE          VKI_OPEN_MAX        /* max open files per process */
++#endif
++#ifndef VKI_MAXUPRC                         /* max simultaneous processes */
++#define VKI_MAXUPRC         VKI_CHILD_MAX       /* POSIX 1003.1-compliant default */
++#else
++
++#define VKI_ALIGNBYTES      VKI___ALIGNBYTES
 +
 +//----------------------------------------------------------------------
 +// sys/types.h
@@ -174,6 +197,14 @@ $NetBSD$
 +typedef struct vki_kauth_cred * vki_kauth_cred_t;
 +
 +typedef int                     vki_pri_t;
++
++//----------------------------------------------------------------------
++// sys/cdefs.h
++//----------------------------------------------------------------------
++
++#define VKI___CAST(__dt, __st)      ((__dt)(__st))
++#define VKI__CASTV(__dt, __st)     VKI___CAST(__dt, VKI___CAST(void *, __st))
++#define VKI___CASTCV(__dt, __st)    VKI___CAST(__dt, VKI___CAST(const void *, __st))
 +
 +//----------------------------------------------------------------------
 +// Now the rest of the arch-specific stuff
@@ -818,6 +849,32 @@ $NetBSD$
 +        int             cmsg_type;      /* protocol-specific type */
 +/* followed by  u_char  cmsg_data[]; */
 +};
++
++#define VKI___CMSG_ALIGN(n) (((n) + VKI___ALIGNBYTES) & ~VKI___ALIGNBYTES)
++
++#define __CMSG_ASIZE    __CMSG_ALIGN(sizeof(struct vki_cmsghdr))
++#define __CMSG_MSGNEXT(cmsg) \
++    (__CASTV(char *, cmsg) + __CMSG_ALIGN((cmsg)->cmsg_len))
++#define VKI___CMSG_MSGEND(mhdr) \
++    (VKI___CASTV(char *, (mhdr)->msg_control) + (mhdr)->msg_controllen)
++
++/* given pointer to struct cmsghdr, return pointer to data */
++#define VKI_CMSG_DATA(cmsg) (VKI___CASTV(vki_u_char *, cmsg) + VKI___CMSG_ASIZE)
++#define VKI_CCMSG_DATA(cmsg) (VKI___CASTCV(const vki_u_char *, cmsg) + VKI___CMSG_ASIZE)
++
++#define VKI_CMSG_NXTHDR(mhdr, cmsg) \
++    VKI___CASTV(struct vki_cmsghdr *,  \
++        VKI___CMSG_MSGNEXT(cmsg) + VKI___CMSG_ASIZE > VKI___CMSG_MSGEND(mhdr) ? 0 : \
++        VKI___CMSG_MSGNEXT(cmsg))
++
++#define VKI_CMSG_FIRSTHDR(mhdr) \
++    VKI___CASTV(struct vki_cmsghdr *, \
++        (mhdr)->msg_controllen < sizeof(struct vki_cmsghdr) ? 0 : \
++        (mhdr)->msg_control)
++
++#define VKI_CMSG_SPACE(l)   (VKI___CMSG_ASIZE + VKI___CMSG_ALIGN(l))
++#define VKI_CMSG_LEN(l)     (VKI___CMSG_ASIZE + (l))
++
 +
 +/* "Socket"-level control message types: */
 +#define VKI_SCM_RIGHTS      0x01            /* access rights (array of int) */
