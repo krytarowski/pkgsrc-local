@@ -1456,7 +1456,7 @@ $NetBSD$
 +#define VKI_IN_PRIVATE(i)   ((((vki_uint32_t)(i) & VKI___IPADDR(0xff000000)) ==     \
 +                          VKI___IPADDR(0x0a000000)) ||                      \
 +                         (((vki_uint32_t)(i) & VKI___IPADDR(0xfff00000)) ==     \
-+                          VKI___IPADDR(0xac100000)) ||                      \                                                                                
++                          VKI___IPADDR(0xac100000)) ||                      \
 +                         (((vki_uint32_t)(i) & VKI___IPADDR(0xffff0000)) ==     \
 +                          VKI___IPADDR(0xc0a80000)))
 +
@@ -1488,7 +1488,7 @@ $NetBSD$
 +
 +#define VKI_INET_ADDRSTRLEN                 16
 +
-+struct ip_opts {
++struct vki_ip_opts {
 +        struct vki_in_addr  ip_dst;         /* first hop, 0 w/o src rt */
 +        vki_int8_t        ip_opts[40];    /* actually variable in size */
 +};
@@ -1524,8 +1524,8 @@ $NetBSD$
 + * Information sent in the control message of a datagram socket for
 + * IP_PKTINFO and IP_RECVPKTINFO.
 + */
-+struct in_pktinfo {
-+        struct in_addr  ipi_addr;       /* src/dst address */
++struct vki_in_pktinfo {
++        struct vki_in_addr  ipi_addr;       /* src/dst address */
 +        unsigned int ipi_ifindex;       /* interface index */
 +};
 +
