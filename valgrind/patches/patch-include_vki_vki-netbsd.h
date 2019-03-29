@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-29 17:03:24.566037184 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,2467 @@
+@@ -0,0 +1,2464 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -107,9 +107,6 @@ $NetBSD$
 +#ifndef VKI_NOFILE
 +#define VKI_NOFILE          VKI_OPEN_MAX        /* max open files per process */
 +#endif
-+#ifndef VKI_MAXUPRC                         /* max simultaneous processes */
-+#define VKI_MAXUPRC         VKI_CHILD_MAX       /* POSIX 1003.1-compliant default */
-+#else
 +
 +#define VKI_ALIGNBYTES      VKI___ALIGNBYTES
 +
@@ -852,9 +849,9 @@ $NetBSD$
 +
 +#define VKI___CMSG_ALIGN(n) (((n) + VKI___ALIGNBYTES) & ~VKI___ALIGNBYTES)
 +
-+#define __CMSG_ASIZE    __CMSG_ALIGN(sizeof(struct vki_cmsghdr))
-+#define __CMSG_MSGNEXT(cmsg) \
-+    (__CASTV(char *, cmsg) + __CMSG_ALIGN((cmsg)->cmsg_len))
++#define VKI___CMSG_ASIZE    VKI___CMSG_ALIGN(sizeof(struct vki_cmsghdr))
++#define VKI___CMSG_MSGNEXT(cmsg) \
++    (VKI___CASTV(char *, cmsg) + VKI___CMSG_ALIGN((cmsg)->cmsg_len))
 +#define VKI___CMSG_MSGEND(mhdr) \
 +    (VKI___CASTV(char *, (mhdr)->msg_control) + (mhdr)->msg_controllen)
 +
