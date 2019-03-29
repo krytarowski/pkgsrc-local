@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-29 03:02:33.032190346 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,1107 @@
+@@ -0,0 +1,1353 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -1104,6 +1104,252 @@ $NetBSD$
 +#define VKI_EPASSTHROUGH	-4		/* ioctl not handled by this layer */
 +#define VKI_EDUPFD		-5		/* Dup given fd */
 +#define VKI_EMOVEFD		-6		/* Move given fd */
++
++//----------------------------------------------------------------------
++// From unistd.h
++//----------------------------------------------------------------------
++
++#define VKI__POSIX_JOB_CONTROL      1
++
++#define VKI__POSIX_VERSION                  200112L
++#define VKI__POSIX2_VERSION                 200112L
++
++#define VKI__POSIX_SPAWN                    200809L
++
++#undef  VKI__POSIX_ADVISORY_INFO
++                                        /* asynchronous I/O is available */
++#define VKI__POSIX_ASYNCHRONOUS_IO          200112L
++                                        /* barriers */
++#define VKI__POSIX_BARRIERS                 200112L
++                                        /* chown requires correct privileges */
++#define VKI__POSIX_CHOWN_RESTRICTED         1
++                                        /* clock selection */
++#define VKI__POSIX_CLOCK_SELECTION          -1
++                                        /* cputime clock */
++#define VKI__POSIX_CPUTIME                  200112L
++                                        /* CPU type */
++#undef  VKI__POSIX_CPUTYPE
++                                        /* file synchronization is available */
++#define VKI__POSIX_FSYNC                    1
++
++                                        /* support IPv6 */                                                                                                   
++#define VKI__POSIX_IPV6                     0
++                                        /* job control is available */
++#define VKI__POSIX_JOB_CONTROL              1
++                                        /* memory mapped files */
++#define VKI__POSIX_MAPPED_FILES             1
++                                        /* memory locking whole address space */
++#define VKI__POSIX_MEMLOCK                  1
++                                        /* memory locking address ranges */
++#define VKI__POSIX_MEMLOCK_RANGE            1                                                                                                                    
++                                        /* memory access protections */
++#define VKI__POSIX_MEMORY_PROTECTION        1
++                                        /* message passing is available */
++#define VKI__POSIX_MESSAGE_PASSING          200112L
++                                        /* monotonic clock */
++#define VKI__POSIX_MONOTONIC_CLOCK          200112L
++                                        /* too-long path comp generate errors */
++#define VKI__POSIX_NO_TRUNC                 1
++
++
++                                        /* prioritized I/O */                                                                                                
++#define VKI__POSIX_PRIORITIZED_IO           -1
++                                        /* priority scheduling */
++#define VKI__POSIX_PRIORITY_SCHEDULING      200112L
++                                        /* raw sockets */
++#define VKI__POSIX_RAW_SOCKETS              200112L
++                                        /* read/write locks */
++#define VKI__POSIX_READER_WRITER_LOCKS      200112L
++                                        /* realtime signals */
++#undef  VKI__POSIX_REALTIME_SIGNALS                                                                                                                              
++                                        /* regular expressions */
++#define VKI__POSIX_REGEXP                   1
++                                        /* semaphores */
++#define VKI__POSIX_SEMAPHORES               0
++                                        /* shared memory objects */
++#define VKI__POSIX_SHARED_MEMORY_OBJECTS    0
++                                        /* shell */
++#define VKI__POSIX_SHELL                    1
++
++
++                                        /* spin locks */                                                                                                     
++#define VKI__POSIX_SPIN_LOCKS               200112L
++                                        /* sporadic server */
++#undef  VKI__POSIX_SPORADIC_SERVER
++                                        /* synchronized I/O is available */
++#define VKI__POSIX_SYNCHRONIZED_IO          1
++                                        /* threads */
++#define VKI__POSIX_THREADS                  200112L
++                                        /* pthread_attr for stack size */
++#define VKI__POSIX_THREAD_ATTR_STACKSIZE    200112L                                                                                                              
++                                        /* pthread_attr for stack address */
++#define VKI__POSIX_THREAD_ATTR_STACKADDR    200112L
++                                        /* thread cputime clock */
++#define VKI__POSIX_THREAD_CPUTIME           200112L
++                                        /* _r functions */
++#define VKI__POSIX_THREAD_PRIO_PROTECT      200112L
++                                        /* PTHREAD_PRIO_PROTECT */
++#define VKI__POSIX_THREAD_SAFE_FUNCTIONS    200112L
++
++                                        /* timeouts */                                                                                                       
++#undef  VKI__POSIX_TIMEOUTS
++                                        /* timers */
++#define VKI__POSIX_TIMERS                   200112L
++                                        /* typed memory objects */
++#undef  VKI__POSIX_TYPED_MEMORY_OBJECTS
++                                        /* may disable terminal spec chars */
++#define VKI__POSIX_VDISABLE                 ((unsigned char)'\377')
++
++                                        /* C binding */                                                                                                      
++#define VKI__POSIX2_C_BIND                  200112L
++
++                                        /* XPG4.2 shared memory */
++#define VKI__XOPEN_SHM                      0
++
++/* access function */
++#define VKI_F_OK            0       /* test for existence of file */
++#define VKI_X_OK            0x01    /* test for execute or search permission */
++#define VKI_W_OK            0x02    /* test for write permission */                                                                                              
++#define VKI_R_OK            0x04    /* test for read permission */
++
++/* whence values for lseek(2) */
++#define VKI_SEEK_SET        0       /* set file offset to offset */
++#define VKI_SEEK_CUR        1       /* set file offset to current plus offset */
++#define VKI_SEEK_END        2       /* set file offset to EOF plus offset */
++
++#define VKI_L_SET           VKI_SEEK_SET
++#define VKI_L_INCR          VKI_SEEK_CUR
++#define VKI_L_XTND          VKI_SEEK_END
++
++#define VKI_FDATASYNC       0x0010  /* sync data and minimal metadata */
++#define VKI_FFILESYNC       0x0020  /* sync data and metadata */
++#define VKI_FDISKSYNC       0x0040  /* flush disk caches after sync */
++
++#define VKI__PC_LINK_MAX             1
++#define VKI__PC_MAX_CANON            2
++#define VKI__PC_MAX_INPUT            3
++#define VKI__PC_NAME_MAX             4
++#define VKI__PC_PATH_MAX             5
++#define VKI__PC_PIPE_BUF             6
++#define VKI__PC_CHOWN_RESTRICTED     7
++#define VKI__PC_NO_TRUNC             8                                                                                                                           
++#define VKI__PC_VDISABLE             9
++#define VKI__PC_SYNC_IO             10
++#define VKI__PC_FILESIZEBITS        11
++#define VKI__PC_SYMLINK_MAX         12
++#define VKI__PC_2_SYMLINKS          13
++#define VKI__PC_ACL_EXTENDED        14
++
++#define VKI__PC_MIN_HOLE_SIZE       15 
++
++#define VKI__SC_ARG_MAX              1
++#define VKI__SC_CHILD_MAX            2
++#define VKI__O_SC_CLK_TCK            3 /* Old version, always 100 */
++#define VKI__SC_NGROUPS_MAX          4
++#define VKI__SC_OPEN_MAX             5
++#define VKI__SC_JOB_CONTROL          6
++#define VKI__SC_SAVED_IDS            7
++#define VKI__SC_VERSION              8
++#define VKI__SC_BC_BASE_MAX          9
++#define VKI__SC_BC_DIM_MAX          10
++#define VKI__SC_BC_SCALE_MAX        11
++#define VKI__SC_BC_STRING_MAX       12
++#define VKI__SC_COLL_WEIGHTS_MAX    13
++#define VKI__SC_EXPR_NEST_MAX       14
++#define VKI__SC_LINE_MAX            15
++#define VKI__SC_RE_DUP_MAX          16
++#define VKI__SC_2_VERSION           17
++#define VKI__SC_2_C_BIND            18
++#define VKI__SC_2_C_DEV             19                                                                                                                           
++#define VKI__SC_2_CHAR_TERM         20
++#define VKI__SC_2_FORT_DEV          21
++#define VKI__SC_2_FORT_RUN          22
++#define VKI__SC_2_LOCALEDEF         23
++#define VKI__SC_2_SW_DEV            24
++#define VKI__SC_2_UPE               25
++#define VKI__SC_STREAM_MAX          26
++#define VKI__SC_TZNAME_MAX          27
++#define VKI__SC_PAGESIZE            28                                                                                                                           
++#define VKI__SC_PAGE_SIZE           VKI__SC_PAGESIZE    /* 1170 compatibility */
++#define VKI__SC_FSYNC               29
++#define VKI__SC_XOPEN_SHM           30
++#define VKI__SC_SYNCHRONIZED_IO     31
++#define VKI__SC_IOV_MAX             32
++#define VKI__SC_MAPPED_FILES        33
++#define VKI__SC_MEMLOCK             34
++#define VKI__SC_MEMLOCK_RANGE       35
++#define VKI__SC_MEMORY_PROTECTION   36                                                                                                                           
++#define VKI__SC_LOGIN_NAME_MAX      37
++#define VKI__SC_MONOTONIC_CLOCK     38
++#define VKI__SC_CLK_TCK             39 /* New, variable version */
++#define VKI__SC_ATEXIT_MAX          40
++#define VKI__SC_THREADS             41
++#define VKI__SC_SEMAPHORES          42
++#define VKI__SC_BARRIERS            43
++#define VKI__SC_TIMERS              44
++#define VKI__SC_SPIN_LOCKS          45                                                                                                                           
++#define VKI__SC_READER_WRITER_LOCKS 46
++#define VKI__SC_GETGR_R_SIZE_MAX    47
++#define VKI__SC_GETPW_R_SIZE_MAX    48
++#define VKI__SC_CLOCK_SELECTION     49
++#define VKI__SC_ASYNCHRONOUS_IO     50
++#define VKI__SC_AIO_LISTIO_MAX      51
++#define VKI__SC_AIO_MAX             52
++#define VKI__SC_MESSAGE_PASSING     53
++#define VKI__SC_MQ_OPEN_MAX         54                                                                                                                           
++#define VKI__SC_MQ_PRIO_MAX         55
++#define VKI__SC_PRIORITY_SCHEDULING 56
++#define VKI__SC_THREAD_DESTRUCTOR_ITERATIONS 57
++#define VKI__SC_THREAD_KEYS_MAX             58
++#define VKI__SC_THREAD_STACK_MIN            59
++#define VKI__SC_THREAD_THREADS_MAX          60
++#define VKI__SC_THREAD_ATTR_STACKADDR       61
++#define VKI__SC_THREAD_ATTR_STACKSIZE       62
++#define VKI__SC_THREAD_PRIORITY_SCHEDULING  63                                                                                                                   
++#define VKI__SC_THREAD_PRIO_INHERIT         64
++#define VKI__SC_THREAD_PRIO_PROTECT         65
++#define VKI__SC_THREAD_PROCESS_SHARED       66
++#define VKI__SC_THREAD_SAFE_FUNCTIONS       67
++#define VKI__SC_TTY_NAME_MAX                68
++#define VKI__SC_HOST_NAME_MAX               69
++#define VKI__SC_PASS_MAX                    70
++#define VKI__SC_REGEXP                      71
++#define VKI__SC_SHELL                       72                                                                                                                   
++#define VKI__SC_SYMLOOP_MAX                 73
++
++/* Actually, they are not supported or implemented yet */
++#define VKI__SC_V6_ILP32_OFF32              74
++#define VKI__SC_V6_ILP32_OFFBIG             75
++#define VKI__SC_V6_LP64_OFF64               76
++#define VKI__SC_V6_LPBIG_OFFBIG             77
++#define VKI__SC_2_PBS                       80
++#define VKI__SC_2_PBS_ACCOUNTING            81                                                                                                                   
++#define VKI__SC_2_PBS_CHECKPOINT            82
++#define VKI__SC_2_PBS_LOCATE                83
++#define VKI__SC_2_PBS_MESSAGE               84
++#define VKI__SC_2_PBS_TRACK                 85
++
++/* These are implemented */
++#define VKI__SC_SPAWN                       86
++#define VKI__SC_SHARED_MEMORY_OBJECTS       87
++#define VKI__SC_TIMER_MAX                   88
++#define VKI__SC_SEM_NSEMS_MAX               89
++#define VKI__SC_CPUTIME                     90
++#define VKI__SC_THREAD_CPUTIME              91
++#define VKI__SC_DELAYTIMER_MAX              92
++#define VKI__SC_SIGQUEUE_MAX                93
++#define VKI__SC_REALTIME_SIGNALS            94
++
++/* Extensions found in Solaris and Linux. */                                                                                                                 
++#define VKI__SC_PHYS_PAGES          121
++
++/* Commonly provided sysconf() extensions */
++#define VKI__SC_NPROCESSORS_CONF    1001
++#define VKI__SC_NPROCESSORS_ONLN    1002
++/* Native variables */
++#define VKI__SC_SCHED_RT_TS         2001
++#define VKI__CS_PATH                 1
++
 +
 +#endif // __VKI_NETBSD_H
 +
