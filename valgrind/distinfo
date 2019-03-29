@@ -42,6 +42,7 @@ SHA1 (patch-coregrind_m__ume_main.c) = 651efe393df07446c98d08dabbade83435ed6196
 SHA1 (patch-coregrind_m__ume_priv__ume.h) = 628853a79d330ced54953cee8d756b4b6c46a8ca
 SHA1 (patch-coregrind_m__vki.c) = 997173b047d469d26e8a8c070dba5f54b0312079
 SHA1 (patch-coregrind_m__vkiscnums.c) = c8a68d4b6f38ece5da416401201ccdd404e071b8
+SHA1 (patch-coregrind_pub__core__debuginfo.h) = 5b43e2f1f57cbabab3424aa387b9ef9529c46e7f
 SHA1 (patch-coregrind_pub__core__initimg.h) = abac1cf83cda86270ebbe9a01118688475b4a069
 SHA1 (patch-coregrind_pub__core__machine.h) = 12214e212a56d5d8b029adf80e3a4e0c8c826d98
 SHA1 (patch-coregrind_pub__core__mallocfree.h) = ba38926737f61ba64b7424de45ab91822264e65f
