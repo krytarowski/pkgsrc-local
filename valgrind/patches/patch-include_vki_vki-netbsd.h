@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-29 03:02:33.032190346 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,1884 @@
+@@ -0,0 +1,1886 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -387,24 +387,24 @@ $NetBSD$
 +        struct vki__ksiginfo _info;
 +} vki_siginfo_t;
 +
-+#define vki_si_signo        _info._signo
-+#define vki_si_code         _info._code
-+#define vki_si_errno        _info._errno
++#define si_signo        _info._signo
++#define si_code         _info._code
++#define si_errno        _info._errno
 +
-+#define vki_si_value        _info._reason._rt._value   
-+#define vki_si_pid          _info._reason._child._pid
-+#define vki_si_uid          _info._reason._child._uid   
-+#define vki_si_status       _info._reason._child._status
-+#define vki_si_utime        _info._reason._child._utime                                                                                                          
-+#define vki_si_stime        _info._reason._child._stime
++#define si_value        _info._reason._rt._value   
++#define si_pid          _info._reason._child._pid
++#define si_uid          _info._reason._child._uid   
++#define si_status       _info._reason._child._status
++#define si_utime        _info._reason._child._utime                                                                                                          
++#define si_stime        _info._reason._child._stime
 +
-+#define vki_si_addr         _info._reason._fault._addr
-+#define vki_si_trap         _info._reason._fault._trap
-+#define vki_si_trap2        _info._reason._fault._trap2
-+#define vki_si_trap3        _info._reason._fault._trap3
++#define si_addr         _info._reason._fault._addr
++#define si_trap         _info._reason._fault._trap
++#define si_trap2        _info._reason._fault._trap2
++#define si_trap3        _info._reason._fault._trap3
 +
-+#define vki_si_band         _info._reason._poll._band
-+#define vki_si_fd           _info._reason._poll._fd 
++#define si_band         _info._reason._poll._band
++#define si_fd           _info._reason._poll._fd 
 +
 +#define VKI_ILL_ILLOPC      1       /* Illegal opcode                       */
 +#define VKI_ILL_ILLOPN      2       /* Illegal operand                      */
@@ -894,6 +894,8 @@ $NetBSD$
 +
 +#define vki_sa_handler _sa_u._sa_handler
 +#define ksa_handler    vki_sa_handler
++
++#define VKI_SA_RESTORER 0 /* linux compat, not supported */
 +
 +#define VKI_SA_ONSTACK      0x0001  /* take signal on signal stack */
 +#define VKI_SA_RESTART      0x0002  /* restart system call on signal return */
