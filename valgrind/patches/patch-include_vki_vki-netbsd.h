@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-29 10:08:50.867431796 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,2104 @@
+@@ -0,0 +1,2290 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -2101,6 +2101,192 @@ $NetBSD$
 +
 +#define VKI_SUN_LEN(su) \
 +        (sizeof(*(su)) - sizeof((su)->sun_path) + strlen((su)->sun_path))
++
++//----------------------------------------------------------------------
++// From netinet6/in6.h
++//----------------------------------------------------------------------
++
++#define VKI_IPV6PORT_RESERVED       1024
++#define VKI_IPV6PORT_ANONMIN        49152
++#define VKI_IPV6PORT_ANONMAX        65535                                                                                                                        
++#define VKI_IPV6PORT_RESERVEDMIN    600
++#define VKI_IPV6PORT_RESERVEDMAX    (VKI_IPV6PORT_RESERVED-1)
++
++struct vki_in6_addr {
++        union {
++                vki_uint8_t   __u6_addr8[16];
++                vki_uint16_t  __u6_addr16[8];
++                vki_uint32_t  __u6_addr32[4];
++        } __u6_addr;                    /* 128-bit IP6 address */
++}; 
++
++#define s6_addr   __u6_addr.__u6_addr8
++
++#define VKI_INET6_ADDRSTRLEN        46
++
++#define VKI_SIN6_LEN
++
++struct vki_sockaddr_in6 {
++        vki_uint8_t         sin6_len;       /* length of this struct(socklen_t)*/
++        vki_sa_family_t     sin6_family;    /* AF_INET6 (sa_family_t) */
++        vki_in_port_t       sin6_port;      /* Transport layer port */
++        vki_uint32_t        sin6_flowinfo;  /* IP6 flow information */
++        struct vki_in6_addr sin6_addr;      /* IP6 address */                                                                                                    
++        vki_uint32_t        sin6_scope_id;  /* scope zone index */
++};
++
++#define VKI_IN6ADDR_ANY_INIT \
++        {{{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
++            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }}}
++#define VKI_IN6ADDR_LOOPBACK_INIT \
++        {{{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
++            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 }}}
++#define VKI_IN6ADDR_NODELOCAL_ALLNODES_INIT \
++        {{{ 0xff, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
++            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 }}}
++#define VKI_IN6ADDR_LINKLOCAL_ALLNODES_INIT \
++        {{{ 0xff, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
++            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 }}}
++#define VKI_IN6ADDR_LINKLOCAL_ALLROUTERS_INIT \
++        {{{ 0xff, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
++            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02 }}}
++
++#define VKI___IPV6_ADDR_SCOPE_NODELOCAL     0x01
++#define VKI___IPV6_ADDR_SCOPE_LINKLOCAL     0x02
++#define VKI___IPV6_ADDR_SCOPE_SITELOCAL     0x05
++#define VKI___IPV6_ADDR_SCOPE_ORGLOCAL      0x08    /* just used in this file */
++#define VKI___IPV6_ADDR_SCOPE_GLOBAL        0x0e
++
++#define VKI_IN6_IS_ADDR_MULTICAST(a)        ((a)->s6_addr[0] == 0xff)
++
++#define VKI___IPV6_ADDR_MC_SCOPE(a)         ((a)->s6_addr[1] & 0x0f)
++
++#define VKI_IPV6_SOCKOPT_RESERVED1  3  /* reserved for future use */
++#define VKI_IPV6_UNICAST_HOPS       4  /* int; IP6 hops */
++#define VKI_IPV6_MULTICAST_IF       9  /* u_int; set/get IP6 multicast i/f  */
++#define VKI_IPV6_MULTICAST_HOPS     10 /* int; set/get IP6 multicast hops */
++#define VKI_IPV6_MULTICAST_LOOP     11 /* u_int; set/get IP6 multicast loopback */
++/* The join and leave membership option numbers need to match with the v4 ones */
++#define VKI_IPV6_JOIN_GROUP         12 /* ip6_mreq; join a group membership */
++#define VKI_IPV6_LEAVE_GROUP        13 /* ip6_mreq; leave a group membership */                                                                                  
++#define VKI_IPV6_PORTRANGE          14 /* int; range to choose for unspec port */
++
++#define VKI_IPV6_PORTALGO           17 /* int; port selection algo (rfc6056) */
++#define VKI_ICMP6_FILTER            18 /* icmp6_filter; icmp6 filter */
++
++#define VKI_IPV6_CHECKSUM           26 /* int; checksum offset for raw socket */
++#define VKI_IPV6_V6ONLY             27 /* bool; make AF_INET6 sockets v6 only */
++                                                                                                                                                             
++#define VKI_IPV6_IPSEC_POLICY       28 /* struct; get/set security policy */
++#define VKI_IPV6_FAITH              29 /* bool; accept FAITH'ed connections */
++
++/* new socket options introduced in RFC3542 */
++#define VKI_IPV6_RTHDRDSTOPTS       35 /* ip6_dest; send dst option before rthdr */
++
++#define VKI_IPV6_RECVPKTINFO        36 /* bool; recv if, dst addr */
++#define VKI_IPV6_RECVHOPLIMIT       37 /* bool; recv hop limit */
++
++#define VKI_IPV6_RECVRTHDR          38 /* bool; recv routing header */                                                                                           
++#define VKI_IPV6_RECVHOPOPTS        39 /* bool; recv hop-by-hop option */
++#define VKI_IPV6_RECVDSTOPTS        40 /* bool; recv dst option after rthdr */
++
++#define VKI_IPV6_USE_MIN_MTU        42 /* bool; send packets at the minimum MTU */
++#define VKI_IPV6_RECVPATHMTU        43 /* bool; notify an according MTU */
++#define VKI_IPV6_PATHMTU            44 /* mtuinfo; get the current path MTU (sopt),
++                                      4 bytes int; MTU notification (cmsg) */                                                                                
++
++/* more new socket options introduced in RFC3542 */
++#define VKI_IPV6_PKTINFO            46 /* in6_pktinfo; send if, src addr */
++#define VKI_IPV6_HOPLIMIT           47 /* int; send hop limit */
++#define VKI_IPV6_NEXTHOP            48 /* sockaddr; next hop addr */
++#define VKI_IPV6_HOPOPTS            49 /* ip6_hbh; send hop-by-hop option */
++#define VKI_IPV6_DSTOPTS            50 /* ip6_dest; send dst option befor rthdr */
++#define VKI_IPV6_RTHDR              51 /* ip6_rthdr; send routing header */
++
++#define VKI_IPV6_RECVTCLASS         57 /* bool; recv traffic class values */
++
++#define VKI_IPV6_TCLASS             61 /* int; send traffic class value */
++#define VKI_IPV6_DONTFRAG           62 /* bool; disable IPv6 fragmentation */
++#define VKI_IPV6_PREFER_TEMPADDR    63 /* int; prefer temporary address as
++                                    * the sorce address */                                                                                                   
++/* to define VKI_items, should talk with KAME guys first, for *BSD compatibility */
++
++#define VKI_IPV6_RTHDR_LOOSE     0 /* this hop need not be a neighbor. XXX old spec */
++#define VKI_IPV6_RTHDR_STRICT    1 /* this hop must be a neighbor. XXX old spec */
++#define VKI_IPV6_RTHDR_TYPE_0    0 /* IPv6 routing header type 0 */
++
++                                                                            
++#define VKI_IPV6_DEFAULT_MULTICAST_HOPS 1   /* normally limit m'casts to 1 hop  */
++#define VKI_IPV6_DEFAULT_MULTICAST_LOOP 1   /* normally hear sends if a member  */
++
++struct vki_ipv6_mreq {
++        struct vki_in6_addr ipv6mr_multiaddr;
++        unsigned int    ipv6mr_interface;                                                                                                                    
++};
++
++struct vki_in6_pktinfo {
++        struct vki_in6_addr ipi6_addr;      /* src/dst IPv6 address */
++        unsigned int    ipi6_ifindex;   /* send/recv interface index */                                                                                      
++};
++
++/*
++ * Control structure for IPV6_RECVPATHMTU socket option.
++ */
++struct vki_ip6_mtuinfo {
++        struct vki_sockaddr_in6 ip6m_addr;  /* or sockaddr_storage? */
++        vki_uint32_t ip6m_mtu;
++};  
++
++#define VKI_IPV6_PORTRANGE_DEFAULT  0       /* default range */
++#define VKI_IPV6_PORTRANGE_HIGH     1       /* "high" - request firewall bypass */
++#define VKI_IPV6_PORTRANGE_LOW      2       /* "low" - vouchsafe security */
++
++#define VKI_IPV6CTL_FORWARDING      1       /* act as router */
++#define VKI_IPV6CTL_SENDREDIRECTS   2       /* may send redirects when forwarding*/
++#define VKI_IPV6CTL_DEFHLIM         3       /* default Hop-Limit */
++/* IPV6CTL_DEFMTU=4, never implemented */
++#define VKI_IPV6CTL_FORWSRCRT       5       /* forward source-routed dgrams */
++#define VKI_IPV6CTL_STATS           6       /* stats */
++#define VKI_IPV6CTL_MRTSTATS        7       /* multicast forwarding stats */
++#define VKI_IPV6CTL_MRTPROTO        8       /* multicast routing protocol */
++#define VKI_IPV6CTL_MAXFRAGPACKETS  9       /* max packets reassembly queue */                                                                                   
++#define VKI_IPV6CTL_SOURCECHECK     10      /* verify source route and intf */
++#define VKI_IPV6CTL_SOURCECHECK_LOGINT 11   /* minimum logging interval */
++#define VKI_IPV6CTL_ACCEPT_RTADV    12
++#define VKI_IPV6CTL_KEEPFAITH       13
++#define VKI_IPV6CTL_LOG_INTERVAL    14
++#define VKI_IPV6CTL_HDRNESTLIMIT    15
++#define VKI_IPV6CTL_DAD_COUNT       16
++#define VKI_IPV6CTL_AUTO_FLOWLABEL  17
++
++#define VKI_IPV6CTL_DEFMCASTHLIM    18                                                                                                                           
++#define VKI_IPV6CTL_GIF_HLIM        19      /* default HLIM for gif encap packet */
++#define VKI_IPV6CTL_KAME_VERSION    20
++#define VKI_IPV6CTL_USE_DEPRECATED  21      /* use deprecated addr (RFC2462 5.5.4) */
++#define VKI_IPV6CTL_RR_PRUNE        22      /* walk timer for router renumbering */
++/* 23: reserved */
++#define VKI_IPV6CTL_V6ONLY          24
++/* 25 to 27: reserved */
++#define VKI_IPV6CTL_ANONPORTMIN     28      /* minimum ephemeral port */
++#define VKI_IPV6CTL_ANONPORTMAX     29      /* maximum ephemeral port */                                                                                         
++#define VKI_IPV6CTL_LOWPORTMIN      30      /* minimum reserved port */
++#define VKI_IPV6CTL_LOWPORTMAX      31      /* maximum reserved port */
++/* 32 to 34: reserved */
++#define VKI_IPV6CTL_AUTO_LINKLOCAL  35      /* automatic link-local addr assign */
++/* 36 to 37: reserved */
++#define VKI_IPV6CTL_ADDRCTLPOLICY   38      /* get/set address selection policy */
++#define VKI_IPV6CTL_USE_DEFAULTZONE 39      /* use default scope zone */
++
++#define VKI_IPV6CTL_MAXFRAGS        41      /* max fragments */                                                                                                  
++#define VKI_IPV6CTL_IFQ             42      /* IPv6 packet input queue */
++#define VKI_IPV6CTL_RTADV_MAXROUTES 43      /* maximum number of routes */
++                                        /* via router advertisement */
++#define VKI_IPV6CTL_RTADV_NUMROUTES 44      /* current number of routes */
++  /* via router advertisement */
++
++#define VKI_INET6_IS_ADDR_LINKLOCAL         1
++#define VKI_INET6_IS_ADDR_MC_LINKLOCAL      2
++#define VKI_INET6_IS_ADDR_SITELOCAL         4
 +
 +#endif // __VKI_NETBSD_H
 +
