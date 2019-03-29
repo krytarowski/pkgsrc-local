@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-29 17:03:24.566037184 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,2466 @@
+@@ -0,0 +1,2520 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -648,7 +648,9 @@ $NetBSD$
 +#define VKI_pseudo_AF_KEY   29              /* Internal key management protocol  */
 +#define VKI_pseudo_AF_HDRCMPLT 30           /* Used by BPF to not rewrite hdrs                                                                                   
 +                                           in interface output routine */
-+#define VKI_AF_BLUETOOTH    31              /* Bluetooth: HCI, SCO, L2CAP, RFCOMM */
++
++//#define VKI_AF_BLUETOOTH    31              /* Bluetooth: HCI, SCO, L2CAP, RFCOMM */
++
 +#define VKI_AF_IEEE80211    32              /* IEEE80211 */
 +#define VKI_AF_MPLS         33              /* MultiProtocol Label Switching */
 +#define VKI_AF_ROUTE        34              /* Internal Routing Protocol */
@@ -2463,6 +2465,58 @@ $NetBSD$
 +    ((cmd) == VKI_IPC_SET || (cmd) == VKI_IPC_STAT ? (void *)sembuf \
 +    : (cmd) == VKI_GETALL || (cmd) == VKI_SETVAL || (cmd) == VKI_SETALL ? (void *)arg \
 +    : 0)
++
++//----------------------------------------------------------------------
++// From sys/shm.h
++//----------------------------------------------------------------------
++
++#define VKI_SHM_RDONLY      010000  /* Attach read-only (else read-write) */
++#define VKI_SHM_RND         020000  /* Round attach address to SHMLBA */
++
++typedef unsigned int    vki_shmatt_t;
++
++struct vki_shmid_ds {
++        struct vki_ipc_perm shm_perm;       /* operation permission structure */
++        vki_size_t          shm_segsz;      /* size of segment in bytes */                                                                                       
++        vki_pid_t           shm_lpid;       /* process ID of last shm operation */
++        vki_pid_t           shm_cpid;       /* process ID of creator */
++        vki_shmatt_t        shm_nattch;     /* number of current attaches */
++        vki_time_t          shm_atime;      /* time of last shmat() */
++        vki_time_t          shm_dtime;      /* time of last shmdt() */
++        vki_time_t          shm_ctime;      /* time of last change by shmctl() */
++
++        void            *_shm_internal;
++};
++
++#define VKI_SHM_LOCK        3       /* Lock segment in memory. */
++#define VKI_SHM_UNLOCK      4       /* Unlock a segment locked by SHM_LOCK. */
++
++#define VKI_SHM_R           VKI_IPC_R   /* S_IRUSR, R for owner */
++#define VKI_SHM_W           VKI_IPC_W   /* S_IWUSR, W for owner */
++
++struct vki_shminfo {                                                                                                                                             
++        vki_uint64_t        shmmax; /* max shared memory segment size (bytes) */
++        vki_uint32_t        shmmin; /* min shared memory segment size (bytes) */
++        vki_uint32_t        shmmni; /* max number of shared memory identifiers */
++        vki_uint32_t        shmseg; /* max shared memory segments per process */
++        vki_uint32_t        shmall; /* max amount of shared memory (pages) */
++};
++
++struct vki_shmid_ds_sysctl {                                                                                                                                     
++        struct          vki_ipc_perm_sysctl shm_perm;
++        vki_uint64_t        shm_segsz;
++        vki_pid_t           shm_lpid;
++        vki_pid_t           shm_cpid;
++        vki_time_t          shm_atime;
++        vki_time_t          shm_dtime;
++        vki_time_t          shm_ctime;
++        vki_uint32_t        shm_nattch;
++};                                                                                                                                                           
++
++struct vki_shm_sysctl_info {
++        struct  vki_shminfo shminfo;
++        struct  vki_shmid_ds_sysctl shmids[1];
++};
 +
 +#endif // __VKI_NETBSD_H
 +
