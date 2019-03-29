@@ -11,6 +11,15 @@ $NetBSD$
  
  #include "pub_core_basics.h"
  #include "pub_core_vki.h"
+@@ -270,7 +270,7 @@ ML_(notify_core_and_tool_of_mprotect) ( 
+ 
+ 
+ 
+-#if HAVE_MREMAP
++#if HAVE_MREMAP && 0
+ /* Expand (or shrink) an existing mapping, potentially moving it at
+    the same time (controlled by the MREMAP_MAYMOVE flag).  Nightmare.
+ */
 @@ -926,7 +926,7 @@ void VG_(init_preopened_fds)(void)
    out:
     VG_(close)(sr_Res(f));
