@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-29 17:03:24.566037184 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,2464 @@
+@@ -0,0 +1,2466 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -200,7 +200,7 @@ $NetBSD$
 +//----------------------------------------------------------------------
 +
 +#define VKI___CAST(__dt, __st)      ((__dt)(__st))
-+#define VKI__CASTV(__dt, __st)     VKI___CAST(__dt, VKI___CAST(void *, __st))
++#define VKI___CASTV(__dt, __st)     VKI___CAST(__dt, VKI___CAST(void *, __st))
 +#define VKI___CASTCV(__dt, __st)    VKI___CAST(__dt, VKI___CAST(const void *, __st))
 +
 +//----------------------------------------------------------------------
@@ -848,6 +848,8 @@ $NetBSD$
 +};
 +
 +#define VKI___CMSG_ALIGN(n) (((n) + VKI___ALIGNBYTES) & ~VKI___ALIGNBYTES)
++
++#define VKI_CMSG_ALIGN(n) VKI___CMSG_ALIGN(n)
 +
 +#define VKI___CMSG_ASIZE    VKI___CMSG_ALIGN(sizeof(struct vki_cmsghdr))
 +#define VKI___CMSG_MSGNEXT(cmsg) \
