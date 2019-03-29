@@ -2,7 +2,7 @@ $NetBSD$
 
 --- coregrind/m_initimg/initimg-netbsd.c.orig	2019-03-29 09:38:06.938846303 +0000
 +++ coregrind/m_initimg/initimg-netbsd.c
-@@ -0,0 +1,896 @@
+@@ -0,0 +1,893 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- Startup: create initial process image on Linux               ---*/
@@ -603,38 +603,35 @@ $NetBSD$
 +      /* ...and fix up / examine the copy */
 +      switch(auxv->a_type) {
 +
-+         case AT_IGNORE:
-+         case AT_PHENT:
-+         case AT_PAGESZ:
-+         case AT_FLAGS:
-+         case AT_NOTELF:
-+         case AT_UID:
-+         case AT_EUID:
-+         case AT_GID:
-+         case AT_EGID:
++         case VKI_AT_IGNORE:
++         case VKI_AT_PHENT:
++         case VKI_AT_PAGESZ:
++         case VKI_AT_FLAGS:
++         case VKI_AT_EUID:
++         case VKI_AT_EGID:
 +            /* All these are pointerless, so we don't need to do
 +               anything about them. */
 +            break;
 +
-+         case AT_PHDR:
++         case VKI_AT_PHDR:
 +            if (info->phdr == 0)
-+               auxv->a_type = AT_IGNORE;
++               auxv->a_type = VKI_AT_IGNORE;
 +            else
 +               auxv->u.a_val = info->phdr;
 +            break;
 +
-+         case AT_PHNUM:
++         case VKI_AT_PHNUM:
 +            if (info->phdr == 0)
-+               auxv->a_type = AT_IGNORE;
++               auxv->a_type = VKI_AT_IGNORE;
 +            else
 +               auxv->u.a_val = info->phnum;
 +            break;
 +
-+         case AT_BASE:
++         case VKI_AT_BASE:
 +            auxv->u.a_val = info->interp_offset;
 +            break;
 +
-+         case AT_ENTRY:
++         case VKI_AT_ENTRY:
 +            auxv->u.a_val = info->entry;
 +            break;
 +

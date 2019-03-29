@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-29 08:35:39.165383192 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,2039 @@
+@@ -0,0 +1,2080 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -2036,6 +2036,47 @@ $NetBSD$
 +        /* Padding to grow without breaking ABI. */
 +        vki_uint32_t        __tcpi_pad[26];         /* Padding. */
 +}; 
++
++//----------------------------------------------------------------------
++// From sys/exec_elf.h
++//----------------------------------------------------------------------
++
++#define VKI_AT_NULL         0       /* Marks end of array */
++#define VKI_AT_IGNORE       1       /* No meaning, a_un is undefined */
++#define VKI_AT_EXECFD       2       /* Open file descriptor of object file */
++#define VKI_AT_PHDR         3       /* &phdr[0] */
++#define VKI_AT_PHENT        4       /* sizeof(phdr[0]) */
++#define VKI_AT_PHNUM        5       /* # phdr entries */
++#define VKI_AT_PAGESZ       6       /* PAGESIZE */
++#define VKI_AT_BASE         7       /* Interpreter base addr */
++#define VKI_AT_FLAGS        8       /* Processor flags */
++#define VKI_AT_ENTRY        9       /* Entry address of executable */
++#define VKI_AT_DCACHEBSIZE  10      /* Data cache block size */
++#define VKI_AT_ICACHEBSIZE  11      /* Instruction cache block size */
++#define VKI_AT_UCACHEBSIZE  12      /* Unified cache block size */
++#define VKI_AT_STACKBASE    13      /* Base address of the main thread */
++
++#define VKI_AT_MIPS_NOTELF  10      /* XXX a_val != 0 -> MIPS XCOFF executable */                                                                                
++
++#define VKI_AT_EUID         2000    /* euid (solaris compatible numbers) */
++#define VKI_AT_RUID         2001    /* ruid (solaris compatible numbers) */
++#define VKI_AT_EGID         2002    /* egid (solaris compatible numbers) */
++#define VKI_AT_RGID         2003    /* rgid (solaris compatible numbers) */
++
++#define VKI_AT_SUN_LDELF    2004    /* dynamic linker's ELF header */
++#define VKI_AT_SUN_LDSHDR   2005    /* dynamic linker's section header */                                                                                        
++#define VKI_AT_SUN_LDNAME   2006    /* dynamic linker's name */
++#define VKI_AT_SUN_LPGSIZE  2007    /* large pagesize */
++
++#define VKI_AT_SUN_PLATFORM 2008    /* sysinfo(SI_PLATFORM) */
++#define VKI_AT_SUN_HWCAP    2009    /* process hardware capabilities */
++#define VKI_AT_SUN_IFLUSH   2010    /* do we need to flush the instruction cache? */
++#define VKI_AT_SUN_CPU      2011    /* CPU name */
++        /* ibcs2 emulation band aid */                                                                                                                       
++#define VKI_AT_SUN_EMUL_ENTRY 2012  /* coff entry point */
++#define VKI_AT_SUN_EMUL_EXECFD 2013 /* coff file descriptor */
++        /* Executable's fully resolved name */
++#define VKI_AT_SUN_EXECNAME 2014
 +
 +#endif // __VKI_NETBSD_H
 +
