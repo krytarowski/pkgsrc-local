@@ -1,6 +1,6 @@
 $NetBSD$
 
---- coregrind/m_syswrap/syswrap-amd64-netbsd.c.orig	2019-03-29 08:35:39.065629803 +0000
+--- coregrind/m_syswrap/syswrap-amd64-netbsd.c.orig	2019-03-29 10:08:50.727690024 +0000
 +++ coregrind/m_syswrap/syswrap-amd64-netbsd.c
 @@ -0,0 +1,718 @@
 +

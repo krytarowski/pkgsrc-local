@@ -1,6 +1,6 @@
 $NetBSD$
 
---- include/vki/vki-netbsd.h.orig	2019-03-29 08:35:39.165383192 +0000
+--- include/vki/vki-netbsd.h.orig	2019-03-29 10:08:50.867431796 +0000
 +++ include/vki/vki-netbsd.h
 @@ -0,0 +1,2080 @@
 +
