@@ -41,7 +41,17 @@ $NetBSD$
     /* Don't do any extra checking if we cannot determine the sa_family. */
     if (! ML_(safe_to_deref) (&sa->sa_family, sizeof(vki_sa_family_t)))
        return;
-@@ -1844,8 +1849,10 @@ ML_(generic_PRE_sys_semctl) ( ThreadId t
+@@ -1818,6 +1823,9 @@ UInt get_sem_count( Int semid )
+ 
+    return buf.sem_nsems;
+ 
++#  elif defined(VGO_netbsd)
++   return 0;
++
+ #  else
+    struct vki_semid_ds buf;
+    arg.buf = &buf;
+@@ -1844,8 +1852,10 @@ ML_(generic_PRE_sys_semctl) ( ThreadId t
     case VKI_SEM_INFO:
     case VKI_IPC_INFO|VKI_IPC_64:
     case VKI_SEM_INFO|VKI_IPC_64:
@@ -52,7 +62,7 @@ $NetBSD$
        break;
  #endif
  
-@@ -1923,7 +1930,9 @@ ML_(generic_POST_sys_semctl) ( ThreadId 
+@@ -1923,7 +1933,9 @@ ML_(generic_POST_sys_semctl) ( ThreadId 
     case VKI_SEM_INFO:
     case VKI_IPC_INFO|VKI_IPC_64:
     case VKI_SEM_INFO|VKI_IPC_64:
@@ -62,7 +72,7 @@ $NetBSD$
        break;
  #endif
  
-@@ -2456,6 +2465,7 @@ ML_(generic_PRE_sys_mmap) ( ThreadId tid
+@@ -2456,6 +2468,7 @@ ML_(generic_PRE_sys_mmap) ( ThreadId tid
  #define PRE(name)      DEFN_PRE_TEMPLATE(generic, name)
  #define POST(name)     DEFN_POST_TEMPLATE(generic, name)
  
@@ -70,7 +80,7 @@ $NetBSD$
  PRE(sys_exit)
  {
     ThreadState* tst;
-@@ -2469,6 +2479,7 @@ PRE(sys_exit)
+@@ -2469,6 +2482,7 @@ PRE(sys_exit)
     tst->os_state.exitcode = ARG1;
     SET_STATUS_Success(0);
  }
@@ -78,7 +88,7 @@ $NetBSD$
  
  PRE(sys_ni_syscall)
  {
-@@ -3339,7 +3350,7 @@ PRE(sys_fork)
+@@ -3339,7 +3353,7 @@ PRE(sys_fork)
  
     if (!SUCCESS) return;
  

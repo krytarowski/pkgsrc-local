@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-29 10:08:50.867431796 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,2290 @@
+@@ -0,0 +1,2337 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -2287,6 +2287,53 @@ $NetBSD$
 +#define VKI_INET6_IS_ADDR_LINKLOCAL         1
 +#define VKI_INET6_IS_ADDR_MC_LINKLOCAL      2
 +#define VKI_INET6_IS_ADDR_SITELOCAL         4
++
++//----------------------------------------------------------------------
++// From sys/ipc.h
++//----------------------------------------------------------------------
++
++struct vki_ipc_perm {
++        vki_uid_t           uid;    /* user id */
++        vki_gid_t           gid;    /* group id */
++        vki_uid_t           cuid;   /* creator user id */
++        vki_gid_t           cgid;   /* creator group id */
++        vki_mode_t          mode;   /* r/w permission */
++
++        /*
++         * These members are private and used only in the internal
++         * implementation of this interface.
++         */
++        unsigned short  _seq;   /* sequence # (to generate unique
++                                   msg/sem/shm id) */
++        vki_key_t           _key;   /* user specified msg/sem/shm key */
++};
++
++struct vki_ipc_perm_sysctl {
++        vki_uint64_t        _key;
++        vki_uid_t           uid;
++        vki_gid_t           gid;
++        vki_uid_t           cuid;
++        vki_gid_t           cgid;
++        vki_mode_t          mode;
++        vki_int16_t         _seq;
++        vki_int16_t         pad;
++};
++
++#define VKI_IPC_R           000400  /* read permission */
++#define VKI_IPC_W           000200  /* write/alter permission */
++#define VKI_IPC_M           010000  /* permission to change control info */
++
++#define VKI_IPC_CREAT       001000  /* create entry if key does not exist */                                                                                     
++#define VKI_IPC_EXCL        002000  /* fail if key exists */
++#define VKI_IPC_NOWAIT      004000  /* error if request must wait */
++
++#define VKI_IPC_PRIVATE     (vki_key_t)0 /* private key */
++
++#define VKI_IPC_RMID        0       /* remove identifier */
++#define VKI_IPC_SET         1       /* set options */
++#define VKI_IPC_STAT        2       /* get options */
++
++#define VKI_IXSEQ_TO_IPCID(ix,perm) (((perm._seq) << 16) | (ix & 0xffff))
 +
 +#endif // __VKI_NETBSD_H
 +
