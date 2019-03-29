@@ -2,7 +2,7 @@ $NetBSD$
 
 --- coregrind/m_syswrap/syswrap-amd64-netbsd.c.orig	2019-03-29 10:08:50.727690024 +0000
 +++ coregrind/m_syswrap/syswrap-amd64-netbsd.c
-@@ -0,0 +1,718 @@
+@@ -0,0 +1,720 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- Platform-specific syscalls stuff.    syswrap-amd64-netbsd.c ---*/
@@ -123,6 +123,7 @@ $NetBSD$
 +#define PRE(name)       DEFN_PRE_TEMPLATE(netbsd, name)
 +#define POST(name)      DEFN_POST_TEMPLATE(netbsd, name)
 +
++#if 0
 +PRE(sys_thr_new)
 +{
 +   static const Bool debug = False;
@@ -712,6 +713,7 @@ $NetBSD$
 +      break;
 +   }
 +}
++#endif
 +
 +#undef PRE
 +#undef POST
