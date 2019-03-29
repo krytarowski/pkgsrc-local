@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-29 03:02:33.032190346 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,1806 @@
+@@ -0,0 +1,1807 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -890,6 +890,7 @@ $NetBSD$
 +typedef  struct vki_sigaction  vki_sigaction_fromK_t; // compat with linux
 +
 +#define vki_sa_handler _sa_u._sa_handler
++#define ksa_handler    vki_sa_handler
 +
 +#define VKI_SA_ONSTACK      0x0001  /* take signal on signal stack */
 +#define VKI_SA_RESTART      0x0002  /* restart system call on signal return */

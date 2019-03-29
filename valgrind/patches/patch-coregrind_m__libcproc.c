@@ -18,7 +18,7 @@ $NetBSD$
 -#  if defined(VGO_linux)
 +#  if defined(VGO_linux) || defined(VGO_netbsd)
 +#    if defined(VGO_netbsd)
-+   SysRes res = VG_(do_syscall4)(__NR__wait450,
++   SysRes res = VG_(do_syscall4)(__NR___wait450,
 +#    else
     SysRes res = VG_(do_syscall4)(__NR_wait4,
 +#    endif
