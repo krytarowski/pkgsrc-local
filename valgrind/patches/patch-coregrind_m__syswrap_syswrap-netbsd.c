@@ -2,7 +2,7 @@ $NetBSD$
 
 --- coregrind/m_syswrap/syswrap-netbsd.c.orig	2019-03-29 12:01:35.786717346 +0000
 +++ coregrind/m_syswrap/syswrap-netbsd.c
-@@ -0,0 +1,4436 @@
+@@ -0,0 +1,4439 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- netbsd-specific syscalls, etc.            syswrap-netbsd.c ---*/
@@ -222,7 +222,7 @@ $NetBSD$
 +         "syscall\n"		/* thr_exit(tst->os_state.exitcode) */
 +	 "popq	%%rdi\n"	/* fake return address */
 +         : "=m" (tst->status)
-+         : "n" (VgTs_Empty), "n" (__NR_thr_exit), "m" (tst->os_state.exitcode)
++         : "n" (VgTs_Empty), "n" (__NR__lwp_exit), "m" (tst->os_state.exitcode)
 +         : "rax", "rdi"
 +      );
 +#else
@@ -384,6 +384,7 @@ $NetBSD$
 +// Combine two 32-bit values into a 64-bit value
 +#define LOHI64(lo,hi)   ( (lo) | ((ULong)(hi) << 32) )
 +
++#if 0
 +PRE(sys_fork)
 +{
 +   PRINT("sys_fork ()");
@@ -821,8 +822,8 @@ $NetBSD$
 +PRE(sys_uname)
 +{
 +   PRINT("sys_uname ( %#lx )", ARG1);
-+   PRE_REG_READ1(long, "uname", struct utsname *, buf);
-+   PRE_MEM_WRITE( "uname(buf)", ARG1, sizeof(struct vki_utsname) );
++// PRE_REG_READ1(long, "uname", struct utsname *, buf);
++//   PRE_MEM_WRITE( "uname(buf)", ARG1, sizeof(struct vki_utsname) );
 +}
 +
 +POST(sys_uname)
@@ -3788,11 +3789,13 @@ $NetBSD$
 +       VG_(free)((struct pselect_adjusted_sigset *)(Addr)ARG6);
 +   }
 +}
++#endif
 +
 +#undef PRE
 +#undef POST
 +
 +const SyscallTableEntry ML_(syscall_table)[] = {
++#if 0
 +   // syscall (handled specially)					// 0
 +   BSDX_(__NR_exit,			sys_exit),			// 1
 +   BSDX_(__NR_fork,			sys_fork),			// 2
@@ -4430,7 +4433,7 @@ $NetBSD$
 +   BSDXY(__NR_pipe2,			sys_pipe2),			// 542
 +
 +   BSDX_(__NR_fake_sigreturn,		sys_fake_sigreturn),		// 1000, fake sigreturn
-+
++#endif
 +};
 +
 +const UInt ML_(syscall_table_size) =
