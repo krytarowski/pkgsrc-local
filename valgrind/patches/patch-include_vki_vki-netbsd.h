@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-29 08:35:39.165383192 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,1889 @@
+@@ -0,0 +1,2039 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -1886,6 +1886,156 @@ $NetBSD$
 +                                           implemented in UVM */
 +#define VKI_MAP_INHERIT_ZERO        4       /* zero in child */
 +#define VKI_MAP_INHERIT_DEFAULT     VKI_MAP_INHERIT_COPY  
++
++//----------------------------------------------------------------------
++// From netinet/tcp.h
++//----------------------------------------------------------------------
++
++typedef vki_uint32_t vki_tcp_seq;
++
++struct vki_tcphdr {
++        vki_uint16_t th_sport;              /* source port */
++        vki_uint16_t th_dport;              /* destination port */
++        vki_tcp_seq   th_seq;               /* sequence number */
++        vki_tcp_seq   th_ack;               /* acknowledgement number */
++#if __x86_64__ /* Little endian */
++        /*LINTED non-portable bitfields*/
++        vki_uint8_t  th_x2:4,               /* (unused) */
++                  th_off:4;             /* data offset */
++#elif 0 /* Big endian */
++        /*LINTED non-portable bitfields*/
++        uint8_t  th_off:4,              /* data offset */                                                                                                    
++                  th_x2:4;              /* (unused) */
++#else
++#error unknown endian
++#endif
++        vki_uint8_t  th_flags;
++#define VKI_TH_FIN    0x01
++#define VKI_TH_SYN    0x02
++#define VKI_TH_RST    0x04
++#define VKI_TH_PUSH   0x08
++#define VKI_TH_ACK    0x10
++#define VKI_TH_URG    0x20
++#define VKI_TH_ECE    0x40
++#define VKI_TH_CWR    0x80
++        vki_uint16_t th_win;                        /* window */
++        vki_uint16_t th_sum;                        /* checksum */
++        vki_uint16_t th_urp;                        /* urgent pointer */
++} __attribute__((__packed__));
++
++#define VKI_TCPOPT_EOL              0
++#define VKI_TCPOLEN_EOL                  1                                                                                                                    
++#define VKI_TCPOPT_PAD              0
++#define VKI_TCPOLEN_PAD                  1
++#define VKI_TCPOPT_NOP              1
++#define VKI_TCPOLEN_NOP                  1
++#define VKI_TCPOPT_MAXSEG           2
++#define VKI_TCPOLEN_MAXSEG               4
++#define VKI_TCPOPT_WINDOW           3
++#define VKI_TCPOLEN_WINDOW               3
++#define VKI_TCPOPT_SACK_PERMITTED   4               /* Experimental */                                                                                           
++#define VKI_TCPOLEN_SACK_PERMITTED       2
++#define VKI_TCPOPT_SACK             5               /* Experimental */
++#define VKI_TCPOPT_TIMESTAMP        8
++#define VKI_TCPOLEN_TIMESTAMP            10
++#define VKI_TCPOLEN_TSTAMP_APPA          (VKI_TCPOLEN_TIMESTAMP+2) /* appendix A */
++
++#define VKI_TCPOPT_TSTAMP_HDR       \
++    (VKI_TCPOPT_NOP<<24|VKI_TCPOPT_NOP<<16|VKI_TCPOPT_TIMESTAMP<<8|VKI_TCPOLEN_TIMESTAMP)
++                                                                                                                                                             
++#define VKI_TCPOPT_SIGNATURE        19              /* Keyed MD5: RFC 2385 */
++#define VKI_TCPOLEN_SIGNATURE            18
++#define VKI_TCPOLEN_SIGLEN               (VKI_TCPOLEN_SIGNATURE+2) /* padding */
++
++#define VKI_MAX_TCPOPTLEN   40      /* max # bytes that go in options */
++
++#define VKI_TCP_MSS         536
++
++#define VKI_TCP_MINMSS      216
++
++#define VKI_TCP_MAXWIN      65535   /* largest value for (unscaled) window */
++  
++#define VKI_TCP_MAX_WINSHIFT        14      /* maximum window shift */
++ 
++#define VKI_TCP_MAXBURST    4       /* maximum segments in a burst */
++
++/*
++ * User-settable options (used with setsockopt).
++ */
++#define VKI_TCP_NODELAY     1       /* don't delay send to coalesce packets */
++
++#define VKI_TCP_MAXSEG      2       /* set maximum segment size */
++#define VKI_TCP_KEEPIDLE    3
++
++#define VKI_TCP_KEEPINTVL   5
++#define VKI_TCP_KEEPCNT     6
++#define VKI_TCP_KEEPINIT    7
++
++#define VKI_TCP_INFO        9       /* retrieve tcp_info structure */
++#define VKI_TCP_MD5SIG      0x10    /* use MD5 digests (RFC2385) */
++#define VKI_TCP_CONGCTL     0x20    /* selected congestion control */
++
++#define VKI_TCPI_OPT_TIMESTAMPS     0x01
++#define VKI_TCPI_OPT_SACK           0x02
++#define VKI_TCPI_OPT_WSCALE         0x04                                                                                                                         
++#define VKI_TCPI_OPT_ECN            0x08
++#define VKI_TCPI_OPT_TOE            0x10
++
++struct vki_tcp_info {
++        vki_uint8_t         tcpi_state; /* TCP FSM state. */
++        vki_uint8_t         __tcpi_ca_state;
++        vki_uint8_t         __tcpi_retransmits;
++        vki_uint8_t         __tcpi_probes;
++        vki_uint8_t         __tcpi_backoff;
++        vki_uint8_t         tcpi_options;          /* Options enabled on conn. */
++        /*LINTED: non-portable bitfield*/
++        vki_uint8_t         tcpi_snd_wscale:4,      /* RFC1323 send shift value. */
++        /*LINTED: non-portable bitfield*/
++                        tcpi_rcv_wscale:4; /* RFC1323 recv shift value. */
++
++        vki_uint32_t        tcpi_rto;               /* Retransmission timeout (usec). */
++        vki_uint32_t        __tcpi_ato;
++        vki_uint32_t        tcpi_snd_mss;           /* Max segment size for send. */
++        vki_uint32_t        tcpi_rcv_mss;           /* Max segment size for receive. */
++
++        vki_uint32_t        __tcpi_unacked;
++        vki_uint32_t        __tcpi_sacked;                                                                                                                       
++        vki_uint32_t        __tcpi_lost;
++        vki_uint32_t        __tcpi_retrans;
++        vki_uint32_t        __tcpi_fackets;
++
++        /* Times; measurements in usecs. */
++        vki_uint32_t        __tcpi_last_data_sent;
++        vki_uint32_t        __tcpi_last_ack_sent;   /* Also unimpl. on Linux? */
++        vki_uint32_t        tcpi_last_data_recv;    /* Time since last recv data. */
++        vki_uint32_t        __tcpi_last_ack_recv;                                                                                                                
++
++        /* Metrics; variable units. */
++        vki_uint32_t        __tcpi_pmtu;
++        vki_uint32_t        __tcpi_rcv_ssthresh;
++        vki_uint32_t        tcpi_rtt;               /* Smoothed RTT in usecs. */
++        vki_uint32_t        tcpi_rttvar;            /* RTT variance in usecs. */
++        vki_uint32_t        tcpi_snd_ssthresh;      /* Slow start threshold. */
++        vki_uint32_t        tcpi_snd_cwnd;          /* Send congestion window. */
++        vki_uint32_t        __tcpi_advmss;                                                                                                                       
++        vki_uint32_t        __tcpi_reordering;
++
++        vki_uint32_t        __tcpi_rcv_rtt;
++        vki_uint32_t        tcpi_rcv_space;         /* Advertised recv window. */
++
++        /* FreeBSD/NetBSD extensions to tcp_info. */
++        vki_uint32_t        tcpi_snd_wnd;           /* Advertised send window. */
++        vki_uint32_t        tcpi_snd_bwnd;          /* No longer used. */
++        vki_uint32_t        tcpi_snd_nxt;           /* Next egress seqno */                                                                                      
++        vki_uint32_t        tcpi_rcv_nxt;           /* Next ingress seqno */
++        vki_uint32_t        tcpi_toe_tid;           /* HWTID for TOE endpoints */
++        vki_uint32_t        tcpi_snd_rexmitpack;    /* Retransmitted packets */
++        vki_uint32_t        tcpi_rcv_ooopack;       /* Out-of-order packets */
++        vki_uint32_t        tcpi_snd_zerowin;       /* Zero-sized windows sent */
++
++        /* Padding to grow without breaking ABI. */
++        vki_uint32_t        __tcpi_pad[26];         /* Padding. */
++}; 
 +
 +#endif // __VKI_NETBSD_H
 +
