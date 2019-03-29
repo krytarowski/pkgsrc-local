@@ -6,7 +6,7 @@ $NetBSD$
 +
 +/*--------------------------------------------------------------------*/
 +/*--- Create/destroy signal delivery frames.                       ---*/
-+/*---                                     sigframe-amd64-freebsd.c ---*/
++/*---                                     sigframe-amd64-netbsd.c ---*/
 +/*--------------------------------------------------------------------*/
 +
 +/*
@@ -34,7 +34,7 @@ $NetBSD$
 +   The GNU General Public License is contained in the file COPYING.
 +*/
 +
-+#if defined(VGP_amd64_freebsd)
++#if defined(VGP_amd64_netbsd)
 +
 +#include "pub_core_basics.h"
 +#include "pub_core_vki.h"
@@ -52,7 +52,7 @@ $NetBSD$
 +#include "pub_core_sigframe.h"   /* self */
 +
 +/* This module creates and removes signal frames for signal deliveries
-+   on amd64-freebsd.
++   on amd64-netbsd.
 +*/
 +
 +
@@ -266,7 +266,7 @@ $NetBSD$
 +             rsp, offsetof(struct sigframe, vg) );
 +
 +   frame->sigNo = sigNo;
-+   frame->retaddr = (Addr)&VG_(amd64_freebsd_SUBST_FOR_sigreturn);
++   frame->retaddr = (Addr)&VG_(amd64_netbsd_SUBST_FOR_sigreturn);
 +   if ((flags & VKI_SA_SIGINFO) == 0)
 +      frame->psigInfo = (Addr)siginfo->si_code;
 +   else
@@ -431,7 +431,7 @@ $NetBSD$
 +   VG_TRACK( post_deliver_signal, tid, sigNo );
 +}
 +
-+#endif // defined(VGP_amd64_freebsd)
++#endif // defined(VGP_amd64_netbsd)
 +
 +/*--------------------------------------------------------------------*/
 +/*--- end                                                          ---*/
