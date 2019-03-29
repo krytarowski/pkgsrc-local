@@ -90,6 +90,15 @@ $NetBSD$
     SysRes sres;
     sres = VG_(do_syscall2)(__NR_getgroups, size, (Addr)list);
     if (sr_isError(sres))
+@@ -823,7 +831,7 @@ Int VG_(getgroups)( Int size, UInt* list
+ Int VG_(ptrace) ( Int request, Int pid, void *addr, void *data )
+ {
+    SysRes res;
+-#  if defined(VGO_linux) || defined(VGO_darwin)
++#  if defined(VGO_linux) || defined(VGO_darwin) || defined(VGO_netbsd)
+    res = VG_(do_syscall4)(__NR_ptrace, request, pid, (UWord)addr, (UWord)data);
+ #  elif defined(VGO_solaris)
+    /* There is no ptrace syscall on Solaris.  Such requests has to be
 @@ -860,7 +868,7 @@ Int VG_(fork) ( void )
        return -1;
     return sr_Res(res);
@@ -106,7 +115,7 @@ $NetBSD$
 +#  elif defined(VGO_netbsd)
 +   { SysRes res;
 +     struct vki_timeval tv_now;
-+     res = VG_(do_syscall2)(__NR__gettimeofday50, (UWord)&tv_now, (UWord)NULL);
++     res = VG_(do_syscall2)(__NR___gettimeofday50, (UWord)&tv_now, (UWord)NULL);
 +     vg_assert(! sr_isError(res));
 +     now = tv_now.tv_sec * 1000000ULL + tv_now.tv_usec;
 +   }
@@ -114,3 +123,30 @@ $NetBSD$
  #  elif defined(VGO_darwin)
     // Weird: it seems that gettimeofday() doesn't fill in the timeval, but
     // rather returns the tv_sec as the low 32 bits of the result and the
+@@ -947,7 +963,11 @@ UInt VG_(read_millisecond_timer) ( void 
+ Int VG_(gettimeofday)(struct vki_timeval *tv, struct vki_timezone *tz)
+ {
+    SysRes res;
++#  if defined(VGO_netbsd)
++   res = VG_(do_syscall2)(__NR___gettimeofday50, (UWord)tv, (UWord)tz);
++#  else
+    res = VG_(do_syscall2)(__NR_gettimeofday, (UWord)tv, (UWord)tz);
++#endif
+ 
+    if (! sr_isError(res)) return 0;
+ 
+@@ -982,6 +1002,14 @@ UInt VG_(get_user_milliseconds)(void)
+       }
+    }
+ 
++#  elif defined(VGO_netbsd)
++   { SysRes res;
++     struct vki_timeval tv_now;
++     res = VG_(do_syscall2)(__NR___gettimeofday50, (UWord)&tv_now, (UWord)NULL);
++     vg_assert(! sr_isError(res));
++     now = tv_now.tv_sec * 1000000ULL + tv_now.tv_usec;
++   }
++
+ #  elif defined(VGO_darwin)
+    res = 0;
+ 
