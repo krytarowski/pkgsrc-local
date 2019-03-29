@@ -1,8 +1,8 @@
 $NetBSD$
 
---- include/vki/vki-netbsd.h.orig	2019-03-29 10:08:50.867431796 +0000
+--- include/vki/vki-netbsd.h.orig	2019-03-29 17:03:24.566037184 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,2337 @@
+@@ -0,0 +1,2410 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -2334,6 +2334,79 @@ $NetBSD$
 +#define VKI_IPC_STAT        2       /* get options */
 +
 +#define VKI_IXSEQ_TO_IPCID(ix,perm) (((perm._seq) << 16) | (ix & 0xffff))
++
++//----------------------------------------------------------------------
++// From sys/sem.h
++//----------------------------------------------------------------------
++
++struct vki___sem {
++        unsigned short  semval;         /* semaphore value */
++        vki_pid_t           sempid;         /* pid of last operation */
++        unsigned short  semncnt;        /* # awaiting semval > cval */
++        unsigned short  semzcnt;        /* # awaiting semval = 0 */
++};
++
++struct vki_semid_ds {
++        struct vki_ipc_perm sem_perm;       /* operation permission structure */
++        unsigned short  sem_nsems;      /* number of semaphores in set */
++        vki_time_t          sem_otime;      /* last semop() time */
++        vki_time_t          sem_ctime;      /* last time changed by semctl() */
++                                                                                                                                                             
++        /*
++         * These members are private and used only in the internal
++         * implementation of this interface.
++         */
++        struct vki___sem    *_sem_base;     /* pointer to first semaphore in set */
++};
++
++struct vki_sembuf {
++        unsigned short  sem_num;        /* semaphore # */
++        short           sem_op;         /* semaphore operation */
++        short           sem_flg;        /* operation flags */
++};
++#define VKI_SEM_UNDO        010000          /* undo changes on process exit */
++
++#define VKI_GETNCNT 3       /* Return the value of semncnt {READ} */
++#define VKI_GETPID  4       /* Return the value of sempid {READ} */
++#define VKI_GETVAL  5       /* Return the value of semval {READ} */
++#define VKI_GETALL  6       /* Return semvals into arg.array {READ} */
++#define VKI_GETZCNT 7       /* Return the value of semzcnt {READ} */
++#define VKI_SETVAL  8       /* Set the value of semval to arg.val {ALTER} */
++#define VKI_SETALL  9       /* Set semvals from arg.array {ALTER} */ 
++
++struct vki_seminfo {
++        vki_int32_t semmap;         /* # of entries in semaphore map */
++        vki_int32_t semmni;         /* # of semaphore identifiers */
++        vki_int32_t semmns;         /* # of semaphores in system */
++        vki_int32_t semmnu;         /* # of undo structures in system */
++        vki_int32_t semmsl;         /* max # of semaphores per id */
++        vki_int32_t semopm;         /* max # of operations per semop call */
++        vki_int32_t semume;         /* max # of undo entries per process */
++        vki_int32_t semusz;         /* size in bytes of undo structure */                                                                                        
++        vki_int32_t semvmx;         /* semaphore maximum value */
++        vki_int32_t semaem;         /* adjust on exit max value */
++};
++
++struct vki_semid_ds_sysctl {
++        struct  vki_ipc_perm_sysctl sem_perm;
++        vki_int16_t sem_nsems;
++        vki_int16_t pad2;                                                                                                                                        
++        vki_int32_t pad3;
++        vki_time_t  sem_otime;
++        vki_time_t  sem_ctime;
++};
++
++struct vki_sem_sysctl_info {
++        struct  vki_seminfo seminfo;
++        struct  vki_semid_ds_sysctl semids[1];
++};
++
++#define VKI_SEM_ALLOC       01000   /* semaphore is allocated */
++
++#define vki_get_semctl_arg(cmd, sembuf, arg) \
++    ((cmd) == VKI_IPC_SET || (cmd) == VKI_IPC_STAT ? (void *)sembuf \
++    : (cmd) == VKI_GETALL || (cmd) == VKI_SETVAL || (cmd) == VKI_SETALL ? (void *)arg \
++    : 0)
 +
 +#endif // __VKI_NETBSD_H
 +
