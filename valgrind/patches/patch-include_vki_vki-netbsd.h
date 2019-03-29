@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-29 03:02:33.032190346 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,1810 @@
+@@ -0,0 +1,1884 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -1807,6 +1807,80 @@ $NetBSD$
 +#define VKI_IPCTL_LOOPBACKCKSUM    23       /* do IP checksum on loopback */
 +#define VKI_IPCTL_STATS             24      /* IP statistics */
 +#define VKI_IPCTL_DAD_COUNT        25       /* DAD packets to send */
++
++//----------------------------------------------------------------------
++// From netinet/mman.h
++//----------------------------------------------------------------------
++
++#define VKI_PROT_NONE       0x00    /* no permissions */
++#define VKI_PROT_READ       0x01    /* pages can be read */
++#define VKI_PROT_WRITE      0x02    /* pages can be written */
++#define VKI_PROT_EXEC       0x04    /* pages can be executed */
++
++#define VKI_PROT_MPROTECT(x)                ((x) << 3)
++#define VKI_PROT_MPROTECT_EXTRACT(x)        (((x) >> 3) & 0x7)
++
++#define VKI_MAP_SHARED      0x0001  /* share changes */
++#define VKI_MAP_PRIVATE     0x0002  /* changes are private */
++        /* old MAP_COPY 0x0004     "copy" region at mmap time */
++
++#define VKI_MAP_REMAPDUP     0x0004 /* mremap only: duplicate the mapping */
++#define VKI_MAP_FIXED        0x0010 /* map addr must be exactly as requested */
++#define VKI_MAP_RENAME       0x0020 /* Sun: rename private pages to file */
++#define VKI_MAP_NORESERVE    0x0040 /* Sun: don't reserve needed swap area */
++#define VKI_MAP_INHERIT      0x0080 /* region is retained after exec */
++#define VKI_MAP_HASSEMAPHORE 0x0200 /* region may contain semaphores */
++#define VKI_MAP_TRYFIXED     0x0400 /* attempt hint address, even within break */                                                                                
++#define VKI_MAP_WIRED        0x0800 /* mlock() mapping when it is established */
++
++#define VKI_MAP_FILE        0x0000  /* map from file (default) */
++#define VKI_MAP_ANONYMOUS   0x1000  /* allocated from memory, swap space */
++#define VKI_MAP_ANON        VKI_MAP_ANONYMOUS
++#define VKI_MAP_STACK       0x2000  /* allocated from memory, swap space (stack) */  
++
++#define VKI_MAP_ALIGNED(n)  ((int)((unsigned int)(n) << VKI_MAP_ALIGNMENT_SHIFT))
++#define VKI_MAP_ALIGNMENT_SHIFT     24
++#define VKI_MAP_ALIGNMENT_MASK      VKI_MAP_ALIGNED(0xff)
++#define VKI_MAP_ALIGNMENT_64KB      VKI_MAP_ALIGNED(16) /* 2^16 */                                                                                                   
++#define VKI_MAP_ALIGNMENT_16MB      VKI_MAP_ALIGNED(24) /* 2^24 */
++#define VKI_MAP_ALIGNMENT_4GB       VKI_MAP_ALIGNED(32) /* 2^32 */
++#define VKI_MAP_ALIGNMENT_1TB       VKI_MAP_ALIGNED(40) /* 2^40 */
++#define VKI_MAP_ALIGNMENT_256TB     VKI_MAP_ALIGNED(48) /* 2^48 */
++#define VKI_MAP_ALIGNMENT_64PB      VKI_MAP_ALIGNED(56) /* 2^56 */
++
++#define VKI_MAP_FAILED      ((void *) -1)   /* mmap() failed */
++
++/*
++ * Flags to msync
++ */   
++#define VKI_MS_ASYNC        0x01    /* perform asynchronous writes */
++#define VKI_MS_INVALIDATE   0x02    /* invalidate cached data */
++#define VKI_MS_SYNC         0x04    /* perform synchronous writes */
++
++#define VKI_MCL_CURRENT     0x01    /* lock all pages currently mapped */
++#define VKI_MCL_FUTURE      0x02    /* lock all pages mapped in the future */
++
++#define VKI_POSIX_MADV_NORMAL       0       /* No further special treatment */
++#define VKI_POSIX_MADV_RANDOM       1       /* Expect random page references */                                                                                  
++#define VKI_POSIX_MADV_SEQUENTIAL   2       /* Expect sequential page references */
++#define VKI_POSIX_MADV_WILLNEED     3       /* Will need these pages */
++#define VKI_POSIX_MADV_DONTNEED     4       /* Don't need these pages */
++
++#define VKI_MADV_NORMAL             VKI_POSIX_MADV_NORMAL
++#define VKI_MADV_RANDOM             VKI_POSIX_MADV_RANDOM
++#define VKI_MADV_SEQUENTIAL         VKI_POSIX_MADV_SEQUENTIAL
++#define VKI_MADV_WILLNEED           VKI_POSIX_MADV_WILLNEED
++#define VKI_MADV_DONTNEED           VKI_POSIX_MADV_DONTNEED
++#define VKI_MADV_SPACEAVAIL         5       /* Insure that resources are reserved */
++#define VKI_MADV_FREE               6       /* Pages are empty, free them */
++
++#define VKI_MAP_INHERIT_SHARE       0       /* share with child */
++#define VKI_MAP_INHERIT_COPY        1       /* copy into child */
++#define VKI_MAP_INHERIT_NONE        2       /* absent from child */
++#define VKI_MAP_INHERIT_DONATE_COPY 3       /* copy and delete -- not
++                                           implemented in UVM */
++#define VKI_MAP_INHERIT_ZERO        4       /* zero in child */
++#define VKI_MAP_INHERIT_DEFAULT     VKI_MAP_INHERIT_COPY  
 +
 +#endif // __VKI_NETBSD_H
 +
