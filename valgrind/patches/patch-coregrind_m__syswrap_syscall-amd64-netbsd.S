@@ -98,7 +98,7 @@ $NetBSD$
 +	/* Save and restore all 5 arg regs round the call.  This is easier
 +           than figuring out the minimal set to save/restore. */
 +
-+	movq	$__NR_sigprocmask, %rax		// syscall #
++	movq	$__NR___sigprocmask14, %rax		// syscall #
 +	movq	$VKI_SIG_SETMASK, %rdi		// how
 +	movq	%rdx, %rsi			// sysmask
 +	movq	%rcx, %rdx			// postmask
@@ -153,7 +153,7 @@ $NetBSD$
 +4:	/* Re-block signals.  If eip is in [4,5), then the syscall 
 +	   is complete and we needn't worry about it. */
 +
-+	movq	$__NR_sigprocmask, %rax	// syscall #
++	movq	$__NR___sigprocmask14, %rax	// syscall #
 +	movq	$VKI_SIG_SETMASK, %rdi		// how
 +	movq	-32(%rbp), %rsi			// postmask
 +	xorq	%rdx, %rdx			// NULL
