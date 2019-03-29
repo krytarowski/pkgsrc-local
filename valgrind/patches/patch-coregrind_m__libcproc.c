@@ -135,18 +135,12 @@ $NetBSD$
  
     if (! sr_isError(res)) return 0;
  
-@@ -982,6 +1002,14 @@ UInt VG_(get_user_milliseconds)(void)
+@@ -982,7 +1002,7 @@ UInt VG_(get_user_milliseconds)(void)
        }
     }
  
-+#  elif defined(VGO_netbsd)
-+   { SysRes res;
-+     struct vki_timeval tv_now;
-+     res = VG_(do_syscall2)(__NR___gettimeofday50, (UWord)&tv_now, (UWord)NULL);
-+     vg_assert(! sr_isError(res));
-+     now = tv_now.tv_sec * 1000000ULL + tv_now.tv_usec;
-+   }
-+
- #  elif defined(VGO_darwin)
+-#  elif defined(VGO_darwin)
++#  elif defined(VGO_darwin) || defined(VGO_netbsd)
     res = 0;
  
+ #  else
