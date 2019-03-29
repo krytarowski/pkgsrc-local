@@ -33,6 +33,7 @@ SHA1 (patch-coregrind_m__syswrap_priv__types__n__macros.h) = feaf58693f4b8ee89c6
 SHA1 (patch-coregrind_m__syswrap_syscall-amd64-netbsd.S) = 2d2534044689fcb8aebfb56edb5203cb164db240
 SHA1 (patch-coregrind_m__syswrap_syswrap-amd64-netbsd.c) = 7051df8c89c683cb1dc3086cdc7204f76060571a
 SHA1 (patch-coregrind_m__syswrap_syswrap-main.c) = 9bda64521671db70fdb8af25dc49ae4bdb008d9d
+SHA1 (patch-coregrind_m__syswrap_syswrap-netbsd-variants.c) = 03f651e330e32fd703e37191eb774152caadac6e
 SHA1 (patch-coregrind_m__syswrap_syswrap-netbsd.c) = 297cf4408502405462fd7a52b406acf87c493da5
 SHA1 (patch-coregrind_m__trampoline.S) = d70748fa8ad836ba49d49fa600cdcae8722f795c
 SHA1 (patch-coregrind_m__vki.c) = 997173b047d469d26e8a8c070dba5f54b0312079
