@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-29 17:03:24.566037184 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,2520 @@
+@@ -0,0 +1,2530 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -174,6 +174,14 @@ $NetBSD$
 +typedef volatile vki___cpu_simple_lock_nv_t vki___cpu_simple_lock_t;
 +
 +typedef int                     vki_boolean_t;
++
++union vki___semun {
++        int             val;            /* value for SETVAL */
++        struct vki_semid_ds *buf;           /* buffer for IPC_STAT & IPC_SET */
++        unsigned short  *array;         /* array for GETALL & SETALL */
++};
++
++#define vki_semun vki___semun // linux compat
 +
 +typedef vki_int32_t             vki___devmajor_t;
 +typedef vki_int32_t             vki___devminor_t;
@@ -2472,6 +2480,8 @@ $NetBSD$
 +
 +#define VKI_SHM_RDONLY      010000  /* Attach read-only (else read-write) */
 +#define VKI_SHM_RND         020000  /* Round attach address to SHMLBA */
++
++#define VKI_SHMLBA          VKI_PAGE_SIZE
 +
 +typedef unsigned int    vki_shmatt_t;
 +
