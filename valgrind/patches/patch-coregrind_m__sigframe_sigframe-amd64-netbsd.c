@@ -2,7 +2,7 @@ $NetBSD$
 
 --- coregrind/m_sigframe/sigframe-amd64-netbsd.c.orig	2019-03-29 10:20:08.379844852 +0000
 +++ coregrind/m_sigframe/sigframe-amd64-netbsd.c
-@@ -0,0 +1,621 @@
+@@ -0,0 +1,623 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- Create/destroy signal delivery frames.                       ---*/
@@ -491,13 +491,15 @@ $NetBSD$
 +}
 +
 +/* EXPORTED */
-+void VG_(sigframe_create)( ThreadId tid, 
-+                           Addr esp_top_of_frame,
-+                           const vki_siginfo_t *siginfo,
-+                           void *handler, 
-+                           UInt flags,
-+                           const vki_sigset_t *mask,
-+		           void *restorer )
++void VG_(sigframe_create)( ThreadId tid,
++                            Bool on_altstack, 
++                            Addr rsp_top_of_frame,
++                            const vki_siginfo_t *siginfo,
++                            const struct vki_ucontext *siguc,   
++                            void *handler,
++                            UInt flags,
++                            const vki_sigset_t *mask,
++                            void *restorer )
 +{
 +   Addr		esp;
 +   ThreadState* tst = VG_(get_ThreadState)(tid);
@@ -584,8 +586,8 @@ $NetBSD$
 +SizeT restore_sigframe ( ThreadState *tst, 
 +                         struct sigframe *frame, Int *sigNo )
 +{
-+   if (restore_vg_sigframe(tst, &frame->vg, sigNo))
-+      restore_sigcontext(tst, &frame->sigContext, &frame->fpstate);
++//   if (restore_vg_sigframe(tst, &frame->vg, sigNo))
++//      restore_sigcontext(tst, &frame->sigContext, &frame->fpstate);
 +
 +   return sizeof(*frame);
 +}
