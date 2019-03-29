@@ -14,6 +14,7 @@ SHA1 (patch-coregrind_m__debuginfo_debuginfo.c) = 243a586975067a38e5a9ab822d7f06
 SHA1 (patch-coregrind_m__debuginfo_storage.c) = 3a4a600613d64799a8229cf9d5d4fb9952eb3a2d
 SHA1 (patch-coregrind_m__debuglog.c) = 63fd7f562bf112a7cb2cf3c13655445a0b319f30
 SHA1 (patch-coregrind_m__dispatch_dispatch-amd64-netbsd.S) = 930d5d9beb6cd862c98aa74cb9553b0c8b46460e
+SHA1 (patch-coregrind_m__initimg_initimg-netbsd.c) = a1ed9aa43a179f56cf018e3cd0157cb50b7800e6
 SHA1 (patch-coregrind_m__libcassert.c) = faab08db23f58c71c2859deb0fc3649c577bfa6f
 SHA1 (patch-coregrind_m__libcfile.c) = 5ce8a3740656d458a43f8896f9636ad8d31a0cc3
 SHA1 (patch-coregrind_m__libcprint.c) = 11be5b36f9bdd61989bf3d93a77e03327beee269
