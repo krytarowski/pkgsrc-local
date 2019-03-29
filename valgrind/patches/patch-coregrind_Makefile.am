@@ -77,15 +77,7 @@ $NetBSD$
  	m_syswrap/syswrap-ppc32-linux.c \
  	m_syswrap/syswrap-ppc64-linux.c \
  	m_syswrap/syswrap-arm-linux.c \
-@@ -455,6 +471,7 @@ COREGRIND_SOURCES_COMMON = \
- 	m_syswrap/syswrap-mips64-linux.c \
- 	m_syswrap/syswrap-x86-darwin.c \
- 	m_syswrap/syswrap-amd64-darwin.c \
-+	m_syswrap/syswrap-amd64-netbsd.c \
- 	m_syswrap/syswrap-xen.c \
- 	m_syswrap/syswrap-x86-solaris.c \
- 	m_syswrap/syswrap-amd64-solaris.c \
-@@ -587,6 +604,11 @@ vgpreload_core_@VGCONF_ARCH_SEC@_@VGCONF
+@@ -587,6 +603,11 @@ vgpreload_core_@VGCONF_ARCH_SEC@_@VGCONF
  	$(PRELOAD_LDFLAGS_@VGCONF_PLATFORM_SEC_CAPS@)
  endif
  

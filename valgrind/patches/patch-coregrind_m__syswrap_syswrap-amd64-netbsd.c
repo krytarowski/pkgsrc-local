@@ -1,11 +1,11 @@
 $NetBSD$
 
---- coregrind/m_syswrap/syswrap-amd64-netbsd.c.orig	2019-03-29 08:34:59.844212936 +0000
+--- coregrind/m_syswrap/syswrap-amd64-netbsd.c.orig	2019-03-29 08:35:39.065629803 +0000
 +++ coregrind/m_syswrap/syswrap-amd64-netbsd.c
 @@ -0,0 +1,718 @@
 +
 +/*--------------------------------------------------------------------*/
-+/*--- Platform-specific syscalls stuff.    syswrap-amd64-freebsd.c ---*/
++/*--- Platform-specific syscalls stuff.    syswrap-amd64-netbsd.c ---*/
 +/*--------------------------------------------------------------------*/
 +
 +/*
@@ -33,7 +33,7 @@ $NetBSD$
 +   The GNU General Public License is contained in the file COPYING.
 +*/
 +
-+#if defined(VGP_amd64_freebsd)
++#if defined(VGP_amd64_netbsd)
 +
 +#include "pub_core_basics.h"
 +#include "pub_core_vki.h"
@@ -59,7 +59,7 @@ $NetBSD$
 +
 +#include "priv_types_n_macros.h"
 +#include "priv_syswrap-generic.h"    /* for decls of generic wrappers */
-+#include "priv_syswrap-freebsd.h"    /* for decls of freebsd-ish wrappers */
++#include "priv_syswrap-netbsd.h"    /* for decls of netbsd-ish wrappers */
 +#include "priv_syswrap-main.h"
 +
 +/* ---------------------------------------------------------------------
@@ -117,11 +117,11 @@ $NetBSD$
 +}
 +
 +/* ---------------------------------------------------------------------
-+   PRE/POST wrappers for amd64/FreeBSD-specific syscalls
++   PRE/POST wrappers for amd64/netbsd-specific syscalls
 +   ------------------------------------------------------------------ */
 +
-+#define PRE(name)       DEFN_PRE_TEMPLATE(freebsd, name)
-+#define POST(name)      DEFN_POST_TEMPLATE(freebsd, name)
++#define PRE(name)       DEFN_PRE_TEMPLATE(netbsd, name)
++#define POST(name)      DEFN_POST_TEMPLATE(netbsd, name)
 +
 +PRE(sys_thr_new)
 +{
@@ -160,7 +160,7 @@ $NetBSD$
 +      On linux, both parent and child return to the same place, and the code
 +      following the clone syscall works out which is which, so we
 +      don't need to worry about it.
-+      On FreeBSD, thr_new arranges a direct call.  We don't actually need any
++      On netbsd, thr_new arranges a direct call.  We don't actually need any
 +      of this gunk.
 +
 +      The parent gets the child's new tid returned from clone, but the
@@ -311,7 +311,7 @@ $NetBSD$
 +      driver logic copies it back unchanged.  Also, note %EAX is of
 +      the guest registers written by VG_(sigframe_destroy). */
 +   rflags = LibVEX_GuestAMD64_get_rflags(&tst->arch.vex);
-+   SET_STATUS_from_SysRes( VG_(mk_SysRes_amd64_freebsd)( tst->arch.vex.guest_RAX,
++   SET_STATUS_from_SysRes( VG_(mk_SysRes_amd64_netbsd)( tst->arch.vex.guest_RAX,
 +       tst->arch.vex.guest_RDX, (rflags & 1) != 0 ? True : False) );
 +
 +   /*
@@ -520,7 +520,7 @@ $NetBSD$
 +   SET_STATUS_from_SysRes(r);
 +}
 +
-+/* FreeBSD-7 introduces a "regular" version of mmap etc. */
++/* netbsd-7 introduces a "regular" version of mmap etc. */
 +PRE(sys_mmap7)
 +{
 +   SysRes r;
@@ -678,7 +678,7 @@ $NetBSD$
 +      PRINT("sys_amd64_set_fsbase ( %#lx )", ARG2);
 +      PRE_REG_READ1(long, "amd64_set_fsbase", void *, base)
 +
-+      /* On FreeBSD, the syscall loads the %gs selector for us, so do it now. */
++      /* On netbsd, the syscall loads the %gs selector for us, so do it now. */
 +      tst = VG_(get_ThreadState)(tid);
 +      p = (void**)ARG2;
 +      tst->arch.vex.guest_FS_CONST = (UWord)*p;
@@ -716,7 +716,7 @@ $NetBSD$
 +#undef PRE
 +#undef POST
 +
-+#endif /* defined(VGP_amd64_freebsd) */
++#endif /* defined(VGP_amd64_netbsd) */
 +
 +/*--------------------------------------------------------------------*/
 +/*--- end                                                          ---*/
