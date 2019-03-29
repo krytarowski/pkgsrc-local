@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-29 03:02:33.032190346 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,1886 @@
+@@ -0,0 +1,1889 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -901,6 +901,9 @@ $NetBSD$
 +#define VKI_SA_RESTART      0x0002  /* restart system call on signal return */
 +#define VKI_SA_RESETHAND    0x0004  /* reset to SIG_DFL when taking signal */
 +#define VKI_SA_NODEFER      0x0010  /* don't mask the signal we're delivering */
++
++#define VKI_SA_ONESHOT VKI_SA_RESETHAND /* linux compat */
++#define VKI_SA_NOMASK VKI_SA_NODEFER /* linux compat */
 +
 +#define VKI_SA_NOCLDSTOP    0x0008  /* do not generate SIGCHLD on child stop */
 +#define VKI_SA_NOCLDWAIT    0x0020  /* do not generate zombies on unwaited child */

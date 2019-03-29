@@ -14,7 +14,7 @@ $NetBSD$
 +#  define VG_UCONTEXT_SYSCALL_SYSRES(uc)                        \
 +      /* Convert the value in uc_mcontext.rax into a SysRes. */ \
 +      VG_(mk_SysRes_amd64_netbsd)( ((uc)->uc_mcontext.__gregs[VKI__REG_RAX]), \
-+         ((uc)->uc_mcontext.__gregs[VKI__REG_RDX]), ((uc)->uc_mcontext.__gregs[VKI__REG_RFALAGS]) != 0 ? True : False )
++         ((uc)->uc_mcontext.__gregs[VKI__REG_RDX]), ((uc)->uc_mcontext.__gregs[VKI__REG_RFLAGS]) != 0 ? True : False )
 +#  define VG_UCONTEXT_LINK_REG(uc)        0 /* No LR on amd64 either */                                                                                      
 +#  define VG_UCONTEXT_TO_UnwindStartRegs(srP, uc)        \
 +      { (srP)->r_pc = VKI__UC_MACHINE_PC(uc);             \
