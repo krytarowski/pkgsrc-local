@@ -98,7 +98,33 @@ $NetBSD$
  
  PRE(sys_ni_syscall)
  {
-@@ -3339,7 +3356,7 @@ PRE(sys_fork)
+@@ -2641,7 +2658,7 @@ PRE(sys_madvise)
+                  unsigned long, start, vki_size_t, length, int, advice);
+ }
+ 
+-#if HAVE_MREMAP
++#if HAVE_MREMAP && 0
+ PRE(sys_mremap)
+ {
+    // Nb: this is different to the glibc version described in the man pages,
+@@ -2735,6 +2752,7 @@ PRE(sys_sync)
+    PRE_REG_READ0(long, "sync");
+ }
+ 
++#if 0
+ PRE(sys_fstatfs)
+ {
+    FUSE_COMPATIBLE_MAY_BLOCK();
+@@ -2762,6 +2780,8 @@ POST(sys_fstatfs64)
+ {
+    POST_MEM_WRITE( ARG3, ARG2 );
+ }
++#endif
++
+ 
+ PRE(sys_getsid)
+ {
+@@ -3339,7 +3359,7 @@ PRE(sys_fork)
  
     if (!SUCCESS) return;
  
