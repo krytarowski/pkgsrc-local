@@ -504,7 +504,7 @@ $NetBSD$
 +   Addr		esp;
 +   ThreadState* tst = VG_(get_ThreadState)(tid);
 +
-+   esp = build_sigframe(tst, esp_top_of_frame, 
++   esp = build_sigframe(tst, rsp_top_of_frame, 
 +			siginfo, handler, flags, mask, restorer);
 +
 +   /* Set the thread so it will next run the handler. */
