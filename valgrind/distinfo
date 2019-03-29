@@ -36,6 +36,7 @@ SHA1 (patch-coregrind_m__syswrap_syswrap-main.c) = 9bda64521671db70fdb8af25dc49a
 SHA1 (patch-coregrind_m__syswrap_syswrap-netbsd-variants.c) = 03f651e330e32fd703e37191eb774152caadac6e
 SHA1 (patch-coregrind_m__syswrap_syswrap-netbsd.c) = 297cf4408502405462fd7a52b406acf87c493da5
 SHA1 (patch-coregrind_m__trampoline.S) = d70748fa8ad836ba49d49fa600cdcae8722f795c
+SHA1 (patch-coregrind_m__ume_main.c) = 651efe393df07446c98d08dabbade83435ed6196
 SHA1 (patch-coregrind_m__vki.c) = 997173b047d469d26e8a8c070dba5f54b0312079
 SHA1 (patch-coregrind_m__vkiscnums.c) = c8a68d4b6f38ece5da416401201ccdd404e071b8
 SHA1 (patch-coregrind_pub__core__initimg.h) = abac1cf83cda86270ebbe9a01118688475b4a069
