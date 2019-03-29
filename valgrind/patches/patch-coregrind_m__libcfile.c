@@ -12,15 +12,15 @@ $NetBSD$
  #  else
  #     error Unknown OS
  #  endif
-@@ -142,7 +145,7 @@ SysRes VG_(mknod) ( const HChar* pathnam
-    /* ARM64 wants to use __NR_mknodat rather than __NR_mknod. */
-    SysRes res = VG_(do_syscall4)(__NR_mknodat,
-                                  VKI_AT_FDCWD, (UWord)pathname, mode, dev);
--#  elif defined(VGO_linux) || defined(VGO_darwin)
-+#  elif defined(VGO_linux) || defined(VGO_darwin) || defined(VGO_netbsd)
+@@ -145,7 +148,7 @@ SysRes VG_(mknod) ( const HChar* pathnam
+ #  elif defined(VGO_linux) || defined(VGO_darwin)
     SysRes res = VG_(do_syscall3)(__NR_mknod,
                                   (UWord)pathname, mode, dev);
- #  elif defined(VGO_solaris)
+-#  elif defined(VGO_solaris)
++#  elif defined(VGO_solaris) || defined(VGO_netbsd)
+    SysRes res = VG_(do_syscall4)(__NR_mknodat,
+                                  VKI_AT_FDCWD, (UWord)pathname, mode, dev);
+ #  else
 @@ -160,7 +163,7 @@ SysRes VG_(open) ( const HChar* pathname
     /* ARM64 wants to use __NR_openat rather than __NR_open. */
     SysRes res = VG_(do_syscall4)(__NR_openat,
@@ -71,7 +71,7 @@ $NetBSD$
  Off64T VG_(lseek) ( Int fd, Off64T offset, Int whence )
  {
 -#  if defined(VGO_linux) || defined(VGP_amd64_darwin)
-+#  if defined(VGO_linux) || defined(VGP_amd64_darwin) || || defined(VGP_amd64_netbsd)
++#  if defined(VGO_linux) || defined(VGP_amd64_darwin) || defined(VGP_amd64_netbsd)
  #  if defined(__NR__llseek)
     Off64T result;
     SysRes res = VG_(do_syscall5)(__NR__llseek, fd,
