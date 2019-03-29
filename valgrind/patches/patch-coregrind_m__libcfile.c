@@ -214,16 +214,22 @@ $NetBSD$
     Int sd, res;
     struct vki_sockaddr_in servAddr;
     UInt   ip   = 0;
-@@ -1124,7 +1143,7 @@ Int VG_(socket) ( Int domain, Int type, 
+@@ -1124,9 +1143,13 @@ Int VG_(socket) ( Int domain, Int type, 
  
  #  elif defined(VGP_amd64_linux) || defined(VGP_arm_linux) \
          || defined(VGP_mips32_linux) || defined(VGP_mips64_linux) \
 -        || defined(VGP_arm64_linux)
 +        || defined(VGP_arm64_linux) || defined(VGO_netbsd)
     SysRes res;
++#    if defined(VGO_netbsd)
++   res = VG_(do_syscall3)(__NR___socket30, domain, type, protocol );
++#    else
     res = VG_(do_syscall3)(__NR_socket, domain, type, protocol );
++#    endif
     return sr_isError(res) ? -1 : sr_Res(res);
-@@ -1179,7 +1198,7 @@ Int my_connect ( Int sockfd, struct vki_
+ 
+ #  elif defined(VGO_darwin)
+@@ -1179,7 +1202,7 @@ Int my_connect ( Int sockfd, struct vki_
  
  #  elif defined(VGP_amd64_linux) || defined(VGP_arm_linux) \
          || defined(VGP_mips32_linux) || defined(VGP_mips64_linux) \
@@ -232,7 +238,7 @@ $NetBSD$
     SysRes res;
     res = VG_(do_syscall3)(__NR_connect, sockfd, (UWord)serv_addr, addrlen);
     return sr_isError(res) ? -1 : sr_Res(res);
-@@ -1226,7 +1245,7 @@ Int VG_(write_socket)( Int sd, const voi
+@@ -1226,7 +1249,7 @@ Int VG_(write_socket)( Int sd, const voi
  
  #  elif defined(VGP_amd64_linux) || defined(VGP_arm_linux) \
          || defined(VGP_mips32_linux) || defined(VGP_mips64_linux) \
@@ -241,7 +247,7 @@ $NetBSD$
     SysRes res;
     res = VG_(do_syscall6)(__NR_sendto, sd, (UWord)msg, 
                                         count, VKI_MSG_NOSIGNAL, 0,0);
-@@ -1262,7 +1281,7 @@ Int VG_(getsockname) ( Int sd, struct vk
+@@ -1262,7 +1285,7 @@ Int VG_(getsockname) ( Int sd, struct vk
     return sr_isError(res) ? -1 : sr_Res(res);
  
  #  elif defined(VGP_amd64_linux) || defined(VGP_arm_linux) \
@@ -250,7 +256,7 @@ $NetBSD$
     SysRes res;
     res = VG_(do_syscall3)( __NR_getsockname,
                             (UWord)sd, (UWord)name, (UWord)namelen );
-@@ -1300,7 +1319,7 @@ Int VG_(getpeername) ( Int sd, struct vk
+@@ -1300,7 +1323,7 @@ Int VG_(getpeername) ( Int sd, struct vk
     return sr_isError(res) ? -1 : sr_Res(res);
  
  #  elif defined(VGP_amd64_linux) || defined(VGP_arm_linux) \
@@ -259,7 +265,7 @@ $NetBSD$
     SysRes res;
     res = VG_(do_syscall3)( __NR_getpeername,
                             (UWord)sd, (UWord)name, (UWord)namelen );
-@@ -1341,14 +1360,14 @@ Int VG_(getsockopt) ( Int sd, Int level,
+@@ -1341,14 +1364,14 @@ Int VG_(getsockopt) ( Int sd, Int level,
  
  #  elif defined(VGP_amd64_linux) || defined(VGP_arm_linux) \
          || defined(VGP_mips32_linux) || defined(VGP_mips64_linux) \
