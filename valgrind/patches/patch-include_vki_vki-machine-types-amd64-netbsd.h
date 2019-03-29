@@ -188,7 +188,7 @@ $NetBSD$
 +
 +typedef char vki___fpregset_t[512] __attribute__((__aligned__(8)));
 +                                                                                                                                                             
-+typedef struct {
++typedef struct vki_mcontext {
 +        vki___gregset_t     __gregs;
 +        vki___greg_t        _mc_tlsbase;
 +        vki___fpregset_t    __fpregs;
