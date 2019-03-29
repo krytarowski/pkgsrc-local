@@ -7,8 +7,8 @@ $NetBSD$
     if (VG_STREQ(soname, VG_U_LD_LINUX_AARCH64_SO_1)) return True;
     if (VG_STREQ(soname, VG_U_LD_LINUX_ARMHF_SO_3))   return True;
 +#  elif defined(VGO_netbsd)
-+   if (VG_STREQ(soname, VG_Z_LD_ELF_SO_1)) return True;
-+   if (VG_STREQ(soname, VG_Z_LD_ELF32_SO_1)) return True;
++   if (VG_STREQ(soname, VG_U_LD_ELF_SO_1)) return True;
++   if (VG_STREQ(soname, VG_U_LD_ELF32_SO_1)) return True;
  #  elif defined(VGO_darwin)
     if (VG_STREQ(soname, VG_U_DYLD)) return True;
  #  elif defined(VGO_solaris)
