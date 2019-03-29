@@ -101,7 +101,57 @@ $NetBSD$
  
  #elif defined(VGP_mips32_linux)
     VexGuestMIPS32State* gst = (VexGuestMIPS32State*)gst_vanilla;
-@@ -983,6 +1049,7 @@ void getSyscallStatusFromGuestState ( /*
+@@ -950,6 +1016,49 @@ void putSyscallArgsIntoGuestState ( /*IN
+    stack[1] = canonical->arg7;
+    stack[2] = canonical->arg8;
+ 
++#elif defined(VGP_amd64_netbsd)
++   VexGuestAMD64State* gst = (VexGuestAMD64State*)gst_vanilla;
++   UWord *stack = (UWord *)gst->guest_RSP;
++      
++   // stack[0] is a (fake) return address
++   switch (canonical->klass) {
++   case VG_NETBSD_SYSCALL0:
++      gst->guest_RAX = __NR_syscall;   
++      gst->guest_RDI = canonical->sysno;
++      gst->guest_RSI = canonical->arg1;
++      gst->guest_RDX = canonical->arg2;
++      gst->guest_R10 = canonical->arg3;   
++      gst->guest_R8  = canonical->arg4;
++      gst->guest_R9  = canonical->arg5;  
++      stack[1]       = canonical->arg6;
++      stack[2]       = canonical->arg7;
++      stack[3]       = canonical->arg8;
++      break;
++   case VG_NETBSD_SYSCALL198:
++      gst->guest_RAX = __NR___syscall;
++      gst->guest_RDI = canonical->sysno;
++      gst->guest_RSI = canonical->arg1;
++      gst->guest_RDX = canonical->arg2;
++      gst->guest_R10 = canonical->arg3;                                                                                                                      
++      gst->guest_R8  = canonical->arg4;
++      gst->guest_R9  = canonical->arg5;
++      stack[1]       = canonical->arg6;
++      stack[2]       = canonical->arg7;
++      stack[3]       = canonical->arg8;
++      break;
++   default:
++      gst->guest_RAX = canonical->sysno;
++      gst->guest_RDI = canonical->arg1; 
++      gst->guest_RSI = canonical->arg2;
++      gst->guest_RDX = canonical->arg3;
++      gst->guest_R10 = canonical->arg4;                                                                                                                      
++      gst->guest_R8  = canonical->arg5;
++      gst->guest_R9  = canonical->arg6;
++      stack[1]       = canonical->arg7;                                                                                                                      
++      stack[2]       = canonical->arg8;
++      break;
++   }
++
+ #else
+ #  error "putSyscallArgsIntoGuestState: unknown arch"
+ #endif
+@@ -983,6 +1092,7 @@ void getSyscallStatusFromGuestState ( /*
     canonical->sres = VG_(mk_SysRes_ppc64_linux)( gst->guest_GPR3, cr0so );
     canonical->what = SsComplete;
  
@@ -109,7 +159,7 @@ $NetBSD$
  #  elif defined(VGP_arm_linux)
     VexGuestARMState* gst = (VexGuestARMState*)gst_vanilla;
     canonical->sres = VG_(mk_SysRes_arm_linux)( gst->guest_R0 );
-@@ -1041,6 +1108,14 @@ void getSyscallStatusFromGuestState ( /*
+@@ -1041,6 +1151,14 @@ void getSyscallStatusFromGuestState ( /*
                       );
     canonical->what = SsComplete;
  
@@ -124,7 +174,7 @@ $NetBSD$
  #  elif defined(VGP_amd64_darwin)
     /* duplicates logic in m_signals.VG_UCONTEXT_SYSCALL_SYSRES */
     VexGuestAMD64State* gst = (VexGuestAMD64State*)gst_vanilla;
-@@ -1134,6 +1209,26 @@ void putSyscallStatusIntoGuestState ( /*
+@@ -1134,6 +1252,26 @@ void putSyscallStatusIntoGuestState ( /*
     VG_TRACK( post_reg_write, Vg_CoreSysCall, tid, 
               OFFSET_amd64_RAX, sizeof(UWord) );
  
@@ -151,7 +201,34 @@ $NetBSD$
  #  elif defined(VGP_ppc32_linux)
     VexGuestPPC32State* gst = (VexGuestPPC32State*)gst_vanilla;
     UInt old_cr = LibVEX_GuestPPC32_get_CR(gst);
-@@ -1478,6 +1573,17 @@ void getSyscallArgLayout ( /*OUT*/Syscal
+@@ -1363,6 +1501,26 @@ void putSyscallStatusIntoGuestState ( /*
+    VG_TRACK(post_reg_write, Vg_CoreSysCall, tid, offsetof(VexGuestAMD64State,
+             guest_CC_DEP2), sizeof(ULong));
+ 
++#elif defined(VGP_amd64_netbsd)
++   VexGuestAMD64State* gst = (VexGuestAMD64State*)gst_vanilla;
++   vg_assert(canonical->what == SsComplete);
++   if (sr_isError(canonical->sres)) {
++      gst->guest_RAX = sr_Err(canonical->sres);
++      LibVEX_GuestAMD64_put_rflag_c(1, gst);
++   } else {
++      gst->guest_RAX = sr_Res(canonical->sres);
++      gst->guest_RDX = sr_ResHI(canonical->sres);
++      LibVEX_GuestAMD64_put_rflag_c(0, gst);
++   }
++   VG_TRACK( post_reg_write, Vg_CoreSysCall, tid,
++      OFFSET_amd64_RAX, sizeof(ULong) );
++   VG_TRACK( post_reg_write, Vg_CoreSysCall, tid,
++      OFFSET_amd64_RDX, sizeof(ULong) );
++   // GrP fixme sets defined for entire eflags, not just bit c
++   // DDD: this breaks exp-ptrcheck.
++   VG_TRACK( post_reg_write, Vg_CoreSysCall, tid,
++      offsetof(VexGuestAMD64State, guest_CC_DEP1), sizeof(ULong) );
++
+ #  else
+ #    error "putSyscallStatusIntoGuestState: unknown arch"
+ #  endif
+@@ -1478,6 +1636,17 @@ void getSyscallArgLayout ( /*OUT*/Syscal
     layout->s_arg7   = sizeof(UWord) * 7;
     layout->s_arg8   = sizeof(UWord) * 8;
     
@@ -169,7 +246,7 @@ $NetBSD$
  #elif defined(VGP_amd64_darwin)
     layout->o_sysno  = OFFSET_amd64_RAX;
     layout->o_arg1   = OFFSET_amd64_RDI;
-@@ -1570,6 +1676,11 @@ static const SyscallTableEntry* get_sysc
+@@ -1570,6 +1739,11 @@ static const SyscallTableEntry* get_sysc
  #  if defined(VGO_linux)
     sys = ML_(get_linux_syscall_entry)( syscallno );
  
@@ -181,7 +258,7 @@ $NetBSD$
  #  elif defined(VGO_darwin)
     Int idx = VG_DARWIN_SYSNO_INDEX(syscallno);
  
-@@ -1786,6 +1897,9 @@ void VG_(client_syscall) ( ThreadId tid,
+@@ -1786,6 +1960,9 @@ void VG_(client_syscall) ( ThreadId tid,
        is interrupted by a signal. */
     sysno = sci->orig_args.sysno;
  
@@ -191,7 +268,7 @@ $NetBSD$
     /* It's sometimes useful, as a crude debugging hack, to get a
        stack trace at each (or selected) syscalls. */
     if (0 && sysno == __NR_ioctl) {
-@@ -2186,7 +2300,7 @@ void VG_(post_syscall) (ThreadId tid)
+@@ -2186,7 +2363,7 @@ void VG_(post_syscall) (ThreadId tid)
  /* These are addresses within ML_(do_syscall_for_client_WRK).  See
     syscall-$PLAT.S for details. 
  */
@@ -200,7 +277,7 @@ $NetBSD$
    extern const Addr ML_(blksys_setup);
    extern const Addr ML_(blksys_restart);
    extern const Addr ML_(blksys_complete);
-@@ -2246,6 +2360,26 @@ void ML_(fixup_guest_state_to_restart_sy
+@@ -2246,6 +2423,26 @@ void ML_(fixup_guest_state_to_restart_sy
        vg_assert(p[0] == 0xcd && p[1] == 0x80);
     }
  
@@ -227,7 +304,7 @@ $NetBSD$
  #elif defined(VGP_amd64_linux)
     arch->vex.guest_RIP -= 2;             // sizeof(syscall)
  
-@@ -2592,7 +2726,7 @@ VG_(fixup_guest_state_after_syscall_inte
+@@ -2592,7 +2789,7 @@ VG_(fixup_guest_state_after_syscall_inte
     th_regs = &tst->arch;
     sci     = & syscallInfo[tid];
  
