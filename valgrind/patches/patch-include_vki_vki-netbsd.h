@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-29 10:08:50.867431796 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,2080 @@
+@@ -0,0 +1,2104 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -2077,6 +2077,30 @@ $NetBSD$
 +#define VKI_AT_SUN_EMUL_EXECFD 2013 /* coff file descriptor */
 +        /* Executable's fully resolved name */
 +#define VKI_AT_SUN_EXECNAME 2014
++
++//----------------------------------------------------------------------
++// From sys/un.h
++//----------------------------------------------------------------------
++
++struct  vki_sockaddr_un {
++        vki_uint8_t         sun_len;        /* total sockaddr length */
++        vki_sa_family_t     sun_family;     /* AF_LOCAL */
++        char            sun_path[104];  /* path name (gag) */
++};
++
++#define VKI_LOCAL_OCREDS    0x0001          /* pass credentials to receiver */
++#define VKI_LOCAL_CONNWAIT  0x0002          /* connects block until accepted */
++#define VKI_LOCAL_PEEREID   0x0003          /* get peer identification */
++#define VKI_LOCAL_CREDS     0x0004          /* pass credentials to receiver */
++
++struct vki_unpcbid {
++        vki_pid_t unp_pid;          /* process id */
++        vki_uid_t unp_euid;         /* effective user id */                                                                                                      
++        vki_gid_t unp_egid;         /* effective group id */
++};
++
++#define VKI_SUN_LEN(su) \
++        (sizeof(*(su)) - sizeof((su)->sun_path) + strlen((su)->sun_path))
 +
 +#endif // __VKI_NETBSD_H
 +

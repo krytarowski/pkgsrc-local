@@ -56,6 +56,6 @@ SHA1 (patch-include_pub__tool__vki.h) = e59b9a1e67ed5038c92f3e038149408b30c38b01
 SHA1 (patch-include_pub__tool__vkiscnums__asm.h) = a62771d625824eab0f5225dfaf474c4187e90d75
 SHA1 (patch-include_vki_vki-amd64-netbsd.h) = fe861ae4a91ca16a9c46f5e7411b9218c7eac1d9
 SHA1 (patch-include_vki_vki-machine-types-amd64-netbsd.h) = c30cebeceac85e7ec3bf9b8e544680698abb58fd
-SHA1 (patch-include_vki_vki-netbsd.h) = 23f33e57b24c7bcd142aa99551ffa1563baf42e1
+SHA1 (patch-include_vki_vki-netbsd.h) = a64cd54944683dbdfb2748e0ef35a24d6ffebc4a
 SHA1 (patch-include_vki_vki-scnums-netbsd.h) = 187f1a4189d1febce0f9e84f870e0019aa108aff
 SHA1 (patch-netbsd.supp) = 8e8d0c59c59b6d47ca75aa99d330043ebbd15215
