@@ -34,6 +34,15 @@ $NetBSD$
  #  define VKI_SIGINFO_si_addr  si_addr
  #  define VKI_SIGINFO_si_pid   si_pid
  #else
+@@ -979,7 +995,7 @@ extern void my_sigreturn(void);
+    "   syscall\n" \
+    ".previous\n"
+ 
+-#elif defined(VGP_x86_solaris) || defined(VGP_amd64_solaris)
++#elif defined(VGP_x86_solaris) || defined(VGP_amd64_solaris) || defined(VGO_netbsd)
+ /* Not used on Solaris. */
+ #  define _MY_SIGRETURN(name) \
+    ".text\n" \
 @@ -1031,7 +1047,7 @@ static void handle_SCSS_change ( Bool fo
        ksa.sa_flags    = skss.skss_per_sig[sig].skss_flags;
  #     if !defined(VGP_ppc32_linux) && \
@@ -79,24 +88,73 @@ $NetBSD$
     sa.sa_restorer = 0;
  #  endif
     VG_(sigemptyset)(&sa.sa_mask);
-@@ -1588,7 +1604,7 @@ void VG_(kill_self)(Int sigNo)
+@@ -1586,14 +1602,14 @@ void VG_(kill_self)(Int sigNo)
+ // request (SI_ASYNCIO).  There's lots of implementation-defined leeway in
+ // POSIX, but the user vs. kernal distinction is what we want here.  We also
  // pass in some other details that can help when si_code is unreliable.
- static Bool is_signal_from_kernel(ThreadId tid, int signum, int si_code)
+-static Bool is_signal_from_kernel(ThreadId tid, int signum, int si_code)
++static Bool is_signal_from_kernel(ThreadId tid, int signum, int my_si_code)
  {
 -#  if defined(VGO_linux) || defined(VGO_solaris)
 +#  if defined(VGO_linux) || defined(VGO_solaris) || defined(VGO_netbsd)
     // On Linux, SI_USER is zero, negative values are from the user, positive
     // values are from the kernel.  There are SI_FROMUSER and SI_FROMKERNEL
     // macros but we don't use them here because other platforms don't have
-@@ -2278,7 +2294,7 @@ static int sanitize_si_code(int si_code)
+    // them.
+-   return ( si_code > VKI_SI_USER ? True : False );
++   return ( my_si_code > VKI_SI_USER ? True : False );
+ 
+ #  elif defined(VGO_darwin)
+    // On Darwin 9.6.0, the si_code is completely unreliable.  It should be the
+@@ -1615,7 +1631,7 @@ static Bool is_signal_from_kernel(Thread
+ 
+    // If it's a SIGSEGV, use the proper condition, since it's fairly reliable.
+    } else if (SIGSEGV == signum) {
+-      return ( si_code > 0 ? True : False );
++      return ( my_si_code > 0 ? True : False );
+ 
+    // If it's anything else, assume it's kernel-generated.  Reason being that
+    // kernel-generated sync signals are more common, and it's probable that
+@@ -2025,7 +2041,7 @@ static void resume_scheduler(ThreadId ti
+    }
+ }
+ 
+-static void synth_fault_common(ThreadId tid, Addr addr, Int si_code)
++static void synth_fault_common(ThreadId tid, Addr addr, Int my_si_code)
+ {
+    vki_siginfo_t info;
+ 
+@@ -2033,7 +2049,7 @@ static void synth_fault_common(ThreadId 
+ 
+    VG_(memset)(&info, 0, sizeof(info));
+    info.si_signo = VKI_SIGSEGV;
+-   info.si_code = si_code;
++   info.si_code = my_si_code;
+    info.VKI_SIGINFO_si_addr = (void*)addr;
+ 
+    /* Even if gdbserver indicates to ignore the signal, we must deliver it.
+@@ -2266,7 +2282,7 @@ static vki_siginfo_t *next_queued(Thread
+    return ret;
+ }
+ 
+-static int sanitize_si_code(int si_code)
++static int sanitize_si_code(int my_si_code)
+ {
+ #if defined(VGO_linux)
+    /* The linux kernel uses the top 16 bits of si_code for it's own
+@@ -2277,9 +2293,9 @@ static int sanitize_si_code(int si_code)
+       The kernel treats the bottom 16 bits as signed and (when it does
        mask them off) sign extends them when exporting to user space so
        we do the same thing here. */
-    return (Short)si_code;
+-   return (Short)si_code;
 -#elif defined(VGO_darwin) || defined(VGO_solaris)
+-   return si_code;
++   return (Short)my_si_code;
 +#elif defined(VGO_darwin) || defined(VGO_solaris) || defined(VGO_netbsd)
-    return si_code;
++   return my_si_code;
  #else
  #  error Unknown OS
+ #endif
 @@ -2904,7 +2920,7 @@ void pp_ksigaction ( vki_sigaction_toK_t
                 sa->ksa_handler, 
                 (UInt)sa->sa_flags, 
