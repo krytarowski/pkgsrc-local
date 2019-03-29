@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-29 03:02:33.032190346 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,1353 @@
+@@ -0,0 +1,1580 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -1350,6 +1350,233 @@ $NetBSD$
 +#define VKI__SC_SCHED_RT_TS         2001
 +#define VKI__CS_PATH                 1
 +
++//----------------------------------------------------------------------
++// From netinet/in.h
++//----------------------------------------------------------------------
++
++typedef vki___in_addr_t     vki_in_addr_t;
++typedef vki___in_port_t     vki_in_port_t;
++typedef vki___sa_family_t   vki_sa_family_t;
++
++#define VKI_IPPROTO_IP              0               /* dummy for IP */
++#define VKI_IPPROTO_HOPOPTS         0               /* IP6 hop-by-hop options */
++#define VKI_IPPROTO_ICMP            1               /* control message protocol */
++#define VKI_IPPROTO_IGMP            2               /* group mgmt protocol */
++#define VKI_IPPROTO_GGP             3               /* gateway^2 (deprecated) */
++#define VKI_IPPROTO_IPV4            4               /* IP header */
++#define VKI_IPPROTO_IPIP            4               /* IP inside IP */
++#define VKI_IPPROTO_TCP             6               /* tcp */
++#define VKI_IPPROTO_EGP             8               /* exterior gateway protocol */
++#define VKI_IPPROTO_PUP             12              /* pup */
++#define VKI_IPPROTO_UDP             17              /* user datagram protocol */
++#define VKI_IPPROTO_IDP             22              /* xns idp */
++#define VKI_IPPROTO_TP              29              /* tp-4 w/ class negotiation */
++#define VKI_IPPROTO_DCCP            33              /* DCCP */
++#define VKI_IPPROTO_IPV6            41              /* IP6 header */
++#define VKI_IPPROTO_ROUTING         43              /* IP6 routing header */
++#define VKI_IPPROTO_FRAGMENT        44              /* IP6 fragmentation header */
++#define VKI_IPPROTO_RSVP            46              /* resource reservation */
++#define VKI_IPPROTO_GRE             47              /* GRE encaps RFC 1701 */                                                                                    
++#define VKI_IPPROTO_ESP             50              /* encap. security payload */
++#define VKI_IPPROTO_AH              51              /* authentication header */
++#define VKI_IPPROTO_MOBILE          55              /* IP Mobility RFC 2004 */
++#define VKI_IPPROTO_IPV6_ICMP       58              /* IPv6 ICMP */
++#define VKI_IPPROTO_ICMPV6          58              /* ICMP6 */
++#define VKI_IPPROTO_NONE            59              /* IP6 no next header */
++#define VKI_IPPROTO_DSTOPTS         60              /* IP6 destination option */
++#define VKI_IPPROTO_EON             80              /* ISO cnlp */
++#define VKI_IPPROTO_ETHERIP         97              /* Ethernet-in-IP */                                                                                         
++#define VKI_IPPROTO_ENCAP           98              /* encapsulation header */
++#define VKI_IPPROTO_PIM             103             /* Protocol indep. multicast */
++#define VKI_IPPROTO_IPCOMP          108             /* IP Payload Comp. Protocol */
++#define VKI_IPPROTO_VRRP            112             /* VRRP RFC 2338 */
++#define VKI_IPPROTO_CARP            112             /* Common Address Resolution Protocol */
++#define VKI_IPPROTO_L2TP            115             /* L2TPv3 */
++#define VKI_IPPROTO_SCTP            132             /* SCTP */
++#define VKI_IPPROTO_PFSYNC      240     /* PFSYNC */
++#define VKI_IPPROTO_RAW             255             /* raw IP packet */                                                                                          
++#define VKI_IPPROTO_MAX             256
++
++/* last return value of *_input(), meaning "all job for this pkt is done".  */
++#define VKI_IPPROTO_DONE            257
++
++/* sysctl placeholder for (FAST_)IPSEC */
++#define VKI_CTL_IPPROTO_IPSEC       258
++
++#define VKI_IPPORT_RESERVED         1024
++#define VKI_IPPORT_ANONMIN          49152
++#define VKI_IPPORT_ANONMAX          65535
++#define VKI_IPPORT_RESERVEDMIN      600
++#define VKI_IPPORT_RESERVEDMAX      (VKI_IPPORT_RESERVED-1)
++
++struct vki_in_addr {
++        vki_in_addr_t s_addr;
++} __attribute__((__packed__));
++
++#define VKI___IPADDR(x)     ((vki_uint32_t)(x))
++
++#define VKI_IN_CLASSA(i)            (((vki_uint32_t)(i) & VKI___IPADDR(0x80000000)) == \
++                                 VKI___IPADDR(0x00000000))
++#define VKI_IN_CLASSA_NET           VKI___IPADDR(0xff000000)
++#define VKI_IN_CLASSA_NSHIFT        24                                                                                                                           
++#define VKI_IN_CLASSA_HOST          VKI___IPADDR(0x00ffffff)
++#define VKI_IN_CLASSA_MAX           128
++
++#define VKI_IN_CLASSB(i)            (((vki_uint32_t)(i) & VKI___IPADDR(0xc0000000)) == \
++                                 VKI___IPADDR(0x80000000))
++#define VKI_IN_CLASSB_NET           VKI___IPADDR(0xffff0000)
++#define VKI_IN_CLASSB_NSHIFT        16
++#define VKI_IN_CLASSB_HOST          VKI___IPADDR(0x0000ffff)
++
++#define VKI_IN_CLASSB_MAX           65536                                                                                                                        
++
++#define VKI_IN_CLASSC(i)            (((vki_uint32_t)(i) & VKI___IPADDR(0xe0000000)) == \
++                                 VKI___IPADDR(0xc0000000))
++#define VKI_IN_CLASSC_NET           VKI___IPADDR(0xffffff00)
++#define VKI_IN_CLASSC_NSHIFT        8
++#define VKI_IN_CLASSC_HOST          VKI___IPADDR(0x000000ff)
++
++#define VKI_IN_CLASSD(i)            (((vki_uint32_t)(i) & VKI___IPADDR(0xf0000000)) == \
++                                 VKI___IPADDR(0xe0000000))                                                                                                       
++/* These ones aren't really net and host fields, but routing needn't know. */
++#define VKI_IN_CLASSD_NET           VKI___IPADDR(0xf0000000)
++#define VKI_IN_CLASSD_NSHIFT        28
++#define VKI_IN_CLASSD_HOST          VKI___IPADDR(0x0fffffff)
++#define VKI_IN_MULTICAST(i)         VKI_IN_CLASSD(i)
++
++#define VKI_IN_EXPERIMENTAL(i)      (((vki_uint32_t)(i) & VKI___IPADDR(0xf0000000)) == \
++                                 VKI___IPADDR(0xf0000000))
++
++#define VKI_IN_BADCLASS(i)          (((vki_uint32_t)(i) & VKI___IPADDR(0xf0000000)) == \                                                                                 
++                                 VKI___IPADDR(0xf0000000))
++
++#define VKI_IN_LINKLOCAL(i) (((vki_uint32_t)(i) & VKI___IPADDR(0xffff0000)) == \
++                         VKI___IPADDR(0xa9fe0000))
++
++#define VKI_IN_PRIVATE(i)   ((((vki_uint32_t)(i) & VKI___IPADDR(0xff000000)) ==     \
++                          VKI___IPADDR(0x0a000000)) ||                      \
++                         (((vki_uint32_t)(i) & VKI___IPADDR(0xfff00000)) ==     \
++                          VKI___IPADDR(0xac100000)) ||                      \                                                                                    
++                         (((vki_uint32_t)(i) & VKI___IPADDR(0xffff0000)) ==     \
++                          VKI___IPADDR(0xc0a80000)))
++
++#define VKI_IN_LOCAL_GROUP(i)       (((vki_uint32_t)(i) & VKI___IPADDR(0xffffff00)) == \
++                                 VKI___IPADDR(0xe0000000))
++
++#define VKI_IN_ANY_LOCAL(i)         (VKI_IN_LINKLOCAL(i) || VKI_IN_LOCAL_GROUP(i))
++
++#define VKI_INADDR_ANY              VKI___IPADDR(0x00000000)                                                                                                         
++#define VKI_INADDR_LOOPBACK         VKI___IPADDR(0x7f000001)
++#define VKI_INADDR_BROADCAST        VKI___IPADDR(0xffffffff)    /* must be masked */
++#define VKI_INADDR_NONE             VKI___IPADDR(0xffffffff)    /* -1 return */
++
++#define VKI_INADDR_UNSPEC_GROUP     VKI___IPADDR(0xe0000000)    /* 224.0.0.0 */
++#define VKI_INADDR_ALLHOSTS_GROUP   VKI___IPADDR(0xe0000001)    /* 224.0.0.1 */
++#define VKI_INADDR_ALLRTRS_GROUP    VKI___IPADDR(0xe0000002)    /* 224.0.0.2 */
++#define VKI_INADDR_CARP_GROUP       VKI___IPADDR(0xe0000012)    /* 224.0.0.18 */
++#define VKI_INADDR_MAX_LOCAL_GROUP  VKI___IPADDR(0xe00000ff)    /* 224.0.0.255 */                                                                                    
++
++#define VKI_IN_LOOPBACKNET          127                     /* official! */
++
++struct vki_sockaddr_in {
++        vki_uint8_t         sin_len;
++        vki_sa_family_t     sin_family;
++        vki_in_port_t       sin_port;
++        struct vki_in_addr  sin_addr;
++        vki_int8_t        sin_zero[8];
++};
++
++#define VKI_INET_ADDRSTRLEN                 16
++
++struct ip_opts {
++        struct vki_in_addr  ip_dst;         /* first hop, 0 w/o src rt */
++        vki_int8_t        ip_opts[40];    /* actually variable in size */
++};
++
++#define VKI_IP_OPTIONS              1    /* buf/ip_opts; set/get IP options */
++#define VKI_IP_HDRINCL              2    /* int; header is included with data */
++#define VKI_IP_TOS                  3    /* int; IP type of service and preced. */
++#define VKI_IP_TTL                  4    /* int; IP time to live */
++#define VKI_IP_RECVOPTS             5    /* bool; receive all IP opts w/dgram */
++#define VKI_IP_RECVRETOPTS          6    /* bool; receive IP opts for response */
++#define VKI_IP_RECVDSTADDR          7    /* bool; receive IP dst addr w/dgram */
++#define VKI_IP_RETOPTS              8    /* ip_opts; set/get IP options */
++#define VKI_IP_MULTICAST_IF         9    /* in_addr; set/get IP multicast i/f  */                                                                                
++#define VKI_IP_MULTICAST_TTL        10   /* u_char; set/get IP multicast ttl */
++#define VKI_IP_MULTICAST_LOOP       11   /* u_char; set/get IP multicast loopback */
++/* The add and drop membership option numbers need to match with the v6 ones */
++#define VKI_IP_ADD_MEMBERSHIP       12   /* ip_mreq; add an IP group membership */
++#define VKI_IP_DROP_MEMBERSHIP      13   /* ip_mreq; drop an IP group membership */
++#define VKI_IP_PORTALGO             18   /* int; port selection algo (rfc6056) */
++#define VKI_IP_PORTRANGE            19   /* int; range to use for ephemeral port */
++#define VKI_IP_RECVIF               20   /* bool; receive reception if w/dgram */
++
++#define VKI_IP_ERRORMTU             21   /* int; get MTU of last xmit = EMSGSIZE */                                                                              
++#define VKI_IP_IPSEC_POLICY         22   /* struct; get/set security policy */
++#define VKI_IP_RECVTTL              23   /* bool; receive IP TTL w/dgram */
++#define VKI_IP_MINTTL               24   /* minimum TTL for packet or drop */
++#define VKI_IP_PKTINFO              25   /* struct; set default src if/addr */
++#define VKI_IP_RECVPKTINFO          26   /* int; receive dst if/addr w/dgram */
++
++#define VKI_IP_SENDSRCADDR VKI_IP_RECVDSTADDR /* FreeBSD compatibility */
++
++/*                                                                                                                                                           
++ * Information sent in the control message of a datagram socket for
++ * IP_PKTINFO and IP_RECVPKTINFO.
++ */
++struct in_pktinfo {
++        struct in_addr  ipi_addr;       /* src/dst address */
++        unsigned int ipi_ifindex;       /* interface index */
++};
++
++#define ipi_spec_dst ipi_addr   /* Solaris/Linux compatibility */                                                                                            
++
++/*
++ * Defaults and limits for options
++ */
++#define VKI_IP_DEFAULT_MULTICAST_TTL  1     /* normally limit m'casts to 1 hop  */
++#define VKI_IP_DEFAULT_MULTICAST_LOOP 1     /* normally hear sends if a member  */
++#define VKI_IP_MAX_MEMBERSHIPS      20      /* per socket; must fit in one mbuf */
++
++/*                                                                                                                                                           
++ * Argument structure for IP_ADD_MEMBERSHIP and IP_DROP_MEMBERSHIP.
++ */
++struct vki_ip_mreq {
++        struct  vki_in_addr imr_multiaddr;  /* IP multicast address of group */
++        struct  vki_in_addr imr_interface;  /* local IP address of interface */
++};
++
++#define VKI_IP_PORTRANGE_DEFAULT    0       /* default range */
++#define VKI_IP_PORTRANGE_HIGH       1       /* same as DEFAULT (FreeBSD compat) */
++#define VKI_IP_PORTRANGE_LOW        2       /* use privileged range */
++
++#define VKI_IPCTL_FORWARDING        1       /* act as router */                                                                                                  
++#define VKI_IPCTL_SENDREDIRECTS     2       /* may send redirects when forwarding */
++#define VKI_IPCTL_DEFTTL            3       /* default TTL */
++/* IPCTL_DEFMTU=4, never implemented */
++#define VKI_IPCTL_FORWSRCRT         5       /* forward source-routed packets */
++#define VKI_IPCTL_DIRECTEDBCAST     6       /* default broadcast behavior */
++#define VKI_IPCTL_ALLOWSRCRT        7       /* allow/drop all source-routed pkts */
++#define VKI_IPCTL_SUBNETSARELOCAL   8       /* treat subnets as local addresses */
++#define VKI_IPCTL_MTUDISC           9       /* allow path MTU discovery */
++
++#define VKI_IPCTL_ANONPORTMIN      10       /* minimum ephemeral port */                                                                                         
++#define VKI_IPCTL_ANONPORTMAX      11       /* maximum ephemeral port */
++#define VKI_IPCTL_MTUDISCTIMEOUT   12       /* allow path MTU discovery */
++#define VKI_IPCTL_MAXFLOWS         13       /* maximum ip flows allowed */
++#define VKI_IPCTL_HOSTZEROBROADCAST 14      /* is host zero a broadcast addr? */
++#define VKI_IPCTL_GIF_TTL          15       /* default TTL for gif encap packet */
++#define VKI_IPCTL_LOWPORTMIN       16       /* minimum reserved port */
++#define VKI_IPCTL_LOWPORTMAX       17       /* maximum reserved port */
++#define VKI_IPCTL_MAXFRAGPACKETS   18       /* max packets reassembly queue */
++
++#define VKI_IPCTL_GRE_TTL          19       /* default TTL for gre encap packet */                                                                               
++#define VKI_IPCTL_CHECKINTERFACE   20       /* drop pkts in from 'wrong' iface */
++#define VKI_IPCTL_IFQ              21       /* IP packet input queue */
++#define VKI_IPCTL_RANDOMID         22       /* use random IP ids (if configured) */
++#define VKI_IPCTL_LOOPBACKCKSUM    23       /* do IP checksum on loopback */
++#define VKI_IPCTL_STATS             24      /* IP statistics */
++#define VKI_IPCTL_DAD_COUNT        25       /* DAD packets to send */
 +
 +#endif // __VKI_NETBSD_H
 +
