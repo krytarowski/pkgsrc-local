@@ -282,3 +282,12 @@ $NetBSD$
     SysRes res;
     res = VG_(do_syscall5)( __NR_getsockopt,
                             (UWord)sd, (UWord)level, (UWord)optname, 
+@@ -1392,7 +1415,7 @@ Int VG_(setsockopt) ( Int sd, Int level,
+                            (UWord)optval, (UWord)optlen );
+    return sr_isError(res) ? -1 : sr_Res(res);
+ 
+-#  elif defined(VGO_darwin)
++#  elif defined(VGO_darwin) || defined(VGO_netbsd)
+    SysRes res;
+    res = VG_(do_syscall5)( __NR_setsockopt,
+                            (UWord)sd, (UWord)level, (UWord)optname, 
