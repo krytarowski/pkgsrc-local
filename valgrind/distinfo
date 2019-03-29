@@ -28,6 +28,7 @@ SHA1 (patch-coregrind_m__sigframe_sigframe-amd64-netbsd.c) = 7c6a5dd2269aa5789c8
 SHA1 (patch-coregrind_m__sigframe_sigframe-common.c) = e70746f02ca2f6de086f17617b6e1cbb5caae79c
 SHA1 (patch-coregrind_m__signals.c) = ed59d1b7053a69e170021273c0c009009c3d3026
 SHA1 (patch-coregrind_m__syscall.c) = e7302c1df64eaf003765e4c99431096d90014c3e
+SHA1 (patch-coregrind_m__syswrap_syscall-amd64-netbsd.S) = 2d2534044689fcb8aebfb56edb5203cb164db240
 SHA1 (patch-coregrind_m__syswrap_syswrap-amd64-netbsd.c) = 7051df8c89c683cb1dc3086cdc7204f76060571a
 SHA1 (patch-coregrind_m__trampoline.S) = d70748fa8ad836ba49d49fa600cdcae8722f795c
 SHA1 (patch-coregrind_m__vki.c) = 997173b047d469d26e8a8c070dba5f54b0312079
