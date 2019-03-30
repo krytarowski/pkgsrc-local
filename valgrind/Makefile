@@ -2,6 +2,7 @@
 #
 
 #MAKE_JOBS_SAFE=		no
+PKGSRC_USE_SSP=         no
 
 DISTNAME=		valgrind-3.14.0
 CATEGORIES=		devel
