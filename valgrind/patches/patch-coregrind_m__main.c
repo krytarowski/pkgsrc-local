@@ -29,21 +29,26 @@ $NetBSD$
  
  /* If linking of the final executables is done with glibc present,
     then Valgrind starts at main() above as usual, and all of the
-@@ -2872,6 +2872,29 @@ asm(
+@@ -2872,6 +2872,34 @@ asm(
      "\tnop\n"
  ".previous\n"
  );
 +#elif defined(VGP_amd64_netbsd)
 +
 +asm("\n"
++    ".section \".note.netbsd.ident\", \"a\", @note\n"
++    ".long 2f-1f\n"
++    ".long 4f-3f\n"
++    ".long 1\n"
++    "1: .asciz \"NetBSD\"\n"
++    "2: .p2align 2\n"
++    "3: .long 800000001\n" // __NetBSD_Version__
++    "4: .p2align 2\n"
++    "\n"
 +    ".text\n"
 +    "\t.globl _start\n"
-+    "\t.globl __start\n"
-+    "\t.globl ___start\n"
 +    "\t.type _start,@function\n"
 +    "_start:\n"
-+    "__start:\n"
-+    "___start:\n"
 +    /* set up the new stack in %rdi */
 +    "\tmovq  $vgPlain_interim_stack, %rdi\n"
 +    "\taddq  $"VG_STRINGIFY(VG_STACK_GUARD_SZB)", %rdi\n"
@@ -59,7 +64,7 @@ $NetBSD$
  #else
  #  error "Unknown linux platform"
  #endif
-@@ -2883,6 +2906,24 @@ asm(
+@@ -2883,6 +2911,24 @@ asm(
  #include <elf.h>
  /* --- !!! --- EXTERNAL HEADERS end --- !!! --- */
  
