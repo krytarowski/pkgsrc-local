@@ -1,6 +1,6 @@
 $NetBSD$
 
---- coregrind/m_dispatch/dispatch-amd64-netbsd.S.orig	2019-03-30 13:39:24.645722898 +0000
+--- coregrind/m_dispatch/dispatch-amd64-netbsd.S.orig	2019-03-30 13:41:46.939848076 +0000
 +++ coregrind/m_dispatch/dispatch-amd64-netbsd.S
 @@ -0,0 +1,256 @@
 +

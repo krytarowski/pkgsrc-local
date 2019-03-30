@@ -31,19 +31,20 @@ $NetBSD$
  LIBREPLACEMALLOC_X86_DARWIN = \
  	$(top_builddir)/coregrind/libreplacemalloc_toolpreload-x86-darwin.a
  
-@@ -182,6 +190,11 @@ LIBREPLACEMALLOC_LDFLAGS_ARM64_LINUX = \
+@@ -182,6 +190,12 @@ LIBREPLACEMALLOC_LDFLAGS_ARM64_LINUX = \
  	$(LIBREPLACEMALLOC_ARM64_LINUX) \
  	-Wl,--no-whole-archive
  
 +LIBREPLACEMALLOC_LDFLAGS_AMD64_NETBSD = \
 +        -Wl,--whole-archive \
 +        $(LIBREPLACEMALLOC_AMD64_NETBSD) \
-+        -Wl,--no-whole-archive
++        -Wl,--no-whole-archive \
++	-shared -fPIC
 +
  LIBREPLACEMALLOC_LDFLAGS_X86_DARWIN = \
  	$(LIBREPLACEMALLOC_X86_DARWIN)
  
-@@ -224,4 +237,3 @@ clean-local: clean-noinst_DSYMS
+@@ -224,4 +238,3 @@ clean-local: clean-noinst_DSYMS
  install-exec-local: install-noinst_PROGRAMS install-noinst_DSYMS
  
  uninstall-local: uninstall-noinst_PROGRAMS uninstall-noinst_DSYMS
