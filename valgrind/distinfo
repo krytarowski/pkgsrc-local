@@ -78,5 +78,6 @@ SHA1 (patch-include_vki_vki-amd64-netbsd.h) = fe861ae4a91ca16a9c46f5e7411b9218c7
 SHA1 (patch-include_vki_vki-machine-types-amd64-netbsd.h) = 92e08cd63a406182bbd25799d8a568b6fc29993f
 SHA1 (patch-include_vki_vki-netbsd.h) = 91678f4b587f8933af54e92748ae1ed6f74f7f91
 SHA1 (patch-include_vki_vki-scnums-netbsd.h) = 187f1a4189d1febce0f9e84f870e0019aa108aff
+SHA1 (patch-memcheck_Makefile.am) = a0c24a215399c0ee4463a55aafbe4a1894e27dc8
 SHA1 (patch-netbsd.supp) = 8e8d0c59c59b6d47ca75aa99d330043ebbd15215
 SHA1 (patch-shared_vg__replace__strmem.c) = 3cf2ef83b7cd9f6131bc4009f0ae89aa58226eac
