@@ -8,7 +8,7 @@ $NetBSD$
  
 +if VGCONF_OS_IS_NETBSD
 +vgpreload_memcheck_@VGCONF_ARCH_PRI@_@VGCONF_OS@_so_LDFLAGS += \
-+       -shared
++       -shared -fPIC
 +endif
 +
  if VGCONF_HAVE_PLATFORM_SEC
