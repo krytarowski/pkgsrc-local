@@ -45,6 +45,12 @@ PLIST_SUBST+=		VGCONF_ARCH_PRI=amd64
 CONFIGURE_ARGS+=	--enable-only64bit
 .endif
 
+_WRAP_EXTRA_ARGS.LD+=-fPIC
+CWRAPPERS_APPEND.LD+=-fPIC
+
+_WRAP_EXTRA_ARGS.CC+=-fPIC
+CWRAPPERS_APPEND.CC+=-fPIC
+
 pre-configure:
 	${RUN} cd ${WRKSRC} && ${SH} ./autogen.sh
 

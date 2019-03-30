@@ -77,20 +77,17 @@ $NetBSD$
  	m_syswrap/syswrap-ppc32-linux.c \
  	m_syswrap/syswrap-ppc64-linux.c \
  	m_syswrap/syswrap-arm-linux.c \
-@@ -548,6 +564,12 @@ libreplacemalloc_toolpreload_@VGCONF_ARC
+@@ -547,7 +563,8 @@ libreplacemalloc_toolpreload_@VGCONF_ARC
+ libreplacemalloc_toolpreload_@VGCONF_ARCH_PRI@_@VGCONF_OS@_a_CPPFLAGS = \
  	$(AM_CPPFLAGS_@VGCONF_PLATFORM_PRI_CAPS@)
  libreplacemalloc_toolpreload_@VGCONF_ARCH_PRI@_@VGCONF_OS@_a_CFLAGS = \
- 	$(AM_CFLAGS_PSO_@VGCONF_PLATFORM_PRI_CAPS@)
-+
-+if VGCONF_OS_IS_NETBSD
-+libreplacemalloc_toolpreload_@VGCONF_ARCH_PRI@_@VGCONF_OS@_a_LDFLAGS = \
-+	-fPIC -shared
-+endif
+-	$(AM_CFLAGS_PSO_@VGCONF_PLATFORM_PRI_CAPS@)
++	$(AM_CFLAGS_PSO_@VGCONF_PLATFORM_PRI_CAPS@) -fPIC
 +
  if VGCONF_HAVE_PLATFORM_SEC
  libreplacemalloc_toolpreload_@VGCONF_ARCH_SEC@_@VGCONF_OS@_a_SOURCES = \
  	m_replacemalloc/vg_replace_malloc.c
-@@ -587,6 +609,11 @@ vgpreload_core_@VGCONF_ARCH_SEC@_@VGCONF
+@@ -587,6 +604,11 @@ vgpreload_core_@VGCONF_ARCH_SEC@_@VGCONF
  	$(PRELOAD_LDFLAGS_@VGCONF_PLATFORM_SEC_CAPS@)
  endif
  
