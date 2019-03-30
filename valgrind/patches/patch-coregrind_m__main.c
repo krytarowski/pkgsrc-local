@@ -29,32 +29,37 @@ $NetBSD$
  
  /* If linking of the final executables is done with glibc present,
     then Valgrind starts at main() above as usual, and all of the
-@@ -2872,6 +2872,24 @@ asm(
+@@ -2872,6 +2872,29 @@ asm(
      "\tnop\n"
  ".previous\n"
  );
 +#elif defined(VGP_amd64_netbsd)
++
 +asm("\n"
 +    ".text\n"
 +    "\t.globl _start\n"
++    "\t.globl __start\n"
++    "\t.globl ___start\n"
 +    "\t.type _start,@function\n"
 +    "_start:\n"
-+    /* set up the new stack in %rsi */
-+    "\tmovq  $vgPlain_interim_stack, %rsi\n"
-+    "\taddq  $"VG_STRINGIFY(VG_STACK_GUARD_SZB)", %rsi\n"
-+    "\taddq  $"VG_STRINGIFY(VG_DEFAULT_STACK_ACTIVE_SZB)", %rsi\n"
-+    "\tandq  $~15, %rsi\n"
++    "__start:\n"
++    "___start:\n"
++    /* set up the new stack in %rdi */
++    "\tmovq  $vgPlain_interim_stack, %rdi\n"
++    "\taddq  $"VG_STRINGIFY(VG_STACK_GUARD_SZB)", %rdi\n"
++    "\taddq  $"VG_STRINGIFY(VG_DEFAULT_STACK_ACTIVE_SZB)", %rdi\n"
++    "\tandq  $~15, %rdi\n"
 +    /* install it, and collect the original one */
-+    "\txchgq %rsi, %rsp\n"
-+    /* call _start_in_C_amd64_netbsd, passing it the startup %rsp */
-+    "\tcall  _start_in_C_amd64_netbsd\n"
++    "\txchgq %rdi, %rsp\n"
++    /* call _start_in_C_netbsd, passing it the startup %rsp */
++    "\tcall  _start_in_C_netbsd\n"
 +    "\thlt\n"
 +    ".previous\n"
 +);
  #else
  #  error "Unknown linux platform"
  #endif
-@@ -2883,6 +2901,24 @@ asm(
+@@ -2883,6 +2906,24 @@ asm(
  #include <elf.h>
  /* --- !!! --- EXTERNAL HEADERS end --- !!! --- */
  
