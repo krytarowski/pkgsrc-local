@@ -28,6 +28,7 @@ SHA1 (patch-coregrind_m__libcassert.c) = faab08db23f58c71c2859deb0fc3649c577bfa6
 SHA1 (patch-coregrind_m__libcfile.c) = 5ce8a3740656d458a43f8896f9636ad8d31a0cc3
 SHA1 (patch-coregrind_m__libcprint.c) = 11be5b36f9bdd61989bf3d93a77e03327beee269
 SHA1 (patch-coregrind_m__libcproc.c) = fd0993c0a3b322b4eba7bc58ff918e737d8d764d
+SHA1 (patch-coregrind_m__libcsetjmp.c) = 6256a64975d71afb6490dc60914cb4f6c0f58489
 SHA1 (patch-coregrind_m__libcsignal.c) = d4ad3a8c5c9dd63cb92cb241203321594149554f
 SHA1 (patch-coregrind_m__machine.c) = 661fb8baf42142bc0570f4db982d45cb5b21b4b7
 SHA1 (patch-coregrind_m__main.c) = cf3e415abf46d26ce97c61328075c3414c915f11
