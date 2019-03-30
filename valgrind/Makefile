@@ -28,8 +28,11 @@ USE_TOOLS+=		gmake perl aclocal autoheader automake autoconf
 USE_LANGUAGES=		c c++
 TEST_TARGET=		regtest
 
-REPLACE_PERL+=		callgrind/callgrind_annotate
-REPLACE_PERL+=		callgrind/callgrind_control
+REPLACE_INTERPRETER+=	perl
+REPLACE.perl.old=	.*/bin/perl.*
+REPLACE.perl.new=	${PREFIX}/bin/perl
+REPLACE_FILES.perl+=	callgrind/callgrind_annotate.in
+REPLACE_FILES.perl+=	callgrind/callgrind_control.in
 
 .include "../../mk/bsd.prefs.mk"
 
