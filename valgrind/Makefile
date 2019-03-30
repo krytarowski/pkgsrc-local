@@ -28,6 +28,9 @@ USE_TOOLS+=		gmake perl aclocal autoheader automake autoconf
 USE_LANGUAGES=		c c++
 TEST_TARGET=		regtest
 
+REPLACE_PERL+=		callgrind/callgrind_annotate
+REPLACE_PERL+=		callgrind/callgrind_control
+
 .include "../../mk/bsd.prefs.mk"
 
 .if ${MACHINE_ARCH:C/arm.*/arm/} == "arm"
