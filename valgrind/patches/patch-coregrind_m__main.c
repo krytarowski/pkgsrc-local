@@ -51,8 +51,8 @@ $NetBSD$
 +    "\tandq  $~15, %rdi\n"
 +    /* install it, and collect the original one */
 +    "\txchgq %rdi, %rsp\n"
-+    /* call _start_in_C_netbsd, passing it the startup %rsp */
-+    "\tcall  _start_in_C_netbsd\n"
++    /* call _start_in_C_amd64_netbsd, passing it the startup %rsp */
++    "\tcall  _start_in_C_amd64_netbsd\n"
 +    "\thlt\n"
 +    ".previous\n"
 +);
