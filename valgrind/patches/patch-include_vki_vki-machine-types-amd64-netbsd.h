@@ -1,6 +1,6 @@
 $NetBSD$
 
---- include/vki/vki-machine-types-amd64-netbsd.h.orig	2019-03-29 17:03:24.556848893 +0000
+--- include/vki/vki-machine-types-amd64-netbsd.h.orig	2019-03-30 06:21:05.020121263 +0000
 +++ include/vki/vki-machine-types-amd64-netbsd.h
 @@ -0,0 +1,222 @@
 +
