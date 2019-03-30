@@ -16,7 +16,7 @@ $NetBSD$
  #  define SP_REG         4
  #  define RA_REG_DEFAULT 8
 -#elif defined(VGP_amd64_linux) || defined(VGP_amd64_solaris)
-+#elif defined(VGP_amd64_linux) || defined(VGP_amd64_solaris) || defined(VGO_amd64_netbsd)
++#elif defined(VGP_amd64_linux) || defined(VGP_amd64_solaris) || defined(VGP_amd64_netbsd)
  #  define FP_REG         6
  #  define SP_REG         7
  #  define RA_REG_DEFAULT 16
