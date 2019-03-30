@@ -7,10 +7,10 @@ $NetBSD$
  #endif
  
 +#elif defined(VGO_netbsd)
-+ STRCHR(VG_Z_LIBC_SONAME,          strchr)
-+ STRCHR(VG_Z_LIBC_SONAME,          index)
-+ STRCHR(VG_Z_LD_ELF_SO_1, strchr)
-+ STRCHR(VG_Z_LD_ELF32_SO_1, strchr)
++// STRCHR(VG_Z_LIBC_SONAME,          strchr)
++// STRCHR(VG_Z_LIBC_SONAME,          index)
++// STRCHR(VG_Z_LD_ELF_SO_1, strchr)
++// STRCHR(VG_Z_LD_ELF32_SO_1, strchr)
 +
  #elif defined(VGO_darwin)
   //STRRCHR(VG_Z_LIBC_SONAME,   strrchr)
