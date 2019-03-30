@@ -15,6 +15,7 @@ SHA1 (patch-coregrind_m__debuginfo_d3basics.c) = c3a435a1c1e075c139f5963d27f4ac2
 SHA1 (patch-coregrind_m__debuginfo_debuginfo.c) = 243a586975067a38e5a9ab822d7f064d8b708118
 SHA1 (patch-coregrind_m__debuginfo_priv__readpdb.h) = c444f25cbe6d624c40c2154fd3646a8151cf8f8c
 SHA1 (patch-coregrind_m__debuginfo_readdwarf.c) = 60ab2ccd3a73cb7364d28e2a17b43bd4b9e571ef
+SHA1 (patch-coregrind_m__debuginfo_readdwarf3.c) = 13084532608812e217f15b64d2986b8b6fb124e6
 SHA1 (patch-coregrind_m__debuginfo_readelf.c) = 8e2c5b6a156fa819d478df4cffd44a08b5629e82
 SHA1 (patch-coregrind_m__debuginfo_readpdb.c) = f8c97fe9fd9fcf43c5ec5fd41477478c6d70114c
 SHA1 (patch-coregrind_m__debuginfo_storage.c) = 3a4a600613d64799a8229cf9d5d4fb9952eb3a2d
