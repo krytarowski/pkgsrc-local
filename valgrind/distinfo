@@ -63,6 +63,7 @@ SHA1 (patch-include_pub__tool__basics__asm.h) = d244496cef9ef5913f8995eaf2949f6a
 SHA1 (patch-include_pub__tool__machine.h) = 91efde63fc24d3c367ee560955661956e3aed842
 SHA1 (patch-include_pub__tool__redir.h) = 9d1b029c7ce27188b6722ef6eced603387ebf608
 SHA1 (patch-include_pub__tool__vki.h) = e59b9a1e67ed5038c92f3e038149408b30c38b01
+SHA1 (patch-include_pub__tool__vkiscnums.h) = ff122044a2f9831d9a6e8dd3e6828d15f301e1a3
 SHA1 (patch-include_pub__tool__vkiscnums__asm.h) = a62771d625824eab0f5225dfaf474c4187e90d75
 SHA1 (patch-include_valgrind.h) = bea2a4f4141873aba01674bf54b5532598b570a7
 SHA1 (patch-include_vki_vki-amd64-netbsd.h) = fe861ae4a91ca16a9c46f5e7411b9218c7eac1d9
