@@ -83,7 +83,7 @@ $NetBSD$
  	$(AM_CFLAGS_PSO_@VGCONF_PLATFORM_PRI_CAPS@)
 +
 +if VGCONF_OS_IS_NETBSD
-+libreplacemalloc_toolpreload_@VGCONF_ARCH_PRI@_@VGCONF_OS@_a_LDFLAGS += \
++libreplacemalloc_toolpreload_@VGCONF_ARCH_PRI@_@VGCONF_OS@_a_LDFLAGS = \
 +	-fPIC -shared
 +endif
 +
