@@ -1,6 +1,6 @@
 $NetBSD$
 
---- coregrind/m_dispatch/dispatch-amd64-netbsd.S.orig	2019-03-29 10:08:50.617491805 +0000
+--- coregrind/m_dispatch/dispatch-amd64-netbsd.S.orig	2019-03-30 13:04:02.688977675 +0000
 +++ coregrind/m_dispatch/dispatch-amd64-netbsd.S
 @@ -0,0 +1,256 @@
 +
@@ -212,7 +212,7 @@ $NetBSD$
 +	movq	OFFSET_amd64_RIP(%rbp), %rax
 +
 +        /* stats only */
-+        addl    $1, VG_(stats__n_xindirs_32)
++//        addl    $1, VG_(stats__n_xindirs_32)
 +        
 +	/* try a fast lookup in the translation cache */
 +	movabsq $VG_(tt_fast), %rcx
@@ -230,7 +230,7 @@ $NetBSD$
 +
 +fast_lookup_failed:
 +        /* stats only */
-+        addl    $1, VG_(stats__n_xindir_misses_32)
++//        addl    $1, VG_(stats__n_xindir_misses_32)
 +
 +	movq	$VG_TRC_INNER_FASTMISS, %rax
 +        movq    $0, %rdx
