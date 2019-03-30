@@ -1,7 +1,7 @@
 # $NetBSD: Makefile,v 1.22 2016/01/16 20:30:11 ryoon Exp $
 #
 
-#MAKE_JOBS_SAFE=		no
+MAKE_JOBS_SAFE=		no
 PKGSRC_USE_SSP=         no
 
 DISTNAME=		valgrind-3.14.0
@@ -45,11 +45,11 @@ PLIST_SUBST+=		VGCONF_ARCH_PRI=amd64
 CONFIGURE_ARGS+=	--enable-only64bit
 .endif
 
-_WRAP_EXTRA_ARGS.LD+=-fPIC
-CWRAPPERS_APPEND.LD+=-fPIC
+#_WRAP_EXTRA_ARGS.LD+=-fPIC
+#CWRAPPERS_APPEND.LD+=-fPIC
 
-_WRAP_EXTRA_ARGS.CC+=-fPIC
-CWRAPPERS_APPEND.CC+=-fPIC
+#_WRAP_EXTRA_ARGS.CC+=-fPIC
+#CWRAPPERS_APPEND.CC+=-fPIC
 
 pre-configure:
 	${RUN} cd ${WRKSRC} && ${SH} ./autogen.sh
