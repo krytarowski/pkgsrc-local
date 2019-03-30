@@ -1,8 +1,8 @@
 $NetBSD$
 
---- coregrind/m_sigframe/sigframe-amd64-netbsd.c.orig	2019-03-29 10:20:08.379844852 +0000
+--- coregrind/m_sigframe/sigframe-amd64-netbsd.c.orig	2019-03-30 07:21:10.160474699 +0000
 +++ coregrind/m_sigframe/sigframe-amd64-netbsd.c
-@@ -0,0 +1,623 @@
+@@ -0,0 +1,625 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- Create/destroy signal delivery frames.                       ---*/
@@ -594,8 +594,10 @@ $NetBSD$
 +
 +
 +/* EXPORTED */
-+void VG_(sigframe_destroy)( ThreadId tid, Bool isRT )
++void VG_(sigframe_destroy)( ThreadId tid )
 +{
++   Bool isRT;
++   memset(&isRT, 0, sizeof(isRT));
 +   Addr          rsp;
 +   ThreadState*  tst;
 +   SizeT	 size;
