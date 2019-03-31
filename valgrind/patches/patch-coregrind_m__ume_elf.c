@@ -20,7 +20,40 @@ $NetBSD$
        if (brkaddr > elfbrk)
           elfbrk = brkaddr;
     }
-@@ -644,6 +646,8 @@ Int VG_(load_ELF)(Int fd, const HChar* n
+@@ -568,8 +570,10 @@ Int VG_(load_ELF)(Int fd, const HChar* n
+    /* The kernel maps position-independent executables at TASK_SIZE*2/3;
+       duplicate this behavior as close as we can. */
+    if (e->e.e_type == ET_DYN && ebase == 0) {
++      VG_(debugLog)(2, "initimg", "%s() %s:%d ebase=%lx\n", __func__, __FILE__, __LINE__, ebase);
+       ebase = VG_PGROUNDDN(info->exe_base 
+                            + (info->exe_end - info->exe_base) * 2 / 3);
++      VG_(debugLog)(2, "initimg", "%s() %s:%d ebase=%lx\n", __func__, __FILE__, __LINE__, ebase);
+       /* We really don't want to load PIEs at zero or too close.  It
+          works, but it's unrobust (NULL pointer reads and writes
+          become legit, which is really bad) and causes problems for
+@@ -595,14 +599,21 @@ Int VG_(load_ELF)(Int fd, const HChar* n
+       /* Record for later use in AT_BASE. */
+       info->interp_offset = ebase;
+ #     endif
++
++      VG_(debugLog)(2, "initimg", "%s() %s:%d ebase=%lx\n", __func__, __FILE__, __LINE__, ebase);
+    }
+ 
+    info->phnum = e->e.e_phnum;
+    info->entry = e->e.e_entry + ebase;
+    info->phdr = 0;
++#if defined(VGO_netbsd)
++   info->stack_prot = VKI_PROT_READ|VKI_PROT_WRITE;
++#else
+    info->stack_prot = VKI_PROT_READ|VKI_PROT_WRITE|VKI_PROT_EXEC;
++#endif
+ 
+    for (i = 0; i < e->e.e_phnum; i++) {
++      __builtin_trap();
+       ESZ(Phdr) *ph = &e->p[i];
+ 
+       switch(ph->p_type) {
+@@ -644,6 +655,8 @@ Int VG_(load_ELF)(Int fd, const HChar* n
           VG_(pread)(fd, buf, ph->p_filesz, ph->p_offset);
           buf[ph->p_filesz] = '\0';
  
@@ -29,7 +62,7 @@ $NetBSD$
           sres = VG_(open)(buf, VKI_O_RDONLY, 0);
           if (sr_isError(sres)) {
              VG_(printf)("valgrind: m_ume.c: can't open interpreter\n");
-@@ -870,7 +874,7 @@ Int VG_(load_ELF)(Int fd, const HChar* n
+@@ -870,7 +883,7 @@ Int VG_(load_ELF)(Int fd, const HChar* n
     return 0;
  }
  
