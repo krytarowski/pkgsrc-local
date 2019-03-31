@@ -31,7 +31,7 @@ $NetBSD$
 +   NetBSD/amd64
 +   X86_TF_RAX(frame) = rval[0];
 +   X86_TF_RDX(frame) = rval[1];
-+   X86_TF_RFLAGS(frame) &= ~PSL_C; /* carry bit */  <- signs error
++//   X86_TF_RFLAGS(frame) &= ~PSL_C; // carry bit <- enabled ZC signs error
 +*/
  
  static inline Bool sr_isError ( SysRes sr ) {

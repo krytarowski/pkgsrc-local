@@ -11,7 +11,91 @@ $NetBSD$
     { VG_(match_ELF),    VG_(load_ELF) },
  #  elif defined(VGO_darwin)
     { VG_(match_macho),  VG_(load_macho) },
-@@ -140,16 +140,24 @@ Int VG_(do_exec_inner)(const HChar* exe,
+@@ -73,18 +73,26 @@ VG_(pre_exec_check)(const HChar* exe_nam
+    SizeT bufsz = sizeof buf, fsz;
+    Bool is_setuid = False;
+ 
++   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
+    // Check it's readable
+    res = VG_(open)(exe_name, VKI_O_RDONLY, 0);
++   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
+    if (sr_isError(res)) {
++      VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
+       return res;
+    }
++   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
+    fd = sr_Res(res);
++   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
+ 
+    // Check we have execute permissions
+    ret = VG_(check_executable)(&is_setuid, exe_name, allow_setuid);
++   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
+    if (0 != ret) {
++      VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
+       VG_(close)(fd);
+       if (is_setuid && !VG_(clo_xml)) {
++         VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
+          VG_(message)(Vg_UserMsg, "\n");
+          VG_(message)(Vg_UserMsg,
+                       "Warning: Can't execute setuid/setgid/setcap executable: %s\n",
+@@ -96,36 +104,55 @@ VG_(pre_exec_check)(const HChar* exe_nam
+       return VG_(mk_SysRes_Error)(ret);
+    }
+ 
++   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++
+    fsz = (SizeT)VG_(fsize)(fd);
+-   if (fsz < bufsz)
++   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++   if (fsz < bufsz) {
++      VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
+       bufsz = fsz;
++   }
++   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
+ 
+    res = VG_(pread)(fd, buf, bufsz, 0);
++   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
+    if (sr_isError(res) || sr_Res(res) != bufsz) {
++      VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
+       VG_(close)(fd);
++      VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
+       return VG_(mk_SysRes_Error)(VKI_EACCES);
+    }
++   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
+    bufsz = sr_Res(res);
++   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
+ 
+    // Look for a matching executable format
+    for (i = 0; i < EXE_HANDLER_COUNT; i++) {
++      VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
+       if ((*exe_handlers[i].match_fn)(buf, bufsz)) {
++         VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
+          res = VG_(mk_SysRes_Success)(i);
+          break;
+       }
+    }
++   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
+    if (i == EXE_HANDLER_COUNT) {
++      VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
+       // Rejected by all executable format handlers.
+       res = VG_(mk_SysRes_Error)(VKI_ENOEXEC);
+    }
+ 
++   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
+    // Write the 'out_fd' param if necessary, or close the file.
+    if (!sr_isError(res) && out_fd) {
++      VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
+       *out_fd = fd; 
+    } else { 
++      VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
+       VG_(close)(fd);
+    }
+ 
++   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
+    return res;
+ }
+ 
+@@ -140,16 +167,24 @@ Int VG_(do_exec_inner)(const HChar* exe,
     Int fd;
     Int ret;
  
@@ -37,7 +121,7 @@ $NetBSD$
  
     return ret;
  }
-@@ -208,10 +216,13 @@ static Int do_exec_shell_followup(Int re
+@@ -208,10 +243,13 @@ static Int do_exec_shell_followup(Int re
     const HChar*  default_interp_name = "/bin/sh";
  #  endif
  
@@ -51,7 +135,7 @@ $NetBSD$
        // It was an executable file, but in an unacceptable format.  Probably
        // is a shell script lacking the "#!" prefix;  try to execute it so.
  
-@@ -220,16 +231,22 @@ static Int do_exec_shell_followup(Int re
+@@ -220,16 +258,22 @@ static Int do_exec_shell_followup(Int re
           VG_(fmsg)("%s: cannot execute binary file\n", exe_name);
           VG_(exit)(126);      // 126 == NOEXEC
        }
@@ -74,7 +158,7 @@ $NetBSD$
  
        if (0 != ret) {
           // Something went wrong with executing the default interpreter
-@@ -237,38 +254,51 @@ static Int do_exec_shell_followup(Int re
+@@ -237,38 +281,51 @@ static Int do_exec_shell_followup(Int re
                       exe_name, info->interp_name, VG_(strerror)(ret));
           VG_(exit)(126);      // 126 == NOEXEC
        }
@@ -129,7 +213,7 @@ $NetBSD$
     return ret;
  }
  
-@@ -282,14 +312,19 @@ Int VG_(do_exec)(const HChar* exe_name, 
+@@ -282,14 +339,19 @@ Int VG_(do_exec)(const HChar* exe_name, 
  {
     Int ret;
  
