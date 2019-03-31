@@ -8,7 +8,7 @@ $NetBSD$
  
 +   VG_(debugLog)(2, "initimg", "%s() %s:%d start=%lu length=%lu prot=%lx flags=%x fd=%d offset=%lu MAP_FIXED-really?=%s\n", __func__, __FILE__, __LINE__, start, length, prot, flags, fd, offset, flags & VKI_MAP_FIXED ? "yes" : "no");
 +
-+   if (addr == 0 && flags & VKI_MAP_FIXED)
++   if (start == 0 && flags & VKI_MAP_FIXED)
 +      __builtin_trap();
 +
  #  if defined(VGP_arm64_linux)
