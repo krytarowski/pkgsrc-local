@@ -20,12 +20,19 @@ $NetBSD$
  typedef
     struct {
        UWord _val;
-@@ -364,7 +364,7 @@ static inline Bool sr_EQ ( UInt sysno, S
+@@ -364,7 +364,14 @@ static inline Bool sr_EQ ( UInt sysno, S
            && sr1._wLO == sr2._wLO && sr1._wHI == sr2._wHI;
  }
  
 -#elif defined(VGO_solaris)
 +#elif defined(VGO_solaris) || defined(VGO_netbsd)
++
++/*
++   NetBSD/amd64
++   X86_TF_RAX(frame) = rval[0];
++   X86_TF_RDX(frame) = rval[1];
++   X86_TF_RFLAGS(frame) &= ~PSL_C; /* carry bit */  <- signs error
++*/
  
  static inline Bool sr_isError ( SysRes sr ) {
     return sr._isError;
