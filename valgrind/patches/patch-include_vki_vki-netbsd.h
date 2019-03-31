@@ -3170,31 +3170,31 @@ $NetBSD$
 +
 +                                                                                                                                                             
 +struct vki_kinfo_vmentry {
-+        vki_unit64_t kve_start;                     /* Starting address. */
-+        vki_unit64_t kve_end;                       /* Finishing address. */
-+        vki_unit64_t kve_offset;                    /* Mapping offset in object */
++        vki_uint64_t kve_start;                     /* Starting address. */
++        vki_uint64_t kve_end;                       /* Finishing address. */
++        vki_uint64_t kve_offset;                    /* Mapping offset in object */
 +
-+        vki_unit32_t kve_type;                      /* Type of map entry. */
-+        vki_unit32_t kve_flags;                     /* Flags on map entry. */
-+        vki_unit32_t kve_count;                     /* Number of pages/entries */                                                                                
-+        vki_unit32_t kve_wired_count;               /* Number of wired pages */
++        vki_uint32_t kve_type;                      /* Type of map entry. */
++        vki_uint32_t kve_flags;                     /* Flags on map entry. */
++        vki_uint32_t kve_count;                     /* Number of pages/entries */                                                                                
++        vki_uint32_t kve_wired_count;               /* Number of wired pages */
 +
-+        vki_unit32_t kve_advice;                    /* Advice */
-+        vki_unit32_t kve_attributes;                /* Map attribute */
++        vki_uint32_t kve_advice;                    /* Advice */
++        vki_uint32_t kve_attributes;                /* Map attribute */
 +
-+        vki_unit32_t kve_protection;                /* Protection bitmask. */
-+        vki_unit32_t kve_max_protection;            /* Max protection bitmask */
++        vki_uint32_t kve_protection;                /* Protection bitmask. */
++        vki_uint32_t kve_max_protection;            /* Max protection bitmask */
 +
-+        vki_unit32_t kve_ref_count;                 /* VM obj ref count. */                                                                                      
-+        vki_unit32_t kve_inheritance;               /* Inheritance */
++        vki_uint32_t kve_ref_count;                 /* VM obj ref count. */                                                                                      
++        vki_uint32_t kve_inheritance;               /* Inheritance */
 +
-+        vki_unit64_t kve_vn_fileid;                 /* inode number if vnode */
-+        vki_unit64_t kve_vn_size;                   /* File size. */
-+        vki_unit64_t kve_vn_fsid;                   /* dev_t of vnode location */
-+        vki_unit64_t kve_vn_rdev;                   /* Device id if device. */
++        vki_uint64_t kve_vn_fileid;                 /* inode number if vnode */
++        vki_uint64_t kve_vn_size;                   /* File size. */
++        vki_uint64_t kve_vn_fsid;                   /* dev_t of vnode location */
++        vki_uint64_t kve_vn_rdev;                   /* Device id if device. */
 +
-+        vki_unit32_t kve_vn_type;                   /* Vnode type. */
-+        vki_unit32_t kve_vn_mode;                   /* File mode. */
++        vki_uint32_t kve_vn_type;                   /* Vnode type. */
++        vki_uint32_t kve_vn_mode;                   /* File mode. */
 +
 +        char     kve_path[VKI_PATH_MAX];            /* Path to VM obj, if any. */
 +};

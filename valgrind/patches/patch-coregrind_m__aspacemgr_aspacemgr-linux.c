@@ -123,8 +123,8 @@ $NetBSD$
 +       endPlusOne = (UWord)kve->kve_end;
 +       foffset    = kve->kve_offset;
 +       filename   = kve->kve_path;
-+       dev        = kve->kve_fsid;
-+       ino        = kve->kve_fileid;
++       dev        = kve->kve_vn_fsid;
++       ino        = kve->kve_vn_fileid;
 +       if (filename[0] != '/') {
 +         filename = NULL;
 +         foffset = 0;
