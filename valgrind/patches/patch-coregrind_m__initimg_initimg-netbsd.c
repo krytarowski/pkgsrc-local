@@ -1,8 +1,8 @@
 $NetBSD$
 
---- coregrind/m_initimg/initimg-netbsd.c.orig	2019-03-29 10:08:50.626100073 +0000
+--- coregrind/m_initimg/initimg-netbsd.c.orig	2019-03-31 10:18:43.806793479 +0000
 +++ coregrind/m_initimg/initimg-netbsd.c
-@@ -0,0 +1,893 @@
+@@ -0,0 +1,907 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- Startup: create initial process image on Linux               ---*/
@@ -80,33 +80,44 @@ $NetBSD$
 +   Int    ret;
 +   SysRes res;
 +
++   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
 +   vg_assert( VG_(args_the_exename) != NULL);
++   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
 +   exe_name = ML_(find_executable)( VG_(args_the_exename) );
++   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
 +
 +   if (!exe_name) {
 +      VG_(printf)("valgrind: %s: command not found\n", VG_(args_the_exename));
 +      VG_(exit)(127);      // 127 is Posix NOTFOUND
 +   }
 +
++   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++
 +   VG_(memset)(info, 0, sizeof(*info));
++   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
 +   ret = VG_(do_exec)(exe_name, info);
++   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
 +   if (ret < 0) {
 +      VG_(printf)("valgrind: could not execute '%s'\n", exe_name);
 +      VG_(exit)(1);
 +   }
++   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
 +
 +   // The client was successfully loaded!  Continue.
 +
 +   /* Get hold of a file descriptor which refers to the client
 +      executable.  This is needed for attaching to GDB. */
 +   res = VG_(open)(exe_name, VKI_O_RDONLY, VKI_S_IRUSR);
++   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
 +   if (!sr_isError(res))
 +      VG_(cl_exec_fd) = sr_Res(res);
 +
++   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
 +   /* Copy necessary bits of 'info' that were filled in */
 +   *client_ip  = info->init_ip;
 +   *client_toc = info->init_toc;
 +   VG_(brk_base) = VG_(brk_limit) = VG_PGROUNDUP(info->brkbase);
++   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +
@@ -747,7 +758,10 @@ $NetBSD$
 +   if (VG_(args_the_exename) == NULL)
 +      VG_(err_missing_prog)();
 +
++   VG_(debugLog)(1, "initimg", "Loading client2\n");
++
 +   load_client(&info, &iifii.initial_client_IP, &iifii.initial_client_TOC);
++   VG_(debugLog)(1, "initimg", "Loading client3\n");
 +
 +   //--------------------------------------------------------------
 +   // Set up client's environment

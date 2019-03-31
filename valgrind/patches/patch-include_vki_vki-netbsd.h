@@ -2,7 +2,7 @@ $NetBSD$
 
 --- include/vki/vki-netbsd.h.orig	2019-03-31 10:18:44.358638467 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,3293 @@
+@@ -0,0 +1,3297 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -1061,12 +1061,16 @@ $NetBSD$
 +
 +#define st_atimespec            st_atim
 +#define st_atimensec            st_atim.tv_nsec
++#define st_atime_nsec st_atimensec // linux compat
 +#define st_mtimespec            st_mtim
 +#define st_mtimensec            st_mtim.tv_nsec
++#define st_mtime_nsec st_mtimensec // linux compat
 +#define st_ctimespec            st_ctim
 +#define st_ctimensec            st_ctim.tv_nsec
++#define st_ctime_nsec st_ctimensec // linux compat
 +#define st_birthtimespec        st_birthtim
 +#define st_birthtimensec        st_birthtimespec.tv_nsec
++#define st_birthtime_nsec st_birthtimensec // linux compat
 +
 +#define VKI_S_ISUID 0004000                 /* set user id on execution */
 +#define VKI_S_ISGID 0002000                 /* set group id on execution */
