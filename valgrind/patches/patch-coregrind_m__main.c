@@ -29,13 +29,14 @@ $NetBSD$
  
  /* If linking of the final executables is done with glibc present,
     then Valgrind starts at main() above as usual, and all of the
-@@ -2872,6 +2872,34 @@ asm(
-     "\tnop\n"
- ".previous\n"
+@@ -2566,8 +2566,19 @@ asm("\n"
+     "\thlt\n"
+     ".previous\n"
  );
-+#elif defined(VGP_amd64_netbsd)
-+
-+asm("\n"
+-#elif defined(VGP_amd64_linux)
++#elif defined(VGP_amd64_linux) || defined(VGP_amd64_netbsd)
+ asm("\n"
++#   if defined(VGP_amd64_netbsd)
 +    ".section \".note.netbsd.ident\", \"a\", @note\n"
 +    ".long 2f-1f\n"
 +    ".long 4f-3f\n"
@@ -45,47 +46,7 @@ $NetBSD$
 +    "3: .long 800000001\n" // __NetBSD_Version__
 +    "4: .p2align 2\n"
 +    "\n"
-+    ".text\n"
-+    "\t.globl _start\n"
-+    "\t.type _start,@function\n"
-+    "_start:\n"
-+    /* set up the new stack in %rdi */
-+    "\tmovq  $vgPlain_interim_stack, %rdi\n"
-+    "\taddq  $"VG_STRINGIFY(VG_STACK_GUARD_SZB)", %rdi\n"
-+    "\taddq  $"VG_STRINGIFY(VG_DEFAULT_STACK_ACTIVE_SZB)", %rdi\n"
-+    "\tandq  $~15, %rdi\n"
-+    /* install it, and collect the original one */
-+    "\txchgq %rdi, %rsp\n"
-+    /* call _start_in_C_amd64_netbsd, passing it the startup %rsp */
-+    "\tcall  _start_in_C_amd64_netbsd\n"
-+    "\thlt\n"
-+    ".previous\n"
-+);
- #else
- #  error "Unknown linux platform"
- #endif
-@@ -2883,6 +2911,24 @@ asm(
- #include <elf.h>
- /* --- !!! --- EXTERNAL HEADERS end --- !!! --- */
- 
-+void _start_in_C_amd64_netbsd ( UWord* pArgc, UWord *initial_sp );
-+void _start_in_C_amd64_netbsd ( UWord* pArgc, UWord *initial_sp )
-+{
-+   Int     r;
-+   Word    argc = pArgc[0];
-+   HChar** argv = (HChar**)&pArgc[1];
-+   HChar** envp = (HChar**)&pArgc[1+argc+1];
-+
-+   VG_(memset)( &the_iicii, 0, sizeof(the_iicii) );
-+   VG_(memset)( &the_iifii, 0, sizeof(the_iifii) );
-+
-+   the_iicii.sp_at_startup = (Addr)initial_sp;
-+
-+   r = valgrind_main( (Int)argc, argv, envp );
-+   /* NOTREACHED */
-+   VG_(exit)(r);
-+}
-+
- /* Avoid compiler warnings: this fn _is_ used, but labelling it
-    'static' causes gcc to complain it isn't.
-    attribute 'used' also ensures the code is not eliminated at link
++#   endif
+     ".text\n"
+     "\t.globl _start\n"
+     "\t.type _start,@function\n"
