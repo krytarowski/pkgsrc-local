@@ -62,7 +62,7 @@ $NetBSD$
     // --- Solaris ------------------------------------------
  #elif defined(VGO_solaris)
  #  if VG_WORDSIZE == 4
-@@ -3797,13 +3823,94 @@ Bool VG_(get_changed_segments)(
+@@ -3797,13 +3823,93 @@ Bool VG_(get_changed_segments)(
     return !css_overflowed;
  }
  
@@ -94,26 +94,26 @@ $NetBSD$
 +    ULong  foffset, dev, ino;
 +    struct vki_kinfo_vmentry *kve;
 +    vki_size_t len;
-+    Int    oid[4] = {}; // XXX
++    Int    oid[5];
 +    SysRes sres;
 +
 +    foffset = ino = 0; /* keep gcc-4.1.0 happy */
-+#if 0
 +
-+    oid[0] = VKI_CTL_KERN;
-+    oid[1] = VKI_KERN_PROC;
-+    oid[2] = VKI_KERN_PROC_VMMAP;
++    oid[0] = VKI_CTL_VM;
++    oid[1] = VKI_VM_PROC;
++    oid[2] = VKI_VM_PROC_MAP;
 +    oid[3] = sr_Res(VG_(do_syscall0)(__NR_getpid));
-+#endif
++    oid[4] = sizeof(struct vki_kinfo_vmentry);
++
 +    len = sizeof(procmap_buf);
 +
-+    sres = VG_(do_syscall6)(__NR___sysctl, (UWord)oid, 4, (UWord)procmap_buf,
++    sres = VG_(do_syscall6)(__NR___sysctl, (UWord)oid, 5, (UWord)procmap_buf,
 +       (UWord)&len, 0, 0);
 +    if (sr_isError(sres)) {
 +       VG_(debugLog)(0, "procselfmaps", "sysctll %ld\n", sr_Err(sres));
 +       ML_(am_exit)(1);
 +    }
-+#if 0
++
 +    gapStart = Addr_MIN;
 +    i = 0;
 +    p = procmap_buf;
@@ -143,12 +143,11 @@ $NetBSD$
 +                              prot, dev, ino,
 +                              foffset, filename );                                                                                                           
 +       gapStart = endPlusOne;
-+       p += kve->kve_structsize;
++       p += sizeof(struct vki_kinfo_vmentry);
 +    }
 +
 +    if (record_gap && gapStart < Addr_MAX)
 +       (*record_gap) ( gapStart, Addr_MAX - gapStart + 1 );
-+#endif
 +}
 +
 +/*------END-procmaps-parser-for-Netbsd--------------------------*/
@@ -160,7 +159,7 @@ $NetBSD$
  
  /* Note: /proc/self/xmap contains extended information about already
     materialized mappings whereas /proc/self/rmap contains information about
-@@ -4113,7 +4220,7 @@ Bool VG_(am_search_for_new_segment)(Addr
+@@ -4113,7 +4219,7 @@ Bool VG_(am_search_for_new_segment)(Addr
  
  /*------END-procmaps-parser-for-Solaris--------------------------*/
  
