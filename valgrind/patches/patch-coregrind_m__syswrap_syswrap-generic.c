@@ -82,23 +82,7 @@ $NetBSD$
        break;
  #endif
  
-@@ -2456,6 +2471,7 @@ ML_(generic_PRE_sys_mmap) ( ThreadId tid
- #define PRE(name)      DEFN_PRE_TEMPLATE(generic, name)
- #define POST(name)     DEFN_POST_TEMPLATE(generic, name)
- 
-+#if !defined(VGO_netbsd)
- PRE(sys_exit)
- {
-    ThreadState* tst;
-@@ -2469,6 +2485,7 @@ PRE(sys_exit)
-    tst->os_state.exitcode = ARG1;
-    SET_STATUS_Success(0);
- }
-+#endif
- 
- PRE(sys_ni_syscall)
- {
-@@ -2641,7 +2658,7 @@ PRE(sys_madvise)
+@@ -2641,7 +2656,7 @@ PRE(sys_madvise)
                   unsigned long, start, vki_size_t, length, int, advice);
  }
  
@@ -107,7 +91,7 @@ $NetBSD$
  PRE(sys_mremap)
  {
     // Nb: this is different to the glibc version described in the man pages,
-@@ -2735,6 +2752,7 @@ PRE(sys_sync)
+@@ -2735,6 +2750,7 @@ PRE(sys_sync)
     PRE_REG_READ0(long, "sync");
  }
  
@@ -115,7 +99,7 @@ $NetBSD$
  PRE(sys_fstatfs)
  {
     FUSE_COMPATIBLE_MAY_BLOCK();
-@@ -2762,6 +2780,8 @@ POST(sys_fstatfs64)
+@@ -2762,6 +2778,8 @@ POST(sys_fstatfs64)
  {
     POST_MEM_WRITE( ARG3, ARG2 );
  }
@@ -124,7 +108,7 @@ $NetBSD$
  
  PRE(sys_getsid)
  {
-@@ -3339,7 +3359,7 @@ PRE(sys_fork)
+@@ -3339,7 +3357,7 @@ PRE(sys_fork)
  
     if (!SUCCESS) return;
  
@@ -133,7 +117,7 @@ $NetBSD$
     // RES is 0 for child, non-0 (the child's PID) for parent.
     is_child = ( RES == 0 ? True : False );
     child_pid = ( is_child ? -1 : RES );
-@@ -4429,6 +4449,7 @@ POST(sys_newstat)
+@@ -4429,6 +4447,7 @@ POST(sys_newstat)
     POST_MEM_WRITE( ARG2, sizeof(struct vki_stat) );
  }
  
@@ -141,7 +125,7 @@ $NetBSD$
  PRE(sys_statfs)
  {
     FUSE_COMPATIBLE_MAY_BLOCK();
-@@ -4456,6 +4477,7 @@ POST(sys_statfs64)
+@@ -4456,6 +4475,7 @@ POST(sys_statfs64)
  {
     POST_MEM_WRITE( ARG3, ARG2 );
  }
@@ -149,7 +133,7 @@ $NetBSD$
  
  PRE(sys_symlink)
  {
-@@ -4514,6 +4536,7 @@ PRE(sys_unlink)
+@@ -4514,6 +4534,7 @@ PRE(sys_unlink)
     PRE_MEM_RASCIIZ( "unlink(pathname)", ARG1 );
  }
  
@@ -157,7 +141,7 @@ $NetBSD$
  PRE(sys_newuname)
  {
     PRINT("sys_newuname ( %#" FMT_REGWORD "x )", ARG1);
-@@ -4527,6 +4550,7 @@ POST(sys_newuname)
+@@ -4527,6 +4548,7 @@ POST(sys_newuname)
        POST_MEM_WRITE( ARG1, sizeof(struct vki_new_utsname) );
     }
  }
