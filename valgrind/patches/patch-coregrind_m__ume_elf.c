@@ -11,7 +11,25 @@ $NetBSD$
  
  #include "pub_core_basics.h"
  #include "pub_core_vki.h"
-@@ -870,7 +870,7 @@ Int VG_(load_ELF)(Int fd, const HChar* n
+@@ -412,6 +412,8 @@ ESZ(Addr) mapelf(struct elfinfo *e, ESZ(
+       memsz   = ph->p_memsz;
+       brkaddr = addr+memsz;
+ 
++      VG_(debugLog)(2, "initimg", "%s() %s:%d addr=%lx vaddr=%lx base=%lx memsz=%lu brkaddr=%lx\n", __func__, __FILE__, __LINE__, addr, ph->p_vaddr, base, memsz, brkaddr);
++
+       if (brkaddr > elfbrk)
+          elfbrk = brkaddr;
+    }
+@@ -644,6 +646,8 @@ Int VG_(load_ELF)(Int fd, const HChar* n
+          VG_(pread)(fd, buf, ph->p_filesz, ph->p_offset);
+          buf[ph->p_filesz] = '\0';
+ 
++         VG_(debugLog)(2, "initimg", "%s() %s:%d interp='%s'\n", __func__, __FILE__, __LINE__, buf);
++
+          sres = VG_(open)(buf, VKI_O_RDONLY, 0);
+          if (sr_isError(sres)) {
+             VG_(printf)("valgrind: m_ume.c: can't open interpreter\n");
+@@ -870,7 +874,7 @@ Int VG_(load_ELF)(Int fd, const HChar* n
     return 0;
  }
  
