@@ -1,8 +1,8 @@
 $NetBSD$
 
---- include/vki/vki-netbsd.h.orig	2019-03-30 06:21:05.038788499 +0000
+--- include/vki/vki-netbsd.h.orig	2019-03-31 10:18:44.358638467 +0000
 +++ include/vki/vki-netbsd.h
-@@ -0,0 +1,2612 @@
+@@ -0,0 +1,3293 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- NetBSD-specific kernel interface.               vki-netbsd.h ---*/
@@ -2609,6 +2609,687 @@ $NetBSD$
 +        vki_clock_t tms_cutime;     /* User CPU time of terminated child procs */
 +        vki_clock_t tms_cstime;     /* System CPU time of terminated child procs */
 +};
++
++//----------------------------------------------------------------------
++// From uvm/uvm_param.h
++//----------------------------------------------------------------------
++
++#define VKI_VM_METER        1               /* struct vmmeter */
++#define VKI_VM_LOADAVG      2               /* struct loadavg */
++#define VKI_VM_UVMEXP       3               /* struct uvmexp */
++#define VKI_VM_NKMEMPAGES   4               /* kmem_map pages */
++#define VKI_VM_UVMEXP2      5               /* struct uvmexp_sysctl */
++#define VKI_VM_ANONMIN      6
++#define VKI_VM_EXECMIN      7
++#define VKI_VM_FILEMIN      8
++#define VKI_VM_MAXSLP       9   
++#define VKI_VM_USPACE       10
++#define VKI_VM_ANONMAX      11
++#define VKI_VM_EXECMAX      12
++#define VKI_VM_FILEMAX      13
++#define VKI_VM_MINADDRESS   14
++#define VKI_VM_MAXADDRESS   15
++#define VKI_VM_PROC         16              /* process information */
++#define VKI_VM_GUARD_SIZE   17              /* guard size for main thread */
++#define VKI_VM_THREAD_GUARD_SIZE    18      /* default guard size for new threads */
++
++#define VKI_VM_PROC_MAP     1               /* struct kinfo_vmentry */
++
++typedef unsigned int vki_uvm_flag_t;
++
++typedef int vki_vm_inherit_t;       /* XXX: inheritance codes */                                                                                                 
++typedef vki_off_t vki_voff_t;           /* XXX: offset within a uvm_object */
++typedef vki_voff_t vki_pgoff_t;         /* XXX: number of pages within a uvm object */
++
++//----------------------------------------------------------------------
++// From sys/sysctl.h
++//----------------------------------------------------------------------
++
++#define VKI_CTL_MAXNAME     12      /* largest number of components supported */
++#define VKI_SYSCTL_NAMELEN  32      /* longest name allowed for a node */
++
++#define VKI_CREATE_BASE     (1024)  /* start of dynamic mib allocation */
++#define VKI_SYSCTL_DEFSIZE  8       /* initial size of a child set */
++
++struct vki_ctlname {
++        const char *ctl_name;   /* subsystem name */
++        int     ctl_type;       /* type of name */
++};
++
++#define VKI_CTLTYPE_NODE    1       /* name is a node */                                                                                                         
++#define VKI_CTLTYPE_INT     2       /* name describes an integer */
++#define VKI_CTLTYPE_STRING  3       /* name describes a string */
++#define VKI_CTLTYPE_QUAD    4       /* name describes a 64-bit number */
++#define VKI_CTLTYPE_STRUCT  5       /* name describes a structure */
++#define VKI_CTLTYPE_BOOL    6       /* name describes a bool */
++
++#ifdef _LP64
++#define VKI_CTLTYPE_LONG    VKI_CTLTYPE_QUAD
++#else                                                                                                                                                        
++#define VKI_CTLTYPE_LONG    VKI_CTLTYPE_INT
++#endif
++
++#define VKI_CTLFLAG_READONLY        0x00000000
++
++#define VKI_CTLFLAG_READWRITE       0x00000070
++#define VKI_CTLFLAG_ANYWRITE        0x00000080
++#define VKI_CTLFLAG_PRIVATE         0x00000100
++#define VKI_CTLFLAG_PERMANENT       0x00000200
++#define VKI_CTLFLAG_OWNDATA         0x00000400
++#define VKI_CTLFLAG_IMMEDIATE       0x00000800
++#define VKI_CTLFLAG_HEX             0x00001000
++#define VKI_CTLFLAG_ROOT            0x00002000                                                                                                                   
++#define VKI_CTLFLAG_ANYNUMBER       0x00004000
++#define VKI_CTLFLAG_HIDDEN          0x00008000
++#define VKI_CTLFLAG_ALIAS           0x00010000
++#define VKI_CTLFLAG_MMAP            0x00020000
++#define VKI_CTLFLAG_OWNDESC         0x00040000
++#define VKI_CTLFLAG_UNSIGNED        0x00080000
++
++#define VKI_SYSCTL_VERS_MASK        0xff000000
++#define VKI_SYSCTL_VERS_0           0x00000000
++#define VKI_SYSCTL_VERS_1           0x01000000
++#define VKI_SYSCTL_VERSION          VKI_SYSCTL_VERS_1
++#define VKI_SYSCTL_VERS(f)          ((f) & VKI_SYSCTL_VERS_MASK)
++
++#define VKI_SYSCTL_USERFLAGS        (VKI_CTLFLAG_READWRITE|\
++                                VKI_CTLFLAG_ANYWRITE|\
++                                VKI_CTLFLAG_PRIVATE|\
++                                VKI_CTLFLAG_OWNDATA|\
++                                VKI_CTLFLAG_IMMEDIATE|\
++                                VKI_CTLFLAG_HEX|\
++                                VKI_CTLFLAG_HIDDEN)
++
++#define VKI_SYSCTL_TYPEMASK         0x0000000f
++#define VKI_SYSCTL_TYPE(x)          ((x) & VKI_SYSCTL_TYPEMASK)
++#define VKI_SYSCTL_FLAGMASK         0x00fffff0
++#define VKI_SYSCTL_FLAGS(x)         ((x) & VKI_SYSCTL_FLAGMASK)
++
++#define VKI_CTL_EOL         (-1)            /* end of createv/destroyv list */
++#define VKI_CTL_QUERY       (-2)            /* enumerates children of a node */
++#define VKI_CTL_CREATE      (-3)            /* node create request */
++#define VKI_CTL_CREATESYM   (-4)            /* node create request with symbol */
++#define VKI_CTL_DESTROY     (-5)            /* node destroy request */
++#define VKI_CTL_MMAP        (-6)            /* mmap request */
++#define VKI_CTL_DESCRIBE    (-7)            /* get node descriptions */  
++
++#define VKI_CTL_UNSPEC      0               /* unused */   
++#define VKI_CTL_KERN        1               /* "high kernel": proc, limits */
++#define VKI_CTL_VM          2               /* virtual memory */
++#define VKI_CTL_VFS         3               /* file system, mount type is next */
++#define VKI_CTL_NET         4               /* network, see socket.h */
++#define VKI_CTL_DEBUG       5               /* debugging parameters */
++#define VKI_CTL_HW          6               /* generic CPU/io */
++#define VKI_CTL_MACHDEP     7               /* machine dependent */  
++#define VKI_CTL_USER        8               /* user-level */
++#define VKI_CTL_DDB         9               /* in-kernel debugger */  
++#define VKI_CTL_PROC        10              /* per-proc attr */
++#define VKI_CTL_VENDOR      11              /* vendor-specific data */ 
++#define VKI_CTL_EMUL        12              /* emulation-specific data */
++#define VKI_CTL_SECURITY    13              /* security */
++
++#define VKI_KERN_OSTYPE              1      /* string: system version */
++#define VKI_KERN_OSRELEASE           2      /* string: system release */
++#define VKI_KERN_OSREV               3      /* int: system revision */
++#define VKI_KERN_VERSION             4      /* string: compile time info */
++#define VKI_KERN_MAXVNODES           5      /* int: max vnodes */
++#define VKI_KERN_MAXPROC             6      /* int: max processes */
++#define VKI_KERN_MAXFILES            7      /* int: max open files */
++#define VKI_KERN_ARGMAX              8      /* int: max arguments to exec */                                                                                     
++#define VKI_KERN_SECURELVL           9      /* int: system security level */
++#define VKI_KERN_HOSTNAME           10      /* string: hostname */
++#define VKI_KERN_HOSTID             11      /* int: host identifier */
++#define VKI_KERN_CLOCKRATE          12      /* struct: struct clockinfo */
++#define VKI_KERN_VNODE              13      /* struct: vnode structures */
++#define VKI_KERN_PROC               14      /* struct: process entries */
++#define VKI_KERN_FILE               15      /* struct: file entries */
++#define VKI_KERN_PROF               16      /* node: kernel profiling info */
++#define VKI_KERN_POSIX1             17      /* int: POSIX.1 version */                                                                                           
++#define VKI_KERN_NGROUPS            18      /* int: # of supplemental group ids */
++#define VKI_KERN_JOB_CONTROL        19      /* int: is job control available */
++#define VKI_KERN_SAVED_IDS          20      /* int: saved set-user/group-ID */
++#define VKI_KERN_OBOOTTIME          21      /* struct: time kernel was booted */
++#define VKI_KERN_DOMAINNAME         22      /* string: (YP) domainname */
++#define VKI_KERN_MAXPARTITIONS      23      /* int: number of partitions/disk */
++#define VKI_KERN_RAWPARTITION       24      /* int: raw partition number */
++#define VKI_KERN_NTPTIME            25      /* struct: extended-precision time */
++#define VKI_KERN_TIMEX              26      /* struct: ntp timekeeping state */                                                                                  
++#define VKI_KERN_AUTONICETIME       27      /* int: proc time before autonice */
++#define VKI_KERN_AUTONICEVAL        28      /* int: auto nice value */
++#define VKI_KERN_RTC_OFFSET         29      /* int: offset of rtc from gmt */
++#define VKI_KERN_ROOT_DEVICE        30      /* string: root device */
++#define VKI_KERN_MSGBUFSIZE         31      /* int: max # of chars in msg buffer */
++#define VKI_KERN_FSYNC              32      /* int: file synchronization support */
++#define VKI_KERN_OLDSYSVMSG         33      /* old: SysV message queue support */
++#define VKI_KERN_OLDSYSVSEM         34      /* old: SysV semaphore support */
++#define VKI_KERN_OLDSYSVSHM         35      /* old: SysV shared memory support */                                                                                
++#define VKI_KERN_OLDSHORTCORENAME   36      /* old, unimplemented */
++#define VKI_KERN_SYNCHRONIZED_IO    37      /* int: POSIX synchronized I/O */
++#define VKI_KERN_IOV_MAX            38      /* int: max iovec's for readv(2) etc. */
++#define VKI_KERN_MBUF               39      /* node: mbuf parameters */
++#define VKI_KERN_MAPPED_FILES       40      /* int: POSIX memory mapped files */
++#define VKI_KERN_MEMLOCK            41      /* int: POSIX memory locking */
++#define VKI_KERN_MEMLOCK_RANGE      42      /* int: POSIX memory range locking */
++#define VKI_KERN_MEMORY_PROTECTION  43      /* int: POSIX memory protections */
++#define VKI_KERN_LOGIN_NAME_MAX     44      /* int: max length login name + NUL */                                                                               
++#define VKI_KERN_DEFCORENAME        45      /* old: sort core name format */
++#define VKI_KERN_LOGSIGEXIT         46      /* int: log signaled processes */
++#define VKI_KERN_PROC2              47      /* struct: process entries */
++#define VKI_KERN_PROC_ARGS          48      /* struct: process argv/env */
++#define VKI_KERN_FSCALE             49      /* int: fixpt FSCALE */
++#define VKI_KERN_CCPU               50      /* old: fixpt ccpu */
++#define VKI_KERN_CP_TIME            51      /* struct: CPU time counters */
++#define VKI_KERN_OLDSYSVIPC_INFO    52      /* old: number of valid kern ids */
++#define VKI_KERN_MSGBUF             53      /* kernel message buffer */                                                                                          
++#define VKI_KERN_CONSDEV            54      /* dev_t: console terminal device */
++#define VKI_KERN_MAXPTYS            55      /* int: maximum number of ptys */
++#define VKI_KERN_PIPE               56      /* node: pipe limits */
++#define VKI_KERN_MAXPHYS            57      /* int: kernel value of MAXPHYS */
++#define VKI_KERN_SBMAX              58      /* int: max socket buffer size */
++#define VKI_KERN_TKSTAT             59      /* tty in/out counters */
++#define VKI_KERN_MONOTONIC_CLOCK    60      /* int: POSIX monotonic clock */
++#define VKI_KERN_URND               61      /* int: random integer from urandom */
++#define VKI_KERN_LABELSECTOR        62      /* int: disklabel sector */                                                                                          
++#define VKI_KERN_LABELOFFSET        63      /* int: offset of label within sector */
++#define VKI_KERN_LWP                64      /* struct: lwp entries */
++#define VKI_KERN_FORKFSLEEP         65      /* int: sleep length on failed fork */
++#define VKI_KERN_POSIX_THREADS      66      /* int: POSIX Threads option */
++#define VKI_KERN_POSIX_SEMAPHORES   67      /* int: POSIX Semaphores option */
++#define VKI_KERN_POSIX_BARRIERS     68      /* int: POSIX Barriers option */
++#define VKI_KERN_POSIX_TIMERS       69      /* int: POSIX Timers option */
++#define VKI_KERN_POSIX_SPIN_LOCKS   70      /* int: POSIX Spin Locks option */
++#define VKI_KERN_POSIX_READER_WRITER_LOCKS 71 /* int: POSIX R/W Locks option */                                                                                  
++#define VKI_KERN_DUMP_ON_PANIC      72      /* int: dump on panic */
++#define VKI_KERN_SOMAXKVA           73      /* int: max socket kernel virtual mem */
++#define VKI_KERN_ROOT_PARTITION     74      /* int: root partition */
++#define VKI_KERN_DRIVERS            75      /* struct: driver names and majors #s */
++#define VKI_KERN_BUF                76      /* struct: buffers */
++#define VKI_KERN_FILE2              77      /* struct: file entries */
++#define VKI_KERN_VERIEXEC           78      /* node: verified exec */
++#define VKI_KERN_CP_ID              79      /* struct: cpu id numbers */
++#define VKI_KERN_HARDCLOCK_TICKS    80      /* int: number of hardclock ticks */                                                                                 
++#define VKI_KERN_ARND               81      /* void *buf, size_t siz random */
++#define VKI_KERN_SYSVIPC            82      /* node: SysV IPC parameters */
++#define VKI_KERN_BOOTTIME           83      /* struct: time kernel was booted */
++#define VKI_KERN_EVCNT              84      /* struct: evcnts */
++
++struct vki_clockinfo {                                                                                                                                           
++        int     hz;             /* clock frequency */
++        int     tick;           /* micro-seconds per hz tick */
++        int     tickadj;        /* clock skew rate for adjtime() */
++        int     stathz;         /* statistics clock frequency */
++        int     profhz;         /* profiling clock frequency */
++};
++
++#define VKI_KERN_PROC_ALL            0      /* everything */
++#define VKI_KERN_PROC_PID            1      /* by process id */
++#define VKI_KERN_PROC_PGRP           2      /* by process group id */
++#define VKI_KERN_PROC_SESSION        3      /* by session of pid */
++#define VKI_KERN_PROC_TTY            4      /* by controlling tty */
++#define VKI_KERN_PROC_UID            5      /* by effective uid */
++#define VKI_KERN_PROC_RUID           6      /* by real uid */
++#define VKI_KERN_PROC_GID            7      /* by effective gid */                                                                                               
++#define VKI_KERN_PROC_RGID           8      /* by real gid */
++
++#define VKI_KERN_PROC_TTY_NODEV     VKI_NODEV           /* no controlling tty */
++#define VKI_KERN_PROC_TTY_REVOKE    ((vki_dev_t)-2)     /* revoked tty */
++
++struct vki_ki_pcred {                                                                                                                                            
++        void            *p_pad;
++        vki_uid_t           p_ruid;         /* Real user id */
++        vki_uid_t           p_svuid;        /* Saved effective user id */
++        vki_gid_t           p_rgid;         /* Real group id */
++        vki_gid_t           p_svgid;        /* Saved effective group id */
++        int             p_refcnt;       /* Number of references */
++};
++
++struct vki_ki_ucred {                                                                                                                                            
++        vki_uint32_t        cr_ref;                 /* reference count */
++        vki_uid_t           cr_uid;                 /* effective user id */
++        vki_gid_t           cr_gid;                 /* effective group id */
++        vki_uint32_t        cr_ngroups;             /* number of groups */
++        vki_gid_t           cr_groups[VKI_NGROUPS];     /* groups */
++};
++
++#define VKI_PTRTOUINT64(p) ((vki_uint64_t)(vki_uintptr_t)(p))
++#define VKI_UINT64TOPTR(u) ((void *)(vki_uintptr_t)(u))
++
++#define VKI_KI_NGROUPS      16
++#define VKI_KI_MAXCOMLEN    24      /* extra for 8 byte alignment */
++#define VKI_KI_WMESGLEN     8
++#define VKI_KI_MAXLOGNAME   24      /* extra for 8 byte alignment */
++#define VKI_KI_MAXEMULLEN   16
++#define VKI_KI_LNAMELEN     20      /* extra 4 for alignment */                                                                                                  
++   
++#define VKI_KI_NOCPU        (~(vki_uint64_t)0)
++
++typedef struct {
++        vki_uint32_t        __bits[4];
++} vki_ki_sigset_t;
++
++struct vki_kinfo_proc2 {
++        vki_uint64_t p_forw;                /* PTR: linked run/sleep queue. */                                                                                   
++        vki_uint64_t p_back;
++        vki_uint64_t p_paddr;               /* PTR: address of proc */
++
++        vki_uint64_t p_addr;                /* PTR: Kernel virtual addr of u-area */
++        vki_uint64_t p_fd;                  /* PTR: Ptr to open files structure. */
++        vki_uint64_t p_cwdi;                /* PTR: cdir/rdir/cmask info */
++        vki_uint64_t p_stats;               /* PTR: Accounting/statistics */
++        vki_uint64_t p_limit;               /* PTR: Process limits. */
++        vki_uint64_t p_vmspace;             /* PTR: Address space. */                                                                                            
++        vki_uint64_t p_sigacts;             /* PTR: Signal actions, state */
++        vki_uint64_t p_sess;                /* PTR: session pointer */
++        vki_uint64_t p_tsess;               /* PTR: tty session pointer */
++        vki_uint64_t p_ru;                  /* PTR: Exit information. XXX */
++
++        vki_int32_t p_eflag;                /* LONG: extra kinfo_proc2 flags */
++#define VKI_EPROC_CTTY      0x01    /* controlling tty vnode active */
++#define VKI_EPROC_SLEADER   0x02    /* session leader */
++        vki_int32_t p_exitsig;              /* INT: signal to sent to parent on exit */                                                                          
++        vki_int32_t p_flag;                 /* INT: P_* flags. */
++
++        vki_int32_t p_pid;                  /* PID_T: Process identifier. */
++        vki_int32_t p_ppid;                 /* PID_T: Parent process id */
++        vki_int32_t p_sid;                  /* PID_T: session id */
++        vki_int32_t p__pgid;                /* PID_T: process group id */
++                                        /* XXX: <sys/proc.h> hijacks p_pgid */
++        vki_int32_t p_tpgid;                /* PID_T: tty process group id */
++        vki_uint32_t p_uid;                 /* UID_T: effective user id */
++        vki_uint32_t p_ruid;                /* UID_T: real user id */
++        vki_uint32_t p_gid;                 /* GID_T: effective group id */
++        vki_uint32_t p_rgid;                /* GID_T: real group id */
++
++        vki_uint32_t p_groups[VKI_KI_NGROUPS];  /* GID_T: groups */
++        vki_int16_t p_ngroups;              /* SHORT: number of groups */
++
++        vki_int16_t p_jobc;                 /* SHORT: job control counter */                                                                                     
++        vki_uint32_t p_tdev;                /* XXX: DEV_T: controlling tty dev */
++
++        vki_uint32_t p_estcpu;              /* U_INT: Time averaged value of p_cpticks. */
++        vki_uint32_t p_rtime_sec;           /* STRUCT TIMEVAL: Real time. */
++        vki_uint32_t p_rtime_usec;          /* STRUCT TIMEVAL: Real time. */
++        vki_int32_t p_cpticks;              /* INT: Ticks of CPU time. */
++        vki_uint32_t p_pctcpu;              /* FIXPT_T: %cpu for this process during p_swtime */
++        vki_uint32_t p_swtime;              /* U_INT: Time swapped in or out. */
++        vki_uint32_t p_slptime;             /* U_INT: Time since last blocked. */                                                                                
++        vki_int32_t p_schedflags;           /* INT: PSCHED_* flags */
++
++        vki_uint64_t p_uticks;              /* U_QUAD_T: Statclock hits in user mode. */
++        vki_uint64_t p_sticks;              /* U_QUAD_T: Statclock hits in system mode. */
++        vki_uint64_t p_iticks;              /* U_QUAD_T: Statclock hits processing intr. */
++
++        vki_uint64_t p_tracep;              /* PTR: Trace to vnode or file */
++        vki_int32_t p_traceflag;            /* INT: Kernel trace points. */
++                                                                                                                                                             
++        vki_int32_t p_holdcnt;              /* INT: If non-zero, don't swap. */
++
++        vki_ki_sigset_t p_siglist;          /* SIGSET_T: Signals arrived but not delivered. */
++        vki_ki_sigset_t p_sigmask;          /* SIGSET_T: Current signal mask. */
++        vki_ki_sigset_t p_sigignore;        /* SIGSET_T: Signals being ignored. */
++        vki_ki_sigset_t p_sigcatch;         /* SIGSET_T: Signals being caught by user. */
++
++        vki_int8_t  p_stat;                 /* CHAR: S* process status (from LWP). */
++        vki_uint8_t p_priority;             /* U_CHAR: Process priority. */                                                                                      
++        vki_uint8_t p_usrpri;               /* U_CHAR: User-priority based on p_cpu and p_nice. */
++        vki_uint8_t p_nice;                 /* U_CHAR: Process "nice" value. */
++
++        vki_uint16_t p_xstat;               /* U_SHORT: Exit status for wait; also stop signal. */
++        vki_uint16_t p_acflag;              /* U_SHORT: Accounting flags. */
++
++        char    p_comm[VKI_KI_MAXCOMLEN];
++
++        char    p_wmesg[VKI_KI_WMESGLEN];   /* wchan message */                                                                                                  
++        vki_uint64_t p_wchan;               /* PTR: sleep address. */
++
++        char    p_login[VKI_KI_MAXLOGNAME]; /* setlogin() name */
++
++        vki_int32_t p_vm_rssize;            /* SEGSZ_T: current resident set size in pages */
++        vki_int32_t p_vm_tsize;             /* SEGSZ_T: text size (pages) */
++        vki_int32_t p_vm_dsize;             /* SEGSZ_T: data size (pages) */
++        vki_int32_t p_vm_ssize;             /* SEGSZ_T: stack size (pages) */
++        vki_int64_t p_uvalid;               /* CHAR: following p_u* parameters are valid */
++                                        /* XXX 64 bits for alignment */
++        vki_uint32_t p_ustart_sec;          /* STRUCT TIMEVAL: starting time. */
++        vki_uint32_t p_ustart_usec;         /* STRUCT TIMEVAL: starting time. */
++
++        vki_uint32_t p_uutime_sec;          /* STRUCT TIMEVAL: user time. */
++        vki_uint32_t p_uutime_usec;         /* STRUCT TIMEVAL: user time. */
++        vki_uint32_t p_ustime_sec;          /* STRUCT TIMEVAL: system time. */
++        vki_uint32_t p_ustime_usec;         /* STRUCT TIMEVAL: system time. */                                                                                   
++
++        vki_uint64_t p_uru_maxrss;          /* LONG: max resident set size. */
++        vki_uint64_t p_uru_ixrss;           /* LONG: integral shared memory size. */
++        vki_uint64_t p_uru_idrss;           /* LONG: integral unshared data ". */
++        vki_uint64_t p_uru_isrss;           /* LONG: integral unshared stack ". */
++        vki_uint64_t p_uru_minflt;          /* LONG: page reclaims. */
++        vki_uint64_t p_uru_majflt;          /* LONG: page faults. */
++        vki_uint64_t p_uru_nswap;           /* LONG: swaps. */
++        vki_uint64_t p_uru_inblock;         /* LONG: block input operations. */                                                                                  
++        vki_uint64_t p_uru_oublock;         /* LONG: block output operations. */
++        vki_uint64_t p_uru_msgsnd;          /* LONG: messages sent. */
++        vki_uint64_t p_uru_msgrcv;          /* LONG: messages received. */
++        vki_uint64_t p_uru_nsignals;        /* LONG: signals received. */
++        vki_uint64_t p_uru_nvcsw;           /* LONG: voluntary context switches. */
++        vki_uint64_t p_uru_nivcsw;          /* LONG: involuntary ". */
++
++        vki_uint32_t p_uctime_sec;          /* STRUCT TIMEVAL: child u+s time. */
++        vki_uint32_t p_uctime_usec;         /* STRUCT TIMEVAL: child u+s time. */                                                                                
++        vki_uint64_t p_cpuid;               /* LONG: CPU id */
++        vki_uint64_t p_realflag;            /* INT: P_* flags (not including LWPs). */
++        vki_uint64_t p_nlwps;               /* LONG: Number of LWPs */
++        vki_uint64_t p_nrlwps;              /* LONG: Number of running LWPs */
++        vki_uint64_t p_realstat;            /* LONG: non-LWP process status */
++        vki_uint32_t p_svuid;               /* UID_T: saved user id */
++        vki_uint32_t p_svgid;               /* GID_T: saved group id */
++        char p_ename[VKI_KI_MAXEMULLEN];    /* emulation name */
++        vki_int64_t p_vm_vsize;             /* SEGSZ_T: total map size (pages) */                                                                                
++        vki_int64_t p_vm_msize;             /* SEGSZ_T: stack-adjusted map size (pages) */
++};
++
++#define VKI_P_ADVLOCK               0x00000001
++#define VKI_P_CONTROLT              0x00000002
++#define VKI_L_INMEM                 0x00000004
++#define VKI_P_INMEM              /* 0x00000004 */   L_INMEM
++#define VKI_P_NOCLDSTOP             0x00000008
++#define VKI_P_PPWAIT                0x00000010
++#define VKI_P_PROFIL                0x00000020
++#define VKI_L_SELECT                0x00000040
++#define VKI_P_SELECT             /* 0x00000040 */   L_SELECT                                                                                                     
++#define VKI_L_SINTR                 0x00000080
++#define VKI_P_SINTR              /* 0x00000080 */   L_SINTR
++#define VKI_P_SUGID                 0x00000100
++#define VKI_L_SYSTEM                0x00000200
++#define VKI_P_SYSTEM             /* 0x00000200 */   L_SYSTEM
++#define VKI_L_SA                    0x00000400
++#define VKI_P_SA                 /* 0x00000400 */   L_SA
++#define VKI_P_TRACED                0x00000800
++#define VKI_P_WAITED                0x00001000                                                                                                                   
++#define VKI_P_WEXIT                 0x00002000
++#define VKI_P_EXEC                  0x00004000
++#define VKI_P_OWEUPC                0x00008000
++#define VKI_P_NOCLDWAIT             0x00020000
++#define VKI_P_32                    0x00040000
++#define VKI_P_CLDSIGIGN             0x00080000
++#define VKI_P_SYSTRACE              0x00200000
++#define VKI_P_CHTRACED              0x00400000
++#define VKI_P_STOPFORK              0x00800000                                                                                                                   
++#define VKI_P_STOPEXEC              0x01000000
++#define VKI_P_STOPEXIT              0x02000000
++#define VKI_P_SYSCALL               0x04000000
++
++#define VKI_L_DETACHED              0x00800000
++
++struct vki_kinfo_lwp {
++        vki_uint64_t l_forw;                /* PTR: linked run/sleep queue. */
++        vki_uint64_t l_back;
++        vki_uint64_t l_laddr;               /* PTR: Address of LWP */
++        vki_uint64_t l_addr;                /* PTR: Kernel virtual addr of u-area */
++        vki_int32_t l_lid;                  /* LWPID_T: LWP identifier */                                                                                        
++        vki_int32_t l_flag;                 /* INT: L_* flags. */
++        vki_uint32_t l_swtime;              /* U_INT: Time swapped in or out. */
++        vki_uint32_t l_slptime;             /* U_INT: Time since last blocked. */
++        vki_int32_t l_schedflags;           /* INT: PSCHED_* flags */
++        vki_int32_t l_holdcnt;              /* INT: If non-zero, don't swap. */
++        vki_uint8_t l_priority;             /* U_CHAR: Process priority. */
++        vki_uint8_t l_usrpri;               /* U_CHAR: User-priority based on l_cpu and p_nice. */
++        vki_int8_t  l_stat;                 /* CHAR: S* process status. */
++        vki_int8_t  l_pad1;                 /* fill out to 4-byte boundary */                                                                                    
++        vki_int32_t l_pad2;                 /* .. and then to an 8-byte boundary */
++        char    l_wmesg[VKI_KI_WMESGLEN];   /* wchan message */
++        vki_uint64_t l_wchan;               /* PTR: sleep address. */
++        vki_uint64_t l_cpuid;               /* LONG: CPU id */
++        vki_uint32_t l_rtime_sec;           /* STRUCT TIMEVAL: Real time. */
++        vki_uint32_t l_rtime_usec;          /* STRUCT TIMEVAL: Real time. */
++        vki_uint32_t l_cpticks;             /* INT: ticks during l_swtime */
++        vki_uint32_t l_pctcpu;              /* FIXPT_T: cpu usage for ps */
++        vki_uint32_t l_pid;                 /* PID_T: process identifier */                                                                                      
++        char    l_name[VKI_KI_LNAMELEN];    /* CHAR[]: name, may be empty */
++};
++
++#define VKI_KERN_PROC_ARGV          1       /* argv */
++#define VKI_KERN_PROC_NARGV         2       /* number of strings in above */
++#define VKI_KERN_PROC_ENV           3       /* environ */                                                                                                        
++#define VKI_KERN_PROC_NENV          4       /* number of strings in above */
++#define VKI_KERN_PROC_PATHNAME      5       /* path to executable */
++
++#define VKI_KERN_SYSVIPC_INFO       1       /* struct: number of valid kern ids */
++#define VKI_KERN_SYSVIPC_MSG        2       /* int: SysV message queue support */
++#define VKI_KERN_SYSVIPC_SEM        3       /* int: SysV semaphore support */                                                                                    
++#define VKI_KERN_SYSVIPC_SHM        4       /* int: SysV shared memory support */
++#define VKI_KERN_SYSVIPC_SHMMAX     5       /* int: max shared memory segment size (bytes) */
++#define VKI_KERN_SYSVIPC_SHMMNI     6       /* int: max number of shared memory identifiers */
++#define VKI_KERN_SYSVIPC_SHMSEG     7       /* int: max shared memory segments per process */
++#define VKI_KERN_SYSVIPC_SHMMAXPGS  8       /* int: max amount of shared memory (pages) */
++#define VKI_KERN_SYSVIPC_SHMUSEPHYS 9       /* int: physical memory usage */
++
++#define VKI_KERN_SYSVIPC_MSG_INFO           4       /* msginfo and msgid_ds */
++#define VKI_KERN_SYSVIPC_SEM_INFO           5       /* seminfo and semid_ds */
++#define VKI_KERN_SYSVIPC_SHM_INFO           6       /* shminfo and shmid_ds */
++
++#define VKI_KERN_TKSTAT_NIN                 1       /* total input character */
++#define VKI_KERN_TKSTAT_NOUT                2       /* total output character */
++#define VKI_KERN_TKSTAT_CANCC               3       /* canonical input character */
++#define VKI_KERN_TKSTAT_RAWCC               4       /* raw input character */
++
++struct vki_kinfo_drivers {
++        vki_devmajor_t      d_cmajor;
++        vki_devmajor_t      d_bmajor;
++        char            d_name[24];
++};
++
++#define VKI_KERN_BUF_ALL    0               /* all buffers */
++
++struct vki_buf_sysctl {
++        vki_uint32_t b_flags;       /* LONG: B_* flags */
++        vki_int32_t  b_error;       /* INT: Errno value */
++        vki_int32_t  b_prio;        /* INT: Hint for buffer queue discipline */                                                                                  
++        vki_uint32_t b_dev;         /* DEV_T: Device associated with buffer */
++        vki_uint64_t b_bufsize;     /* LONG: Allocated buffer size */
++        vki_uint64_t b_bcount;      /* LONG: Valid bytes in buffer */
++        vki_uint64_t b_resid;       /* LONG: Remaining I/O */
++        vki_uint64_t b_addr;        /* CADDR_T: Memory, superblocks, indirect... */
++        vki_uint64_t b_blkno;       /* DADDR_T: Underlying physical block number */
++        vki_uint64_t b_rawblkno;    /* DADDR_T: Raw underlying physical block */
++        vki_uint64_t b_iodone;      /* PTR: Function called upon completion */
++        vki_uint64_t b_proc;        /* PTR: Associated proc if B_PHYS set */                                                                                     
++        vki_uint64_t b_vp;          /* PTR: File vnode */
++        vki_uint64_t b_saveaddr;    /* PTR: Original b_addr for physio */
++        vki_uint64_t b_lblkno;      /* DADDR_T: Logical block number */
++};
++
++struct vki_kinfo_file {
++        vki_uint64_t        ki_fileaddr;    /* PTR: address of struct file */
++        vki_uint32_t        ki_flag;        /* INT: flags (see fcntl.h) */
++        vki_uint32_t        ki_iflags;      /* INT: internal flags */                                                                                            
++        vki_uint32_t        ki_ftype;       /* INT: descriptor type */
++        vki_uint32_t        ki_count;       /* UINT: reference count */
++        vki_uint32_t        ki_msgcount;    /* UINT: references from msg queue */
++        vki_uint32_t        ki_usecount;    /* INT: number active users */
++        vki_uint64_t        ki_fucred;      /* PTR: creds for descriptor */
++        vki_uint32_t        ki_fuid;        /* UID_T: descriptor credentials */
++        vki_uint32_t        ki_fgid;        /* GID_T: descriptor credentials */
++        vki_uint64_t        ki_fops;        /* PTR: address of fileops */
++        vki_uint64_t        ki_foffset;     /* OFF_T: offset */                                                                                                  
++        vki_uint64_t        ki_fdata;       /* PTR: descriptor data */
++
++        /* vnode information to glue this file to something */
++        vki_uint64_t        ki_vun;         /* PTR: socket, specinfo, etc */
++        vki_uint64_t        ki_vsize;       /* OFF_T: size of file */
++        vki_uint32_t        ki_vtype;       /* ENUM: vnode type */
++        vki_uint32_t        ki_vtag;        /* ENUM: type of underlying data */
++        vki_uint64_t        ki_vdata;       /* PTR: private data for fs */
++        /* process information when retrieved via KERN_FILE_BYPID */
++        vki_uint32_t        ki_pid;         /* PID_T: process id */
++        vki_int32_t         ki_fd;          /* INT: descriptor number */
++        vki_uint32_t        ki_ofileflags;  /* CHAR: open file flags */
++        vki_uint32_t        _ki_padto64bits;
++};
++
++#define VKI_KERN_FILE_BYFILE        1
++#define VKI_KERN_FILE_BYPID         2                                                                                                                            
++#define VKI_KERN_FILESLOP           10
++
++struct vki_evcnt_sysctl {                                                                                                                                        
++        vki_uint64_t        ev_count;               /* current count */
++        vki_uint64_t        ev_addr;                /* kernel address of evcnt */
++        vki_uint64_t        ev_parent;              /* kernel address of parent */
++        vki_uint8_t         ev_type;                /* EVCNT_TRAP_* */
++        vki_uint8_t         ev_grouplen;            /* length of group with NUL */
++        vki_uint8_t         ev_namelen;             /* length of name with NUL */
++        vki_uint8_t         ev_len;                 /* multiply by 8 */
++        /*
++         * Now the group and name strings follow (both include the trailing                                                                                  
++         * NUL).  ev_name start at &ev_strings[ev_grouplen+1]
++         */
++        char            ev_strings[0];
++};
++
++#define VKI_KERN_EVCNT_COUNT_ANY            0
++#define VKI_KERN_EVCNT_COUNT_NONZERO        1
++
++#define VKI_KVME_TYPE_NONE          0
++#define VKI_KVME_TYPE_OBJECT        1
++#define VKI_KVME_TYPE_VNODE         2
++#define VKI_KVME_TYPE_KERN          3
++#define VKI_KVME_TYPE_DEVICE        4
++#define VKI_KVME_TYPE_ANON          5
++#define VKI_KVME_TYPE_SUBMAP        6
++#define VKI_KVME_TYPE_UNKNOWN       255
++
++#define VKI_KVME_PROT_READ          0x00000001
++#define VKI_KVME_PROT_WRITE         0x00000002                                                                                                                   
++#define VKI_KVME_PROT_EXEC          0x00000004
++
++#define VKI_KVME_FLAG_COW           0x00000001
++#define VKI_KVME_FLAG_NEEDS_COPY    0x00000002
++#define VKI_KVME_FLAG_NOCOREDUMP    0x00000004
++#define VKI_KVME_FLAG_PAGEABLE      0x00000008
++#define VKI_KVME_FLAG_GROWS_UP      0x00000010
++#define VKI_KVME_FLAG_GROWS_DOWN    0x00000020
++
++                                                                                                                                                             
++struct vki_kinfo_vmentry {
++        vki_unit64_t kve_start;                     /* Starting address. */
++        vki_unit64_t kve_end;                       /* Finishing address. */
++        vki_unit64_t kve_offset;                    /* Mapping offset in object */
++
++        vki_unit32_t kve_type;                      /* Type of map entry. */
++        vki_unit32_t kve_flags;                     /* Flags on map entry. */
++        vki_unit32_t kve_count;                     /* Number of pages/entries */                                                                                
++        vki_unit32_t kve_wired_count;               /* Number of wired pages */
++
++        vki_unit32_t kve_advice;                    /* Advice */
++        vki_unit32_t kve_attributes;                /* Map attribute */
++
++        vki_unit32_t kve_protection;                /* Protection bitmask. */
++        vki_unit32_t kve_max_protection;            /* Max protection bitmask */
++
++        vki_unit32_t kve_ref_count;                 /* VM obj ref count. */                                                                                      
++        vki_unit32_t kve_inheritance;               /* Inheritance */
++
++        vki_unit64_t kve_vn_fileid;                 /* inode number if vnode */
++        vki_unit64_t kve_vn_size;                   /* File size. */
++        vki_unit64_t kve_vn_fsid;                   /* dev_t of vnode location */
++        vki_unit64_t kve_vn_rdev;                   /* Device id if device. */
++
++        vki_unit32_t kve_vn_type;                   /* Vnode type. */
++        vki_unit32_t kve_vn_mode;                   /* File mode. */
++
++        char     kve_path[VKI_PATH_MAX];            /* Path to VM obj, if any. */
++};
++
++#define VKI_HW_MACHINE       1              /* string: machine class */
++#define VKI_HW_MODEL         2              /* string: specific machine model */                                                                                 
++#define VKI_HW_NCPU          3              /* int: number of cpus */
++#define VKI_HW_BYTEORDER     4              /* int: machine byte order */
++#define VKI_HW_PHYSMEM       5              /* int: total memory (bytes) */
++#define VKI_HW_USERMEM       6              /* int: non-kernel memory (bytes) */
++#define VKI_HW_PAGESIZE      7              /* int: software page size */
++#define VKI_HW_DISKNAMES     8              /* string: disk drive names */
++#define VKI_HW_IOSTATS       9              /* struct: iostats[] */
++#define VKI_HW_MACHINE_ARCH 10              /* string: machine architecture */
++#define VKI_HW_ALIGNBYTES   11              /* int: ALIGNBYTES for the kernel */                                                                                 
++#define VKI_HW_CNMAGIC      12              /* string: console magic sequence(s) */
++#define VKI_HW_PHYSMEM64    13              /* quad: total memory (bytes) */
++#define VKI_HW_USERMEM64    14              /* quad: non-kernel memory (bytes) */
++#define VKI_HW_IOSTATNAMES  15              /* string: iostat names */
++#define VKI_HW_NCPUONLINE   16              /* number CPUs online */
++
++/*
++ * CTL_USER definitions
++ */                                                                                                                                                          
++#define VKI_USER_CS_PATH             1      /* string: _CS_PATH */
++#define VKI_USER_BC_BASE_MAX         2      /* int: BC_BASE_MAX */
++#define VKI_USER_BC_DIM_MAX          3      /* int: BC_DIM_MAX */
++#define VKI_USER_BC_SCALE_MAX        4      /* int: BC_SCALE_MAX */
++#define VKI_USER_BC_STRING_MAX       5      /* int: BC_STRING_MAX */
++#define VKI_USER_COLL_WEIGHTS_MAX    6      /* int: COLL_WEIGHTS_MAX */
++#define VKI_USER_EXPR_NEST_MAX       7      /* int: EXPR_NEST_MAX */
++#define VKI_USER_LINE_MAX            8      /* int: LINE_MAX */
++#define VKI_USER_RE_DUP_MAX          9      /* int: RE_DUP_MAX */                                                                                                
++#define VKI_USER_POSIX2_VERSION     10      /* int: POSIX2_VERSION */
++#define VKI_USER_POSIX2_C_BIND      11      /* int: POSIX2_C_BIND */
++#define VKI_USER_POSIX2_C_DEV       12      /* int: POSIX2_C_DEV */
++#define VKI_USER_POSIX2_CHAR_TERM   13      /* int: POSIX2_CHAR_TERM */
++#define VKI_USER_POSIX2_FORT_DEV    14      /* int: POSIX2_FORT_DEV */
++#define VKI_USER_POSIX2_FORT_RUN    15      /* int: POSIX2_FORT_RUN */
++#define VKI_USER_POSIX2_LOCALEDEF   16      /* int: POSIX2_LOCALEDEF */
++#define VKI_USER_POSIX2_SW_DEV      17      /* int: POSIX2_SW_DEV */
++#define VKI_USER_POSIX2_UPE         18      /* int: POSIX2_UPE */                                                                                                
++#define VKI_USER_STREAM_MAX         19      /* int: POSIX2_STREAM_MAX */
++#define VKI_USER_TZNAME_MAX         20      /* int: _POSIX_TZNAME_MAX */
++#define VKI_USER_ATEXIT_MAX         21      /* int: {ATEXIT_MAX} */
++
++#define VKI_DDBCTL_RADIX            1       /* int: Input and output radix */
++#define VKI_DDBCTL_MAXOFF           2       /* int: max symbol offset */                                                                                         
++#define VKI_DDBCTL_MAXWIDTH         3       /* int: width of the display line */
++#define VKI_DDBCTL_LINES            4       /* int: number of display lines */
++#define VKI_DDBCTL_TABSTOPS         5       /* int: tab width */
++#define VKI_DDBCTL_ONPANIC          6       /* int: DDB on panic if non-zero */
++#define VKI_DDBCTL_FROMCONSOLE      7       /* int: DDB via console if non-zero */
++
++#define VKI_CTL_DEBUG_NAME          0       /* string: variable name */
++#define VKI_CTL_DEBUG_VALUE         1       /* int: variable value */
++
++#define VKI_PROC_CURPROC    (~((vki_u_int)1 << 31))
++
++#define VKI_PROC_PID_CORENAME       1                                                                                                                            
++#define VKI_PROC_PID_LIMIT          2
++#define VKI_PROC_PID_STOPFORK       3
++#define VKI_PROC_PID_STOPEXEC       4
++#define VKI_PROC_PID_STOPEXIT       5
++#define VKI_PROC_PID_PAXFLAGS       6
++
++#define VKI_PROC_PID_LIMIT_CPU      (VKI_RLIMIT_CPU+1)
++#define VKI_PROC_PID_LIMIT_FSIZE    (VKI_RLIMIT_FSIZE+1)                                                                                                             
++#define VKI_PROC_PID_LIMIT_DATA     (VKI_RLIMIT_DATA+1)
++#define VKI_PROC_PID_LIMIT_STACK    (VKI_RLIMIT_STACK+1)
++#define VKI_PROC_PID_LIMIT_CORE     (VKI_RLIMIT_CORE+1)
++#define VKI_PROC_PID_LIMIT_RSS      (VKI_RLIMIT_RSS+1)
++#define VKI_PROC_PID_LIMIT_MEMLOCK  (VKI_RLIMIT_MEMLOCK+1)
++#define VKI_PROC_PID_LIMIT_NPROC    (VKI_RLIMIT_NPROC+1)
++#define VKI_PROC_PID_LIMIT_NOFILE   (VKI_RLIMIT_NOFILE+1)
++#define VKI_PROC_PID_LIMIT_SBSIZE   (VKI_RLIMIT_SBSIZE+1)
++#define VKI_PROC_PID_LIMIT_AS       (VKI_RLIMIT_AS+1)                                                                                                                
++#define VKI_PROC_PID_LIMIT_NTHR     (VKI_RLIMIT_NTHR+1)
++
++/* for each type, either hard or soft value */ 
++#define VKI_PROC_PID_LIMIT_TYPE_SOFT        1
++#define VKI_PROC_PID_LIMIT_TYPE_HARD        2
++
++/*
++ * Export PAX flag definitions to userland.
++ *
++ * XXX These are duplicated from sys/pax.h but that header is not
++ * XXX installed.
++ */
++#define VKI_CTL_PROC_PAXFLAGS_ASLR          0x01
++#define VKI_CTL_PROC_PAXFLAGS_MPROTECT      0x02
++#define VKI_CTL_PROC_PAXFLAGS_GUARD         0x04
++
++#define VKI_EMUL_LINUX      1
++#define VKI_EMUL_LINUX32    5
 +
 +#endif // __VKI_NETBSD_H
 +
