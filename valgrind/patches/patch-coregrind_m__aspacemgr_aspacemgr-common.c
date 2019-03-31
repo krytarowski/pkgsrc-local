@@ -2,7 +2,16 @@ $NetBSD$
 
 --- coregrind/m_aspacemgr/aspacemgr-common.c.orig	2018-08-06 07:22:24.000000000 +0000
 +++ coregrind/m_aspacemgr/aspacemgr-common.c
-@@ -161,6 +161,11 @@ SysRes VG_(am_do_mmap_NO_NOTIFY)( Addr s
+@@ -146,6 +146,8 @@ SysRes VG_(am_do_mmap_NO_NOTIFY)( Addr s
+    SysRes res;
+    aspacem_assert(VG_IS_PAGE_ALIGNED(offset));
+ 
++   VG_(debugLog)(2, "initimg", "%s() %s:%d start=%lu length=%lu prot=%lx flags=%x fd=%d offset=%lu MAP_FIXED-really?=%s\n", __func__, __FILE__, __LINE__, start, length, prot, flags, fd, offset, flags & VKI_MAP_FIXED ? "yes" : "no");
++
+ #  if defined(VGP_arm64_linux)
+    res = VG_(do_syscall6)(__NR3264_mmap, (UWord)start, length, 
+                          prot, flags, fd, offset);
+@@ -161,6 +163,11 @@ SysRes VG_(am_do_mmap_NO_NOTIFY)( Addr s
          || defined(VGP_mips64_linux) || defined(VGP_arm64_linux)
     res = VG_(do_syscall6)(__NR_mmap, (UWord)start, length, 
                           prot, flags, fd, offset);
@@ -14,7 +23,7 @@ $NetBSD$
  #  elif defined(VGP_x86_darwin)
     if (fd == 0  &&  (flags & VKI_MAP_ANONYMOUS)) {
         fd = -1;  // MAP_ANON with fd==0 is EINVAL
-@@ -221,6 +226,12 @@ SysRes ML_(am_do_extend_mapping_NO_NOTIF
+@@ -221,6 +228,12 @@ SysRes ML_(am_do_extend_mapping_NO_NOTIF
               0/*flags, meaning: must be at old_addr, else FAIL */,
               0/*new_addr, is ignored*/
            );
@@ -27,7 +36,7 @@ $NetBSD$
  #  else
  #    error Unknown OS
  #  endif
-@@ -242,6 +253,12 @@ SysRes ML_(am_do_relocate_nooverlap_mapp
+@@ -242,6 +255,12 @@ SysRes ML_(am_do_relocate_nooverlap_mapp
               VKI_MREMAP_MAYMOVE|VKI_MREMAP_FIXED/*move-or-fail*/,
               new_addr
            );
@@ -40,7 +49,7 @@ $NetBSD$
  #  else
  #    error Unknown OS
  #  endif
-@@ -257,7 +274,7 @@ SysRes ML_(am_open) ( const HChar* pathn
+@@ -257,7 +276,7 @@ SysRes ML_(am_open) ( const HChar* pathn
     /* ARM64 wants to use __NR_openat rather than __NR_open. */
     SysRes res = VG_(do_syscall4)(__NR_openat,
                                   VKI_AT_FDCWD, (UWord)pathname, flags, mode);
@@ -49,7 +58,7 @@ $NetBSD$
     SysRes res = VG_(do_syscall3)(__NR_open, (UWord)pathname, flags, mode);
  #  elif defined(VGO_solaris)
     SysRes res = VG_(do_syscall4)(__NR_openat, VKI_AT_FDCWD, (UWord)pathname,
-@@ -285,7 +302,7 @@ Int ML_(am_readlink)(const HChar* path, 
+@@ -285,7 +304,7 @@ Int ML_(am_readlink)(const HChar* path, 
  #  if defined(VGP_arm64_linux)
     res = VG_(do_syscall4)(__NR_readlinkat, VKI_AT_FDCWD,
                                             (UWord)path, (UWord)buf, bufsiz);
@@ -58,7 +67,7 @@ $NetBSD$
     res = VG_(do_syscall3)(__NR_readlink, (UWord)path, (UWord)buf, bufsiz);
  #  elif defined(VGO_solaris)
     res = VG_(do_syscall4)(__NR_readlinkat, VKI_AT_FDCWD, (UWord)path,
-@@ -298,7 +315,7 @@ Int ML_(am_readlink)(const HChar* path, 
+@@ -298,7 +317,7 @@ Int ML_(am_readlink)(const HChar* path, 
  
  Int ML_(am_fcntl) ( Int fd, Int cmd, Addr arg )
  {
@@ -67,7 +76,7 @@ $NetBSD$
     SysRes res = VG_(do_syscall3)(__NR_fcntl, fd, cmd, arg);
  #  elif defined(VGO_darwin)
     SysRes res = VG_(do_syscall3)(__NR_fcntl_nocancel, fd, cmd, arg);
-@@ -314,7 +331,7 @@ Bool ML_(am_get_fd_d_i_m)( Int fd, 
+@@ -314,7 +333,7 @@ Bool ML_(am_get_fd_d_i_m)( Int fd, 
                             /*OUT*/ULong* dev, 
                             /*OUT*/ULong* ino, /*OUT*/UInt* mode )
  {
@@ -76,7 +85,7 @@ $NetBSD$
     SysRes          res;
     struct vki_stat buf;
  #  if defined(VGO_linux) && defined(__NR_fstat64)
-@@ -330,7 +347,11 @@ Bool ML_(am_get_fd_d_i_m)( Int fd, 
+@@ -330,7 +349,11 @@ Bool ML_(am_get_fd_d_i_m)( Int fd, 
        return True;
     }
  #  endif
@@ -88,7 +97,7 @@ $NetBSD$
     if (!sr_isError(res)) {
        *dev  = (ULong)buf.st_dev;
        *ino  = (ULong)buf.st_ino;
-@@ -393,6 +414,9 @@ Bool ML_(am_resolve_filename) ( Int fd, 
+@@ -393,6 +416,9 @@ Bool ML_(am_resolve_filename) ( Int fd, 
     else
        return False;
  
