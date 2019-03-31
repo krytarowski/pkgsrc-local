@@ -324,7 +324,7 @@ $NetBSD$
     return res;
 +#  elif defined(VGP_amd64_netbsd)
 +   vg_assert(sizeof(OffT) == 8);
-+   res = VG_(do_syscall4)(__NR_pread, fd, (UWord)buf, count, 0, offset);
++   res = VG_(do_syscall5)(__NR_pread, fd, (UWord)buf, count, 0, offset);
 +   return res;
  #  elif defined(VGP_amd64_darwin)
     vg_assert(sizeof(OffT) == 8);
