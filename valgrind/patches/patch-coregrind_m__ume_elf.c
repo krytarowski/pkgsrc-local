@@ -31,7 +31,7 @@ $NetBSD$
        /* We really don't want to load PIEs at zero or too close.  It
           works, but it's unrobust (NULL pointer reads and writes
           become legit, which is really bad) and causes problems for
-@@ -595,14 +599,21 @@ Int VG_(load_ELF)(Int fd, const HChar* n
+@@ -595,12 +599,18 @@ Int VG_(load_ELF)(Int fd, const HChar* n
        /* Record for later use in AT_BASE. */
        info->interp_offset = ebase;
  #     endif
@@ -49,11 +49,8 @@ $NetBSD$
 +#endif
  
     for (i = 0; i < e->e.e_phnum; i++) {
-+      __builtin_trap();
        ESZ(Phdr) *ph = &e->p[i];
- 
-       switch(ph->p_type) {
-@@ -644,6 +655,8 @@ Int VG_(load_ELF)(Int fd, const HChar* n
+@@ -644,6 +654,8 @@ Int VG_(load_ELF)(Int fd, const HChar* n
           VG_(pread)(fd, buf, ph->p_filesz, ph->p_offset);
           buf[ph->p_filesz] = '\0';
  
@@ -62,7 +59,7 @@ $NetBSD$
           sres = VG_(open)(buf, VKI_O_RDONLY, 0);
           if (sr_isError(sres)) {
              VG_(printf)("valgrind: m_ume.c: can't open interpreter\n");
-@@ -870,7 +883,7 @@ Int VG_(load_ELF)(Int fd, const HChar* n
+@@ -870,7 +882,7 @@ Int VG_(load_ELF)(Int fd, const HChar* n
     return 0;
  }
  
