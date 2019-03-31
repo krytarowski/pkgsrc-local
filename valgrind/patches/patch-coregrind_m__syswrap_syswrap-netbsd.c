@@ -2,7 +2,7 @@ $NetBSD$
 
 --- coregrind/m_syswrap/syswrap-netbsd.c.orig	2019-03-31 21:41:10.598938025 +0000
 +++ coregrind/m_syswrap/syswrap-netbsd.c
-@@ -0,0 +1,4441 @@
+@@ -0,0 +1,4443 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- netbsd-specific syscalls, etc.            syswrap-netbsd.c ---*/
@@ -3800,10 +3800,12 @@ $NetBSD$
 +   BSDX_(__NR_exit,			sys_exit),			// 1
 +
 +   BSDX_(__NR_fork,			sys_fork),			// 2
-+#if 0
++
 +   GENXY(__NR_read,			sys_read),			// 3
 +
 +   GENX_(__NR_write,			sys_write),			// 4
++
++#if 0
 +   GENXY(__NR_open,			sys_open),			// 5
 +   GENXY(__NR_close,			sys_close),			// 6
 +   GENXY(__NR_wait4,			sys_wait4),			// 7
