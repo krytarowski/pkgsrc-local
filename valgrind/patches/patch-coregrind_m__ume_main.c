@@ -46,7 +46,7 @@ $NetBSD$
 +
     fsz = (SizeT)VG_(fsize)(fd);
 -   if (fsz < bufsz)
-+   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++   VG_(debugLog)(2, "initimg", "%s() %s:%d %u\n", __func__, __FILE__, __LINE__, (unsigned)fsz);
 +   if (fsz < bufsz) {
 +      VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
        bufsz = fsz;
