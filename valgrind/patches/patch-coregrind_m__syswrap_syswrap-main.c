@@ -246,7 +246,15 @@ $NetBSD$
  #elif defined(VGP_amd64_darwin)
     layout->o_sysno  = OFFSET_amd64_RAX;
     layout->o_arg1   = OFFSET_amd64_RDI;
-@@ -1570,6 +1739,11 @@ static const SyscallTableEntry* get_sysc
+@@ -1543,6 +1712,7 @@ void bad_before ( ThreadId              
+                   /*OUT*/SyscallStatus* status,
+                   /*OUT*/UWord*         flags )
+ {
++   __builtin_trap();
+    VG_(dmsg)("WARNING: unhandled %s syscall: %s\n",
+       VG_PLATFORM, VG_SYSNUM_STRING(args->sysno));
+    if (VG_(clo_verbosity) > 1) {
+@@ -1570,6 +1740,11 @@ static const SyscallTableEntry* get_sysc
  #  if defined(VGO_linux)
     sys = ML_(get_linux_syscall_entry)( syscallno );
  
@@ -258,7 +266,7 @@ $NetBSD$
  #  elif defined(VGO_darwin)
     Int idx = VG_DARWIN_SYSNO_INDEX(syscallno);
  
-@@ -1786,6 +1960,9 @@ void VG_(client_syscall) ( ThreadId tid,
+@@ -1786,6 +1961,9 @@ void VG_(client_syscall) ( ThreadId tid,
        is interrupted by a signal. */
     sysno = sci->orig_args.sysno;
  
@@ -268,7 +276,7 @@ $NetBSD$
     /* It's sometimes useful, as a crude debugging hack, to get a
        stack trace at each (or selected) syscalls. */
     if (0 && sysno == __NR_ioctl) {
-@@ -2186,7 +2363,7 @@ void VG_(post_syscall) (ThreadId tid)
+@@ -2186,7 +2364,7 @@ void VG_(post_syscall) (ThreadId tid)
  /* These are addresses within ML_(do_syscall_for_client_WRK).  See
     syscall-$PLAT.S for details. 
  */
@@ -277,7 +285,7 @@ $NetBSD$
    extern const Addr ML_(blksys_setup);
    extern const Addr ML_(blksys_restart);
    extern const Addr ML_(blksys_complete);
-@@ -2246,6 +2423,26 @@ void ML_(fixup_guest_state_to_restart_sy
+@@ -2246,6 +2424,26 @@ void ML_(fixup_guest_state_to_restart_sy
        vg_assert(p[0] == 0xcd && p[1] == 0x80);
     }
  
@@ -304,7 +312,7 @@ $NetBSD$
  #elif defined(VGP_amd64_linux)
     arch->vex.guest_RIP -= 2;             // sizeof(syscall)
  
-@@ -2592,7 +2789,7 @@ VG_(fixup_guest_state_after_syscall_inte
+@@ -2592,7 +2790,7 @@ VG_(fixup_guest_state_after_syscall_inte
     th_regs = &tst->arch;
     sci     = & syscallInfo[tid];
  

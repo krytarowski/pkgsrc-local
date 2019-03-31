@@ -1,8 +1,8 @@
 $NetBSD$
 
---- coregrind/m_syswrap/syswrap-netbsd.c.orig	2019-03-29 12:01:35.786717346 +0000
+--- coregrind/m_syswrap/syswrap-netbsd.c.orig	2019-03-31 21:41:10.598938025 +0000
 +++ coregrind/m_syswrap/syswrap-netbsd.c
-@@ -0,0 +1,4439 @@
+@@ -0,0 +1,4441 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- netbsd-specific syscalls, etc.            syswrap-netbsd.c ---*/
@@ -384,7 +384,6 @@ $NetBSD$
 +// Combine two 32-bit values into a 64-bit value
 +#define LOHI64(lo,hi)   ( (lo) | ((ULong)(hi) << 32) )
 +
-+#if 0
 +PRE(sys_fork)
 +{
 +   PRINT("sys_fork ()");
@@ -412,6 +411,7 @@ $NetBSD$
 +   }
 +}
 +
++#if 0
 +PRE(sys_socket)
 +{
 +   PRINT("sys_socket ( %ld, %ld, %ld )",ARG1,ARG2,ARG3);
@@ -733,6 +733,7 @@ $NetBSD$
 +}
 +#endif
 +
++#endif
 +/* On netbsd, if any thread calls exit(2), then they are all shut down, pretty
 + * much like linux's exit_group().
 + */
@@ -759,7 +760,7 @@ $NetBSD$
 +   SET_STATUS_Success(0);
 +}
 +
-+
++#if 0
 +PRE(sys_getlogin)
 +{
 +   PRINT("sys_getlogin ( %#lx, %ld )",ARG1,ARG2);
@@ -3795,10 +3796,11 @@ $NetBSD$
 +#undef POST
 +
 +const SyscallTableEntry ML_(syscall_table)[] = {
-+#if 0
 +   // syscall (handled specially)					// 0
 +   BSDX_(__NR_exit,			sys_exit),			// 1
++
 +   BSDX_(__NR_fork,			sys_fork),			// 2
++#if 0
 +   GENXY(__NR_read,			sys_read),			// 3
 +
 +   GENX_(__NR_write,			sys_write),			// 4
