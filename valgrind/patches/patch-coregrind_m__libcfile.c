@@ -107,6 +107,15 @@ $NetBSD$
     /* First try with fstat64.  If that doesn't work out, fall back to
        the vanilla version. */
  #  if defined(__NR_fstat64)
+@@ -450,7 +469,7 @@ Long VG_(fsize) ( Int fd )
+ SysRes VG_(getxattr) ( const HChar* file_name, const HChar* attr_name, Addr attr_value, SizeT attr_value_len )
+ {
+    SysRes res;
+-#if defined(VGO_linux)
++#if defined(VGO_linux) || defined(VGO_netbsd)
+    res = VG_(do_syscall4)(__NR_getxattr, (UWord)file_name, (UWord)attr_name,
+                           attr_value, attr_value_len);
+ #else
 @@ -469,7 +488,7 @@ Bool VG_(is_dir) ( const HChar* f )
  
  SysRes VG_(dup) ( Int oldfd )
@@ -200,138 +209,65 @@ $NetBSD$
     SysRes res = VG_(do_syscall2)(__NR_access, (UWord)path, w);
  #  elif defined(VGO_solaris)
     SysRes res = VG_(do_syscall4)(__NR_faccessat, VKI_AT_FDCWD, (UWord)path,
-@@ -768,71 +791,113 @@ Int VG_(check_executable)(/*OUT*/Bool* i
-                           const HChar* f, Bool allow_setuid)
- {
+@@ -770,8 +793,9 @@ Int VG_(check_executable)(/*OUT*/Bool* i
     struct vg_stat st;
-+   VG_(debugLog)(2, "initimg", "%s() %s:%d f='%s'\n", __func__, __FILE__, __LINE__, f);
     SysRes res = VG_(stat)(f, &st);
-+   VG_(debugLog)(2, "initimg", "%s() %s:%d st.uid=%d\n", __func__, __FILE__, __LINE__, st.uid);
  
 -   if (is_setuid)
 +   if (is_setuid) {
-+      VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
        *is_setuid = False;
 +   }
-+
-+   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
  
     if (sr_isError(res)) {
-+      VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
        return sr_Err(res);
+@@ -782,27 +806,30 @@ Int VG_(check_executable)(/*OUT*/Bool* i
     }
  
-+   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
-+
-    if ( VKI_S_ISDIR (st.mode) ) {
-+      VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
-       return VKI_EACCES;
-    }
- 
-+   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
-+
     if ( (st.mode & (VKI_S_ISUID | VKI_S_ISGID)) && !allow_setuid ) {
 -      if (is_setuid)
-+      VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
 +      if (is_setuid) {
-+         VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
           *is_setuid = True;
 +      }
-+      VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
        return VKI_EACCES;
     }
  
     res = VG_(getxattr)(f, "security.capability", (Addr)0, 0);
-+   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if (!sr_isError(res) && !allow_setuid) {
 -      if (is_setuid)
-+      VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
 +      if (is_setuid) {
-+          VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
           *is_setuid = True;
 +      }
-+      VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
        return VKI_EACCES;
     }
-+   VG_(debugLog)(2, "initimg", "%s() %s:%d st.uid=%d\n", __func__, __FILE__, __LINE__, st.uid);
  
     if (VG_(geteuid)() == st.uid) {
 -      if (!(st.mode & VKI_S_IXUSR))
-+      VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
 +      if (!(st.mode & VKI_S_IXUSR)) {
-+         VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
           return VKI_EACCES;
 +      }
     } else {
-+      VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
        Int grpmatch = 0;
  
 -      if (VG_(getegid)() == st.gid)
 +      if (VG_(getegid)() == st.gid) {
-+         VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
  	 grpmatch = 1;
 -      else {
 +      } else {
-+         VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
           UInt *groups = NULL;
           Int   ngrp;
  
-          /* Find out # groups, allocate large enough array and fetch groups */
-          ngrp = VG_(getgroups)(0, NULL);
-          if (ngrp != -1) {
-+            VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
-             groups = VG_(malloc)("check_executable", ngrp * sizeof *groups);
-+            VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
-             ngrp   = VG_(getgroups)(ngrp, groups);
-+            VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
-          }
- 
-+         VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
-          Int i;
-          /* ngrp will be -1 if VG_(getgroups) failed. */
-          for (i = 0; i < ngrp; i++) {
-+            VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
- 	    if (groups[i] == st.gid) {
-+               VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
- 	       grpmatch = 1;
- 	       break;
- 	    }
-          }
-+         VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
-          VG_(free)(groups);
-+         VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
-       }
- 
-+      VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
-       if (grpmatch) {
-+         VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
- 	 if (!(st.mode & VKI_S_IXGRP)) {
-+            VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
-             return VKI_EACCES;
-          }
-       } else if (!(st.mode & VKI_S_IXOTH)) {
-+         VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
-          return VKI_EACCES;
-       }
-    }
- 
-+   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
-+
-    return 0;
- }
- 
-@@ -872,6 +937,10 @@ SysRes VG_(pread) ( Int fd, void* buf, I
+@@ -872,6 +899,10 @@ SysRes VG_(pread) ( Int fd, void* buf, I
        || defined(VGP_mips64_linux) || defined(VGP_arm64_linux)
     res = VG_(do_syscall4)(__NR_pread64, fd, (UWord)buf, count, offset);
     return res;
-+#  elif defined(VGP_amd64_netbsd)
++#  elif defined(VGO_netbsd)
 +   vg_assert(sizeof(OffT) == 8);
 +   res = VG_(do_syscall5)(__NR_pread, fd, (UWord)buf, count, 0, offset);
 +   return res;
  #  elif defined(VGP_amd64_darwin)
     vg_assert(sizeof(OffT) == 8);
     res = VG_(do_syscall4)(__NR_pread_nocancel, fd, (UWord)buf, count, offset);
-@@ -1023,7 +1092,7 @@ UShort VG_(ntohs) ( UShort x )
+@@ -1023,7 +1054,7 @@ UShort VG_(ntohs) ( UShort x )
  */
  Int VG_(connect_via_socket)( const HChar* str )
  {
@@ -340,7 +276,7 @@ $NetBSD$
     Int sd, res;
     struct vki_sockaddr_in servAddr;
     UInt   ip   = 0;
-@@ -1124,9 +1193,13 @@ Int VG_(socket) ( Int domain, Int type, 
+@@ -1124,9 +1155,13 @@ Int VG_(socket) ( Int domain, Int type, 
  
  #  elif defined(VGP_amd64_linux) || defined(VGP_arm_linux) \
          || defined(VGP_mips32_linux) || defined(VGP_mips64_linux) \
@@ -355,7 +291,7 @@ $NetBSD$
     return sr_isError(res) ? -1 : sr_Res(res);
  
  #  elif defined(VGO_darwin)
-@@ -1179,7 +1252,7 @@ Int my_connect ( Int sockfd, struct vki_
+@@ -1179,7 +1214,7 @@ Int my_connect ( Int sockfd, struct vki_
  
  #  elif defined(VGP_amd64_linux) || defined(VGP_arm_linux) \
          || defined(VGP_mips32_linux) || defined(VGP_mips64_linux) \
@@ -364,7 +300,7 @@ $NetBSD$
     SysRes res;
     res = VG_(do_syscall3)(__NR_connect, sockfd, (UWord)serv_addr, addrlen);
     return sr_isError(res) ? -1 : sr_Res(res);
-@@ -1226,7 +1299,7 @@ Int VG_(write_socket)( Int sd, const voi
+@@ -1226,7 +1261,7 @@ Int VG_(write_socket)( Int sd, const voi
  
  #  elif defined(VGP_amd64_linux) || defined(VGP_arm_linux) \
          || defined(VGP_mips32_linux) || defined(VGP_mips64_linux) \
@@ -373,7 +309,7 @@ $NetBSD$
     SysRes res;
     res = VG_(do_syscall6)(__NR_sendto, sd, (UWord)msg, 
                                         count, VKI_MSG_NOSIGNAL, 0,0);
-@@ -1262,7 +1335,7 @@ Int VG_(getsockname) ( Int sd, struct vk
+@@ -1262,7 +1297,7 @@ Int VG_(getsockname) ( Int sd, struct vk
     return sr_isError(res) ? -1 : sr_Res(res);
  
  #  elif defined(VGP_amd64_linux) || defined(VGP_arm_linux) \
@@ -382,7 +318,7 @@ $NetBSD$
     SysRes res;
     res = VG_(do_syscall3)( __NR_getsockname,
                             (UWord)sd, (UWord)name, (UWord)namelen );
-@@ -1300,7 +1373,7 @@ Int VG_(getpeername) ( Int sd, struct vk
+@@ -1300,7 +1335,7 @@ Int VG_(getpeername) ( Int sd, struct vk
     return sr_isError(res) ? -1 : sr_Res(res);
  
  #  elif defined(VGP_amd64_linux) || defined(VGP_arm_linux) \
@@ -391,7 +327,7 @@ $NetBSD$
     SysRes res;
     res = VG_(do_syscall3)( __NR_getpeername,
                             (UWord)sd, (UWord)name, (UWord)namelen );
-@@ -1341,14 +1414,14 @@ Int VG_(getsockopt) ( Int sd, Int level,
+@@ -1341,14 +1376,14 @@ Int VG_(getsockopt) ( Int sd, Int level,
  
  #  elif defined(VGP_amd64_linux) || defined(VGP_arm_linux) \
          || defined(VGP_mips32_linux) || defined(VGP_mips64_linux) \
@@ -408,7 +344,7 @@ $NetBSD$
     SysRes res;
     res = VG_(do_syscall5)( __NR_getsockopt,
                             (UWord)sd, (UWord)level, (UWord)optname, 
-@@ -1392,7 +1465,7 @@ Int VG_(setsockopt) ( Int sd, Int level,
+@@ -1392,7 +1427,7 @@ Int VG_(setsockopt) ( Int sd, Int level,
                             (UWord)optval, (UWord)optlen );
     return sr_isError(res) ? -1 : sr_Res(res);
  
