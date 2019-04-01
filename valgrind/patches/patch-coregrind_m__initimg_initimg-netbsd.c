@@ -1,8 +1,8 @@
 $NetBSD$
 
---- coregrind/m_initimg/initimg-netbsd.c.orig	2019-03-31 21:41:10.254214132 +0000
+--- coregrind/m_initimg/initimg-netbsd.c.orig	2019-04-01 07:48:19.136215414 +0000
 +++ coregrind/m_initimg/initimg-netbsd.c
-@@ -0,0 +1,907 @@
+@@ -0,0 +1,896 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- Startup: create initial process image on Linux               ---*/
@@ -80,44 +80,33 @@ $NetBSD$
 +   Int    ret;
 +   SysRes res;
 +
-+   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
 +   vg_assert( VG_(args_the_exename) != NULL);
-+   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
 +   exe_name = ML_(find_executable)( VG_(args_the_exename) );
-+   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
 +
 +   if (!exe_name) {
 +      VG_(printf)("valgrind: %s: command not found\n", VG_(args_the_exename));
 +      VG_(exit)(127);      // 127 is Posix NOTFOUND
 +   }
 +
-+   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
-+
 +   VG_(memset)(info, 0, sizeof(*info));
-+   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
 +   ret = VG_(do_exec)(exe_name, info);
-+   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
 +   if (ret < 0) {
 +      VG_(printf)("valgrind: could not execute '%s'\n", exe_name);
 +      VG_(exit)(1);
 +   }
-+   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
 +
 +   // The client was successfully loaded!  Continue.
 +
 +   /* Get hold of a file descriptor which refers to the client
 +      executable.  This is needed for attaching to GDB. */
 +   res = VG_(open)(exe_name, VKI_O_RDONLY, VKI_S_IRUSR);
-+   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
 +   if (!sr_isError(res))
 +      VG_(cl_exec_fd) = sr_Res(res);
 +
-+   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
 +   /* Copy necessary bits of 'info' that were filled in */
 +   *client_ip  = info->init_ip;
 +   *client_toc = info->init_toc;
 +   VG_(brk_base) = VG_(brk_limit) = VG_PGROUNDUP(info->brkbase);
-+   VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +
