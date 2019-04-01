@@ -70,7 +70,7 @@ $NetBSD$
                               SizeT current_val, SizeT old_val, 
                               LeakCheckDeltaMode delta_mode)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++//VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     // Make sure the buffer size is large enough. With old_val == 0 and
     // current_val == ULLONG_MAX the delta including inserted commas is:
     // 18,446,744,073,709,551,615
@@ -338,7 +338,7 @@ $NetBSD$
  
  Bool MC_(error_matches_suppression) ( const Error* err, const Supp* su )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++//VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Int       su_szB;
     MC_Error* extra = VG_(get_error_extra)(err);
     ErrorKind ekind = VG_(get_error_kind)(err);
