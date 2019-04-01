@@ -1,8 +1,8 @@
 $NetBSD$
 
---- coregrind/m_initimg/initimg-netbsd.c.orig	2019-04-01 07:48:19.136215414 +0000
+--- coregrind/m_initimg/initimg-netbsd.c.orig	2019-04-01 07:51:01.642926937 +0000
 +++ coregrind/m_initimg/initimg-netbsd.c
-@@ -0,0 +1,896 @@
+@@ -0,0 +1,893 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- Startup: create initial process image on Linux               ---*/
@@ -747,10 +747,7 @@ $NetBSD$
 +   if (VG_(args_the_exename) == NULL)
 +      VG_(err_missing_prog)();
 +
-+   VG_(debugLog)(1, "initimg", "Loading client2\n");
-+
 +   load_client(&info, &iifii.initial_client_IP, &iifii.initial_client_TOC);
-+   VG_(debugLog)(1, "initimg", "Loading client3\n");
 +
 +   //--------------------------------------------------------------
 +   // Set up client's environment
