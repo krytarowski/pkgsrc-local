@@ -57,6 +57,9 @@ CXXFLAGS+=              -O0 -g -ggdb
 INSTALL_UNSTRIPPED=     yes
 BUILDLINK_TRANSFORM+=   rm:-s
 
+#CFLAGS+=		-fsanitize=address
+#LDFLAGS+=		-fsanitize=address
+
 pre-configure:
 	${RUN} cd ${WRKSRC} && ${SH} ./autogen.sh
 
