@@ -50,7 +50,7 @@ PLIST_SUBST+=		VGCONF_ARCH_PRI=amd64
 CONFIGURE_ARGS+=	--enable-only64bit
 .endif
 
-CFLAGS+=	-fsanitize-coverage=trace-pc
+#CFLAGS+=	-fsanitize-coverage=trace-pc
 
 pre-configure:
 	${RUN} cd ${WRKSRC} && ${SH} ./autogen.sh

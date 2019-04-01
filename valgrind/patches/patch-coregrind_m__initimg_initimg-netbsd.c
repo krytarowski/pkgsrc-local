@@ -1,6 +1,6 @@
 $NetBSD$
 
---- coregrind/m_initimg/initimg-netbsd.c.orig	2019-04-01 07:51:01.642926937 +0000
+--- coregrind/m_initimg/initimg-netbsd.c.orig	2019-04-01 09:14:48.164955265 +0000
 +++ coregrind/m_initimg/initimg-netbsd.c
 @@ -0,0 +1,893 @@
 +
