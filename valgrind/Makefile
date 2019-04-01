@@ -52,6 +52,11 @@ CONFIGURE_ARGS+=	--enable-only64bit
 
 #CFLAGS+=	-fsanitize-coverage=trace-pc
 
+CFLAGS+=                -O0 -g -ggdb
+CXXFLAGS+=              -O0 -g -ggdb
+INSTALL_UNSTRIPPED=     yes
+BUILDLINK_TRANSFORM+=   rm:-s
+
 pre-configure:
 	${RUN} cd ${WRKSRC} && ${SH} ./autogen.sh
 
