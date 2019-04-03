@@ -29,13 +29,20 @@ $NetBSD$
        // GrP fixme kernel info doesn't have dev/inode
        cmp_devino = False;
        
-@@ -1638,6 +1638,32 @@ Addr VG_(am_startup) ( Addr sp_at_startu
+@@ -1638,6 +1638,39 @@ Addr VG_(am_startup) ( Addr sp_at_startu
  
     suggested_clstack_end = -1; // ignored; Mach-O specifies its stack
  
 +   // --- Freebsd ------------------------------------------
 +
 +#elif defined(VGO_netbsd)
++
++   /* Establish address limits and block out unusable parts
++      accordingly. */
++
++   VG_(debugLog)(2, "aspacem", 
++                    "        sp_at_startup = 0x%010lx (supplied)\n", 
++                    sp_at_startup );
 +
 +# if VG_WORDSIZE == 4
 +   aspacem_maxAddr = VG_PGROUNDDN( sp_at_startup ) - 1;
@@ -62,7 +69,7 @@ $NetBSD$
     // --- Solaris ------------------------------------------
  #elif defined(VGO_solaris)
  #  if VG_WORDSIZE == 4
-@@ -3797,13 +3823,93 @@ Bool VG_(get_changed_segments)(
+@@ -3797,13 +3830,93 @@ Bool VG_(get_changed_segments)(
     return !css_overflowed;
  }
  
@@ -159,7 +166,7 @@ $NetBSD$
  
  /* Note: /proc/self/xmap contains extended information about already
     materialized mappings whereas /proc/self/rmap contains information about
-@@ -4113,7 +4219,7 @@ Bool VG_(am_search_for_new_segment)(Addr
+@@ -4113,7 +4226,7 @@ Bool VG_(am_search_for_new_segment)(Addr
  
  /*------END-procmaps-parser-for-Solaris--------------------------*/
  

@@ -1,8 +1,8 @@
 $NetBSD$
 
---- coregrind/m_initimg/initimg-netbsd.c.orig	2019-04-01 10:05:56.420527388 +0000
+--- coregrind/m_initimg/initimg-netbsd.c.orig	2019-04-03 09:45:37.901625813 +0000
 +++ coregrind/m_initimg/initimg-netbsd.c
-@@ -0,0 +1,893 @@
+@@ -0,0 +1,895 @@
 +
 +/*--------------------------------------------------------------------*/
 +/*--- Startup: create initial process image on Linux               ---*/
@@ -609,6 +609,8 @@ $NetBSD$
 +         case VKI_AT_FLAGS:
 +         case VKI_AT_EUID:
 +         case VKI_AT_EGID:
++         case VKI_AT_RUID:
++         case VKI_AT_RGID:
 +            /* All these are pointerless, so we don't need to do
 +               anything about them. */
 +            break;
