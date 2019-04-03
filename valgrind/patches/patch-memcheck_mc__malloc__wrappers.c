@@ -6,7 +6,7 @@ $NetBSD$
     some of the oldest blocks in the queue at the same time. */
  static void add_to_freed_queue ( MC_Chunk* mc )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     const Bool show = False;
     const int l = (mc->szB >= MC_(clo_freelist_big_blocks) ? 0 : 1);
  
@@ -14,7 +14,7 @@ $NetBSD$
     On exit, VG_(free_queue_volume) will be <= MC_(clo_freelist_vol). */
  static void release_oldest_block(void)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     const Bool show = False;
     int i;
     tl_assert (VG_(free_queue_volume) > MC_(clo_freelist_vol));
@@ -22,7 +22,7 @@ $NetBSD$
  
  MC_Chunk* MC_(get_freed_block_bracketting) (Addr a)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     int i;
     for (i = 0; i < 2; i++) {
        MC_Chunk*  mc;
@@ -30,7 +30,7 @@ $NetBSD$
  MC_Chunk* create_MC_Chunk ( ThreadId tid, Addr p, SizeT szB,
                              MC_AllocKind kind)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_Chunk* mc  = VG_(allocEltPA)(MC_(chunk_poolalloc));
     mc->data      = p;
     mc->szB       = szB;
@@ -38,14 +38,14 @@ $NetBSD$
  static inline
  void delete_MC_Chunk (MC_Chunk* mc)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     VG_(freeEltPA) (MC_(chunk_poolalloc), mc);
  }
  
  // True if mc is in the given block list.
  static Bool in_block_list (const VgHashTable *block_list, MC_Chunk* mc)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_Chunk* found_mc = VG_(HT_lookup) ( block_list, (UWord)mc->data );
     if (found_mc) {
        tl_assert (found_mc->data == mc->data);
@@ -53,7 +53,7 @@ $NetBSD$
  // True if mc is a live block (not yet freed).
  static Bool live_block (MC_Chunk* mc)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if (mc->allockind == MC_AllocCustom) {
        MC_Mempool* mp;
        VG_(HT_ResetIter)(MC_(mempool_list));
@@ -61,7 +61,7 @@ $NetBSD$
  
  ExeContext* MC_(allocated_at) (MC_Chunk* mc)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     switch (MC_(clo_keep_stacktraces)) {
        case KS_none:            return VG_(null_ExeContext) ();
        case KS_alloc:           return mc->where[0];
@@ -69,7 +69,7 @@ $NetBSD$
  
  ExeContext* MC_(freed_at) (MC_Chunk* mc)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     switch (MC_(clo_keep_stacktraces)) {
        case KS_none:            return VG_(null_ExeContext) ();
        case KS_alloc:           return VG_(null_ExeContext) ();
@@ -77,7 +77,7 @@ $NetBSD$
  
  void  MC_(set_allocated_at) (ThreadId tid, MC_Chunk* mc)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     switch (MC_(clo_keep_stacktraces)) {
        case KS_none:            return;
        case KS_alloc:           break;
@@ -85,7 +85,7 @@ $NetBSD$
  
  void  MC_(set_freed_at) (ThreadId tid, MC_Chunk* mc)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Int pos;
     ExeContext* ec_free;
  
@@ -93,7 +93,7 @@ $NetBSD$
  
  UInt MC_(n_where_pointers) (void)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     switch (MC_(clo_keep_stacktraces)) {
        case KS_none:            return 0;
        case KS_alloc:
@@ -101,7 +101,7 @@ $NetBSD$
                         Bool is_zeroed, MC_AllocKind kind,
                         VgHashTable *table)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_Chunk* mc;
  
     // Allocate and zero if necessary
@@ -109,7 +109,7 @@ $NetBSD$
  
  void* MC_(malloc) ( ThreadId tid, SizeT n )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if (MC_(record_fishy_value_error)(tid, "malloc", "size", n)) {
        return NULL;
     } else {
@@ -117,7 +117,7 @@ $NetBSD$
  
  void* MC_(__builtin_new) ( ThreadId tid, SizeT n )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if (MC_(record_fishy_value_error)(tid, "__builtin_new", "size", n)) {
        return NULL;
     } else {
@@ -125,7 +125,7 @@ $NetBSD$
  
  void* MC_(__builtin_vec_new) ( ThreadId tid, SizeT n )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if (MC_(record_fishy_value_error)(tid, "__builtin_vec_new", "size", n)) {
        return NULL;
     } else {
@@ -133,7 +133,7 @@ $NetBSD$
  
  void* MC_(memalign) ( ThreadId tid, SizeT alignB, SizeT n )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if (MC_(record_fishy_value_error)(tid, "memalign", "size", n)) {
        return NULL;
     } else {
@@ -141,7 +141,7 @@ $NetBSD$
  
  void* MC_(calloc) ( ThreadId tid, SizeT nmemb, SizeT size1 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if (MC_(record_fishy_value_error)(tid, "calloc", "nmemb", nmemb) ||
         MC_(record_fishy_value_error)(tid, "calloc", "size", size1)) {
        return NULL;
@@ -149,7 +149,7 @@ $NetBSD$
  static
  void die_and_free_mem ( ThreadId tid, MC_Chunk* mc, SizeT rzB )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     /* Note: we do not free fill the custom allocs produced
        by MEMPOOL or by MALLOC/FREELIKE_BLOCK requests. */
     if (MC_(clo_free_fill) != -1 && MC_AllocCustom != mc->allockind ) {
@@ -157,7 +157,7 @@ $NetBSD$
  static
  void record_freemismatch_error (ThreadId tid, MC_Chunk* mc)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     /* Only show such an error if the user hasn't disabled doing so. */
     if (!MC_(clo_show_mismatched_frees))
        return;
@@ -165,7 +165,7 @@ $NetBSD$
  
  void MC_(handle_free) ( ThreadId tid, Addr p, UInt rzB, MC_AllocKind kind )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_Chunk* mc;
  
     cmalloc_n_frees++;
@@ -173,28 +173,28 @@ $NetBSD$
  
  void MC_(free) ( ThreadId tid, void* p )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_(handle_free)( 
        tid, (Addr)p, MC_(Malloc_Redzone_SzB), MC_AllocMalloc );
  }
  
  void MC_(__builtin_delete) ( ThreadId tid, void* p )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_(handle_free)(
        tid, (Addr)p, MC_(Malloc_Redzone_SzB), MC_AllocNew);
  }
  
  void MC_(__builtin_vec_delete) ( ThreadId tid, void* p )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_(handle_free)(
        tid, (Addr)p, MC_(Malloc_Redzone_SzB), MC_AllocNewVec);
  }
  
  void* MC_(realloc) ( ThreadId tid, void* p_old, SizeT new_szB )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_Chunk* old_mc;
     MC_Chunk* new_mc;
     Addr      a_new; 
@@ -202,7 +202,7 @@ $NetBSD$
  
  SizeT MC_(malloc_usable_size) ( ThreadId tid, void* p )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_Chunk* mc = VG_(HT_lookup) ( MC_(malloc_list), (UWord)p );
  
     // There may be slop, but pretend there isn't because only the asked-for
@@ -210,7 +210,7 @@ $NetBSD$
  void MC_(handle_resizeInPlace)(ThreadId tid, Addr p,
                                 SizeT oldSizeB, SizeT newSizeB, SizeT rzB)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_Chunk* mc = VG_(HT_lookup) ( MC_(malloc_list), (UWord)p );
     if (!mc || mc->szB != oldSizeB || newSizeB == 0) {
        /* Reject if: p is not found, or oldSizeB is wrong,
@@ -218,7 +218,7 @@ $NetBSD$
                                             Addr StartAddr,
                                             Addr EndAddr)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_Chunk *mc;
     ThreadId tid;
  
@@ -226,7 +226,7 @@ $NetBSD$
  void MC_(create_mempool)(Addr pool, UInt rzB, Bool is_zeroed,
                           Bool auto_free, Bool metapool)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_Mempool* mp;
  
     if (VG_(clo_verbosity) > 2 || (auto_free && !metapool)) {
@@ -234,7 +234,7 @@ $NetBSD$
  
  void MC_(destroy_mempool)(Addr pool)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_Chunk*   mc;
     MC_Mempool* mp;
  
@@ -242,7 +242,7 @@ $NetBSD$
  static Int 
  mp_compar(const void* n1, const void* n2)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     const MC_Chunk* mc1 = *(const MC_Chunk *const *)n1;
     const MC_Chunk* mc2 = *(const MC_Chunk *const *)n2;
     if (mc1->data < mc2->data) return -1;
@@ -250,7 +250,7 @@ $NetBSD$
  static void 
  check_mempool_sane(MC_Mempool* mp)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt n_chunks, i, bad = 0;   
     static UInt tick = 0;
  
@@ -258,7 +258,7 @@ $NetBSD$
  
  void MC_(mempool_alloc)(ThreadId tid, Addr pool, Addr addr, SizeT szB)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_Mempool* mp;
  
     if (VG_(clo_verbosity) > 2) {     
@@ -266,7 +266,7 @@ $NetBSD$
  
  void MC_(mempool_free)(Addr pool, Addr addr)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_Mempool*  mp;
     MC_Chunk*    mc;
     ThreadId     tid = VG_(get_running_tid)();
@@ -274,7 +274,7 @@ $NetBSD$
  
  void MC_(mempool_trim)(Addr pool, Addr addr, SizeT szB)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_Mempool*  mp;
     MC_Chunk*    mc;
     ThreadId     tid = VG_(get_running_tid)();
@@ -282,7 +282,7 @@ $NetBSD$
  
  void MC_(move_mempool)(Addr poolA, Addr poolB)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_Mempool* mp;
  
     if (VG_(clo_verbosity) > 2) {
@@ -290,7 +290,7 @@ $NetBSD$
  
  void MC_(mempool_change)(Addr pool, Addr addrA, Addr addrB, SizeT szB)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_Mempool*  mp;
     MC_Chunk*    mc;
     ThreadId     tid = VG_(get_running_tid)();
@@ -298,7 +298,7 @@ $NetBSD$
  
  Bool MC_(mempool_exists)(Addr pool)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_Mempool*  mp;
  
     mp = VG_(HT_lookup)(MC_(mempool_list), (UWord)pool);
@@ -306,7 +306,7 @@ $NetBSD$
  
  static void xtmemory_report_next_block(XT_Allocs* xta, ExeContext** ec_alloc)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_Chunk* mc = VG_(HT_Next)(MC_(malloc_list));
     if (mc) {
        xta->nbytes = mc->szB;
@@ -314,7 +314,7 @@ $NetBSD$
  
  void MC_(xtmemory_report) ( const HChar* filename, Bool fini )
  { 
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     // Make xtmemory_report_next_block ready to be called.
     VG_(HT_ResetIter)(MC_(malloc_list));
  
@@ -322,7 +322,7 @@ $NetBSD$
  
  void MC_(print_malloc_stats) ( void )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_Chunk* mc;
     SizeT     nblocks = 0;
     ULong     nbytes  = 0;
@@ -330,7 +330,7 @@ $NetBSD$
  
  SizeT MC_(get_cmalloc_n_frees) ( void )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return cmalloc_n_frees;
  }
  

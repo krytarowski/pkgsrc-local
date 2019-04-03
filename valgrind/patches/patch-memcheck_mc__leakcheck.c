@@ -6,7 +6,7 @@ $NetBSD$
  // Compare the MC_Chunks by 'data' (i.e. the address of the block).
  static Int compare_MC_Chunks(const void* n1, const void* n2)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     const MC_Chunk* mc1 = *(const MC_Chunk *const *)n1;
     const MC_Chunk* mc2 = *(const MC_Chunk *const *)n2;
     if (mc1->data < mc2->data) return -1;
@@ -14,7 +14,7 @@ $NetBSD$
                           Int        n_chunks )
  
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Int  i;
     Addr a_lo, a_hi;
     PROF_EVENT(MCPE_FIND_CHUNK_FOR_OLD);
@@ -22,7 +22,7 @@ $NetBSD$
                       MC_Chunk** chunks,
                       Int        n_chunks )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Addr a_mid_lo, a_mid_hi;
     Int lo, mid, hi, retVal;
     // VG_(printf)("find chunk for %p = ", ptr);
@@ -30,7 +30,7 @@ $NetBSD$
  static MC_Chunk**
  find_active_chunks(Int* pn_chunks)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     // Our goal is to construct a set of chunks that includes every
     // mempool chunk, and every malloc region that *doesn't* contain a
     // mempool chunk.
@@ -38,7 +38,7 @@ $NetBSD$
  static Bool
  lc_is_a_chunk_ptr(Addr ptr, Int* pch_no, MC_Chunk** pch, LC_Extra** pex)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Int ch_no;
     MC_Chunk* ch;
     LC_Extra* ex;
@@ -46,7 +46,7 @@ $NetBSD$
  // Push a chunk (well, just its index) onto the mark stack.
  static void lc_push(Int ch_no, MC_Chunk* ch)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if (!lc_extras[ch_no].pending) {
        if (0) {
           VG_(printf)("pushing %#lx-%#lx\n", ch->data, ch->data + ch->szB);
@@ -54,7 +54,7 @@ $NetBSD$
  // there isn't one.
  static Bool lc_pop(Int* ret)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if (-1 == lc_markstack_top) {
        return False;
     } else {
@@ -62,7 +62,7 @@ $NetBSD$
  
  static const HChar* pp_heuristic(LeakCheckHeuristic h)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     switch(h) {
     case LchNone:                return "none";
     case LchStdString:           return "stdstring";
@@ -70,7 +70,7 @@ $NetBSD$
  // function.
  static Bool aligned_ptr_above_page0_is_vtable_addr(Addr ptr)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     // ??? If performance problem:
     // ??? maybe implement a cache (array indexed by ptr % primenr)
     // ??? of "I am a vtable ptr" ???
@@ -78,7 +78,7 @@ $NetBSD$
  // true if a is properly aligned and points to 64bits of valid memory
  static Bool is_valid_aligned_ULong ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if (sizeof(Word) == 8)
        return MC_(is_valid_aligned_word)(a);
  
@@ -86,7 +86,7 @@ $NetBSD$
  void leak_search_fault_catcher ( Int sigNo, Addr addr,
                                   const HChar *who, VG_MINIMAL_JMP_BUF(jmpbuf) )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     vki_sigset_t sigmask;
  
     if (0)
@@ -94,7 +94,7 @@ $NetBSD$
  static
  void heuristic_reachedness_fault_catcher ( Int sigNo, Addr addr )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     leak_search_fault_catcher (sigNo, addr, 
                                "heuristic_reachedness_fault_catcher",
                                heuristic_reachedness_jmpbuf);
@@ -103,7 +103,7 @@ $NetBSD$
                                                   UInt heur_set)
  {
 -
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     fault_catcher_t prev_catcher;
  
     prev_catcher = VG_(set_fault_catcher)(heuristic_reachedness_fault_catcher);
@@ -111,7 +111,7 @@ $NetBSD$
  static void
  lc_push_without_clique_if_a_chunk_ptr(Addr ptr, Bool is_prior_definite)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Int ch_no;
     MC_Chunk* ch;
     LC_Extra* ex;
@@ -119,7 +119,7 @@ $NetBSD$
  static void
  lc_push_if_a_chunk_ptr_register(ThreadId tid, const HChar* regname, Addr ptr)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     lc_push_without_clique_if_a_chunk_ptr(ptr, /*is_prior_definite*/True);
  }
  
@@ -127,7 +127,7 @@ $NetBSD$
  static void
  lc_push_with_clique_if_a_chunk_ptr(Addr ptr, Int clique, Int cur_clique)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Int ch_no;
     MC_Chunk* ch;
     LC_Extra* ex;
@@ -135,7 +135,7 @@ $NetBSD$
  lc_push_if_a_chunk_ptr(Addr ptr,
                         Int clique, Int cur_clique, Bool is_prior_definite)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if (-1 == clique) 
        lc_push_without_clique_if_a_chunk_ptr(ptr, is_prior_definite);
     else
@@ -143,7 +143,7 @@ $NetBSD$
  static
  void lc_scan_memory_fault_catcher ( Int sigNo, Addr addr )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     leak_search_fault_catcher (sigNo, addr, 
                                "lc_scan_memory_fault_catcher",
                                lc_scan_memory_jmpbuf);
@@ -151,7 +151,7 @@ $NetBSD$
                 Int clique, Int cur_clique,
                 Addr searched, SizeT szB)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     /* memory scan is based on the assumption that valid pointers are aligned
        on a multiple of sizeof(Addr). So, we can (and must) skip the begin and
        end portions of the block if they are not aligned on sizeof(Addr):
@@ -159,7 +159,7 @@ $NetBSD$
  // Process the mark stack until empty.
  static void lc_process_markstack(Int clique)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Int  top = -1;    // shut gcc up
     Bool is_prior_definite;
  
@@ -167,7 +167,7 @@ $NetBSD$
  
  static Word cmp_LossRecordKey_LossRecord(const void* key, const void* elem)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     const LossRecordKey* a = key;
     const LossRecordKey* b = &(((const LossRecord*)elem)->key);
  
@@ -175,7 +175,7 @@ $NetBSD$
  
  static Int cmp_LossRecords(const void* va, const void* vb)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     const LossRecord* lr_a = *(const LossRecord *const *)va;
     const LossRecord* lr_b = *(const LossRecord *const *)vb;
     SizeT total_szB_a = lr_a->szB + lr_a->indirect_szB;
@@ -183,7 +183,7 @@ $NetBSD$
  // allocates or reallocates lr_array, and set its elements to the loss records
  // contains in lr_table.
  static UInt get_lr_array_from_lr_table(void) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt         i, n_lossrecords;
     LossRecord*  lr;
  
@@ -191,7 +191,7 @@ $NetBSD$
                                 Bool* count_as_error,
                                 Bool* print_record)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     // Rules for printing:
     // - We don't show suppressed loss records ever (and that's controlled
     //   within the error manager).
@@ -199,12 +199,12 @@ $NetBSD$
  
  static void MC_(XT_Leak_init)(void* xtl)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     VG_(memset) (xtl, 0, sizeof(XT_Leak));
  }
  static void MC_(XT_Leak_add) (void* to, const void* xtleak)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     XT_Leak* xto = to;
     const XT_Leak* xtl = xtleak;
  
@@ -212,7 +212,7 @@ $NetBSD$
  }
  static void XT_insert_lr (LossRecord* lr)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     XT_Leak xtl;
     Reachedness i = lr->key.state;
  
@@ -220,12 +220,12 @@ $NetBSD$
  
  static void MC_(XT_Leak_sub) (void* from, const void* xtleak)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(0); // Should not be called.
  }
  static const HChar* MC_(XT_Leak_img) (const void* xtleak)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     static XT_Leak zero;
     static HChar buf[600];
     UInt off = 0;
@@ -233,7 +233,7 @@ $NetBSD$
  
  static void print_results(ThreadId tid, LeakCheckParams* lcp)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Int          i, n_lossrecords, start_lr_output_scan;
     LossRecord*  lr;
     Bool         is_suppressed;
@@ -241,7 +241,7 @@ $NetBSD$
  // Printing stops when *remaining reaches 0.
  static void print_clique (Int clique, UInt level, UInt *remaining)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Int ind;
     UInt i,  n_lossrecords;
  
@@ -249,7 +249,7 @@ $NetBSD$
                               UInt max_blocks,
                               UInt heuristics)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt loss_record_nr;
     UInt         i,  n_lossrecords;
     LossRecord*  lr;
@@ -257,7 +257,7 @@ $NetBSD$
  // pointing inside [searched, searched+szB[.
  static void scan_memory_root_set(Addr searched, SizeT szB)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Int   i;
     Int   n_seg_starts;
     Addr* seg_starts = VG_(get_segment_starts)( SkFileC | SkAnonC | SkShmC,
@@ -265,7 +265,7 @@ $NetBSD$
  
  static MC_Mempool *find_mp_of_chunk (MC_Chunk* mc_search)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_Mempool* mp;
  
     tl_assert( MC_(mempool_list) );
@@ -273,7 +273,7 @@ $NetBSD$
  
  void MC_(detect_memory_leaks) ( ThreadId tid, LeakCheckParams* lcp)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Int i, j;
 -   
 +
@@ -284,7 +284,7 @@ $NetBSD$
  static void
  search_address_in_GP_reg(ThreadId tid, const HChar* regname, Addr addr_in_reg)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if (addr_in_reg >= searched_wpa 
         && addr_in_reg < searched_wpa + searched_szB) {
        if (addr_in_reg == searched_wpa)
@@ -292,7 +292,7 @@ $NetBSD$
  
  void MC_(who_points_at) ( Addr address, SizeT szB)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_Chunk** chunks;
     Int        n_chunks;
     Int        i;

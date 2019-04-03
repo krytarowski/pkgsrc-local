@@ -6,14 +6,14 @@ $NetBSD$
  
  __attribute__((unused))
  static inline Bool host_is_big_endian ( void ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt x = 0x11223344;
     return 0x1122 == *(UShort*)(&x);
  }
  
  __attribute__((unused))
  static inline Bool host_is_little_endian ( void ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt x = 0x11223344;
     return 0x3344 == *(UShort*)(&x);
  }
@@ -21,7 +21,7 @@ $NetBSD$
  
  Int MC_(get_otrack_shadow_offset) ( Int offset, Int szB )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Int cand = get_otrack_shadow_offset_wrk( offset, szB );
     if (cand == -1) 
        return cand;
@@ -29,7 +29,7 @@ $NetBSD$
  
  static Int get_otrack_shadow_offset_wrk ( Int offset, Int szB )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     /* -------------------- ppc64 -------------------- */
  
  #  if defined(VGA_ppc64be) || defined(VGA_ppc64le)
@@ -37,7 +37,7 @@ $NetBSD$
  */
  IRType MC_(get_otrack_reg_array_equiv_int_type) ( IRRegArray* arr )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     /* -------------------- ppc64 -------------------- */
  #  if defined(VGA_ppc64be) || defined(VGA_ppc64le)
     /* The redir stack. */

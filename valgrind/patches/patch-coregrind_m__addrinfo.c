@@ -7,7 +7,7 @@ $NetBSD$
           VG_(core_panic)("mc_pp_AddrInfo");
     }
 +
-+   VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++   VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
  }
  
  void VG_(pp_addrinfo) ( Addr a, const AddrInfo* ai )
@@ -15,9 +15,9 @@ $NetBSD$
  
  void VG_(pp_addrinfo_mc) ( Addr a, const AddrInfo* ai, Bool maybe_gcc )
  {
-+   VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++   VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     pp_addrinfo_WRK (a, ai, True /*mc*/, maybe_gcc);
-+   VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++   VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
  }
  
  

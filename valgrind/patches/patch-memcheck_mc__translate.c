@@ -6,7 +6,7 @@ $NetBSD$
  static void DetailLevelByOp__set_all ( /*OUT*/DetailLevelByOp* dlbo,
                                         DetailLevel dl )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     dlbo->dl_Add32           = dl;
     dlbo->dl_Add64           = dl;
     dlbo->dl_Sub32           = dl;
@@ -14,7 +14,7 @@ $NetBSD$
  
  static void DetailLevelByOp__check_sanity ( const DetailLevelByOp* dlbo )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(dlbo->dl_Add32 >= DLcheap && dlbo->dl_Add32 <= DLexpensive);
     tl_assert(dlbo->dl_Add64 >= DLcheap && dlbo->dl_Add64 <= DLexpensive);
     tl_assert(dlbo->dl_Sub32 >= DLcheap && dlbo->dl_Sub32 <= DLexpensive);
@@ -22,7 +22,7 @@ $NetBSD$
  static UInt DetailLevelByOp__count ( const DetailLevelByOp* dlbo,
                                       DetailLevel dl )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt n = 0;
     n += (dlbo->dl_Add32 == dl            ? 1 : 0);
     n += (dlbo->dl_Add64 == dl            ? 1 : 0);
@@ -30,7 +30,7 @@ $NetBSD$
     from VG_(indexXA)(mce->tmpMap) are invalidated. */
  static IRTemp newTemp ( MCEnv* mce, IRType ty, TempKind kind )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Word       newIx;
     TempMapEnt ent;
     IRTemp     tmp = newIRTemp(mce->sb->tyenv, ty);
@@ -38,7 +38,7 @@ $NetBSD$
     so far exists, allocate one.  */
  static IRTemp findShadowTmpV ( MCEnv* mce, IRTemp orig )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     TempMapEnt* ent;
     /* VG_(indexXA) range-checks 'orig', hence no need to check
        here. */
@@ -46,7 +46,7 @@ $NetBSD$
     regardless. */
  static void newShadowTmpV ( MCEnv* mce, IRTemp orig )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     TempMapEnt* ent;
     /* VG_(indexXA) range-checks 'orig', hence no need to check
        here. */
@@ -54,7 +54,7 @@ $NetBSD$
     like it's from original code? */
  static Bool isOriginalAtom ( MCEnv* mce, IRAtom* a1 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if (a1->tag == Iex_Const)
        return True;
     if (a1->tag == Iex_RdTmp) {
@@ -62,7 +62,7 @@ $NetBSD$
     like it's from shadow code? */
  static Bool isShadowAtom ( MCEnv* mce, IRAtom* a1 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if (a1->tag == Iex_Const)
        return True;
     if (a1->tag == Iex_RdTmp) {
@@ -70,7 +70,7 @@ $NetBSD$
     are identically-kinded. */
  static Bool sameKindedAtoms ( IRAtom* a1, IRAtom* a2 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if (a1->tag == Iex_RdTmp && a2->tag == Iex_RdTmp)
        return True;
     if (a1->tag == Iex_Const && a2->tag == Iex_Const)
@@ -78,7 +78,7 @@ $NetBSD$
  
  static IRType shadowTypeV ( IRType ty )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     switch (ty) {
        case Ity_I1:
        case Ity_I8:
@@ -86,7 +86,7 @@ $NetBSD$
  /* Produce a 'defined' value of the given shadow type.  Should only be
     supplied shadow types (Bit/I8/I16/I32/UI64). */
  static IRExpr* definedOfType ( IRType ty ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     switch (ty) {
        case Ity_I1:   return IRExpr_Const(IRConst_U1(False));
        case Ity_I8:   return IRExpr_Const(IRConst_U8(0));
@@ -94,7 +94,7 @@ $NetBSD$
  
  /* add stmt to a bb */
  static inline void stmt ( HChar cat, MCEnv* mce, IRStmt* st ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if (mce->trace) {
        VG_(printf)("  %c: ", cat);
        ppIRStmt(st);
@@ -102,7 +102,7 @@ $NetBSD$
  /* assign value to tmp */
  static inline 
  void assign ( HChar cat, MCEnv* mce, IRTemp tmp, IRExpr* expr ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     stmt(cat, mce, IRStmt_WrTmp(tmp,expr));
  }
  
@@ -110,7 +110,7 @@ $NetBSD$
     assert that the two types agree. */
  static IRAtom* assignNew ( HChar cat, MCEnv* mce, IRType ty, IRExpr* e )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     TempKind k;
     IRTemp   t;
     IRType   tyE = typeOfIRExpr(mce->sb->tyenv, e);
@@ -118,7 +118,7 @@ $NetBSD$
  
  static IRExpr *i128_const_zero(void)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* z64 = IRExpr_Const(IRConst_U64(0));
     return binop(Iop_64HLto128, z64, z64);
  }
@@ -126,42 +126,42 @@ $NetBSD$
  /* --------- Defined-if-either-defined --------- */
  
  static IRAtom* mkDifD8 ( MCEnv* mce, IRAtom* a1, IRAtom* a2 ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isShadowAtom(mce,a1));
     tl_assert(isShadowAtom(mce,a2));
     return assignNew('V', mce, Ity_I8, binop(Iop_And8, a1, a2));
  }
  
  static IRAtom* mkDifD16 ( MCEnv* mce, IRAtom* a1, IRAtom* a2 ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isShadowAtom(mce,a1));
     tl_assert(isShadowAtom(mce,a2));
     return assignNew('V', mce, Ity_I16, binop(Iop_And16, a1, a2));
  }
  
  static IRAtom* mkDifD32 ( MCEnv* mce, IRAtom* a1, IRAtom* a2 ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isShadowAtom(mce,a1));
     tl_assert(isShadowAtom(mce,a2));
     return assignNew('V', mce, Ity_I32, binop(Iop_And32, a1, a2));
  }
  
  static IRAtom* mkDifD64 ( MCEnv* mce, IRAtom* a1, IRAtom* a2 ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isShadowAtom(mce,a1));
     tl_assert(isShadowAtom(mce,a2));
     return assignNew('V', mce, Ity_I64, binop(Iop_And64, a1, a2));
  }
  
  static IRAtom* mkDifDV128 ( MCEnv* mce, IRAtom* a1, IRAtom* a2 ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isShadowAtom(mce,a1));
     tl_assert(isShadowAtom(mce,a2));
     return assignNew('V', mce, Ity_V128, binop(Iop_AndV128, a1, a2));
  }
  
  static IRAtom* mkDifDV256 ( MCEnv* mce, IRAtom* a1, IRAtom* a2 ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isShadowAtom(mce,a1));
     tl_assert(isShadowAtom(mce,a2));
     return assignNew('V', mce, Ity_V256, binop(Iop_AndV256, a1, a2));
@@ -169,35 +169,35 @@ $NetBSD$
  /* --------- Undefined-if-either-undefined --------- */
  
  static IRAtom* mkUifU8 ( MCEnv* mce, IRAtom* a1, IRAtom* a2 ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isShadowAtom(mce,a1));
     tl_assert(isShadowAtom(mce,a2));
     return assignNew('V', mce, Ity_I8, binop(Iop_Or8, a1, a2));
  }
  
  static IRAtom* mkUifU16 ( MCEnv* mce, IRAtom* a1, IRAtom* a2 ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isShadowAtom(mce,a1));
     tl_assert(isShadowAtom(mce,a2));
     return assignNew('V', mce, Ity_I16, binop(Iop_Or16, a1, a2));
  }
  
  static IRAtom* mkUifU32 ( MCEnv* mce, IRAtom* a1, IRAtom* a2 ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isShadowAtom(mce,a1));
     tl_assert(isShadowAtom(mce,a2));
     return assignNew('V', mce, Ity_I32, binop(Iop_Or32, a1, a2));
  }
  
  static IRAtom* mkUifU64 ( MCEnv* mce, IRAtom* a1, IRAtom* a2 ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isShadowAtom(mce,a1));
     tl_assert(isShadowAtom(mce,a2));
     return assignNew('V', mce, Ity_I64, binop(Iop_Or64, a1, a2));
  }
  
  static IRAtom* mkUifU128 ( MCEnv* mce, IRAtom* a1, IRAtom* a2 ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom *tmp1, *tmp2, *tmp3, *tmp4, *tmp5, *tmp6;
     tl_assert(isShadowAtom(mce,a1));
     tl_assert(isShadowAtom(mce,a2));
@@ -205,21 +205,21 @@ $NetBSD$
  }
  
  static IRAtom* mkUifUV128 ( MCEnv* mce, IRAtom* a1, IRAtom* a2 ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isShadowAtom(mce,a1));
     tl_assert(isShadowAtom(mce,a2));
     return assignNew('V', mce, Ity_V128, binop(Iop_OrV128, a1, a2));
  }
  
  static IRAtom* mkUifUV256 ( MCEnv* mce, IRAtom* a1, IRAtom* a2 ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isShadowAtom(mce,a1));
     tl_assert(isShadowAtom(mce,a2));
     return assignNew('V', mce, Ity_V256, binop(Iop_OrV256, a1, a2));
  }
  
  static IRAtom* mkUifU ( MCEnv* mce, IRType vty, IRAtom* a1, IRAtom* a2 ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     switch (vty) {
        case Ity_I8:   return mkUifU8(mce, a1, a2);
        case Ity_I16:  return mkUifU16(mce, a1, a2);
@@ -227,25 +227,25 @@ $NetBSD$
  /* --------- The Left-family of operations. --------- */
  
  static IRAtom* mkLeft8 ( MCEnv* mce, IRAtom* a1 ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isShadowAtom(mce,a1));
     return assignNew('V', mce, Ity_I8, unop(Iop_Left8, a1));
  }
  
  static IRAtom* mkLeft16 ( MCEnv* mce, IRAtom* a1 ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isShadowAtom(mce,a1));
     return assignNew('V', mce, Ity_I16, unop(Iop_Left16, a1));
  }
  
  static IRAtom* mkLeft32 ( MCEnv* mce, IRAtom* a1 ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isShadowAtom(mce,a1));
     return assignNew('V', mce, Ity_I32, unop(Iop_Left32, a1));
  }
  
  static IRAtom* mkLeft64 ( MCEnv* mce, IRAtom* a1 ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isShadowAtom(mce,a1));
     return assignNew('V', mce, Ity_I64, unop(Iop_Left64, a1));
  }
@@ -253,7 +253,7 @@ $NetBSD$
  */
  static IRAtom* mkImproveAND8 ( MCEnv* mce, IRAtom* data, IRAtom* vbits )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isOriginalAtom(mce, data));
     tl_assert(isShadowAtom(mce, vbits));
     tl_assert(sameKindedAtoms(data, vbits));
@@ -261,7 +261,7 @@ $NetBSD$
  
  static IRAtom* mkImproveAND16 ( MCEnv* mce, IRAtom* data, IRAtom* vbits )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isOriginalAtom(mce, data));
     tl_assert(isShadowAtom(mce, vbits));
     tl_assert(sameKindedAtoms(data, vbits));
@@ -269,7 +269,7 @@ $NetBSD$
  
  static IRAtom* mkImproveAND32 ( MCEnv* mce, IRAtom* data, IRAtom* vbits )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isOriginalAtom(mce, data));
     tl_assert(isShadowAtom(mce, vbits));
     tl_assert(sameKindedAtoms(data, vbits));
@@ -277,7 +277,7 @@ $NetBSD$
  
  static IRAtom* mkImproveAND64 ( MCEnv* mce, IRAtom* data, IRAtom* vbits )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isOriginalAtom(mce, data));
     tl_assert(isShadowAtom(mce, vbits));
     tl_assert(sameKindedAtoms(data, vbits));
@@ -285,7 +285,7 @@ $NetBSD$
  
  static IRAtom* mkImproveANDV128 ( MCEnv* mce, IRAtom* data, IRAtom* vbits )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isOriginalAtom(mce, data));
     tl_assert(isShadowAtom(mce, vbits));
     tl_assert(sameKindedAtoms(data, vbits));
@@ -293,7 +293,7 @@ $NetBSD$
  
  static IRAtom* mkImproveANDV256 ( MCEnv* mce, IRAtom* data, IRAtom* vbits )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isOriginalAtom(mce, data));
     tl_assert(isShadowAtom(mce, vbits));
     tl_assert(sameKindedAtoms(data, vbits));
@@ -301,7 +301,7 @@ $NetBSD$
  */
  static IRAtom* mkImproveOR8 ( MCEnv* mce, IRAtom* data, IRAtom* vbits )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isOriginalAtom(mce, data));
     tl_assert(isShadowAtom(mce, vbits));
     tl_assert(sameKindedAtoms(data, vbits));
@@ -309,7 +309,7 @@ $NetBSD$
  
  static IRAtom* mkImproveOR16 ( MCEnv* mce, IRAtom* data, IRAtom* vbits )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isOriginalAtom(mce, data));
     tl_assert(isShadowAtom(mce, vbits));
     tl_assert(sameKindedAtoms(data, vbits));
@@ -317,7 +317,7 @@ $NetBSD$
  
  static IRAtom* mkImproveOR32 ( MCEnv* mce, IRAtom* data, IRAtom* vbits )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isOriginalAtom(mce, data));
     tl_assert(isShadowAtom(mce, vbits));
     tl_assert(sameKindedAtoms(data, vbits));
@@ -325,7 +325,7 @@ $NetBSD$
  
  static IRAtom* mkImproveOR64 ( MCEnv* mce, IRAtom* data, IRAtom* vbits )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isOriginalAtom(mce, data));
     tl_assert(isShadowAtom(mce, vbits));
     tl_assert(sameKindedAtoms(data, vbits));
@@ -333,7 +333,7 @@ $NetBSD$
  
  static IRAtom* mkImproveORV128 ( MCEnv* mce, IRAtom* data, IRAtom* vbits )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isOriginalAtom(mce, data));
     tl_assert(isShadowAtom(mce, vbits));
     tl_assert(sameKindedAtoms(data, vbits));
@@ -341,7 +341,7 @@ $NetBSD$
  
  static IRAtom* mkImproveORV256 ( MCEnv* mce, IRAtom* data, IRAtom* vbits )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isOriginalAtom(mce, data));
     tl_assert(isShadowAtom(mce, vbits));
     tl_assert(sameKindedAtoms(data, vbits));
@@ -349,7 +349,7 @@ $NetBSD$
  
  static IRAtom* mkPCastTo( MCEnv* mce, IRType dst_ty, IRAtom* vbits ) 
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRType  src_ty;
     IRAtom* tmp1;
  
@@ -357,7 +357,7 @@ $NetBSD$
     the entire argument down to a single bit. */
  static IRAtom* mkPCastXXtoXXlsb ( MCEnv* mce, IRAtom* varg, IRType ty )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if (ty == Ity_V128) {
        /* --- Case for V128 --- */
        IRAtom* varg128 = varg;
@@ -365,7 +365,7 @@ $NetBSD$
  */
  static IRAtom* mkOCastAt( MCEnv* mce, IRType ty, IRAtom* vbits )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IROp opSUB, opSHR, opSAR;
     UInt sh;
  
@@ -373,7 +373,7 @@ $NetBSD$
                                      IRAtom* vxx, IRAtom* vyy, 
                                      IRAtom* xx,  IRAtom* yy )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom *naive, *vec, *improved, *final_cast;
     IROp   opDIFD, opUIFU, opOR, opXOR, opNOT;
  
@@ -381,7 +381,7 @@ $NetBSD$
  */
  static Bool isZeroU32 ( IRAtom* e )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return
        toBool( e->tag == Iex_Const
                && e->Iex.Const.con->tag == Ico_U32
@@ -389,7 +389,7 @@ $NetBSD$
  
  static Bool isZeroU64 ( IRAtom* e )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return
        toBool( e->tag == Iex_Const
                && e->Iex.Const.con->tag == Ico_U64
@@ -397,7 +397,7 @@ $NetBSD$
                            IRAtom* xxhash, IRAtom* yyhash, 
                            IRAtom* xx,     IRAtom* yy )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Bool   m64    = cmp_op == Iop_CmpORD64S || cmp_op == Iop_CmpORD64U;
     Bool   syned  = cmp_op == Iop_CmpORD64S || cmp_op == Iop_CmpORD32S;
     IROp   opOR   = m64 ? Iop_Or64  : Iop_Or32;
@@ -405,7 +405,7 @@ $NetBSD$
     call. */
  
  static void setHelperAnns ( MCEnv* mce, IRDirty* di ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     di->nFxState = 2;
     di->fxState[0].fx        = Ifx_Read;
     di->fxState[0].offset    = mce->layout->offset_SP;
@@ -413,7 +413,7 @@ $NetBSD$
  */
  static void complainIfUndefined ( MCEnv* mce, IRAtom* atom, IRExpr *guard )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom*  vatom;
     IRType   ty;
     Int      sz;
@@ -421,7 +421,7 @@ $NetBSD$
  */
  static Bool isAlwaysDefd ( MCEnv* mce, Int offset, Int size )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Int minoffD, maxoffD, i;
     Int minoff = offset;
     Int maxoff = minoff + size - 1;
@@ -429,7 +429,7 @@ $NetBSD$
  void do_shadow_PUT ( MCEnv* mce,  Int offset, 
                       IRAtom* atom, IRAtom* vatom, IRExpr *guard )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRType ty;
  
     // Don't do shadow PUTs if we're not doing undefined value checking.
@@ -437,7 +437,7 @@ $NetBSD$
  static
  void do_shadow_PUTI ( MCEnv* mce, IRPutI *puti)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* vatom;
     IRType  ty, tyS;
     Int     arrSize;;
@@ -445,7 +445,7 @@ $NetBSD$
  static 
  IRExpr* shadow_GET ( MCEnv* mce, Int offset, IRType ty )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRType tyS = shadowTypeV(ty);
     tl_assert(ty != Ity_I1);
     tl_assert(ty != Ity_I128);
@@ -453,7 +453,7 @@ $NetBSD$
  IRExpr* shadow_GETI ( MCEnv* mce, 
                        IRRegArray* descr, IRAtom* ix, Int bias )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRType ty   = descr->elemTy;
     IRType tyS  = shadowTypeV(ty);
     Int arrSize = descr->nElems * sizeofIRType(ty);
@@ -461,7 +461,7 @@ $NetBSD$
  static
  IRAtom* mkLazy2 ( MCEnv* mce, IRType finalVty, IRAtom* va1, IRAtom* va2 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     IRType t1 = typeOfIRExpr(mce->sb->tyenv, va1);
     IRType t2 = typeOfIRExpr(mce->sb->tyenv, va2);
@@ -469,7 +469,7 @@ $NetBSD$
  IRAtom* mkLazy3 ( MCEnv* mce, IRType finalVty, 
                    IRAtom* va1, IRAtom* va2, IRAtom* va3 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     IRType t1 = typeOfIRExpr(mce->sb->tyenv, va1);
     IRType t2 = typeOfIRExpr(mce->sb->tyenv, va2);
@@ -477,7 +477,7 @@ $NetBSD$
  IRAtom* mkLazy4 ( MCEnv* mce, IRType finalVty, 
                    IRAtom* va1, IRAtom* va2, IRAtom* va3, IRAtom* va4 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     IRType t1 = typeOfIRExpr(mce->sb->tyenv, va1);
     IRType t2 = typeOfIRExpr(mce->sb->tyenv, va2);
@@ -485,7 +485,7 @@ $NetBSD$
  IRAtom* mkLazyN ( MCEnv* mce, 
                    IRAtom** exprvec, IRType finalVtype, IRCallee* cee )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Int     i;
     IRAtom* here;
     IRAtom* curr;
@@ -493,7 +493,7 @@ $NetBSD$
                            IRAtom* qaa, IRAtom* qbb, 
                            IRAtom* aa,  IRAtom* bb )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom *a_min, *b_min, *a_max, *b_max;
     IROp   opAND, opOR, opXOR, opNOT, opADD, opSUB;
  
@@ -501,7 +501,7 @@ $NetBSD$
  IRAtom* expensiveCountTrailingZeroes ( MCEnv* mce, IROp czop,
                                         IRAtom* atom, IRAtom* vatom )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRType ty;
     IROp xorOp, subOp, andOp;
     IRExpr *one;
@@ -509,7 +509,7 @@ $NetBSD$
                               IRAtom* qaa, IRAtom* qbb, 
                               IRAtom* aa,  IRAtom* bb )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isShadowAtom(mce,qaa));
     tl_assert(isShadowAtom(mce,qbb));
     tl_assert(isOriginalAtom(mce,aa));
@@ -517,85 +517,85 @@ $NetBSD$
  
  static IRAtom* mkPCast8x16 ( MCEnv* mce, IRAtom* at )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return assignNew('V', mce, Ity_V128, unop(Iop_CmpNEZ8x16, at));
  }
  
  static IRAtom* mkPCast16x8 ( MCEnv* mce, IRAtom* at )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return assignNew('V', mce, Ity_V128, unop(Iop_CmpNEZ16x8, at));
  }
  
  static IRAtom* mkPCast32x4 ( MCEnv* mce, IRAtom* at )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return assignNew('V', mce, Ity_V128, unop(Iop_CmpNEZ32x4, at));
  }
  
  static IRAtom* mkPCast64x2 ( MCEnv* mce, IRAtom* at )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return assignNew('V', mce, Ity_V128, unop(Iop_CmpNEZ64x2, at));
  }
  
  static IRAtom* mkPCast128x1 ( MCEnv* mce, IRAtom* at )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return assignNew('V', mce, Ity_V128, unop(Iop_CmpNEZ128x1, at));
  }
  
  static IRAtom* mkPCast64x4 ( MCEnv* mce, IRAtom* at )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return assignNew('V', mce, Ity_V256, unop(Iop_CmpNEZ64x4, at));
  }
  
  static IRAtom* mkPCast32x8 ( MCEnv* mce, IRAtom* at )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return assignNew('V', mce, Ity_V256, unop(Iop_CmpNEZ32x8, at));
  }
  
  static IRAtom* mkPCast32x2 ( MCEnv* mce, IRAtom* at )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return assignNew('V', mce, Ity_I64, unop(Iop_CmpNEZ32x2, at));
  }
  
  static IRAtom* mkPCast16x16 ( MCEnv* mce, IRAtom* at )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return assignNew('V', mce, Ity_V256, unop(Iop_CmpNEZ16x16, at));
  }
  
  static IRAtom* mkPCast16x4 ( MCEnv* mce, IRAtom* at )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return assignNew('V', mce, Ity_I64, unop(Iop_CmpNEZ16x4, at));
  }
  
  static IRAtom* mkPCast8x32 ( MCEnv* mce, IRAtom* at )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return assignNew('V', mce, Ity_V256, unop(Iop_CmpNEZ8x32, at));
  }
  
  static IRAtom* mkPCast8x8 ( MCEnv* mce, IRAtom* at )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return assignNew('V', mce, Ity_I64, unop(Iop_CmpNEZ8x8, at));
  }
  
  static IRAtom* mkPCast16x2 ( MCEnv* mce, IRAtom* at )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return assignNew('V', mce, Ity_I32, unop(Iop_CmpNEZ16x2, at));
  }
  
  static IRAtom* mkPCast8x4 ( MCEnv* mce, IRAtom* at )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return assignNew('V', mce, Ity_I32, unop(Iop_CmpNEZ8x4, at));
  }
  
@@ -603,7 +603,7 @@ $NetBSD$
  static
  IRAtom* binary32Fx4 ( MCEnv* mce, IRAtom* vatomX, IRAtom* vatomY )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     tl_assert(isShadowAtom(mce, vatomX));
     tl_assert(isShadowAtom(mce, vatomY));
@@ -611,7 +611,7 @@ $NetBSD$
  static
  IRAtom* unary32Fx4 ( MCEnv* mce, IRAtom* vatomX )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     tl_assert(isShadowAtom(mce, vatomX));
     at = assignNew('V', mce, Ity_V128, mkPCast32x4(mce, vatomX));
@@ -619,7 +619,7 @@ $NetBSD$
  static
  IRAtom* binary32F0x4 ( MCEnv* mce, IRAtom* vatomX, IRAtom* vatomY )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     tl_assert(isShadowAtom(mce, vatomX));
     tl_assert(isShadowAtom(mce, vatomY));
@@ -627,7 +627,7 @@ $NetBSD$
  static
  IRAtom* unary32F0x4 ( MCEnv* mce, IRAtom* vatomX )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     tl_assert(isShadowAtom(mce, vatomX));
     at = assignNew('V', mce, Ity_I32, unop(Iop_V128to32, vatomX));
@@ -635,7 +635,7 @@ $NetBSD$
  static
  IRAtom* binary64Fx2 ( MCEnv* mce, IRAtom* vatomX, IRAtom* vatomY )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     tl_assert(isShadowAtom(mce, vatomX));
     tl_assert(isShadowAtom(mce, vatomY));
@@ -643,7 +643,7 @@ $NetBSD$
  static
  IRAtom* unary64Fx2 ( MCEnv* mce, IRAtom* vatomX )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     tl_assert(isShadowAtom(mce, vatomX));
     at = assignNew('V', mce, Ity_V128, mkPCast64x2(mce, vatomX));
@@ -651,7 +651,7 @@ $NetBSD$
  static
  IRAtom* binary64F0x2 ( MCEnv* mce, IRAtom* vatomX, IRAtom* vatomY )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     tl_assert(isShadowAtom(mce, vatomX));
     tl_assert(isShadowAtom(mce, vatomY));
@@ -659,7 +659,7 @@ $NetBSD$
  static
  IRAtom* unary64F0x2 ( MCEnv* mce, IRAtom* vatomX )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     tl_assert(isShadowAtom(mce, vatomX));
     at = assignNew('V', mce, Ity_I64, unop(Iop_V128to64, vatomX));
@@ -667,7 +667,7 @@ $NetBSD$
  static
  IRAtom* binary32Fx2 ( MCEnv* mce, IRAtom* vatomX, IRAtom* vatomY )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     tl_assert(isShadowAtom(mce, vatomX));
     tl_assert(isShadowAtom(mce, vatomY));
@@ -675,7 +675,7 @@ $NetBSD$
  static
  IRAtom* unary32Fx2 ( MCEnv* mce, IRAtom* vatomX )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     tl_assert(isShadowAtom(mce, vatomX));
     at = assignNew('V', mce, Ity_I64, mkPCast32x2(mce, vatomX));
@@ -683,7 +683,7 @@ $NetBSD$
  static
  IRAtom* binary64Fx4 ( MCEnv* mce, IRAtom* vatomX, IRAtom* vatomY )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     tl_assert(isShadowAtom(mce, vatomX));
     tl_assert(isShadowAtom(mce, vatomY));
@@ -691,7 +691,7 @@ $NetBSD$
  static
  IRAtom* unary64Fx4 ( MCEnv* mce, IRAtom* vatomX )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     tl_assert(isShadowAtom(mce, vatomX));
     at = assignNew('V', mce, Ity_V256, mkPCast64x4(mce, vatomX));
@@ -699,7 +699,7 @@ $NetBSD$
  static
  IRAtom* binary32Fx8 ( MCEnv* mce, IRAtom* vatomX, IRAtom* vatomY )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     tl_assert(isShadowAtom(mce, vatomX));
     tl_assert(isShadowAtom(mce, vatomY));
@@ -707,7 +707,7 @@ $NetBSD$
  static
  IRAtom* unary32Fx8 ( MCEnv* mce, IRAtom* vatomX )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     tl_assert(isShadowAtom(mce, vatomX));
     at = assignNew('V', mce, Ity_V256, mkPCast32x8(mce, vatomX));
@@ -715,7 +715,7 @@ $NetBSD$
  IRAtom* binary64Fx2_w_rm ( MCEnv* mce, IRAtom* vRM,
                                         IRAtom* vatomX, IRAtom* vatomY )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     /* This is the same as binary64Fx2, except that we subsequently
        pessimise vRM (definedness of the rounding mode), widen to 128
        bits and UifU it into the result.  As with the scalar cases, if
@@ -723,7 +723,7 @@ $NetBSD$
  IRAtom* binary32Fx4_w_rm ( MCEnv* mce, IRAtom* vRM,
                                         IRAtom* vatomX, IRAtom* vatomY )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* t1 = binary32Fx4(mce, vatomX, vatomY);
     // PCast the RM, and widen it to 128 bits
     IRAtom* t2 = mkPCastTo(mce, Ity_V128, vRM);
@@ -731,7 +731,7 @@ $NetBSD$
  IRAtom* binary64Fx4_w_rm ( MCEnv* mce, IRAtom* vRM,
                                         IRAtom* vatomX, IRAtom* vatomY )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* t1 = binary64Fx4(mce, vatomX, vatomY);
     // PCast the RM, and widen it to 256 bits
     IRAtom* t2 = mkPCastTo(mce, Ity_V256, vRM);
@@ -739,7 +739,7 @@ $NetBSD$
  IRAtom* binary32Fx8_w_rm ( MCEnv* mce, IRAtom* vRM,
                                         IRAtom* vatomX, IRAtom* vatomY )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* t1 = binary32Fx8(mce, vatomX, vatomY);
     // PCast the RM, and widen it to 256 bits
     IRAtom* t2 = mkPCastTo(mce, Ity_V256, vRM);
@@ -747,7 +747,7 @@ $NetBSD$
  static
  IRAtom* unary64Fx2_w_rm ( MCEnv* mce, IRAtom* vRM, IRAtom* vatomX )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     /* Same scheme as binary64Fx2_w_rm. */
     // "do" the vector arg
     IRAtom* t1 = unary64Fx2(mce, vatomX);
@@ -755,7 +755,7 @@ $NetBSD$
  static
  IRAtom* unary32Fx4_w_rm ( MCEnv* mce, IRAtom* vRM, IRAtom* vatomX )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     /* Same scheme as unary32Fx4_w_rm. */
     IRAtom* t1 = unary32Fx4(mce, vatomX);
     // PCast the RM, and widen it to 128 bits
@@ -763,7 +763,7 @@ $NetBSD$
  static
  IROp vanillaNarrowingOpOfShape ( IROp qnarrowOp )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     switch (qnarrowOp) {
        /* Binary: (128, 128) -> 128 */
        case Iop_QNarrowBin16Sto8Ux16:
@@ -771,7 +771,7 @@ $NetBSD$
  IRAtom* vectorNarrowBinV128 ( MCEnv* mce, IROp narrow_op, 
                                IRAtom* vatom1, IRAtom* vatom2)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom *at1, *at2, *at3;
     IRAtom* (*pcast)( MCEnv*, IRAtom* );
     switch (narrow_op) {
@@ -779,7 +779,7 @@ $NetBSD$
  IRAtom* vectorNarrowBin64 ( MCEnv* mce, IROp narrow_op, 
                              IRAtom* vatom1, IRAtom* vatom2)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom *at1, *at2, *at3;
     IRAtom* (*pcast)( MCEnv*, IRAtom* );
     switch (narrow_op) {
@@ -787,7 +787,7 @@ $NetBSD$
  IRAtom* vectorNarrowUnV128 ( MCEnv* mce, IROp narrow_op,
                               IRAtom* vatom1)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom *at1, *at2;
     IRAtom* (*pcast)( MCEnv*, IRAtom* );
     tl_assert(isShadowAtom(mce,vatom1));
@@ -795,7 +795,7 @@ $NetBSD$
  IRAtom* vectorWidenI64 ( MCEnv* mce, IROp longen_op,
                           IRAtom* vatom1)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom *at1, *at2;
     IRAtom* (*pcast)( MCEnv*, IRAtom* );
     switch (longen_op) {
@@ -803,7 +803,7 @@ $NetBSD$
  static
  IRAtom* binary8Ix32 ( MCEnv* mce, IRAtom* vatom1, IRAtom* vatom2 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     at = mkUifUV256(mce, vatom1, vatom2);
     at = mkPCast8x32(mce, at);
@@ -811,7 +811,7 @@ $NetBSD$
  static
  IRAtom* binary16Ix16 ( MCEnv* mce, IRAtom* vatom1, IRAtom* vatom2 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     at = mkUifUV256(mce, vatom1, vatom2);
     at = mkPCast16x16(mce, at);
@@ -819,7 +819,7 @@ $NetBSD$
  static
  IRAtom* binary32Ix8 ( MCEnv* mce, IRAtom* vatom1, IRAtom* vatom2 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     at = mkUifUV256(mce, vatom1, vatom2);
     at = mkPCast32x8(mce, at);
@@ -827,7 +827,7 @@ $NetBSD$
  static
  IRAtom* binary64Ix4 ( MCEnv* mce, IRAtom* vatom1, IRAtom* vatom2 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     at = mkUifUV256(mce, vatom1, vatom2);
     at = mkPCast64x4(mce, at);
@@ -835,7 +835,7 @@ $NetBSD$
  static
  IRAtom* binary8Ix16 ( MCEnv* mce, IRAtom* vatom1, IRAtom* vatom2 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     at = mkUifUV128(mce, vatom1, vatom2);
     at = mkPCast8x16(mce, at);
@@ -843,7 +843,7 @@ $NetBSD$
  static
  IRAtom* binary16Ix8 ( MCEnv* mce, IRAtom* vatom1, IRAtom* vatom2 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     at = mkUifUV128(mce, vatom1, vatom2);
     at = mkPCast16x8(mce, at);
@@ -851,7 +851,7 @@ $NetBSD$
  static
  IRAtom* binary32Ix4 ( MCEnv* mce, IRAtom* vatom1, IRAtom* vatom2 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     at = mkUifUV128(mce, vatom1, vatom2);
     at = mkPCast32x4(mce, at);
@@ -859,7 +859,7 @@ $NetBSD$
  static
  IRAtom* binary64Ix2 ( MCEnv* mce, IRAtom* vatom1, IRAtom* vatom2 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     at = mkUifUV128(mce, vatom1, vatom2);
     at = mkPCast64x2(mce, at);
@@ -867,7 +867,7 @@ $NetBSD$
  static
  IRAtom* binary128Ix1 ( MCEnv* mce, IRAtom* vatom1, IRAtom* vatom2 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     at = mkUifUV128(mce, vatom1, vatom2);
     at = mkPCast128x1(mce, at);
@@ -875,7 +875,7 @@ $NetBSD$
  static
  IRAtom* binary8Ix8 ( MCEnv* mce, IRAtom* vatom1, IRAtom* vatom2 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     at = mkUifU64(mce, vatom1, vatom2);
     at = mkPCast8x8(mce, at);
@@ -883,7 +883,7 @@ $NetBSD$
  static
  IRAtom* binary16Ix4 ( MCEnv* mce, IRAtom* vatom1, IRAtom* vatom2 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     at = mkUifU64(mce, vatom1, vatom2);
     at = mkPCast16x4(mce, at);
@@ -891,7 +891,7 @@ $NetBSD$
  static
  IRAtom* binary32Ix2 ( MCEnv* mce, IRAtom* vatom1, IRAtom* vatom2 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     at = mkUifU64(mce, vatom1, vatom2);
     at = mkPCast32x2(mce, at);
@@ -899,7 +899,7 @@ $NetBSD$
  static
  IRAtom* binary64Ix1 ( MCEnv* mce, IRAtom* vatom1, IRAtom* vatom2 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     at = mkUifU64(mce, vatom1, vatom2);
     at = mkPCastTo(mce, Ity_I64, at);
@@ -907,7 +907,7 @@ $NetBSD$
  static
  IRAtom* binary8Ix4 ( MCEnv* mce, IRAtom* vatom1, IRAtom* vatom2 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     at = mkUifU32(mce, vatom1, vatom2);
     at = mkPCast8x4(mce, at);
@@ -915,7 +915,7 @@ $NetBSD$
  static
  IRAtom* binary16Ix2 ( MCEnv* mce, IRAtom* vatom1, IRAtom* vatom2 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* at;
     at = mkUifU32(mce, vatom1, vatom2);
     at = mkPCast16x2(mce, at);
@@ -923,7 +923,7 @@ $NetBSD$
                           IRAtom* atom1, IRAtom* atom2, 
                           IRAtom* atom3, IRAtom* atom4 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* vatom1 = expr2vbits( mce, atom1, HuOth );
     IRAtom* vatom2 = expr2vbits( mce, atom2, HuOth );
     IRAtom* vatom3 = expr2vbits( mce, atom3, HuOth );
@@ -931,7 +931,7 @@ $NetBSD$
                             IROp op,
                             IRAtom* atom1, IRAtom* atom2, IRAtom* atom3 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom* vatom1 = expr2vbits( mce, atom1, HuOth );
     IRAtom* vatom2 = expr2vbits( mce, atom2, HuOth );
     IRAtom* vatom3 = expr2vbits( mce, atom3, HuOth );
@@ -939,7 +939,7 @@ $NetBSD$
                             IRAtom* atom1, IRAtom* atom2,
                             HowUsed hu/*use HuOth if unknown*/ )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRType  and_or_ty;
     IRAtom* (*uifu)    (MCEnv*, IRAtom*, IRAtom*);
     IRAtom* (*difd)    (MCEnv*, IRAtom*, IRAtom*);
@@ -947,7 +947,7 @@ $NetBSD$
  static 
  IRExpr* expr2vbits_Unop ( MCEnv* mce, IROp op, IRAtom* atom )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     /* For the widening operations {8,16,32}{U,S}to{16,32,64}, the
        selection of shadow operation implicitly duplicates the logic in
        do_shadow_LoadG and should be kept in sync (in the very unlikely
@@ -955,7 +955,7 @@ $NetBSD$
                                IREndness end, IRType ty,
                                IRAtom* addr, UInt bias, IRAtom* guard )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isOriginalAtom(mce,addr));
     tl_assert(end == Iend_LE || end == Iend_BE);
  
@@ -963,7 +963,7 @@ $NetBSD$
                            IRAtom* addr, UInt bias,
                            IRAtom* guard )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(end == Iend_LE || end == Iend_BE);
     switch (shadowTypeV(ty)) {
        case Ity_I8:
@@ -971,7 +971,7 @@ $NetBSD$
                                            IRAtom* guard,
                                            IROp vwiden, IRAtom* valt )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     /* Sanity check the conversion operation, and also set TYWIDE. */
     IRType tyWide = Ity_INVALID;
     switch (vwiden) {
@@ -979,7 +979,7 @@ $NetBSD$
                                           IRAtom* addr, UInt bias,
                                           IRAtom *guard )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return expr2vbits_Load_guarded_General(
               mce, end, ty, addr, bias, guard, Iop_INVALID, definedOfType(ty)
            );
@@ -987,7 +987,7 @@ $NetBSD$
  IRAtom* expr2vbits_ITE ( MCEnv* mce, 
                           IRAtom* cond, IRAtom* iftrue, IRAtom* iffalse )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom *vbitsC, *vbits0, *vbits1;
     IRType ty;
     /* Given ITE(cond, iftrue,  iffalse),  generate
@@ -995,7 +995,7 @@ $NetBSD$
  IRExpr* expr2vbits ( MCEnv* mce, IRExpr* e,
                       HowUsed hu/*use HuOth if unknown*/ )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     switch (e->tag) {
  
        case Iex_Get:
@@ -1003,7 +1003,7 @@ $NetBSD$
  static
  IRExpr* zwidenToHostWord ( MCEnv* mce, IRAtom* vatom )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRType ty, tyH;
  
     /* vatom is vbits-value and as such can only have a shadow type. */
@@ -1011,7 +1011,7 @@ $NetBSD$
                         IRAtom* data, IRAtom* vdata,
                         IRAtom* guard )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IROp     mkAdd;
     IRType   ty, tyAddr;
     void*    helper = NULL;
@@ -1019,7 +1019,7 @@ $NetBSD$
  
  static IRType szToITy ( Int n )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     switch (n) {
        case 1: return Ity_I8;
        case 2: return Ity_I16;
@@ -1027,7 +1027,7 @@ $NetBSD$
  static
  void do_shadow_Dirty ( MCEnv* mce, IRDirty* d )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Int       i, k, n, toDo, gSz, gOff;
     IRAtom    *src, *here, *curr;
     IRType    tySrc, tyDst;
@@ -1035,7 +1035,7 @@ $NetBSD$
  static
  void do_AbiHint ( MCEnv* mce, IRExpr* base, Int len, IRExpr* nia )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRDirty* di;
  
     if (MC_(clo_mc_level) == 3) {
@@ -1043,7 +1043,7 @@ $NetBSD$
                                        MCEnv* mce,
                                        IRAtom* orig, IRAtom* shadow )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(isOriginalAtom(mce, orig));
     tl_assert(isShadowAtom(mce, shadow));
     switch (orig->tag) {
@@ -1051,7 +1051,7 @@ $NetBSD$
  static
  void do_shadow_CAS ( MCEnv* mce, IRCAS* cas )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     /* Scheme is (both single- and double- cases):
  
        1. fetch data#,dataB (the proposed new value)
@@ -1059,7 +1059,7 @@ $NetBSD$
  
  static void do_shadow_CAS_single ( MCEnv* mce, IRCAS* cas )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom *vdataLo = NULL, *bdataLo = NULL;
     IRAtom *vexpdLo = NULL, *bexpdLo = NULL;
     IRAtom *voldLo  = NULL, *boldLo  = NULL;
@@ -1067,7 +1067,7 @@ $NetBSD$
  
  static void do_shadow_CAS_double ( MCEnv* mce, IRCAS* cas )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRAtom *vdataHi = NULL, *bdataHi = NULL;
     IRAtom *vdataLo = NULL, *bdataLo = NULL;
     IRAtom *vexpdHi = NULL, *bexpdHi = NULL;
@@ -1075,7 +1075,7 @@ $NetBSD$
                               IRExpr*   stAddr,
                               IRExpr*   stStoredata )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     /* In short: treat a load-linked like a normal load followed by an
        assignment of the loaded (shadow) data to the result temporary.
        Treat a store-conditional like a normal store, and mark the
@@ -1083,7 +1083,7 @@ $NetBSD$
  
  static void do_shadow_StoreG ( MCEnv* mce, IRStoreG* sg )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     complainIfUndefined(mce, sg->guard, NULL);
     /* do_shadow_Store will generate code to check the definedness and
        validity of sg->addr, in the case where sg->guard evaluates to
@@ -1091,7 +1091,7 @@ $NetBSD$
  
  static void do_shadow_LoadG ( MCEnv* mce, IRLoadG* lg )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     complainIfUndefined(mce, lg->guard, NULL);
     /* expr2vbits_Load_guarded_General will generate code to check the
        definedness and validity of lg->addr, in the case where
@@ -1099,7 +1099,7 @@ $NetBSD$
  /* Almost identical to findShadowTmpV. */
  static IRTemp findShadowTmpB ( MCEnv* mce, IRTemp orig )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     TempMapEnt* ent;
     /* VG_(indexXA) range-checks 'orig', hence no need to check
        here. */
@@ -1107,7 +1107,7 @@ $NetBSD$
  
  static IRAtom* gen_maxU32 ( MCEnv* mce, IRAtom* b1, IRAtom* b2 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return assignNew( 'B', mce, Ity_I32, binop(Iop_Max32U, b1, b2) );
  }
  
@@ -1115,7 +1115,7 @@ $NetBSD$
                                      IRAtom* baseaddr, 
                                      Int offset, IRExpr* guard )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     void*    hFun;
     const HChar* hName;
     IRTemp   bTmp;
@@ -1123,7 +1123,7 @@ $NetBSD$
  static IRAtom* gen_load_b ( MCEnv* mce, Int szB, IRAtom* baseaddr,
                              Int offset )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return gen_guarded_load_b(mce, szB, baseaddr, offset, NULL/*guard*/);
  }
  
@@ -1131,7 +1131,7 @@ $NetBSD$
                                          IRAtom* addr, UInt bias,
                                          IRAtom* guard, IRAtom* balt )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     /* If the guard evaluates to True, this will hold the loaded
        origin.  If the guard evaluates to False, this will be zero,
        meaning "unknown origin", in which case we will have to replace
@@ -1139,7 +1139,7 @@ $NetBSD$
                            IRAtom* baseaddr, Int offset, IRAtom* dataB,
                            IRAtom* guard )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     void*    hFun;
     const HChar* hName;
     IRDirty* di;
@@ -1147,7 +1147,7 @@ $NetBSD$
  }
  
  static IRAtom* narrowTo32 ( MCEnv* mce, IRAtom* e ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRType eTy = typeOfIRExpr(mce->sb->tyenv, e);
     if (eTy == Ity_I64)
        return assignNew( 'B', mce, Ity_I32, unop(Iop_64to32, e) );
@@ -1155,7 +1155,7 @@ $NetBSD$
  }
  
  static IRAtom* zWidenFrom32 ( MCEnv* mce, IRType dstTy, IRAtom* e ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRType eTy = typeOfIRExpr(mce->sb->tyenv, e);
     tl_assert(eTy == Ity_I32);
     if (dstTy == Ity_I64)
@@ -1163,7 +1163,7 @@ $NetBSD$
  
  static IRAtom* schemeE ( MCEnv* mce, IRExpr* e )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(MC_(clo_mc_level) == 3);
  
     switch (e->tag) {
@@ -1171,7 +1171,7 @@ $NetBSD$
  
  static void do_origins_Dirty ( MCEnv* mce, IRDirty* d )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     // This is a hacked version of do_shadow_Dirty
     Int       i, k, n, toDo, gSz, gOff;
     IRAtom    *here, *curr;
@@ -1179,7 +1179,7 @@ $NetBSD$
                                         IRExpr* stData,
                                         IRExpr* guard )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Int     dszB;
     IRAtom* dataB;
     /* assert that the B value for the address is already available
@@ -1187,7 +1187,7 @@ $NetBSD$
                                       IRExpr* stAddr,
                                       IRExpr* stData )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     do_origins_Store_guarded ( mce, stEnd, stAddr, stData,
                                NULL/*guard*/ );
  }
@@ -1195,14 +1195,14 @@ $NetBSD$
  
  static void do_origins_StoreG ( MCEnv* mce, IRStoreG* sg )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     do_origins_Store_guarded( mce, sg->end, sg->addr,
                               sg->data, sg->guard );
  }
  
  static void do_origins_LoadG ( MCEnv* mce, IRLoadG* lg )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     IRType loadedTy = Ity_INVALID;
     switch (lg->cvt) {
        case ILGop_IdentV128: loadedTy = Ity_V128; break;
@@ -1210,7 +1210,7 @@ $NetBSD$
  
  static void schemeS ( MCEnv* mce, IRStmt* st )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(MC_(clo_mc_level) == 3);
  
     switch (st->tag) {
@@ -1218,7 +1218,7 @@ $NetBSD$
  
  static Bool sameIRValue ( IRExpr* e1, IRExpr* e2 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if (e1->tag != e2->tag)
        return False;
     switch (e1->tag) {
@@ -1226,7 +1226,7 @@ $NetBSD$
  static 
  Bool check_or_add ( Pairs* tidyingEnv, IRExpr* guard, void* entry )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt i, n = tidyingEnv->pairsUsed;
     tl_assert(n <= N_TIDYING_PAIRS);
     for (i = 0; i < n; i++) {
@@ -1234,7 +1234,7 @@ $NetBSD$
  
  static Bool is_helperc_value_checkN_fail ( const HChar* name )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     /* This is expensive because it happens a lot.  We are checking to
        see whether |name| is one of the following 8 strings:
  
@@ -1242,7 +1242,7 @@ $NetBSD$
  
  IRSB* MC_(final_tidy) ( IRSB* sb_in )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Int       i;
     IRStmt*   st;
     IRDirty*  di;
@@ -1250,7 +1250,7 @@ $NetBSD$
  
  void MC_(do_instrumentation_startup_checks)( void )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     /* Make a best-effort check to see that is_helperc_value_checkN_fail
        is working as we expect. */
  
@@ -1258,7 +1258,7 @@ $NetBSD$
  
  static Bool isBogusAtom ( IRAtom* at )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if (at->tag == Iex_RdTmp)
        return False;
     tl_assert(at->tag == Iex_Const);
@@ -1266,7 +1266,7 @@ $NetBSD$
     isBogusAtom()? */
  static inline Bool containsBogusLiterals ( /*FLAT*/ IRStmt* st )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Int      i;
     IRExpr*  e;
     IRDirty* d;
@@ -1274,7 +1274,7 @@ $NetBSD$
                                     UInt tyenvUsed,
                                     HowUsed newUse, IRAtom* at )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     /* For the atom |at|, declare that for any tmp |t| in |at|, we will have
        seen a use of |newUse|.  So, merge that info into |t|'s accumulated
        use info. */
@@ -1282,7 +1282,7 @@ $NetBSD$
                                           /*OUT*/Bool* hasBogusLiteralsP,
                                           const IRSB* sb_in )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     const UInt nOrigTmps = (UInt)sb_in->tyenv->types_used;
  
     // We've seen no bogus literals so far.
@@ -1290,7 +1290,7 @@ $NetBSD$
                          const VexArchInfo* archinfo_host,
                          IRType gWordTy, IRType hWordTy )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Bool    verboze = 0||False;
     Int     i, j, first_stmt;
     IRStmt* st;

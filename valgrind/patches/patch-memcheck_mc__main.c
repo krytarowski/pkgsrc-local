@@ -21,7 +21,7 @@ $NetBSD$
 +
 +   recursive++;
 +
-+   VG_(debugLog)(2, "KR", "%s() %s:%d addr=%lx\n", __func__, __FILE__, __LINE__, __builtin_return_address(0));
++   VG_(debugLog)(3, "KR", "%s() %s:%d addr=%lx\n", __func__, __FILE__, __LINE__, __builtin_return_address(0));
 +
 +   recursive--;
 +}
@@ -32,11 +32,11 @@ $NetBSD$
  #define INLINE    inline __attribute__((always_inline))
  
  static INLINE Addr start_of_this_sm ( Addr a ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return (a & (~SM_MASK));
  }
  static INLINE Bool is_start_of_sm ( Addr a ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return (start_of_this_sm(a) == a);
  }
  
@@ -44,7 +44,7 @@ $NetBSD$
  */
  static SecMap* copy_for_writing ( SecMap* dist_sm )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     SecMap* new_sm;
     tl_assert(dist_sm == &sm_distinguished[0]
            || dist_sm == &sm_distinguished[1]
@@ -52,7 +52,7 @@ $NetBSD$
  
  static void update_SM_counts(SecMap* oldSM, SecMap* newSM)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if      (oldSM == &sm_distinguished[SM_DIST_NOACCESS ]) n_noaccess_SMs --;
     else if (oldSM == &sm_distinguished[SM_DIST_UNDEFINED]) n_undefined_SMs--;
     else if (oldSM == &sm_distinguished[SM_DIST_DEFINED  ]) n_defined_SMs  --;
@@ -60,7 +60,7 @@ $NetBSD$
  
  static void init_auxmap_L1_L2 ( void )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Int i;
     for (i = 0; i < N_AUXMAP_L1; i++) {
        auxmap_L1[i].base = 0;
@@ -68,7 +68,7 @@ $NetBSD$
  
  static const HChar* check_auxmap_L1_L2_sanity ( Word* n_secmaps_found )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Word i, j;
     /* On a 32-bit platform, the L2 and L1 tables should
        both remain empty forever.
@@ -76,7 +76,7 @@ $NetBSD$
  
  static void insert_into_auxmap_L1_at ( Word rank, AuxMapEnt* ent )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Word i;
     tl_assert(ent);
     tl_assert(rank >= 0 && rank < N_AUXMAP_L1);
@@ -84,7 +84,7 @@ $NetBSD$
  
  static INLINE AuxMapEnt* maybe_find_in_auxmap ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     AuxMapEnt  key;
     AuxMapEnt* res;
     Word       i;
@@ -92,7 +92,7 @@ $NetBSD$
  
  static AuxMapEnt* find_or_alloc_in_auxmap ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     AuxMapEnt *nyu, *res;
  
     /* First see if we already have it. */
@@ -100,14 +100,14 @@ $NetBSD$
  
  static INLINE UWord get_primary_map_low_offset ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
    UWord pm_off = a >> 16;
    return pm_off;
  }
  
  static INLINE SecMap** get_secmap_low_ptr ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UWord pm_off = a >> 16;
  #  if VG_DEBUG_MEMORY >= 1
     tl_assert(pm_off < N_PRIMARY_MAP);
@@ -115,14 +115,14 @@ $NetBSD$
  
  static INLINE SecMap** get_secmap_high_ptr ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     AuxMapEnt* am = find_or_alloc_in_auxmap(a);
     return &am->sm;
  }
  
  static INLINE SecMap** get_secmap_ptr ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return ( a <= MAX_PRIMARY_ADDRESS 
            ? get_secmap_low_ptr(a) 
            : get_secmap_high_ptr(a));
@@ -130,19 +130,19 @@ $NetBSD$
  
  static INLINE SecMap* get_secmap_for_reading_low ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return *get_secmap_low_ptr(a);
  }
  
  static INLINE SecMap* get_secmap_for_reading_high ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return *get_secmap_high_ptr(a);
  }
  
  static INLINE SecMap* get_secmap_for_writing_low(Addr a)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     SecMap** p = get_secmap_low_ptr(a);
     if (UNLIKELY(is_distinguished_sm(*p)))
        *p = copy_for_writing(*p);
@@ -150,7 +150,7 @@ $NetBSD$
  */
  static INLINE SecMap* get_secmap_for_reading ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return ( a <= MAX_PRIMARY_ADDRESS
            ? get_secmap_for_reading_low (a)
            : get_secmap_for_reading_high(a) );
@@ -158,7 +158,7 @@ $NetBSD$
  */
  static INLINE SecMap* get_secmap_for_writing ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return ( a <= MAX_PRIMARY_ADDRESS
            ? get_secmap_for_writing_low (a)
            : get_secmap_for_writing_high(a) );
@@ -166,7 +166,7 @@ $NetBSD$
  */
  static SecMap* maybe_get_secmap_for ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if (a <= MAX_PRIMARY_ADDRESS) {
        return get_secmap_for_reading_low(a);
     } else {
@@ -174,7 +174,7 @@ $NetBSD$
  static INLINE
  void insert_vabits2_into_vabits8 ( Addr a, UChar vabits2, UChar* vabits8 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt shift =  (a & 3)  << 1;        // shift by 0, 2, 4, or 6
     *vabits8  &= ~(0x3     << shift);   // mask out the two old bits
     *vabits8  |=  (vabits2 << shift);   // mask  in the two new bits
@@ -182,7 +182,7 @@ $NetBSD$
  static INLINE
  void insert_vabits4_into_vabits8 ( Addr a, UChar vabits4, UChar* vabits8 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt shift;
     tl_assert(VG_IS_2_ALIGNED(a));      // Must be 2-aligned
     shift     =  (a & 2)   << 1;        // shift by 0 or 4
@@ -190,7 +190,7 @@ $NetBSD$
  static INLINE
  UChar extract_vabits2_from_vabits8 ( Addr a, UChar vabits8 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt shift = (a & 3) << 1;          // shift by 0, 2, 4, or 6
     vabits8 >>= shift;                  // shift the two bits to the bottom
     return 0x3 & vabits8;               // mask out the rest
@@ -198,7 +198,7 @@ $NetBSD$
  static INLINE
  UChar extract_vabits4_from_vabits8 ( Addr a, UChar vabits8 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt shift;
     tl_assert(VG_IS_2_ALIGNED(a));      // Must be 2-aligned
     shift = (a & 2) << 1;               // shift by 0 or 4
@@ -206,7 +206,7 @@ $NetBSD$
  static INLINE
  void set_vabits2 ( Addr a, UChar vabits2 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     SecMap* sm       = get_secmap_for_writing(a);
     UWord   sm_off   = SM_OFF(a);
     insert_vabits2_into_vabits8( a, vabits2, &(sm->vabits8[sm_off]) );
@@ -214,7 +214,7 @@ $NetBSD$
  static INLINE
  UChar get_vabits2 ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     SecMap* sm       = get_secmap_for_reading(a);
     UWord   sm_off   = SM_OFF(a);
     UChar   vabits8  = sm->vabits8[sm_off];
@@ -222,7 +222,7 @@ $NetBSD$
  static INLINE
  UChar get_vabits8_for_aligned_word32 ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     SecMap* sm       = get_secmap_for_reading(a);
     UWord   sm_off   = SM_OFF(a);
     UChar   vabits8  = sm->vabits8[sm_off];
@@ -230,7 +230,7 @@ $NetBSD$
  static INLINE
  void set_vabits8_for_aligned_word32 ( Addr a, UChar vabits8 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     SecMap* sm       = get_secmap_for_writing(a);
     UWord   sm_off   = SM_OFF(a);
     sm->vabits8[sm_off] = vabits8;
@@ -238,7 +238,7 @@ $NetBSD$
  static INLINE
  Bool set_vbits8 ( Addr a, UChar vbits8 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Bool  ok      = True;
     UChar vabits2 = get_vabits2(a);
     if ( VA_BITS2_NOACCESS != vabits2 ) {
@@ -246,7 +246,7 @@ $NetBSD$
  static INLINE
  Bool get_vbits8 ( Addr a, UChar* vbits8 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Bool  ok      = True;
     UChar vabits2 = get_vabits2(a);
  
@@ -254,7 +254,7 @@ $NetBSD$
  
  static OSet* createSecVBitTable(void)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     OSet* newSecVBitTable;
     newSecVBitTable = VG_(OSetGen_Create_With_Pool)
        ( offsetof(SecVBitNode, a), 
@@ -262,7 +262,7 @@ $NetBSD$
  
  static void gcSecVBitTable(void)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     OSet*        secVBitTable2;
     SecVBitNode* n;
     Int          i, n_nodes = 0, n_survivors = 0;
@@ -270,7 +270,7 @@ $NetBSD$
  
  static UWord get_sec_vbits8(Addr a)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Addr         aAligned = VG_ROUNDDN(a, BYTES_PER_SEC_VBIT_NODE);
     Int          amod     = a % BYTES_PER_SEC_VBIT_NODE;
     SecVBitNode* n        = VG_(OSetGen_Lookup)(secVBitTable, &aAligned);
@@ -278,7 +278,7 @@ $NetBSD$
  
  static void set_sec_vbits8(Addr a, UWord vbits8)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Addr         aAligned = VG_ROUNDDN(a, BYTES_PER_SEC_VBIT_NODE);
     Int          i, amod  = a % BYTES_PER_SEC_VBIT_NODE;
     SecVBitNode* n        = VG_(OSetGen_Lookup)(secVBitTable, &aAligned);
@@ -286,7 +286,7 @@ $NetBSD$
     in a wordszB-sized word, given the specified endianness. */
  static INLINE UWord byte_offset_w ( UWord wordszB, Bool bigendian, 
                                      UWord byteno ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return bigendian ? (wordszB-1-byteno) : byteno;
  }
  
@@ -294,7 +294,7 @@ $NetBSD$
  
  static const HChar* showIARKind ( IARKind iark )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     switch (iark) {
        case IAR_INVALID:     return "INVALID";
        case IAR_NotIgnored:  return "NotIgnored";
@@ -302,7 +302,7 @@ $NetBSD$
  
  static void init_gIgnoredAddressRanges ( void )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if (LIKELY(gIgnoredAddressRanges != NULL))
        return;
     gIgnoredAddressRanges = VG_(newRangeMap)( VG_(malloc), "mc.igIAR.1",
@@ -310,7 +310,7 @@ $NetBSD$
  
  Bool MC_(in_ignored_range) ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if (LIKELY(gIgnoredAddressRanges == NULL))
        return False;
     UWord how     = IAR_INVALID;
@@ -318,7 +318,7 @@ $NetBSD$
  
  Bool MC_(in_ignored_range_below_sp) ( Addr sp, Addr a, UInt szB )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if (LIKELY(!MC_(clo_ignore_range_below_sp)))
         return False;
     tl_assert(szB >= 1 && szB <= 32);
@@ -326,7 +326,7 @@ $NetBSD$
  
  static Bool parse_Addr_pair ( const HChar** ppc, Addr* result1, Addr* result2 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Bool ok = VG_(parse_Addr) (ppc, result1);
     if (!ok)
        return False;
@@ -334,7 +334,7 @@ $NetBSD$
  
  static Bool parse_UInt_pair ( const HChar** ppc, UInt* result1, UInt* result2 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Bool ok = VG_(parse_UInt) (ppc, result1);
     if (!ok)
        return False;
@@ -342,7 +342,7 @@ $NetBSD$
     ranges. */
  static Bool parse_ignore_ranges ( const HChar* str0 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     init_gIgnoredAddressRanges();
     const HChar*  str = str0;
     const HChar** ppc = &str;
@@ -350,7 +350,7 @@ $NetBSD$
  /* Add or remove [start, +len) from the set of ignored ranges. */
  static Bool modify_ignore_ranges ( Bool addRange, Addr start, Addr len )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     init_gIgnoredAddressRanges();
     const Bool verbose = (VG_(clo_verbosity) > 1);
     if (len == 0) {
@@ -358,7 +358,7 @@ $NetBSD$
  void mc_LOADV_128_or_256_slow ( /*OUT*/ULong* res,
                                  Addr a, SizeT nBits, Bool bigendian )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     ULong  pessim[4];     /* only used when p-l-ok=yes */
     SSizeT szB            = nBits / 8;
     SSizeT szL            = szB / 8;  /* Size in Longs (64-bit units) */
@@ -366,7 +366,7 @@ $NetBSD$
                   this function may get called from hand written assembly. */
  ULong mc_LOADVn_slow ( Addr a, SizeT nBits, Bool bigendian )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
 +VG_(debugLog)(2, "initimg", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_LOADVN_SLOW);
  
@@ -395,7 +395,7 @@ $NetBSD$
  __attribute__((noinline))
  void mc_STOREVn_slow ( Addr a, SizeT nBits, ULong vbytes, Bool bigendian )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     SizeT szB = nBits / 8;
     SizeT i, n_addrs_bad = 0;
     UChar vbits8;
@@ -403,7 +403,7 @@ $NetBSD$
  static void set_address_range_perms ( Addr a, SizeT lenT, UWord vabits16,
                                        UWord dsm_num )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UWord    sm_off, sm_off16;
     UWord    vabits2 = vabits16 & 0x3;
     SizeT    lenA, lenB, len_to_next_secmap;
@@ -411,7 +411,7 @@ $NetBSD$
  
  void MC_(make_mem_noaccess) ( Addr a, SizeT len )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_MAKE_MEM_NOACCESS);
     DEBUG("MC_(make_mem_noaccess)(%p, %lu)\n", a, len);
     set_address_range_perms ( a, len, VA_BITS16_NOACCESS, SM_DIST_NOACCESS );
@@ -419,7 +419,7 @@ $NetBSD$
  
  static void make_mem_undefined ( Addr a, SizeT len )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_MAKE_MEM_UNDEFINED);
     DEBUG("make_mem_undefined(%p, %lu)\n", a, len);
     set_address_range_perms ( a, len, VA_BITS16_UNDEFINED, SM_DIST_UNDEFINED );
@@ -427,7 +427,7 @@ $NetBSD$
  
  void MC_(make_mem_undefined_w_otag) ( Addr a, SizeT len, UInt otag )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_MAKE_MEM_UNDEFINED_W_OTAG);
     DEBUG("MC_(make_mem_undefined)(%p, %lu)\n", a, len);
     set_address_range_perms ( a, len, VA_BITS16_UNDEFINED, SM_DIST_UNDEFINED );
@@ -435,7 +435,7 @@ $NetBSD$
  void make_mem_undefined_w_tid_and_okind ( Addr a, SizeT len,
                                            ThreadId tid, UInt okind )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt        ecu;
     ExeContext* here;
     /* VG_(record_ExeContext) checks for validity of tid, and asserts
@@ -443,20 +443,20 @@ $NetBSD$
  static
  void mc_new_mem_w_tid_make_ECU  ( Addr a, SizeT len, ThreadId tid )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     make_mem_undefined_w_tid_and_okind ( a, len, tid, MC_OKIND_UNKNOWN );
  }
  
  static
  void mc_new_mem_w_tid_no_ECU  ( Addr a, SizeT len, ThreadId tid )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_(make_mem_undefined_w_otag) ( a, len, MC_OKIND_UNKNOWN );
  }
  
  void MC_(make_mem_defined) ( Addr a, SizeT len )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_MAKE_MEM_DEFINED);
     DEBUG("MC_(make_mem_defined)(%p, %lu)\n", a, len);
     set_address_range_perms ( a, len, VA_BITS16_DEFINED, SM_DIST_DEFINED );
@@ -464,7 +464,7 @@ $NetBSD$
  __attribute__((unused))
  static void make_mem_defined_w_tid ( Addr a, SizeT len, ThreadId tid )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_(make_mem_defined)(a, len);
  }
  
@@ -472,7 +472,7 @@ $NetBSD$
     addressibility.  Low-performance implementation. */
  static void make_mem_defined_if_addressable ( Addr a, SizeT len )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     SizeT i;
     UChar vabits2;
     DEBUG("make_mem_defined_if_addressable(%p, %llu)\n", a, (ULong)len);
@@ -480,7 +480,7 @@ $NetBSD$
  /* Similarly (needed for mprotect handling ..) */
  static void make_mem_defined_if_noaccess ( Addr a, SizeT len )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     SizeT i;
     UChar vabits2;
     DEBUG("make_mem_defined_if_noaccess(%p, %llu)\n", a, (ULong)len);
@@ -488,7 +488,7 @@ $NetBSD$
  
  void MC_(copy_address_range_state) ( Addr src, Addr dst, SizeT len )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     SizeT i, j;
     UChar vabits2, vabits8;
     Bool  aligned, nooverlap;
@@ -496,11 +496,11 @@ $NetBSD$
  #define OC_W32S_PER_LINE (1 << (OC_BITS_PER_LINE - 2))
  
  static INLINE UWord oc_line_offset ( Addr a ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return (a >> 2) & (OC_W32S_PER_LINE - 1);
  }
  static INLINE Bool is_valid_oc_tag ( Addr tag ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return 0 == (tag & ((1 << OC_BITS_PER_LINE) - 1));
  }
  
@@ -508,7 +508,7 @@ $NetBSD$
     and 'z' if all the represented tags are zero. */
  static UChar classify_OCacheLine ( OCacheLine* line )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UWord i;
     if (line->tag == 1/*invalid*/)
        return 'e'; /* EMPTY */
@@ -516,7 +516,7 @@ $NetBSD$
  static void init_ocacheL2 ( void ); /* fwds */
  static void init_OCache ( void )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UWord line, set;
     tl_assert(MC_(clo_mc_level) >= 3);
     tl_assert(ocacheL1 == NULL);
@@ -524,7 +524,7 @@ $NetBSD$
  
  static void moveLineForwards ( OCacheSet* set, UWord lineno )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     OCacheLine tmp;
     stats_ocacheL1_movefwds++;
     tl_assert(lineno > 0 && lineno < OC_LINES_PER_SET);
@@ -532,7 +532,7 @@ $NetBSD$
  }
  
  static void zeroise_OCacheLine ( OCacheLine* line, Addr tag ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UWord i;
     for (i = 0; i < OC_W32S_PER_LINE; i++) {
        line->w32[i] = 0; /* NO ORIGIN */
@@ -540,11 +540,11 @@ $NetBSD$
  static OSet* ocacheL2 = NULL;
  
  static void* ocacheL2_malloc ( const HChar* cc, SizeT szB ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return VG_(malloc)(cc, szB);
  }
  static void ocacheL2_free ( void* v ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     VG_(free)( v );
  }
  
@@ -552,7 +552,7 @@ $NetBSD$
  
  static void init_ocacheL2 ( void )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(!ocacheL2);
     tl_assert(sizeof(Word) == sizeof(Addr)); /* since OCacheLine.tag :: Addr */
     tl_assert(0 == offsetof(OCacheLine,tag));
@@ -560,7 +560,7 @@ $NetBSD$
  /* Find line with the given tag in the tree, or NULL if not found. */
  static OCacheLine* ocacheL2_find_tag ( Addr tag )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     OCacheLine* line;
     tl_assert(is_valid_oc_tag(tag));
     stats__ocacheL2_refs++;
@@ -568,7 +568,7 @@ $NetBSD$
     free up the associated memory. */
  static void ocacheL2_del_tag ( Addr tag )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     OCacheLine* line;
     tl_assert(is_valid_oc_tag(tag));
     stats__ocacheL2_refs++;
@@ -576,7 +576,7 @@ $NetBSD$
     present. */
  static void ocacheL2_add_line ( OCacheLine* line )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     OCacheLine* copy;
     tl_assert(is_valid_oc_tag(line->tag));
     copy = VG_(OSetGen_AllocNode)( ocacheL2, sizeof(OCacheLine) );
@@ -584,7 +584,7 @@ $NetBSD$
  __attribute__((noinline))
  static OCacheLine* find_OCacheLine_SLOW ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     OCacheLine *victim, *inL2;
     UChar c;
     UWord line;
@@ -592,7 +592,7 @@ $NetBSD$
  
  static INLINE OCacheLine* find_OCacheLine ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UWord setno   = (a >> OC_BITS_PER_LINE) & (OC_N_SETS - 1);
     UWord tagmask = ~((1 << OC_BITS_PER_LINE) - 1);
     UWord tag     = a & tagmask;
@@ -600,7 +600,7 @@ $NetBSD$
  
  static INLINE void set_aligned_word64_Origin_to_undef ( Addr a, UInt otag )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     //// BEGIN inlined, specialised version of MC_(helperc_b_store8)
     //// Set the origins for a+0 .. a+7
     { OCacheLine* line;
@@ -608,7 +608,7 @@ $NetBSD$
  
  static INLINE void make_aligned_word32_undefined ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
    PROF_EVENT(MCPE_MAKE_ALIGNED_WORD32_UNDEFINED);
  
  #ifndef PERF_FAST_STACK2
@@ -616,7 +616,7 @@ $NetBSD$
  static INLINE
  void make_aligned_word32_undefined_w_otag ( Addr a, UInt otag )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     make_aligned_word32_undefined(a);
     //// BEGIN inlined, specialised version of MC_(helperc_b_store4)
     //// Set the origins for a+0 .. a+3
@@ -624,7 +624,7 @@ $NetBSD$
  static INLINE
  void make_aligned_word32_noaccess ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_MAKE_ALIGNED_WORD32_NOACCESS);
  
  #ifndef PERF_FAST_STACK2
@@ -632,7 +632,7 @@ $NetBSD$
  
  static INLINE void make_aligned_word64_undefined ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_MAKE_ALIGNED_WORD64_UNDEFINED);
  
  #ifndef PERF_FAST_STACK2
@@ -640,7 +640,7 @@ $NetBSD$
  static INLINE
  void make_aligned_word64_undefined_w_otag ( Addr a, UInt otag )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     make_aligned_word64_undefined(a);
     //// BEGIN inlined, specialised version of MC_(helperc_b_store8)
     //// Set the origins for a+0 .. a+7
@@ -648,7 +648,7 @@ $NetBSD$
  static INLINE
  void make_aligned_word64_noaccess ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_MAKE_ALIGNED_WORD64_NOACCESS);
  
  #ifndef PERF_FAST_STACK2
@@ -656,7 +656,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(2) mc_new_mem_stack_4_w_ECU(Addr new_SP, UInt ecu)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt otag = ecu | MC_OKIND_STACK;
     PROF_EVENT(MCPE_NEW_MEM_STACK_4);
     if (VG_IS_4_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP )) {
@@ -664,7 +664,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(1) mc_new_mem_stack_4(Addr new_SP)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_NEW_MEM_STACK_4);
     if (VG_IS_4_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP )) {
        make_aligned_word32_undefined ( -VG_STACK_REDZONE_SZB + new_SP );
@@ -672,7 +672,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(1) mc_die_mem_stack_4(Addr new_SP)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_DIE_MEM_STACK_4);
     if (VG_IS_4_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP )) {
        make_aligned_word32_noaccess ( -VG_STACK_REDZONE_SZB + new_SP-4 );
@@ -680,7 +680,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(2) mc_new_mem_stack_8_w_ECU(Addr new_SP, UInt ecu)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt otag = ecu | MC_OKIND_STACK;
     PROF_EVENT(MCPE_NEW_MEM_STACK_8);
     if (VG_IS_8_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP )) {
@@ -688,7 +688,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(1) mc_new_mem_stack_8(Addr new_SP)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_NEW_MEM_STACK_8);
     if (VG_IS_8_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP )) {
        make_aligned_word64_undefined ( -VG_STACK_REDZONE_SZB + new_SP );
@@ -696,7 +696,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(1) mc_die_mem_stack_8(Addr new_SP)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_DIE_MEM_STACK_8);
     if (VG_IS_8_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP )) {
        make_aligned_word64_noaccess ( -VG_STACK_REDZONE_SZB + new_SP-8 );
@@ -704,7 +704,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(2) mc_new_mem_stack_12_w_ECU(Addr new_SP, UInt ecu)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt otag = ecu | MC_OKIND_STACK;
     PROF_EVENT(MCPE_NEW_MEM_STACK_12);
     if (VG_IS_8_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP )) {
@@ -712,7 +712,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(1) mc_new_mem_stack_12(Addr new_SP)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_NEW_MEM_STACK_12);
     if (VG_IS_8_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP )) {
        make_aligned_word64_undefined ( -VG_STACK_REDZONE_SZB + new_SP );
@@ -720,7 +720,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(1) mc_die_mem_stack_12(Addr new_SP)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_DIE_MEM_STACK_12);
     /* Note the -12 in the test */
     if (VG_IS_8_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP-12 )) {
@@ -728,7 +728,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(2) mc_new_mem_stack_16_w_ECU(Addr new_SP, UInt ecu)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt otag = ecu | MC_OKIND_STACK;
     PROF_EVENT(MCPE_NEW_MEM_STACK_16);
     if (VG_IS_8_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP )) {
@@ -736,7 +736,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(1) mc_new_mem_stack_16(Addr new_SP)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_NEW_MEM_STACK_16);
     if (VG_IS_8_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP )) {
        /* Have 8-alignment at +0, hence do 8 at +0 and 8 at +8. */
@@ -744,7 +744,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(1) mc_die_mem_stack_16(Addr new_SP)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_DIE_MEM_STACK_16);
     if (VG_IS_8_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP )) {
        /* Have 8-alignment at +0, hence do 8 at -16 and 8 at -8. */
@@ -752,7 +752,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(2) mc_new_mem_stack_32_w_ECU(Addr new_SP, UInt ecu)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt otag = ecu | MC_OKIND_STACK;
     PROF_EVENT(MCPE_NEW_MEM_STACK_32);
     if (VG_IS_8_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP )) {
@@ -760,7 +760,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(1) mc_new_mem_stack_32(Addr new_SP)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_NEW_MEM_STACK_32);
     if (VG_IS_8_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP )) {
        /* Straightforward */
@@ -768,7 +768,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(1) mc_die_mem_stack_32(Addr new_SP)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_DIE_MEM_STACK_32);
     if (VG_IS_8_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP )) {
        /* Straightforward */
@@ -776,7 +776,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(2) mc_new_mem_stack_112_w_ECU(Addr new_SP, UInt ecu)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt otag = ecu | MC_OKIND_STACK;
     PROF_EVENT(MCPE_NEW_MEM_STACK_112);
     if (VG_IS_8_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP )) {
@@ -784,7 +784,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(1) mc_new_mem_stack_112(Addr new_SP)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_NEW_MEM_STACK_112);
     if (VG_IS_8_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP )) {
        make_aligned_word64_undefined ( -VG_STACK_REDZONE_SZB + new_SP );
@@ -792,7 +792,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(1) mc_die_mem_stack_112(Addr new_SP)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_DIE_MEM_STACK_112);
     if (VG_IS_8_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP )) {
        make_aligned_word64_noaccess ( -VG_STACK_REDZONE_SZB + new_SP-112);
@@ -800,7 +800,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(2) mc_new_mem_stack_128_w_ECU(Addr new_SP, UInt ecu)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt otag = ecu | MC_OKIND_STACK;
     PROF_EVENT(MCPE_NEW_MEM_STACK_128);
     if (VG_IS_8_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP )) {
@@ -808,7 +808,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(1) mc_new_mem_stack_128(Addr new_SP)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_NEW_MEM_STACK_128);
     if (VG_IS_8_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP )) {
        make_aligned_word64_undefined ( -VG_STACK_REDZONE_SZB + new_SP );
@@ -816,7 +816,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(1) mc_die_mem_stack_128(Addr new_SP)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_DIE_MEM_STACK_128);
     if (VG_IS_8_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP )) {
        make_aligned_word64_noaccess ( -VG_STACK_REDZONE_SZB + new_SP-128);
@@ -824,7 +824,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(2) mc_new_mem_stack_144_w_ECU(Addr new_SP, UInt ecu)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt otag = ecu | MC_OKIND_STACK;
     PROF_EVENT(MCPE_NEW_MEM_STACK_144);
     if (VG_IS_8_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP )) {
@@ -832,7 +832,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(1) mc_new_mem_stack_144(Addr new_SP)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_NEW_MEM_STACK_144);
     if (VG_IS_8_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP )) {
        make_aligned_word64_undefined ( -VG_STACK_REDZONE_SZB + new_SP );
@@ -840,7 +840,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(1) mc_die_mem_stack_144(Addr new_SP)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_DIE_MEM_STACK_144);
     if (VG_IS_8_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP )) {
        make_aligned_word64_noaccess ( -VG_STACK_REDZONE_SZB + new_SP-144);
@@ -848,7 +848,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(2) mc_new_mem_stack_160_w_ECU(Addr new_SP, UInt ecu)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt otag = ecu | MC_OKIND_STACK;
     PROF_EVENT(MCPE_NEW_MEM_STACK_160);
     if (VG_IS_8_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP )) {
@@ -856,7 +856,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(1) mc_new_mem_stack_160(Addr new_SP)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_NEW_MEM_STACK_160);
     if (VG_IS_8_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP )) {
        make_aligned_word64_undefined ( -VG_STACK_REDZONE_SZB + new_SP );
@@ -864,7 +864,7 @@ $NetBSD$
  MAYBE_USED
  static void VG_REGPARM(1) mc_die_mem_stack_160(Addr new_SP)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_DIE_MEM_STACK_160);
     if (VG_IS_8_ALIGNED( -VG_STACK_REDZONE_SZB + new_SP )) {
        make_aligned_word64_noaccess ( -VG_STACK_REDZONE_SZB + new_SP-160);
@@ -872,7 +872,7 @@ $NetBSD$
  
  static void mc_new_mem_stack_w_ECU ( Addr a, SizeT len, UInt ecu )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt otag = ecu | MC_OKIND_STACK;
     PROF_EVENT(MCPE_NEW_MEM_STACK);
     MC_(make_mem_undefined_w_otag) ( -VG_STACK_REDZONE_SZB + a, len, otag );
@@ -880,14 +880,14 @@ $NetBSD$
  
  static void mc_new_mem_stack ( Addr a, SizeT len )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_NEW_MEM_STACK);
     make_mem_undefined ( -VG_STACK_REDZONE_SZB + a, len );
  }
  
  static void mc_die_mem_stack ( Addr a, SizeT len )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_DIE_MEM_STACK);
     MC_(make_mem_noaccess) ( -VG_STACK_REDZONE_SZB + a, len );
  }
@@ -895,7 +895,7 @@ $NetBSD$
  
  static void init_nia_to_ecu_cache ( void )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UWord       i;
     Addr        zero_addr = 0;
     ExeContext* zero_ec;
@@ -903,7 +903,7 @@ $NetBSD$
  
  static inline UInt convert_nia_to_ecu ( Addr nia )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UWord i;
     UInt        ecu;
     ExeContext* ec;
@@ -911,7 +911,7 @@ $NetBSD$
  VG_REGPARM(3)
  void MC_(helperc_MAKE_STACK_UNINIT_w_o) ( Addr base, UWord len, Addr nia )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_MAKE_STACK_UNINIT_W_O);
     if (0)
        VG_(printf)("helperc_MAKE_STACK_UNINIT_w_o (%#lx,%lu,nia=%#lx)\n",
@@ -919,7 +919,7 @@ $NetBSD$
  VG_REGPARM(2)
  void MC_(helperc_MAKE_STACK_UNINIT_no_o) ( Addr base, UWord len )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_MAKE_STACK_UNINIT_NO_O);
     if (0)
        VG_(printf)("helperc_MAKE_STACK_UNINIT_no_o (%#lx,%lu)\n",
@@ -927,7 +927,7 @@ $NetBSD$
  VG_REGPARM(1)
  void MC_(helperc_MAKE_STACK_UNINIT_128_no_o) ( Addr base )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_MAKE_STACK_UNINIT_128_NO_O);
     if (0)
        VG_(printf)("helperc_MAKE_STACK_UNINIT_128_no_o (%#lx)\n", base );
@@ -935,7 +935,7 @@ $NetBSD$
     similar. */
  Bool MC_(check_mem_is_noaccess) ( Addr a, SizeT len, Addr* bad_addr )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     SizeT i;
     UWord vabits2;
  
@@ -943,7 +943,7 @@ $NetBSD$
  static Bool is_mem_addressable ( Addr a, SizeT len, 
                                   /*OUT*/Addr* bad_addr )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     SizeT i;
     UWord vabits2;
  
@@ -951,7 +951,7 @@ $NetBSD$
                                        /*OUT*/Addr* bad_addr,
                                        /*OUT*/UInt* otag )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     SizeT i;
     UWord vabits2;
  
@@ -959,7 +959,7 @@ $NetBSD$
                 /*OUT*/Addr* bad_addrA  /* if so where? */
              )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     SizeT i;
     UWord vabits2;
     Bool  already_saw_errV = False;
@@ -967,7 +967,7 @@ $NetBSD$
  
  static Bool mc_is_defined_asciiz ( Addr a, Addr* bad_addr, UInt* otag )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UWord vabits2;
  
     PROF_EVENT(MCPE_IS_DEFINED_ASCIIZ);
@@ -975,7 +975,7 @@ $NetBSD$
  void check_mem_is_addressable ( CorePart part, ThreadId tid, const HChar* s,
                                  Addr base, SizeT size )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Addr bad_addr;
     Bool ok = is_mem_addressable ( base, size, &bad_addr );
  
@@ -983,7 +983,7 @@ $NetBSD$
  void check_mem_is_defined ( CorePart part, ThreadId tid, const HChar* s,
                              Addr base, SizeT size )
  {     
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt otag = 0;
     Addr bad_addr;
     MC_ReadResult res = is_mem_defined ( base, size, &bad_addr, &otag );
@@ -991,7 +991,7 @@ $NetBSD$
  void check_mem_is_defined_asciiz ( CorePart part, ThreadId tid,
                                     const HChar* s, Addr str )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_ReadResult res;
     Addr bad_addr = 0;   // shut GCC up
     UInt otag = 0;
@@ -999,7 +999,7 @@ $NetBSD$
  void mc_new_mem_mmap ( Addr a, SizeT len, Bool rr, Bool ww, Bool xx,
                         ULong di_handle )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if (rr || ww || xx) {
        /* (2) mmap/mprotect other -> defined */
        MC_(make_mem_defined)(a, len);
@@ -1007,7 +1007,7 @@ $NetBSD$
  static
  void mc_new_mem_mprotect ( Addr a, SizeT len, Bool rr, Bool ww, Bool xx )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if (rr || ww || xx) {
        /* (4) mprotect other  ->  change any "noaccess" to "defined" */
        make_mem_defined_if_noaccess(a, len);
@@ -1015,7 +1015,7 @@ $NetBSD$
  void mc_new_mem_startup( Addr a, SizeT len,
                           Bool rr, Bool ww, Bool xx, ULong di_handle )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     // Because code is defined, initialised variables get put in the data
     // segment and are defined, and uninitialised variables get put in the
     // bss segment and are auto-zeroed (and so defined).  
@@ -1023,7 +1023,7 @@ $NetBSD$
  static
  void mc_post_mem_write(CorePart part, ThreadId tid, Addr a, SizeT len)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_(make_mem_defined)(a, len);
  }
  
@@ -1031,7 +1031,7 @@ $NetBSD$
  static UInt mb_get_origin_for_guest_offset ( ThreadId tid,
                                               Int offset, SizeT size )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Int   sh2off;
     UInt  area[3];
     UInt  otag;
@@ -1039,7 +1039,7 @@ $NetBSD$
  static void mc_post_reg_write ( CorePart part, ThreadId tid, 
                                  PtrdiffT offset, SizeT size)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
  #  define MAX_REG_WRITE_SIZE 1744
     UChar area[MAX_REG_WRITE_SIZE];
     tl_assert(size <= MAX_REG_WRITE_SIZE);
@@ -1047,7 +1047,7 @@ $NetBSD$
  void mc_post_reg_write_clientcall ( ThreadId tid, 
                                      PtrdiffT offset, SizeT size, Addr f)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     mc_post_reg_write(/*dummy*/0, tid, offset, size);
  }
  
@@ -1055,7 +1055,7 @@ $NetBSD$
  static void mc_pre_reg_read ( CorePart part, ThreadId tid, const HChar* s, 
                                PtrdiffT offset, SizeT size)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Int   i;
     Bool  bad;
     UInt  otag;
@@ -1063,7 +1063,7 @@ $NetBSD$
  static void mc_copy_mem_to_reg ( CorePart part, ThreadId tid, Addr a,
                                   PtrdiffT guest_state_offset, SizeT size )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     SizeT i;
     UChar vbits8;
     Int offset;
@@ -1071,7 +1071,7 @@ $NetBSD$
                                   PtrdiffT guest_state_offset, Addr a,
                                   SizeT size )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     SizeT i;
     UChar vbits8;
     Int offset;
@@ -1079,7 +1079,7 @@ $NetBSD$
  void mc_LOADV_128_or_256 ( /*OUT*/ULong* res,
                             Addr a, SizeT nBits, Bool isBigEndian )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_LOADV_128_OR_256);
  
  #ifndef PERF_FAST_LOADV
@@ -1087,23 +1087,23 @@ $NetBSD$
  
  VG_REGPARM(2) void MC_(helperc_LOADV256be) ( /*OUT*/V256* res, Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     mc_LOADV_128_or_256(&res->w64[0], a, 256, True);
  }
  VG_REGPARM(2) void MC_(helperc_LOADV256le) ( /*OUT*/V256* res, Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     mc_LOADV_128_or_256(&res->w64[0], a, 256, False);
  }
  
  VG_REGPARM(2) void MC_(helperc_LOADV128be) ( /*OUT*/V128* res, Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     mc_LOADV_128_or_256(&res->w64[0], a, 128, True);
  }
  VG_REGPARM(2) void MC_(helperc_LOADV128le) ( /*OUT*/V128* res, Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     mc_LOADV_128_or_256(&res->w64[0], a, 128, False);
  }
  
@@ -1111,7 +1111,7 @@ $NetBSD$
  static INLINE
  ULong mc_LOADV64 ( Addr a, Bool isBigEndian )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_LOADV64);
  
  #ifndef PERF_FAST_LOADV
@@ -1119,7 +1119,7 @@ $NetBSD$
  // Generic for all platforms
  VG_REGPARM(1) ULong MC_(helperc_LOADV64be) ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return mc_LOADV64(a, True);
  }
  
@@ -1127,7 +1127,7 @@ $NetBSD$
  // Generic for all platforms except {arm32,x86}-linux and x86-solaris
  VG_REGPARM(1) ULong MC_(helperc_LOADV64le) ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return mc_LOADV64(a, False);
  }
  #endif
@@ -1135,7 +1135,7 @@ $NetBSD$
  static INLINE
  void mc_STOREV64 ( Addr a, ULong vbits64, Bool isBigEndian )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_STOREV64);
  
  #ifndef PERF_FAST_STOREV
@@ -1143,12 +1143,12 @@ $NetBSD$
  
  VG_REGPARM(1) void MC_(helperc_STOREV64be) ( Addr a, ULong vbits64 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     mc_STOREV64(a, vbits64, True);
  }
  VG_REGPARM(1) void MC_(helperc_STOREV64le) ( Addr a, ULong vbits64 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     mc_STOREV64(a, vbits64, False);
  }
  
@@ -1156,7 +1156,7 @@ $NetBSD$
  static INLINE
  UWord mc_LOADV32 ( Addr a, Bool isBigEndian )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_LOADV32);
  
  #ifndef PERF_FAST_LOADV
@@ -1164,7 +1164,7 @@ $NetBSD$
  // Generic for all platforms
  VG_REGPARM(1) UWord MC_(helperc_LOADV32be) ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return mc_LOADV32(a, True);
  }
  
@@ -1184,7 +1184,7 @@ $NetBSD$
  static INLINE
  void mc_STOREV32 ( Addr a, UWord vbits32, Bool isBigEndian )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_STOREV32);
  
  #ifndef PERF_FAST_STOREV
@@ -1192,20 +1192,20 @@ $NetBSD$
        mc_STOREVn_slow( a, 32, (ULong)vbits32, isBigEndian );
     }
  #endif
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
  }
  
  VG_REGPARM(2) void MC_(helperc_STOREV32be) ( Addr a, UWord vbits32 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     mc_STOREV32(a, vbits32, True);
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
  }
  VG_REGPARM(2) void MC_(helperc_STOREV32le) ( Addr a, UWord vbits32 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     mc_STOREV32(a, vbits32, False);
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
  }
  
  /*------------------------------------------------------------*/
@@ -1213,7 +1213,7 @@ $NetBSD$
  static INLINE
  UWord mc_LOADV16 ( Addr a, Bool isBigEndian )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_LOADV16);
  
  #ifndef PERF_FAST_LOADV
@@ -1221,13 +1221,13 @@ $NetBSD$
        }
     }
  #endif
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
  }
  
  // Generic for all platforms
  VG_REGPARM(1) UWord MC_(helperc_LOADV16be) ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return mc_LOADV16(a, True);
  }
  
@@ -1235,7 +1235,7 @@ $NetBSD$
  static INLINE
  Bool accessible_vabits4_in_vabits8 ( Addr a, UChar vabits8 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt shift;
     tl_assert(VG_IS_2_ALIGNED(a));      // Must be 2-aligned
     shift = (a & 2) << 1;               // shift by 0 or 4
@@ -1243,7 +1243,7 @@ $NetBSD$
  static INLINE
  void mc_STOREV16 ( Addr a, UWord vbits16, Bool isBigEndian )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_STOREV16);
  
  #ifndef PERF_FAST_STOREV
@@ -1251,12 +1251,12 @@ $NetBSD$
  
  VG_REGPARM(2) void MC_(helperc_STOREV16be) ( Addr a, UWord vbits16 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     mc_STOREV16(a, vbits16, True);
  }
  VG_REGPARM(2) void MC_(helperc_STOREV16le) ( Addr a, UWord vbits16 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     mc_STOREV16(a, vbits16, False);
  }
  
@@ -1264,7 +1264,7 @@ $NetBSD$
  VG_REGPARM(1)
  UWord MC_(helperc_LOADV8) ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_LOADV8);
  
  #ifndef PERF_FAST_LOADV
@@ -1272,7 +1272,7 @@ $NetBSD$
  VG_REGPARM(2)
  void MC_(helperc_STOREV8) ( Addr a, UWord vbits8 )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     PROF_EVENT(MCPE_STOREV8);
  
  #ifndef PERF_FAST_STOREV
@@ -1280,74 +1280,74 @@ $NetBSD$
  /* Call these ones when an origin is available ... */
  VG_REGPARM(1)
  void MC_(helperc_value_check0_fail_w_o) ( UWord origin ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_(record_cond_error) ( VG_(get_running_tid)(), (UInt)origin );
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
  }
  
  VG_REGPARM(1)
  void MC_(helperc_value_check1_fail_w_o) ( UWord origin ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_(record_value_error) ( VG_(get_running_tid)(), 1, (UInt)origin );
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
  }
  
  VG_REGPARM(1)
  void MC_(helperc_value_check4_fail_w_o) ( UWord origin ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_(record_value_error) ( VG_(get_running_tid)(), 4, (UInt)origin );
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
  }
  
  VG_REGPARM(1)
  void MC_(helperc_value_check8_fail_w_o) ( UWord origin ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_(record_value_error) ( VG_(get_running_tid)(), 8, (UInt)origin );
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
  }
  
  VG_REGPARM(2) 
  void MC_(helperc_value_checkN_fail_w_o) ( HWord sz, UWord origin ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_(record_value_error) ( VG_(get_running_tid)(), (Int)sz, (UInt)origin );
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
  }
  
  /* ... and these when an origin isn't available. */
  
  VG_REGPARM(0)
  void MC_(helperc_value_check0_fail_no_o) ( void ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_(record_cond_error) ( VG_(get_running_tid)(), 0/*origin*/ );
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
  }
  
  VG_REGPARM(0)
  void MC_(helperc_value_check1_fail_no_o) ( void ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_(record_value_error) ( VG_(get_running_tid)(), 1, 0/*origin*/ );
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
  }
  
  VG_REGPARM(0)
  void MC_(helperc_value_check4_fail_no_o) ( void ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_(record_value_error) ( VG_(get_running_tid)(), 4, 0/*origin*/ );
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
  }
  
  VG_REGPARM(0)
  void MC_(helperc_value_check8_fail_no_o) ( void ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_(record_value_error) ( VG_(get_running_tid)(), 8, 0/*origin*/ );
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
  }
  
  VG_REGPARM(1) 
  void MC_(helperc_value_checkN_fail_no_o) ( HWord sz ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_(record_value_error) ( VG_(get_running_tid)(), (Int)sz, 0/*origin*/ );
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
  }
  
  
@@ -1355,7 +1355,7 @@ $NetBSD$
                               False <=> internal call from gdbserver */ 
  )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     SizeT i;
     Bool  ok;
     UChar vbits8;
@@ -1363,7 +1363,7 @@ $NetBSD$
  */
  Bool MC_(is_within_valid_secondary) ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     SecMap* sm = maybe_get_secmap_for ( a );
     if (sm == NULL || sm == &sm_distinguished[SM_DIST_NOACCESS]) {
        /* Definitely not in use. */
@@ -1371,7 +1371,7 @@ $NetBSD$
     address is to be regarded as valid. */
  Bool MC_(is_valid_aligned_word) ( Addr a )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     tl_assert(sizeof(UWord) == 4 || sizeof(UWord) == 8);
     tl_assert(VG_IS_WORD_ALIGNED(a));
     if (get_vabits8_for_aligned_word32 (a) != VA_BITS8_DEFINED)
@@ -1379,7 +1379,7 @@ $NetBSD$
  
  static void init_shadow_memory ( void )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Int     i;
     SecMap* sm;
  
@@ -1387,7 +1387,7 @@ $NetBSD$
  
  static Bool mc_cheap_sanity_check ( void )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     n_sanity_cheap++;
     PROF_EVENT(MCPE_CHEAP_SANITY_CHECK);
     /* Check for sane operating level */
@@ -1395,7 +1395,7 @@ $NetBSD$
  
  static Bool mc_expensive_sanity_check ( void )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Int     i;
     Word    n_secmaps_found;
     SecMap* sm;
@@ -1403,7 +1403,7 @@ $NetBSD$
  
  static Bool mc_process_cmd_line_options(const HChar* arg)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     const HChar* tmp_str;
     Int   tmp_show;
  
@@ -1411,7 +1411,7 @@ $NetBSD$
  
  static void mc_print_usage(void)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     VG_(printf)(
  "    --leak-check=no|summary|full     search for memory leaks at exit?  [summary]\n"
  "    --leak-resolution=low|med|high   differentiation of leak stack traces [high]\n"
@@ -1419,7 +1419,7 @@ $NetBSD$
  
  static void mc_print_debug_usage(void)
  {  
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     VG_(printf)(
  "    (none)\n"
     );
@@ -1427,7 +1427,7 @@ $NetBSD$
  void MC_(get_ClientBlock_array)( /*OUT*/CGenBlock** blocks,
                                   /*OUT*/UWord* nBlocks )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     *blocks  = cgbs;
     *nBlocks = cgb_used;
  }
@@ -1435,7 +1435,7 @@ $NetBSD$
  static
  Int alloc_client_block ( void )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UWord      i, sz_new;
     CGenBlock* cgbs_new;
  
@@ -1443,7 +1443,7 @@ $NetBSD$
  
  static void show_client_block_stats ( void )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     VG_(message)(Vg_DebugMsg, 
        "general CBs: %llu allocs, %llu discards, %llu maxinuse, %llu search\n",
        cgb_allocs, cgb_discards, cgb_used_MAX, cgb_search 
@@ -1451,7 +1451,7 @@ $NetBSD$
  }
  static void print_monitor_help ( void )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     VG_(gdb_printf) 
        (
  "\n"
@@ -1459,7 +1459,7 @@ $NetBSD$
     res[i] == 1 indicates the corresponding byte is addressable. */
  static void gdb_xb (Addr address, SizeT szB, Int res[])
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt i;
  
     for (i = 0; i < szB; i++) {
@@ -1467,7 +1467,7 @@ $NetBSD$
     or address of the string terminator. */
  static HChar* next_non_space (HChar *s)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     while (*s && *s == ' ')
        s++;
     return s;
@@ -1475,7 +1475,7 @@ $NetBSD$
  static Bool VG_(parse_slice) (HChar* s, HChar** saveptr,
                                UInt *from, UInt *to)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     HChar* wl;
     HChar *endptr;
     endptr = NULL;////
@@ -1483,7 +1483,7 @@ $NetBSD$
  /* return True if request recognised, False otherwise */
  static Bool handle_gdb_monitor_command (ThreadId tid, HChar *req)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     HChar* wcmd;
     HChar s[VG_(strlen)(req) + 1]; /* copy for strtok_r */
     HChar *ssaveptr;
@@ -1491,7 +1491,7 @@ $NetBSD$
  
  static Bool mc_handle_client_request ( ThreadId tid, UWord* arg, UWord* ret )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Int   i;
     Addr  bad_addr;
  
@@ -1499,7 +1499,7 @@ $NetBSD$
  
  static void init_prof_mem ( void )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Int i, name_count = 0;
  
     for (i = 0; i < MCPE_LAST; i++) {
@@ -1507,7 +1507,7 @@ $NetBSD$
  
  static void done_prof_mem ( void )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     Int  i, n;
     Bool spaced = False;
     for (i = n = 0; i < MCPE_LAST; i++) {
@@ -1517,8 +1517,8 @@ $NetBSD$
  
 -static void init_prof_mem ( void ) { }
 -static void done_prof_mem ( void ) { }
-+static void init_prof_mem ( void ) { VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);}
-+static void done_prof_mem ( void ) { VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);}
++static void init_prof_mem ( void ) { VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);}
++static void done_prof_mem ( void ) { VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);}
  
  #endif
  
@@ -1526,12 +1526,12 @@ $NetBSD$
  /*--------------------------------------------*/
  
  static INLINE UInt merge_origins ( UInt or1, UInt or2 ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     return or1 > or2 ? or1 : or2;
  }
  
  UWord VG_REGPARM(1) MC_(helperc_b_load1)( Addr a ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     OCacheLine* line;
     UChar descr;
     UWord lineoff = oc_line_offset(a);
@@ -1539,7 +1539,7 @@ $NetBSD$
  }
  
  UWord VG_REGPARM(1) MC_(helperc_b_load2)( Addr a ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     OCacheLine* line;
     UChar descr;
     UWord lineoff, byteoff;
@@ -1547,7 +1547,7 @@ $NetBSD$
  }
  
  UWord VG_REGPARM(1) MC_(helperc_b_load4)( Addr a ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     OCacheLine* line;
     UChar descr;
     UWord lineoff;
@@ -1555,7 +1555,7 @@ $NetBSD$
  }
  
  UWord VG_REGPARM(1) MC_(helperc_b_load8)( Addr a ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     OCacheLine* line;
     UChar descrLo, descrHi, descr;
     UWord lineoff;
@@ -1563,7 +1563,7 @@ $NetBSD$
  }
  
  UWord VG_REGPARM(1) MC_(helperc_b_load16)( Addr a ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt oLo   = (UInt)MC_(helperc_b_load8)( a + 0 );
     UInt oHi   = (UInt)MC_(helperc_b_load8)( a + 8 );
     UInt oBoth = merge_origins(oLo, oHi);
@@ -1571,7 +1571,7 @@ $NetBSD$
  }
  
  UWord VG_REGPARM(1) MC_(helperc_b_load32)( Addr a ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     UInt oQ0   = (UInt)MC_(helperc_b_load8)( a + 0 );
     UInt oQ1   = (UInt)MC_(helperc_b_load8)( a + 8 );
     UInt oQ2   = (UInt)MC_(helperc_b_load8)( a + 16 );
@@ -1579,7 +1579,7 @@ $NetBSD$
  /*--------------------------------------------*/
  
  void VG_REGPARM(2) MC_(helperc_b_store1)( Addr a, UWord d32 ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     OCacheLine* line;
     UWord lineoff = oc_line_offset(a);
     UWord byteoff = a & 3; /* 0, 1, 2 or 3 */
@@ -1587,7 +1587,7 @@ $NetBSD$
  }
  
  void VG_REGPARM(2) MC_(helperc_b_store2)( Addr a, UWord d32 ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     OCacheLine* line;
     UWord lineoff, byteoff;
  
@@ -1595,7 +1595,7 @@ $NetBSD$
  }
  
  void VG_REGPARM(2) MC_(helperc_b_store4)( Addr a, UWord d32 ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     OCacheLine* line;
     UWord lineoff;
  
@@ -1603,7 +1603,7 @@ $NetBSD$
  }
  
  void VG_REGPARM(2) MC_(helperc_b_store8)( Addr a, UWord d32 ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     OCacheLine* line;
     UWord lineoff;
  
@@ -1611,13 +1611,13 @@ $NetBSD$
  }
  
  void VG_REGPARM(2) MC_(helperc_b_store16)( Addr a, UWord d32 ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_(helperc_b_store8)( a + 0, d32 );
     MC_(helperc_b_store8)( a + 8, d32 );
  }
  
  void VG_REGPARM(2) MC_(helperc_b_store32)( Addr a, UWord d32 ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_(helperc_b_store8)( a +  0, d32 );
     MC_(helperc_b_store8)( a +  8, d32 );
     MC_(helperc_b_store8)( a + 16, d32 );
@@ -1625,7 +1625,7 @@ $NetBSD$
  
  __attribute__((noinline))
  static void ocache_sarp_Set_Origins ( Addr a, UWord len, UInt otag ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if ((a & 1) && len >= 1) {
        MC_(helperc_b_store1)( a, otag );
        a++;
@@ -1633,7 +1633,7 @@ $NetBSD$
  
  __attribute__((noinline))
  static void ocache_sarp_Clear_Origins ( Addr a, UWord len ) {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     if ((a & 1) && len >= 1) {
        MC_(helperc_b_store1)( a, 0 );
        a++;
@@ -1641,7 +1641,7 @@ $NetBSD$
  
  static void mc_post_clo_init ( void )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     /* If we've been asked to emit XML, mash around various other
        options so as to constrain the output somewhat. */
     if (VG_(clo_xml)) {
@@ -1649,7 +1649,7 @@ $NetBSD$
  
  static void print_SM_info(const HChar* type, Int n_SMs)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     VG_(message)(Vg_DebugMsg,
        " memcheck: SMs: %s = %d (%luk, %luM)\n",
        type,
@@ -1657,7 +1657,7 @@ $NetBSD$
  
  static void mc_print_stats (void)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     SizeT max_secVBit_szB, max_SMs_szB, max_shmem_szB;
  
     VG_(message)(Vg_DebugMsg, " memcheck: freelist: vol %lld length %lld\n",
@@ -1665,7 +1665,7 @@ $NetBSD$
  
  static void mc_fini ( Int exitcode )
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     MC_(xtmemory_report) (VG_(clo_xtree_memory_file), True);
     MC_(print_malloc_stats)();
  
@@ -1673,7 +1673,7 @@ $NetBSD$
  static Bool mc_mark_unaddressable_for_watchpoint (PointKind kind, Bool insert,
                                                    Addr addr, SizeT len)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     /* GDBTD this is somewhat fishy. We might rather have to save the previous
        accessibility and definedness in gdbserver so as to allow restoring it
        properly. Currently, we assume that the user only watches things
@@ -1681,7 +1681,7 @@ $NetBSD$
  
  static void mc_pre_clo_init(void)
  {
-+VG_(debugLog)(2, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
++VG_(debugLog)(3, "KR", "%s() %s:%d\n", __func__, __FILE__, __LINE__);
     VG_(details_name)            ("Memcheck");
     VG_(details_version)         (NULL);
     VG_(details_description)     ("a memory error detector");
