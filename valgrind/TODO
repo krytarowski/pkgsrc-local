@@ -1,1 +1,4 @@
  - revisit address ranges in coregrind/m_aspacemgr/aspacemgr-linux.c
+ - fix in initimg-netbsd.c
+:2: initimg   stomping auxv entry 13    // AT_STACKBASE
+:2: initimg   stomping auxv entry 2014  // AT_SUN_EXECNAME
