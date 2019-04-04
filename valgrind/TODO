@@ -1,4 +1,16 @@
  - revisit address ranges in coregrind/m_aspacemgr/aspacemgr-linux.c
+
  - fix in initimg-netbsd.c
 :2: initimg   stomping auxv entry 13    // AT_STACKBASE
 :2: initimg   stomping auxv entry 2014  // AT_SUN_EXECNAME
+
+ - needed?
+1:    main Create fake /proc/<pid>/cmdline
+1:    main Create fake /proc/<pid>/auxv
+
+ - missing?
+-- Contents of /proc/version:
+--   Linux version 4.9.0-8-amd64 (debian-kernel@lists.debian.org) (gcc version 6.3.0 20170516 (Debian 6.3.0-18+deb9u1) ) #1 SMP Debian 4.9.130-2 (2018-10-27)
+-- 
+
+ - 
