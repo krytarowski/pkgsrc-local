@@ -1,0 +1,11 @@
+$NetBSD$
+
+--- accel/stubs/Makefile.objs.orig	2019-04-23 18:14:45.000000000 +0000
++++ accel/stubs/Makefile.objs
+@@ -1,5 +1,6 @@
+ obj-$(call lnot,$(CONFIG_HAX))  += hax-stub.o
+ obj-$(call lnot,$(CONFIG_HVF))  += hvf-stub.o
+ obj-$(call lnot,$(CONFIG_WHPX)) += whpx-stub.o
++obj-$(call lnot,$(CONFIG_NVMM)) += nvmm-stub.o
+ obj-$(call lnot,$(CONFIG_KVM))  += kvm-stub.o
+ obj-$(call lnot,$(CONFIG_TCG))  += tcg-stub.o
