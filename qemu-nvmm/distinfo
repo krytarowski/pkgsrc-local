@@ -16,7 +16,6 @@ SHA1 (patch-hw_net_xilinx__axienet.c) = ebcd2676d64ce6f31e4a8c976d4fdf530ad5e8b7
 SHA1 (patch-hw_tpm_tpm__ioctl.h) = f99aa2912a2229b4ae52d3a0a8f2a7b15756c9be
 SHA1 (patch-hw_usb_dev-mtp.c) = c48e11fbe3a017f0e9f8dbd7bf46898b758ab79c
 SHA1 (patch-include_sysemu_kvm.h) = f99e8ad021f6c8e89e3ca52538bd9b0656e6f619
-SHA1 (patch-nvmm-support) = 637d2af2c98d256fb71c8801d0984e1043f5c3c4
 SHA1 (patch-roms_u-boot_tools_imx8m__image.sh) = e4c452062f40569e33aa93eec4a65bd3af2e74fc
 SHA1 (patch-target_hppa_insns.decode) = 111ad3d5db1c46fd42bb033ac09db377303d352e
 SHA1 (patch-target_hppa_mem__helper.c) = 080d99b2a6dc7f5ab1df04ef6c316e5dcd133753
