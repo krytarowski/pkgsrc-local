@@ -1,0 +1,14 @@
+$NetBSD: patch-configure,v 1.25 2019/04/24 13:59:32 ryoon Exp $
+
+configure: Add HAX support in NetBSD
+
+--- configure.orig	2019-04-23 18:14:45.000000000 +0000
++++ configure
+@@ -815,6 +815,7 @@ FreeBSD)
+ ;;
+ DragonFly)
+   bsd="yes"
++  hax="yes"
+   make="${MAKE-gmake}"
+   audio_drv_list="oss try-sdl"
+   audio_possible_drivers="oss sdl pa"
