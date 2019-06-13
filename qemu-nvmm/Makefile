@@ -48,6 +48,7 @@ CONFIGURE_ARGS+=	--enable-curses
 CONFIGURE_ARGS+=	--enable-docs
 CONFIGURE_ARGS+=	--enable-jemalloc
 CONFIGURE_ARGS+=	--disable-opengl
+CONFIGURE_ARGS+=	--enable-nvmm
 CONFIGURE_ENV+=		mansuffix=/${PKGMANDIR}
 
 .if defined(PKGSRC_USE_SSP)
