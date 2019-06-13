@@ -17,6 +17,7 @@ USE_CMAKE=	yes
 USE_LANGUAGES=	c c++
 USE_TOOLS+=	pkg-config
 
+.include "../../math/double-conversion/buildlink3.mk"
 .include "../../x11/qt5-qtsvg/buildlink3.mk"
 .include "../../wip/mk/git-package.mk"
 .include "../../devel/boost-headers/buildlink3.mk"
