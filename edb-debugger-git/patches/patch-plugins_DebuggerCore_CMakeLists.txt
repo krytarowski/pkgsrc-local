@@ -1,0 +1,34 @@
+$NetBSD$
+
+--- plugins/DebuggerCore/CMakeLists.txt.orig	2019-06-13 22:49:27.000000000 +0000
++++ plugins/DebuggerCore/CMakeLists.txt
+@@ -93,6 +93,29 @@ elseif(TARGET_PLATFORM_FREEBSD)
+ 		unix/freebsd/PlatformThread.cpp
+ 		unix/freebsd/PlatformThread.h
+ 	)
++elseif(TARGET_PLATFORM_NETBSD)
++
++	set(PLUGIN_INCLUDES
++		${PLUGIN_INCLUDES}
++		unix/netbsd
++		unix
++	)
++
++	set(DebuggerCore_SRCS
++		${DebuggerCore_SRCS}
++		unix/netbsd/DebuggerCore.cpp
++		unix/netbsd/DebuggerCore.h
++		unix/netbsd/PlatformCommon.cpp
++		unix/netbsd/PlatformCommon.h
++		unix/netbsd/PlatformEvent.cpp
++		unix/netbsd/PlatformEvent.h
++		unix/netbsd/PlatformProcess.cpp
++		unix/netbsd/PlatformProcess.h
++		unix/netbsd/PlatformRegion.cpp
++		unix/netbsd/PlatformRegion.h
++		unix/netbsd/PlatformThread.cpp
++		unix/netbsd/PlatformThread.h
++	)
+ endif()
+ 
+ if(TARGET_ARCH_FAMILY_X86)
