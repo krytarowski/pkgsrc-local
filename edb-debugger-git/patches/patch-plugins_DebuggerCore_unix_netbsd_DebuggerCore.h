@@ -1,8 +1,8 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/DebuggerCore.h.orig	2019-06-14 00:22:08.129131731 +0000
+--- plugins/DebuggerCore/unix/netbsd/DebuggerCore.h.orig	2019-06-14 00:28:36.179759538 +0000
 +++ plugins/DebuggerCore/unix/netbsd/DebuggerCore.h
-@@ -0,0 +1,100 @@
+@@ -0,0 +1,103 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -38,6 +38,7 @@ $NetBSD$
 +	friend class PlatformProcess;
 +	friend class PlatformThread;
 +
++	CPUMode cpu_mode() const override { return cpu_mode_; }
 +public:
 +	DebuggerCore();
 +	~DebuggerCore() override;
@@ -53,6 +54,7 @@ $NetBSD$
 +	Status open(const QString &path, const QString &cwd, const QList<QByteArray> &args, const QString &tty) override;
 +	MeansOfCapture last_means_of_capture() const override;
 +	void set_ignored_exceptions(const QList<qlonglong> &exceptions) override;
++	uint8_t nopFillByte() const override;
 +
 +public:
 +	QMap<qlonglong, QString> exceptions() const override;
@@ -98,6 +100,7 @@ $NetBSD$
 +
 +	edb::address_t page_size_;
 +	threadmap_t    threads_;
++	CPUMode cpu_mode_ = CPUMode::Unknown;
 +};
 +
 +}

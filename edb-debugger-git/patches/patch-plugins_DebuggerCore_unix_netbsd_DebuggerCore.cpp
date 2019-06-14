@@ -1,8 +1,8 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp.orig	2019-06-14 00:22:08.118660999 +0000
+--- plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp.orig	2019-06-14 00:28:36.169297133 +0000
 +++ plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp
-@@ -0,0 +1,438 @@
+@@ -0,0 +1,449 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -437,6 +437,17 @@ $NetBSD$
 +	return "eip";
 +#elif defined(EDB_X86_64)
 +	return "rip";
++#endif
++}
++
++uint8_t DebuggerCore::nopFillByte() const {
++#if defined EDB_X86 || defined EDB_X86_64
++        return 0x90;
++#elif defined EDB_ARM32 || defined EDB_ARM64
++        // TODO(eteran): does this concept even make sense for a multi-byte instruction encoding?
++        return 0x00;
++#else
++        #error "Unsupported Architecture"
 +#endif
 +}
 +
