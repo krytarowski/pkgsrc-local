@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp.orig	2019-06-14 00:28:36.169297133 +0000
 +++ plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp
-@@ -0,0 +1,449 @@
+@@ -0,0 +1,448 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -34,16 +34,15 @@ $NetBSD$
 +#include <cerrno>
 +#include <cstring>
 +
++#include <sys/param.h>
 +#include <fcntl.h>
 +#include <kvm.h>
 +#include <machine/reg.h>
 +#include <paths.h>
 +#include <signal.h>
 +#include <sys/mman.h>
-+#include <sys/param.h>
 +#include <sys/ptrace.h>
 +#include <sys/sysctl.h>
-+#include <sys/user.h>
 +#include <sys/wait.h>
 +#include <unistd.h>
 +
@@ -111,7 +110,7 @@ $NetBSD$
 +// Desc: waits for a debug event, msecs is a timeout
 +//      it will return false if an error or timeout occurs
 +//------------------------------------------------------------------------------
-+std::shared_ptr<const IDebugEvent> DebuggerCore::wait_debug_event(int msecs) {
++std::shared_ptr<IDebugEvent> DebuggerCore::wait_debug_event(int msecs) {
 +	if(attached()) {
 +		int status;
 +		bool timeout;

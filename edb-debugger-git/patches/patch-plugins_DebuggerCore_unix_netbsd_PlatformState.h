@@ -69,10 +69,10 @@ $NetBSD$
 +	void set_instruction_pointer(edb::address_t value) override;
 +	void set_register(const Register &reg) override;
 +	void set_register(const QString &name, edb::reg_t value) override;
-+	Register mmx_register(size_t n) const override;
-+	Register xmm_register(size_t n) const override;
-+	Register ymm_register(size_t n) const override;
-+	Register gp_register(size_t n) const override;
++	Register mmx_register(size_t n) const;
++	Register xmm_register(size_t n) const;
++	Register ymm_register(size_t n) const;
++	Register gp_register(size_t n) const;
 +
 +private:
 +	reg   regs_;
