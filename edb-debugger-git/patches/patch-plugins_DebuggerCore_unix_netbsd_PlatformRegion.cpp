@@ -1,6 +1,6 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/PlatformRegion.cpp.orig	2019-06-13 23:19:57.249779151 +0000
+--- plugins/DebuggerCore/unix/netbsd/PlatformRegion.cpp.orig	2019-06-14 00:00:37.482272641 +0000
 +++ plugins/DebuggerCore/unix/netbsd/PlatformRegion.cpp
 @@ -0,0 +1,93 @@
 +/*
