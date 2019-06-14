@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp.orig	2019-06-14 00:50:24.165432268 +0000
 +++ plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp
-@@ -0,0 +1,985 @@
+@@ -0,0 +1,959 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -569,36 +569,10 @@ $NetBSD$
 +		return Status(std::strerror(lastErr));
 +	}
 +
-+	lastErr = -2;
-+	bool attached;
-+	do {
-+		attached = false;
-+		QDir proc_directory(QString("/proc/%1/task/").arg(pid));
-+		for(const QString &s: proc_directory.entryList(QDir::NoDotAndDotDot | QDir::Dirs)) {
-+			// this can get tricky if the threads decide to spawn new threads
-+			// when we are attaching. I wish that linux had an atomic way to do this
-+			// all in one shot
-+			const edb::tid_t tid = s.toInt();
-+			if(!threads_.contains(tid)) {
-+                const auto errnum = attach_thread(tid);
-+				if(errnum == 0) {
-+					attached = true;
-+				} else {
-+					lastErr = errnum;
-+				}
-+			}
-+		}
-+	} while(attached);
 +
-+
-+	if(!threads_.empty()) {
-+		active_thread_  = pid;
-+		detectCPUMode();
-+		return Status::Ok;
-+	}
-+
-+    process_ = nullptr;
-+	return Status(std::strerror(lastErr));
++	active_thread_ = pid;
++	detectCPUMode();
++	return Status::Ok;
 +}
 +
 +//------------------------------------------------------------------------------
