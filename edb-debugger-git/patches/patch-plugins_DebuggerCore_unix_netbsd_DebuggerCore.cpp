@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp.orig	2019-06-14 00:50:24.165432268 +0000
 +++ plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp
-@@ -0,0 +1,959 @@
+@@ -0,0 +1,868 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -48,9 +48,7 @@ $NetBSD$
 +#include <cerrno>
 +#include <cstring>
 +
-+#if defined(EDB_X86) || defined(EDB_X86_64)
 +#include <cpuid.h>
-+#endif
 +
 +#include <sys/types.h>
 +#include <sys/ptrace.h>
@@ -94,15 +92,12 @@ $NetBSD$
 +// Desc: constructor
 +//------------------------------------------------------------------------------
 +DebuggerCore::DebuggerCore()
-+#if defined(EDB_X86_64)
 +    :
 +    edbIsIn64BitSegment(true),
 +    osIs64Bit(os64Bit(true),
 +    USER_CS_32(0x23),
 +    USER_CS_64(0x33), // RPL 0 can't appear in user segment registers, so 0xfff8 is safe
-+    USER_SS(0x2b)
-+#endif
-+	 {
++    USER_SS(0x2b) {
 +
 +	Posix::initialize();
 +
@@ -117,7 +112,6 @@ $NetBSD$
 +	
 +	Q_UNUSED(ext)
 +	
-+#if defined(EDB_X86_64)
 +	static constexpr auto mmxHash = edb::string_hash("MMX");
 +	static constexpr auto xmmHash = edb::string_hash("XMM");
 +	static constexpr auto ymmHash = edb::string_hash("YMM");
@@ -156,9 +150,6 @@ $NetBSD$
 +	default:
 +		return false;
 +	}
-+#else
-+	return false;
-+#endif
 +}
 +
 +//------------------------------------------------------------------------------
@@ -179,22 +170,6 @@ $NetBSD$
 +//------------------------------------------------------------------------------
 +DebuggerCore::~DebuggerCore() {
 +	end_debug_session();
-+}
-+
-+//------------------------------------------------------------------------------
-+// Name: ptrace_getsiginfo
-+// Desc:
-+//------------------------------------------------------------------------------
-+Status DebuggerCore::ptrace_getsiginfo(edb::tid_t tid, siginfo_t *siginfo) {
-+
-+	Q_ASSERT(siginfo);
-+
-+	if(ptrace(PT_GET_SIGINFO, tid, siginfo, sizeof(*siginfo))==-1) {
-+		const char *const strError = strerror(errno);
-+		qWarning() << "Unable to get signal info for thread" << tid << ": PT_GET_SIGINFO failed:" << strError;
-+		return Status(strError);
-+	}
-+	return Status::Ok;
 +}
 +
 +//------------------------------------------------------------------------------
@@ -304,7 +279,6 @@ $NetBSD$
 +	Q_UNUSED(status)
 +
 +	threads_.remove(tid);
-+	waited_threads_.remove(tid);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -447,69 +421,7 @@ $NetBSD$
 +		}
 +	}
 +
-+#if defined EDB_ARM32
-+	if(it != threads_.end()) {
-+		const auto& thread = *it;
-+		if(thread->singleStepBreakpoint) {
-+
-+			remove_breakpoint(thread->singleStepBreakpoint->address());
-+			thread->singleStepBreakpoint = nullptr;
-+
-+			assert(e->siginfo_.si_signo == SIGTRAP); // signo must have already be converted to SIGTRAP if needed
-+			e->siginfo_.si_code = TRAP_TRACE;
-+		}
-+	}
-+#endif
 +	return e;
-+}
-+
-+//------------------------------------------------------------------------------
-+// Name: stop_threads
-+// Desc:
-+//------------------------------------------------------------------------------
-+Status DebuggerCore::stop_threads() {
-+
-+	QString errorMessage;
-+
-+	if(process_) {
-+		for(auto &thread: process_->threads()) {
-+			const edb::tid_t tid = thread->tid();
-+
-+			if(!util::contains(waited_threads_, tid)) {
-+
-+				if(auto thread_ptr = std::static_pointer_cast<PlatformThread>(thread)) {
-+
-+					if(syscall(SYS_tgkill, process_->pid(), thread->tid(), SIGSTOP) == -1) {
-+						const char *const error = strerror(errno);
-+						errorMessage += tr("Failed to stop thread %1: %2\n").arg(tid).arg(error);
-+					}
-+
-+					int thread_status;
-+					if(Posix::waitpid(thread->tid(), &thread_status, __WALL/* | WNOHANG*/) > 0) {
-+						waited_threads_.insert(tid);
-+						thread_ptr->status_ = thread_status;
-+
-+						// A thread could have exited between previous waitpid and the latest one...
-+						if(WIFEXITED(thread_status)) {
-+							handle_thread_exit(tid, thread_status);
-+						}
-+
-+						// ..., otherwise it must have stopped.
-+						else if(!WIFSTOPPED(thread_status) || WSTOPSIG(thread_status) != SIGSTOP) {
-+							qWarning("stop_threads(): paused thread [%d] received an event besides SIGSTOP: status=0x%x", tid, thread_status);
-+						}
-+					}
-+				}
-+			}
-+		}
-+	}
-+
-+	if(errorMessage.isEmpty()) {
-+		return Status::Ok;
-+	}
-+
-+	qWarning() << qPrintable(errorMessage);
-+	return Status("\n" + errorMessage);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -650,10 +562,7 @@ $NetBSD$
 +	switch(pid_t pid = fork()) {
 +	case 0:
 +	{
-+		// we are in the child now...
-+
-+		// set ourselves (the child proc) up to be traced
-+		ptrace_traceme();
++		ptrace(PT_TRACE_ME, 0, NULL, 0);
 +
 +		// redirect it's I/O
 +		if(!tty.isEmpty()) {
