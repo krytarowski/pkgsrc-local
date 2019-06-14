@@ -1,8 +1,8 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp.orig	2019-06-14 00:47:12.351409717 +0000
+--- plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp.orig	2019-06-14 00:50:24.165432268 +0000
 +++ plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp
-@@ -0,0 +1,1177 @@
+@@ -0,0 +1,1122 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -56,52 +56,17 @@ $NetBSD$
 +#include <cpuid.h>
 +#endif
 +
++#include <sys/types.h>
 +#include <sys/ptrace.h>
 +#include <sys/mman.h>
-+#include <sys/personality.h>
 +#include <sys/wait.h>
 +#include <sys/syscall.h>   /* For SYS_xxx definitions */
-+
-+// doesn't always seem to be defined in the headers
-+
-+#ifndef PTRACE_GETSIGINFO
-+#define PTRACE_GETSIGINFO static_cast<__ptrace_request>(0x4202)
-+#endif
-+
-+#ifndef PTRACE_EVENT_CLONE
-+#define PTRACE_EVENT_CLONE 3
-+#endif
-+
-+#ifndef PTRACE_O_TRACECLONE
-+#define PTRACE_O_TRACECLONE (1 << PTRACE_EVENT_CLONE)
-+#endif
-+
-+#ifndef PTRACE_O_EXITKILL
-+#define PTRACE_O_EXITKILL	(1 << 20)
-+#endif
-+
-+#ifndef PTRACE_O_TRACEEXIT
-+#define PTRACE_O_TRACEEXIT	(1 << PTRACE_EVENT_EXIT)
-+#endif
 +
 +namespace DebuggerCorePlugin {
 +
 +namespace {
 +
 +const size_t PageSize = 0x1000;
-+
-+/**
-+ * @brief disable_aslr
-+ */
-+void disable_aslr() {
-+	const int current = ::personality(UINT32_MAX);
-+	// This shouldn't fail, but let's at least perror if it does anyway
-+	if(current == -1) {
-+		perror("Failed to get current personality");
-+	} else if(::personality(current | ADDR_NO_RANDOMIZE) == -1) {
-+		perror("Failed to disable ASLR");
-+	}
-+}
 +
 +/**
 + * @brief disable_lazy_binding
@@ -124,22 +89,6 @@ $NetBSD$
 +	}
 +
 +	return true;
-+}
-+
-+//------------------------------------------------------------------------------
-+// Name: is_clone_event
-+// Desc:
-+//------------------------------------------------------------------------------
-+bool is_clone_event(int status) {
-+    return (status >> 8 == (SIGTRAP | (PTRACE_EVENT_CLONE << 8)));
-+}
-+
-+//------------------------------------------------------------------------------
-+// Name: is_exit_trace_event
-+// Desc:
-+//------------------------------------------------------------------------------
-+bool is_exit_trace_event(int status) {
-+    return (status >> 8 == (SIGTRAP | (PTRACE_EVENT_EXIT << 8)));
 +}
 +
 +#if defined(EDB_X86) || defined(EDB_X86_64)
@@ -296,9 +245,9 @@ $NetBSD$
 +
 +	Q_ASSERT(siginfo);
 +
-+	if(ptrace(PTRACE_GETSIGINFO, tid, 0, siginfo)==-1) {
++	if(ptrace(PT_GET_SIGINFO, tid, siginfo, sizeof(*siginfo))==-1) {
 +		const char *const strError = strerror(errno);
-+		qWarning() << "Unable to get signal info for thread" << tid << ": PTRACE_GETSIGINFO failed:" << strError;
++		qWarning() << "Unable to get signal info for thread" << tid << ": PT_GET_SIGINFO failed:" << strError;
 +		return Status(strError);
 +	}
 +	return Status::Ok;
@@ -876,10 +825,6 @@ $NetBSD$
 +			Q_UNUSED(std_out)
 +			Q_UNUSED(std_in)
 +			Q_UNUSED(std_err)
-+		}
-+
-+		if(edb::v1::config().disableASLR) {
-+			disable_aslr();
 +		}
 +
 +		if(edb::v1::config().disableLazyBinding) {

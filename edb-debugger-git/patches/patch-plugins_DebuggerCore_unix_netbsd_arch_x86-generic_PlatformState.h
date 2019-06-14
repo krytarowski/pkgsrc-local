@@ -1,8 +1,8 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformState.h.orig	2019-06-14 00:47:12.609650315 +0000
+--- plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformState.h.orig	2019-06-14 00:50:24.427188430 +0000
 +++ plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformState.h
-@@ -0,0 +1,525 @@
+@@ -0,0 +1,562 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -29,7 +29,6 @@ $NetBSD$
 +#include "PrStatus.h"
 +#include "edb.h"
 +#include <cstddef>
-+#include <sys/user.h>
 +
 +namespace DebuggerCorePlugin {
 +
@@ -57,9 +56,40 @@ $NetBSD$
 +static constexpr size_t MAX_ZMM_REG_COUNT               = AMD64_ZMM_REG_COUNT;
 +
 +#ifdef EDB_X86
++struct user_regs_struct {
++	unsigned long long int rdi;
++	unsigned long long int rsi;
++	unsigned long long int rdx;
++	unsigned long long int rcx;
++	unsigned long long int r8;
++	unsigned long long int r9;
++	unsigned long long int r10;
++	unsigned long long int r11;
++	unsigned long long int r12;
++	unsigned long long int r13;
++	unsigned long long int r14;
++	unsigned long long int r15;
++	unsigned long long int rbp;
++	unsigned long long int rbx;
++	unsigned long long int rax;
++	unsigned long long int gs;
++	unsigned long long int fs;
++	unsigned long long int es;
++	unsigned long long int ds;
++	unsigned long long int trapno;
++	unsigned long long int err;
++	unsigned long long int rip;
++	unsigned long long int cs;
++	unsigned long long int rflags;
++	unsigned long long int rsp;
++	unsigned long long int ss;
++};
++
 +using UserRegsStructX86    = struct user_regs_struct;
++#if 0
 +using UserFPRegsStructX86  = struct user_fpregs_struct;
 +using UserFPXRegsStructX86 = struct user_fpxregs_struct;
++#endif
 +
 +// Dummies to avoid missing compile-time checks for conversion code.
 +// Actual layout is irrelevant since the code is not going to be executed
@@ -108,9 +138,12 @@ $NetBSD$
 +};
 +
 +#elif defined EDB_X86_64
-+
++struct user_regs_struct {
++};
 +using UserRegsStructX86_64   = user_regs_struct;
++#if 0
 +using UserFPRegsStructX86_64 = user_fpregs_struct;
++#endif
 +
 +// Dummies to avoid missing compile-time checks for conversion code
 +// Actual layout is irrelevant since the code is not going to be executed
@@ -512,16 +545,20 @@ $NetBSD$
 +	void fillFrom(const PrStatus_X86 &regs);
 +	void fillFrom(const PrStatus_X86_64 &regs);
 +	void fillFrom(const UserFPRegsStructX86 &regs);
++#if 0
 +	void fillFrom(const UserFPRegsStructX86_64 &regs);
 +	void fillFrom(const UserFPXRegsStructX86 &regs);
++#endif
 +	bool fillFrom(const X86XState &regs, size_t sizeFromKernel);
 +
 +	void fillStruct(UserRegsStructX86 &regs) const;
 +	void fillStruct(UserRegsStructX86_64 &regs) const;
 +	void fillStruct(PrStatus_X86_64 &regs) const;
 +	void fillStruct(UserFPRegsStructX86 &regs) const;
++#if 0
 +	void fillStruct(UserFPRegsStructX86_64 &regs) const;
 +	void fillStruct(UserFPXRegsStructX86 &regs) const;
++#endif
 +	size_t fillStruct(X86XState &regs) const;
 +};
 +
