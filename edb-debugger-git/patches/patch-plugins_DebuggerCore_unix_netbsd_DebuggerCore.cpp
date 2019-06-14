@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp.orig	2019-06-14 00:50:24.165432268 +0000
 +++ plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp
-@@ -0,0 +1,968 @@
+@@ -0,0 +1,985 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -546,8 +546,25 @@ $NetBSD$
 +	// create this, so the threads created can refer to it
 +	process_ = std::make_shared<PlatformProcess>(this, pid);
 +
-+	int lastErr = attach_thread(pid); // Fail early if we are going to
-+	if(lastErr) {
++	if (ptrace(PTRACE_ATTACH, pid, 0, 0) == -1) {
++		process_ = nullptr;
++		return Status(std::strerror(lastErr));
++	}
++
++	const int ret = Posix::waitpid(pid, &status, 0);
++	if (ret == -1) {
++		process_ = nullptr;
++		return Status(std::strerror(lastErr));
++	}
++
++	struct ptrace_lwpinfo pl;
++	pl.pl_lwpid = 0;
++	int rv;
++	while ((rv = ptrace (PT_LWPINFO, pid, (void *)&pl, sizeof(pl))) != -1 && pl.pl_lwpid != 0) {
++		auto newThread     = std::make_shared<PlatformThread>(this, process_, pl.pl_lwpid);
++		threads_.insert(tid, newThread);
++	}
++	if (rv == -1) {
 +		process_ = nullptr;
 +		return Status(std::strerror(lastErr));
 +	}
