@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp.orig	2019-06-14 00:50:24.165432268 +0000
 +++ plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp
-@@ -0,0 +1,1122 @@
+@@ -0,0 +1,968 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -48,10 +48,6 @@ $NetBSD$
 +#include <cerrno>
 +#include <cstring>
 +
-+#ifndef _GNU_SOURCE
-+#define _GNU_SOURCE        /* or _BSD_SOURCE or _SVID_SOURCE */
-+#endif
-+
 +#if defined(EDB_X86) || defined(EDB_X86_64)
 +#include <cpuid.h>
 +#endif
@@ -62,11 +58,11 @@ $NetBSD$
 +#include <sys/wait.h>
 +#include <sys/syscall.h>   /* For SYS_xxx definitions */
 +
++#include <unistd.h>
++
 +namespace DebuggerCorePlugin {
 +
 +namespace {
-+
-+const size_t PageSize = 0x1000;
 +
 +/**
 + * @brief disable_lazy_binding
@@ -91,41 +87,6 @@ $NetBSD$
 +	return true;
 +}
 +
-+#if defined(EDB_X86) || defined(EDB_X86_64)
-+bool in64BitSegment() {
-+	bool edbIsIn64BitSegment;
-+	// Check that we're running in 64 bit segment: this can be in cases
-+	// of LP64 and ILP32 programming models, so we can't rely on sizeof(void*)
-+	asm(R"(
-+		   .byte 0x33,0xc0 # XOR EAX,EAX
-+		   .byte 0x48      # DEC EAX for 32 bit, REX prefix for 64 bit
-+		   .byte 0xff,0xc0 # INC EAX for 32 bit, INC RAX due to REX.W in 64 bit
-+		 )":"=a"(edbIsIn64BitSegment));
-+	return edbIsIn64BitSegment;
-+}
-+
-+bool os64Bit(bool edbIsIn64BitSegment) {
-+	bool osIs64Bit;
-+
-+	if(edbIsIn64BitSegment) {
-+		osIs64Bit = true;
-+	} else {
-+		// We want to be really sure the OS is 32 bit, so we can't rely on such easy
-+		// to (even unintentionally) fake mechanisms as uname(2) (e.g. see setarch(8))
-+		asm(R"(.intel_syntax noprefix
-+			   mov eax,cs
-+			   cmp ax,0x23 # this value is set for 32-bit processes on 64-bit kernel
-+			   mov ah,0    # not sure this is really needed: usually the compiler will do
-+						   # MOVZX EAX,AL, but we have to be certain the result is correct
-+			   sete al
-+			   .att_syntax # restore default syntax
-+			   )":"=a"(osIs64Bit));
-+	}
-+
-+	return osIs64Bit;
-+}
-+#endif
-+
 +}
 +
 +//------------------------------------------------------------------------------
@@ -133,36 +94,19 @@ $NetBSD$
 +// Desc: constructor
 +//------------------------------------------------------------------------------
 +DebuggerCore::DebuggerCore()
-+#if defined(EDB_X86) || defined(EDB_X86_64)
++#if defined(EDB_X86_64)
 +    :
-+    edbIsIn64BitSegment(in64BitSegment()),
-+    osIs64Bit(os64Bit(edbIsIn64BitSegment)),
-+    USER_CS_32(osIs64Bit ? 0x23 : 0x73),
-+    USER_CS_64(osIs64Bit ? 0x33 : 0xfff8), // RPL 0 can't appear in user segment registers, so 0xfff8 is safe
-+    USER_SS(osIs64Bit    ? 0x2b : 0x7b)
++    edbIsIn64BitSegment(true),
++    osIs64Bit(os64Bit(true),
++    USER_CS_32(0x23),
++    USER_CS_64(0x33), // RPL 0 can't appear in user segment registers, so 0xfff8 is safe
++    USER_SS(0x2b)
 +#endif
 +	 {
 +
 +	Posix::initialize();
 +
 +	feature::detect_proc_access(&proc_mem_read_broken_, &proc_mem_write_broken_);
-+
-+	if(proc_mem_read_broken_ || proc_mem_write_broken_) {
-+
-+		qDebug() << "Detect that read /proc/<pid>/mem works  = " << !proc_mem_read_broken_;
-+		qDebug() << "Detect that write /proc/<pid>/mem works = " << !proc_mem_write_broken_;
-+
-+		QSettings settings;
-+		const bool warn = settings.value("DebuggerCore/warn_on_broken_proc_mem.enabled", true).toBool();
-+		if(warn) {
-+			auto dialog = new DialogMemoryAccess(nullptr);
-+			dialog->exec();
-+
-+			settings.setValue("DebuggerCore/warn_on_broken_proc_mem.enabled", dialog->warnNextTime());
-+
-+			delete dialog;
-+		}
-+	}
 +}
 +
 +//------------------------------------------------------------------------------
@@ -173,12 +117,12 @@ $NetBSD$
 +	
 +	Q_UNUSED(ext)
 +	
-+#if defined(EDB_X86) || defined(EDB_X86_64)
++#if defined(EDB_X86_64)
 +	static constexpr auto mmxHash = edb::string_hash("MMX");
 +	static constexpr auto xmmHash = edb::string_hash("XMM");
 +	static constexpr auto ymmHash = edb::string_hash("YMM");
 +
-+	if(EDB_IS_64_BIT && (ext == xmmHash || ext == mmxHash)) {
++	if(ext == xmmHash || ext == mmxHash) {
 +		return true;
 +	}
 +
@@ -222,7 +166,7 @@ $NetBSD$
 +// Desc: returns the size of a page on this system
 +//------------------------------------------------------------------------------
 +size_t DebuggerCore::page_size() const {
-+	return PageSize;
++	return sysconf(_SC_PAGESIZE);
 +}
 +
 +std::size_t DebuggerCore::pointer_size() const {
@@ -307,12 +251,12 @@ $NetBSD$
 +// Name: ptrace_set_options
 +// Desc:
 +//------------------------------------------------------------------------------
-+Status DebuggerCore::ptrace_set_options(edb::tid_t tid, long options) {
-+	Q_ASSERT(util::contains(waited_threads_, tid));
-+	Q_ASSERT(tid != 0);
-+	if(ptrace(PTRACE_SETOPTIONS, tid, 0, options)==-1) {
++Status DebuggerCore::ptrace_set_options(edb::tid_t tid, ptrace_event_t pe) {
++	Q_ASSERT(tid != 0);	
++
++	if(ptrace(PT_SET_EVENT_MASK, tid, &pe, sizeof(pe))==-1) {
 +		const char *const strError = strerror(errno);
-+		qWarning() << "Unable to set ptrace options for thread" << tid << ": PTRACE_SETOPTIONS failed:" << strError;
++		qWarning() << "Unable to set ptrace options " << tid << ": PT_SET_EVENT_MASK failed:" << strError;
 +		return Status(strError);
 +	}
 +	return Status::Ok;
@@ -339,32 +283,17 @@ $NetBSD$
 +// Name: desired_ptrace_options
 +// Desc:
 +//------------------------------------------------------------------------------
-+long DebuggerCore::ptraceOptions() const {
++ptrace_event_t DebuggerCore::ptraceOptions() const {
++    ptrace_event_t pe = {};
 +
-+    // we want to trace clone (thread) creation events
-+    long options = PTRACE_O_TRACECLONE;
++    pe.pe_set_event |= PTRACE_FORK;
++    pe.pe_set_event |= PTRACE_VFORK;
++    pe.pe_set_event |= PTRACE_VFORK_DONE;
++    pe.pe_set_event |= PTRACE_LWP_CREATE;
++    pe.pe_set_event |= PTRACE_LWP_EXIT;
++    pe.pe_set_event |= PTRACE_POSIX_SPAWN;
 +
-+    // if applicable, we want an auto SIGKILL sent to the child
-+    // process and its threads
-+    switch(edb::v1::config().close_behavior) {
-+    case Configuration::Kill:
-+        options |= PTRACE_O_EXITKILL;
-+        break;
-+    case Configuration::KillIfLaunchedDetachIfAttached:
-+        if(last_means_of_capture() == MeansOfCapture::Launch) {
-+            options |= PTRACE_O_EXITKILL;
-+        }
-+        break;
-+    default:
-+        break;
-+    }
-+
-+#if 0
-+    // TODO(eteran): research this option for issue #46
-+    options |= PTRACE_O_TRACEEXIT;
-+#endif
-+
-+    return options;
++    return pe;
 +}
 +
 +//------------------------------------------------------------------------------
@@ -605,42 +534,6 @@ $NetBSD$
 +}
 +
 +//------------------------------------------------------------------------------
-+// Name: attach_thread
-+// Desc: returns 0 if successful, errno if failed
-+//------------------------------------------------------------------------------
-+int DebuggerCore::attach_thread(edb::tid_t tid) {
-+
-+	if(ptrace(PTRACE_ATTACH, tid, 0, 0) == 0) {
-+
-+		int status;
-+		const int ret = Posix::waitpid(tid, &status, __WALL);
-+		if(ret > 0) {
-+
-+			auto newThread     = std::make_shared<PlatformThread>(this, process_, tid);
-+			newThread->status_ = status;
-+
-+			threads_.insert(tid, newThread);
-+			waited_threads_.insert(tid);
-+
-+            const long options = ptraceOptions();
-+
-+			const auto setoptStatus = ptrace_set_options(tid, options);
-+			if(!setoptStatus)	{
-+				qDebug() << "[DebuggerCore] failed to set ptrace options: ["<< tid <<"]" << setoptStatus.error();
-+            }
-+
-+			return 0;
-+		} else if(ret == -1) {
-+			return errno;
-+        } else {
-+            return -1; // unknown error
-+        }
-+    } else {
-+        return errno;
-+    }
-+}
-+
-+//------------------------------------------------------------------------------
 +// Name: attach
 +// Desc:
 +//------------------------------------------------------------------------------
@@ -741,54 +634,9 @@ $NetBSD$
 +}
 +
 +void DebuggerCore::detectCPUMode() {
-+
-+#if defined(EDB_X86) || defined(EDB_X86_64)
-+	const size_t offset = EDB_IS_64_BIT ?
-+	                          offsetof(UserRegsStructX86_64, cs) :
-+	                          offsetof(UserRegsStructX86, xcs);
-+	errno = 0;
-+	const edb::seg_reg_t cs = ptrace(PTRACE_PEEKUSER, active_thread_, offset, 0);
-+
-+	if (!errno) {
-+		if (cs == USER_CS_32) {
-+			if (pointer_size_ == sizeof(quint64)) {
-+				qDebug() << "Debuggee is now 32 bit";
-+				cpu_mode_ = CPUMode::x86_32;
-+				CapstoneEDB::init(CapstoneEDB::Architecture::ARCH_X86);
-+			}
-+			pointer_size_ = sizeof(quint32);
-+			return;
-+		} else if (cs == USER_CS_64) {
-+			if (pointer_size_ == sizeof(quint32)) {
-+				qDebug() << "Debuggee is now 64 bit";
-+				cpu_mode_ = CPUMode::x86_64;
-+				CapstoneEDB::init(CapstoneEDB::Architecture::ARCH_AMD64);
-+			}
-+			pointer_size_ = sizeof(quint64);
-+			return;
-+		}
-+	}
-+#elif defined(EDB_ARM32)
-+	errno = 0;
-+	const auto cpsr = ptrace(PTRACE_PEEKUSER, active_thread_, sizeof(long) * 16, 0L);
-+	if (!errno) {
-+		const bool thumb = cpsr & 0x20;
-+		if (thumb) {
-+			cpu_mode_ = CPUMode::Thumb;
-+			CapstoneEDB::init(CapstoneEDB::Architecture::ARCH_ARM32_THUMB);
-+		} else {
-+			cpu_mode_ = CPUMode::ARM32;
-+			CapstoneEDB::init(CapstoneEDB::Architecture::ARCH_ARM32_ARM);
-+		}
-+	}
-+	pointer_size_ = sizeof(quint32);
-+#elif defined(EDB_ARM64)
-+	cpu_mode_ = CPUMode::ARM64;
-+	CapstoneEDB::init(CapstoneEDB::Architecture::ARCH_ARM64);
++	cpu_mode_ = CPUMode::x86_64;
++	CapstoneEDB::init(CapstoneEDB::Architecture::ARCH_AMD64);
 +	pointer_size_ = sizeof(quint64);
-+#else
-+    #error "Unsupported Architecture"
-+#endif
 +}
 +
 +//------------------------------------------------------------------------------
@@ -834,9 +682,7 @@ $NetBSD$
 +		// do the actual exec
 +		const Status status = Unix::execute_process(path, cwd, args);
 +
-+#if defined __GNUG__ && __GNUC__ >= 5 || !defined __GNUG__ || defined __clang__ && __clang_major__*100+__clang_minor__>=306
 +		static_assert(std::is_trivially_copyable<QChar>::value, "Can't copy string of QChar to shared memory");
-+#endif
 +		QString error = status.error();
 +		std::memcpy(sharedMem, error.constData(), std::min(sizeof(QChar) * error.size(), sharedMemSize - sizeof(QChar) /*prevent overwriting of last null*/ ));
 +
@@ -858,15 +704,15 @@ $NetBSD$
 +            ::munmap(sharedMem, sharedMemSize);
 +
 +            if(wpidRet == -1) {
-+				return Status(tr("waitpid() failed: %1").arg(std::strerror(errno))+(childError.isEmpty()?"" : tr(".\nError returned by child:\n%1.").arg(childError)));
++		return Status(tr("waitpid() failed: %1").arg(std::strerror(errno))+(childError.isEmpty()?"" : tr(".\nError returned by child:\n%1.").arg(childError)));
 +            }
 +
 +            if(WIFEXITED(status)) {
-+				return Status(tr("The child unexpectedly exited with code %1. Error returned by child:\n%2").arg(WEXITSTATUS(status)).arg(childError));
++		return Status(tr("The child unexpectedly exited with code %1. Error returned by child:\n%2").arg(WEXITSTATUS(status)).arg(childError));
 +            }
 +
 +            if(WIFSIGNALED(status)) {
-+				return Status(tr("The child was unexpectedly killed by signal %1. Error returned by child:\n%2").arg(WTERMSIG(status)).arg(childError));
++		return Status(tr("The child was unexpectedly killed by signal %1. Error returned by child:\n%2").arg(WTERMSIG(status)).arg(childError));
 +            }
 +
 +			// This happens when exec failed, but just in case it's something another return some description.
@@ -878,7 +724,7 @@ $NetBSD$
 +			if(!WIFSTOPPED(status) || WSTOPSIG(status) != SIGTRAP) {
 +				end_debug_session();
 +				return Status(tr("First event after waitpid() should be a STOP of type SIGTRAP, but wasn't, instead status=0x%1")
-+											.arg(status,0,16)+(childError.isEmpty() ? "" : tr(".\nError returned by child:\n%1.").arg(childError)));
++					.arg(status,0,16)+(childError.isEmpty() ? "" : tr(".\nError returned by child:\n%1.").arg(childError)));
 +			}
 +
 +            waited_threads_.insert(pid);
@@ -889,7 +735,7 @@ $NetBSD$
 +			const auto setoptStatus=ptrace_set_options(pid, options);
 +            if(!setoptStatus) {
 +                end_debug_session();
-+				return Status(tr("[DebuggerCore] failed to set ptrace options: %1").arg(setoptStatus.error()));
++		return Status(tr("[DebuggerCore] failed to set ptrace options: %1").arg(setoptStatus.error()));
 +            }
 +
 +            // create the process
