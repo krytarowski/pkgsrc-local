@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp.orig	2019-06-14 15:42:03.422152074 +0000
 +++ plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp
-@@ -0,0 +1,814 @@
+@@ -0,0 +1,1046 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -52,7 +52,7 @@ $NetBSD$
 +#include <sys/ptrace.h>
 +#include <sys/mman.h>
 +#include <sys/wait.h>
-+#include <sys/syscall.h>   /* For SYS_xxx definitions */
++#include <sys/syscall.h>
 +
 +#include <unistd.h>
 +
@@ -96,10 +96,7 @@ $NetBSD$
 +    USER_CS_32(0x23),
 +    USER_CS_64(0x33), // RPL 0 can't appear in user segment registers, so 0xfff8 is safe
 +    USER_SS(0x2b) {
-+
 +	Posix::initialize();
-+
-+	feature::detect_proc_access(&proc_mem_read_broken_, &proc_mem_write_broken_);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -107,9 +104,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +bool DebuggerCore::has_extension(quint64 ext) const {
-+	
 +	Q_UNUSED(ext)
-+	
++
 +	static constexpr auto mmxHash = edb::string_hash("MMX");
 +	static constexpr auto xmmHash = edb::string_hash("XMM");
 +	static constexpr auto ymmHash = edb::string_hash("YMM");
@@ -168,27 +164,6 @@ $NetBSD$
 +//------------------------------------------------------------------------------
 +DebuggerCore::~DebuggerCore() {
 +	end_debug_session();
-+}
-+
-+//------------------------------------------------------------------------------
-+// Name: ptrace_continue
-+// Desc:
-+//------------------------------------------------------------------------------
-+Status DebuggerCore::ptrace_continue(edb::tid_t tid, long status) {
-+	// TODO(eteran): perhaps address this at a higher layer?
-+	//               I would like to not have these events show up
-+	//               in the first place if we aren't stopped on this TID :-(
-+	if(util::contains(waited_threads_, tid)) {
-+		Q_ASSERT(tid != 0);
-+		if(ptrace(PTRACE_CONT, tid, 0, status) == -1) {
-+			const char *const strError = strerror(errno);
-+			qWarning() << "Unable to continue thread" << tid << ": PTRACE_CONT failed:" << strError;
-+			return Status(strError);
-+		}
-+		waited_threads_.remove(tid);
-+		return Status::Ok;
-+	}
-+	return Status(tr("ptrace_continue(): waited_threads_ doesn't contain tid %1").arg(tid));
 +}
 +
 +//------------------------------------------------------------------------------
@@ -277,6 +252,235 @@ $NetBSD$
 +}
 +
 +//------------------------------------------------------------------------------
++// Name: monitor_sigtrap
++// Desc:
++//------------------------------------------------------------------------------
++void DebuggerCore::monitor_sigtrap(edb::pid_t pid) {
++	ptrace_state_t pst;
++	ptrace_siginfo_t psi;
++	lwpid_t lid;
++	int status;  
++		
++	ptrace(PT_GET_SIGINFO, pid, &psi, sizeof(psi));
++
++	lid = psi.psi_lwpid;
++ 
++	switch (psi.psi_siginfo.si_code) {
++	case TRAP_DBREG:
++		TRACE_DEBUGREGISTER(pid, lid);
++		break;
++
++	case TRAP_TRACE:
++		TRACE_SINGLESTEP(pid, lid);
++		break;
++ 
++	case TRAP_BRKPT:
++		TRACE_BREAKPOINT(pid, lid);
++		break;
++
++	case TRAP_SCE:
++		TRACE_SYSCALLENTRY(pid, lid, &psi.psi_siginfo);
++
++	case TRAP_SCX:
++		TRACE_SYSCALLEXIT(pid, lid, &psi.psi_siginfo);
++		break;
++
++	case TRAP_EXEC:
++		TRACE_EXEC(pid, lid);
++		break;
++
++	case TRAP_LWP:
++		/* FALLTHROUGH */
++	case TRAP_CHLD:
++		ptrace(PT_GET_PROCESS_STATE, pid, &pst, sizeof(pst));
++		switch (pst.pe_report_event) {
++		case PTRACE_FORK:
++			TRACE_FORKED(pid, lid, pst.pe_other_pid);
++			break;
++
++		case PTRACE_VFORK:
++			TRACE_VFORKED(pid, lid, pst.pe_other_pid);
++			break;
++
++		case PTRACE_VFORK_DONE:
++			TRACE_VFORKDONE(pid, lid, pst.pe_other_pid);
++			break;
++
++		case PTRACE_LWP_CREATE:
++			TRACE_LWPCREATED(pid, lid, pst.pe_lwp);
++			break;
++
++		case PTRACE_LWP_EXIT:
++			TRACE_LWPEXITED(pid, lid, pst.pe_lwp);
++			break;
++
++		case PTRACE_POSIX_SPAWN:
++			TRACE_SPAWNED(pid, lid, pst.pe_other_pid);
++			break;
++		}
++		break;
++
++	default:
++		/* Fallback to regular crash/signal. */
++		if (psi.psi_siginfo.si_code <= SI_USER || 
++		    psi.psi_siginfo.si_code == SI_NOINFO) {
++			TRACE_STOPPED(pid, lid, &psi.psi_siginfo);
++		} else {
++			TRACE_CRASHED(pid, lid, &psi.psi_siginfo);
++		}
++		break;
++	}
++}
++
++//------------------------------------------------------------------------------
++// Name: monitor_sigtrap
++// Desc:
++//------------------------------------------------------------------------------
++void DebuggerCore::monitor_crash(edb::pid_t pid) {
++	ptrace_siginfo_t psi;
++	lwpid_t lid;
++
++	ptrace(PT_GET_SIGINFO, pid, &psi, sizeof(psi));
++ 
++	lid = psi.psi_lwpid;
++
++	if (psi.psi_siginfo.si_code <= SI_USER ||
++	    psi.psi_siginfo.si_code == SI_NOINFO) {
++		TRACE_STOPPED(pid, lid, &psi.psi_siginfo);
++	} else {
++		TRACE_CRASHED(pid, lid, &psi.psi_siginfo);
++	}
++}
++
++//------------------------------------------------------------------------------
++// Name: monitor_sigtrap
++// Desc:
++//------------------------------------------------------------------------------
++void DebuggerCore::monitor_signal(edb::pid_t pid) {
++	ptrace_siginfo_t psi;
++	lwpid_t lid;
++
++	ptrace(PT_GET_SIGINFO, pid, &psi, sizeof(psi));
++ 
++	lid = psi.psi_lwpid;
++
++	TRACE_STOPPED(pid, lid, &psi.psi_siginfo);
++}
++
++//------------------------------------------------------------------------------
++// Name: monitor_sigtrap
++// Desc:
++//------------------------------------------------------------------------------
++void DebuggerCore::handle_continued(edb::pid_t pid) {
++
++}
++
++//------------------------------------------------------------------------------
++// Name: monitor_sigtrap
++// Desc:
++//------------------------------------------------------------------------------
++void DebuggerCore::monitor_signaled(edb::pid_t pid, int sig, int core) {
++}
++
++//------------------------------------------------------------------------------
++// Name: monitor_sigtrap
++// Desc:
++//------------------------------------------------------------------------------
++void DebuggerCore::handle_exited(edb::pid_t pid, int status) {
++}
++
++//------------------------------------------------------------------------------
++// Name: monitor_sigtrap
++// Desc:
++//------------------------------------------------------------------------------
++void DebuggerCore::handle_debugregister(edb::pid_t pid, edb::tid_t lid) {
++}
++
++//------------------------------------------------------------------------------
++// Name: monitor_sigtrap
++// Desc:
++//------------------------------------------------------------------------------
++void DebuggerCore::handle_singlestep(edb::pid_t pid, edb::tid_t lid) {
++}
++
++//------------------------------------------------------------------------------
++// Name: monitor_sigtrap
++// Desc:
++//------------------------------------------------------------------------------
++void DebuggerCore::handle_breakpoint(edb::pid_t pid, edb::tid_t lid) {
++}
++
++//------------------------------------------------------------------------------
++// Name: monitor_sigtrap
++// Desc:
++//------------------------------------------------------------------------------
++void DebuggerCore::handle_syscallentry(edb::pid_t pid, edb::tid_t lid, siginfo_t *si) {
++}
++
++//------------------------------------------------------------------------------
++// Name: monitor_sigtrap
++// Desc:
++//------------------------------------------------------------------------------
++void DebuggerCore::handle_syscallexit(edb::pid_t pid, edb::tid_t lid, siginfo_t *si) {
++}
++
++//------------------------------------------------------------------------------
++// Name: monitor_sigtrap
++// Desc:
++//------------------------------------------------------------------------------
++void DebuggerCore::handle_exec(edb::pid_t pid, edb::tid_t lid) {
++}
++
++//------------------------------------------------------------------------------
++// Name: monitor_sigtrap
++// Desc:
++//------------------------------------------------------------------------------
++void DebuggerCore::handle_forked(edb::pid_t pid, edb::tid_t lid, edb::pid_t child) {
++}
++
++//------------------------------------------------------------------------------
++// Name: monitor_sigtrap
++// Desc:
++//------------------------------------------------------------------------------
++void DebuggerCore::handle_vforked(edb::pid_t pid, edb::tid_t lid, edb::pid_t child) {
++}
++
++//------------------------------------------------------------------------------
++// Name: monitor_sigtrap
++// Desc:
++//------------------------------------------------------------------------------
++void DebuggerCore::handle_vforkdone(edb::pid_t pid, edb::tid_t lid, edb::pid_t child) {
++}
++
++//------------------------------------------------------------------------------
++// Name: monitor_sigtrap
++// Desc:
++//------------------------------------------------------------------------------
++void DebuggerCore::handle_lwpcreated(edb::pid_t pid, edb::tid_t lid, edb::tid_t lwp) {
++}
++
++//------------------------------------------------------------------------------
++// Name: monitor_sigtrap
++// Desc:
++//------------------------------------------------------------------------------
++void DebuggerCore::handle_lwpexited(edb::pid_t pid, edb::tid_t lid, edb::tid_t lwp) {
++}
++
++//------------------------------------------------------------------------------
++// Name: monitor_sigtrap
++// Desc:
++//------------------------------------------------------------------------------
++void DebuggerCore::handle_crashed(edb::pid_t pid, edb::tid_t lid, siginfo_t *si) {
++}
++
++//------------------------------------------------------------------------------
++// Name: monitor_sigtrap
++// Desc:
++//------------------------------------------------------------------------------
++void DebuggerCore::handle_stopped(edb::pid_t pid, edb::tid_t lid, siginfo_t *si) {
++}
++
++//------------------------------------------------------------------------------
 +// Name: handle_thread_exit
 +// Desc:
 +//------------------------------------------------------------------------------
@@ -291,7 +495,6 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IDebugEvent> DebuggerCore::handle_thread_create_event(edb::tid_t tid, int status) {
-+
 +	Q_UNUSED(status)
 +
 +	unsigned long message;
@@ -304,14 +507,14 @@ $NetBSD$
 +		threads_.insert(new_tid, newThread);
 +
 +		int thread_status = 0;
-+		if(!util::contains(waited_threads_, new_tid)) {
++		if (!util::contains(waited_threads_, new_tid)) {
 +			if(Posix::waitpid(new_tid, &thread_status, __WALL) > 0) {
 +				waited_threads_.insert(new_tid);
 +			}
 +		}
 +
 +		// A new thread could exit before we have fully created it, no event then since it can't be the last thread
-+		if(WIFEXITED(thread_status)) {
++		if (WIFEXITED(thread_status)) {
 +			handle_thread_exit(tid, thread_status);
 +			return nullptr;
 +		}
@@ -336,7 +539,8 @@ $NetBSD$
 +		newThread->resume();
 +	}
 +
-+	ptrace_continue(tid, 0);
++	ptrace_continue(pid, 0);
++
 +	return nullptr;
 +}
 +
@@ -345,13 +549,44 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IDebugEvent> DebuggerCore::handle_event(edb::pid_t pid, int status) {
++	if (WIFSTOPPED(status)) {
++		switch (WSTOPSIG(status)) {
++		case SIGTRAP:
++			monitor_sigtrap(pid);
++			break;
++		case SIGSEGV:
++			/* FALLTHROUGH */
++		case SIGILL:
++			/* FALLTHROUGH */
++		case SIGFPE:
++			/* FALLTHROUGH */
++		case SIGBUS:
++			monitor_crash(pid);
++			break;
++		default:
++			monitor_signal(pid);
++		}
++	}
 +
-+	// note that we have waited on this thread
-+	waited_threads_.insert(tid);
++	if (WIFCONTINUED(status)) {
++		handle_continued(pid);
++	}
++		
++	/* Tracee terminating event */
++	if (WIFSIGNALED(status)) {
++		handle_signaled(pid, WTERMSIG(status), WCOREDUMP(status));
++		break;
++	}
++
++	if (WIFEXITED(status)) {
++		handle_exited(pid, status);
++		break;
++	}
++
++
 +
 +	// was it a thread exit event?
 +	if(WIFEXITED(status)) {
-+
 +		handle_thread_exit(tid,status);
 +		// if this was the last thread, return nullptr
 +		// so we report it to the user.
@@ -362,9 +597,8 @@ $NetBSD$
 +		}
 +	}
 +
-+    if(is_exit_trace_event(status)) {
-+
-+    }
++	if(is_exit_trace_event(status)) {
++	}
 +
 +	// was it a thread create event?
 +	if(is_clone_event(status)) {
@@ -435,9 +669,8 @@ $NetBSD$
 +//       it will return nullptr if an error or timeout occurs
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IDebugEvent> DebuggerCore::wait_debug_event(int msecs) {
-+
-+	if(process_) {
-+		if(!Posix::wait_for_sigchld(msecs)) {
++	if (process_) {
++		if (!Posix::wait_for_sigchld(msecs)) {
 +			int status;
 +			const edb::pid_t pid = Posix::waitpid(process_->pid(), &status, WNOHANG);
 +			if (pid > 0) {
@@ -493,7 +726,6 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +Status DebuggerCore::detach() {
-+
 +	QString errorMessage;
 +
 +	if (process_) {
@@ -527,7 +759,7 @@ $NetBSD$
 +		::kill(process_->pid(), SIGKILL);
 +
 +		pid_t ret;
-+		while ((ret = Posix::waitpid(-1, nullptr, 0)) != process_->pid() && ret != -1);
++		while ((ret = Posix::waitpid(process_->pid(), nullptr, 0)) != process_->pid() && ret != -1);
 +
 +		process_ = nullptr;
 +		reset();
@@ -613,7 +845,7 @@ $NetBSD$
 +	}
 +
 +	// This happens when exec failed, but just in case it's something another return some description.
-+        if (WIFSTOPPED(status) && WSTOPSIG(status) == SIGABRT) {
++	if (WIFSTOPPED(status) && WSTOPSIG(status) == SIGABRT) {
 +		return Status(childError.isEmpty() ? tr("The child unexpectedly aborted") : childError);
 +	}
 +
