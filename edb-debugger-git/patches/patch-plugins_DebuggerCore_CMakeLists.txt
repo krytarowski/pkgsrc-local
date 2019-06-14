@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/CMakeLists.txt.orig	2019-06-13 22:49:27.000000000 +0000
 +++ plugins/DebuggerCore/CMakeLists.txt
-@@ -93,6 +93,29 @@ elseif(TARGET_PLATFORM_FREEBSD)
+@@ -93,6 +93,39 @@ elseif(TARGET_PLATFORM_FREEBSD)
  		unix/freebsd/PlatformThread.cpp
  		unix/freebsd/PlatformThread.h
  	)
@@ -18,6 +18,11 @@ $NetBSD$
 +		${DebuggerCore_SRCS}
 +		unix/netbsd/DebuggerCore.cpp
 +		unix/netbsd/DebuggerCore.h
++		unix/netbsd/DialogMemoryAccess.cpp
++		unix/netbsd/DialogMemoryAccess.h
++		unix/netbsd/DialogMemoryAccess.ui
++		unix/netbsd/FeatureDetect.cpp
++		unix/netbsd/FeatureDetect.h
 +		unix/netbsd/PlatformCommon.cpp
 +		unix/netbsd/PlatformCommon.h
 +		unix/netbsd/PlatformEvent.cpp
@@ -28,7 +33,55 @@ $NetBSD$
 +		unix/netbsd/PlatformRegion.h
 +		unix/netbsd/PlatformThread.cpp
 +		unix/netbsd/PlatformThread.h
++		unix/netbsd/PrStatus.h
++		unix/Posix.cpp
++		unix/Posix.h
++		unix/Unix.cpp
++		unix/Unix.h
 +	)
  endif()
  
  if(TARGET_ARCH_FAMILY_X86)
+@@ -121,6 +154,20 @@ if(TARGET_ARCH_FAMILY_X86)
+         )
+     endif()
+ 
++    if(TARGET_PLATFORM_NETBSD)
++		set(PLUGIN_INCLUDES
++			${PLUGIN_INCLUDES}
++			unix/netbsd/arch/x86-generic
++		)
++
++        set(DebuggerCore_SRCS
++            ${DebuggerCore_SRCS}
++            unix/netbsd/arch/x86-generic/PlatformState.cpp
++            unix/netbsd/arch/x86-generic/PlatformState.h
++            unix/netbsd/arch/x86-generic/PlatformThread.cpp
++        )
++    endif()
++
+ endif()
+ 
+ if(TARGET_ARCH_FAMILY_ARM)
+@@ -151,6 +198,21 @@ if(TARGET_ARCH_FAMILY_ARM)
+             )
+         endif()
+ 
++        if(TARGET_PLATFORM_NETBSD)
++		
++			set(PLUGIN_INCLUDES
++				${PLUGIN_INCLUDES}
++				unix/netbsd/arch/arm-generic
++			)
++
++            set(DebuggerCore_SRCS
++                ${DebuggerCore_SRCS}
++                unix/netbsd/arch/arm-generic/PlatformState.cpp
++                unix/netbsd/arch/arm-generic/PlatformState.h
++                unix/netbsd/arch/arm-generic/PlatformThread.cpp
++            )
++        endif()
++
+ endif()
+ 
+ add_library(${PluginName} SHARED ${DebuggerCore_SRCS} )

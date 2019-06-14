@@ -1,6 +1,6 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/FeatureDetect.cpp.orig	2019-06-14 00:46:21.723627637 +0000
+--- plugins/DebuggerCore/unix/netbsd/FeatureDetect.cpp.orig	2019-06-14 00:47:12.409851748 +0000
 +++ plugins/DebuggerCore/unix/netbsd/FeatureDetect.cpp
 @@ -0,0 +1,173 @@
 +/*

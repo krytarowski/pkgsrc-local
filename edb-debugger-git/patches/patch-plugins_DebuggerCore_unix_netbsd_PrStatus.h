@@ -1,6 +1,6 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/PrStatus.h.orig	2019-06-14 00:46:21.743129203 +0000
+--- plugins/DebuggerCore/unix/netbsd/PrStatus.h.orig	2019-06-14 00:47:12.549681680 +0000
 +++ plugins/DebuggerCore/unix/netbsd/PrStatus.h
 @@ -0,0 +1,67 @@
 +
