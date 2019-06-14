@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp.orig	2019-06-14 15:42:03.422152074 +0000
 +++ plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp
-@@ -0,0 +1,1046 @@
+@@ -0,0 +1,1039 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -921,18 +921,18 @@ $NetBSD$
 +
 +	const int mib[] = { CTL_KERN, KERN_PROC2, KERN_PROC_ALL, 0, sizeof(*kp), 0 };
 +
-+	if (sysctl(mib, __arraycount(mib), NULL, &len, NULL, 0) == -1)
++	if (::sysctl(mib, __arraycount(mib), NULL, &len, NULL, 0) == -1)
 +		return ret;
 +
-+	if (reallocarr(&kp, len, sizeof(*kp)) != 0)
-+		reutn ret;
++	if (::reallocarr(&kp, len, sizeof(*kp)) != 0)
++		return ret;
 +
-+	if (sysctl(mib, __arraycount(mib), NULL, &len, NULL, 0) == -1) {
-+		reallocarr(&kp, 0, 0);
++	if (::sysctl(mib, __arraycount(mib), NULL, &len, NULL, 0) == -1) {
++		::reallocarr(&kp, 0, 0);
 +		return ret;
 +	}
 +
-+	for (size_t i = 0; i < len/sizeof(*kp); i++) {
++	for (::size_t i = 0; i < len/sizeof(*kp); i++) {
 +		ret.insert(pid, std::make_shared<PlatformProcess>(const_cast<DebuggerCore*>(this), kp[i].p_pid));
 +	}
 +
@@ -946,10 +946,10 @@ $NetBSD$
 +//------------------------------------------------------------------------------
 +edb::pid_t DebuggerCore::parent_pid(edb::pid_t pid) const {
 +	struct ::kinfo_proc2 kp;
-+	size_t ::len = sizeof(p);
++	::size_t len = sizeof(p);
 +
 +	const int mib[] = { CTL_KERN, KERN_PROC2, KERN_PROC_PID, pid, sizeof(kp), 1 };
-+	if (sysctl(mib, __arraycount(mib), &kp, &len, NULL, 0) == -1)
++	if (::sysctl(mib, __arraycount(mib), &kp, &len, NULL, 0) == -1)
 +		return 0;
 +
 +	return kp.p_ppid;
@@ -1038,14 +1038,7 @@ $NetBSD$
 +}
 +
 +uint8_t DebuggerCore::nopFillByte() const {
-+#if defined EDB_X86 || defined EDB_X86_64
 +	return 0x90;
-+#elif defined EDB_ARM32 || defined EDB_ARM64
-+	// TODO(eteran): does this concept even make sense for a multi-byte instruction encoding?
-+	return 0x00;
-+#else
-+	#error "Unsupported Architecture"
-+#endif
 +}
 +
 +}
