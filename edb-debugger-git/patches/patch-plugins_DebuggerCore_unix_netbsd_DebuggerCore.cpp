@@ -1,6 +1,6 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp.orig	2019-06-15 23:22:18.421682691 +0000
+--- plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp.orig	2019-06-15 23:26:47.595122030 +0000
 +++ plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp
 @@ -0,0 +1,841 @@
 +/*
@@ -727,7 +727,7 @@ $NetBSD$
 +	if (::reallocarr(&kp, len, sizeof(*kp)) != 0)
 +		return ret;
 +
-+	if (::sysctl(mib, __arraycount(mib), NULL, &len, NULL, 0) == -1) {
++	if (::sysctl(mib, __arraycount(mib), kp, &len, NULL, 0) == -1) {
 +		::reallocarr(&kp, 0, 0);
 +		return ret;
 +	}
@@ -736,7 +736,7 @@ $NetBSD$
 +		ret.insert(kp[i].p_pid, std::make_shared<PlatformProcess>(const_cast<DebuggerCore*>(this), kp[i].p_pid));
 +	}
 +
-+	free(kp);
++	::reallocarr(&kp, 0, 0);
 +
 +	return ret;
 +}
