@@ -1,6 +1,6 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/DialogMemoryAccess.h.orig	2019-06-14 15:42:03.457665290 +0000
+--- plugins/DebuggerCore/unix/netbsd/DialogMemoryAccess.h.orig	2019-06-15 15:00:37.887629729 +0000
 +++ plugins/DebuggerCore/unix/netbsd/DialogMemoryAccess.h
 @@ -0,0 +1,43 @@
 +/*

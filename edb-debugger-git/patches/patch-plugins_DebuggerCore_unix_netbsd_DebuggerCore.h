@@ -1,8 +1,8 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/DebuggerCore.h.orig	2019-06-14 15:42:03.434163108 +0000
+--- plugins/DebuggerCore/unix/netbsd/DebuggerCore.h.orig	2019-06-15 15:00:37.864964807 +0000
 +++ plugins/DebuggerCore/unix/netbsd/DebuggerCore.h
-@@ -0,0 +1,133 @@
+@@ -0,0 +1,148 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -42,8 +42,8 @@ $NetBSD$
 +	Q_OBJECT
 +	Q_PLUGIN_METADATA(IID "edb.IDebugger/1.0")
 +	Q_INTERFACES(IDebugger)
-+	Q_CLASSINFO("author", "Evan Teran")
-+	Q_CLASSINFO("url", "http://www.codef00.com")
++	Q_CLASSINFO("author", "Kamil Rytarowski")
++	Q_CLASSINFO("url", "https://github.com/krytarowski/")
 +	friend class PlatformProcess;
 +	friend class PlatformThread;
 +
@@ -102,9 +102,26 @@ $NetBSD$
 +private:
 +	void reset();
 +	Status stop_threads();
-+	std::shared_ptr<IDebugEvent> handle_event(edb::tid_t tid, int status);
-+	std::shared_ptr<IDebugEvent> handle_thread_create_event(edb::tid_t tid, int status);
-+	void handle_thread_exit(edb::tid_t tid, int status);
++	std::shared_ptr<IDebugEvent> handle_event(edb::pid_t pid, int status);
++	std::shared_ptr<IDebugEvent> monitor_sigtrap(edb::pid_t pid);
++	std::shared_ptr<IDebugEvent> monitor_crash(edb::pid_t pid);
++	std::shared_ptr<IDebugEvent> monitor_signal(edb::pid_t pid);
++	std::shared_ptr<IDebugEvent> handle_continued(edb::pid_t pid);
++	std::shared_ptr<IDebugEvent> handle_signaled(edb::pid_t pid, int sig, int core);
++	std::shared_ptr<IDebugEvent> handle_exited(edb::pid_t pid, int status);
++	std::shared_ptr<IDebugEvent> handle_debugregister(edb::pid_t pid, edb::tid_t lid);
++	std::shared_ptr<IDebugEvent> handle_singlestep(edb::pid_t pid, edb::tid_t lid);
++	std::shared_ptr<IDebugEvent> handle_breakpoint(edb::pid_t pid, edb::tid_t lid);
++	std::shared_ptr<IDebugEvent> handle_syscallentry(edb::pid_t pid, edb::tid_t lid, siginfo_t *si);
++	std::shared_ptr<IDebugEvent> handle_syscallexit(edb::pid_t pid, edb::tid_t lid, siginfo_t *si);
++	std::shared_ptr<IDebugEvent> handle_exec(edb::pid_t pid, edb::tid_t lid);
++	std::shared_ptr<IDebugEvent> handle_forked(edb::pid_t pid, edb::tid_t lid, edb::pid_t child);
++	std::shared_ptr<IDebugEvent> handle_vforkdone(edb::pid_t pid, edb::tid_t lid, edb::pid_t child);
++	std::shared_ptr<IDebugEvent> handle_lwpcreated(edb::pid_t pid, edb::tid_t lid, edb::tid_t lwp);
++	std::shared_ptr<IDebugEvent> handle_lwpexited(edb::pid_t pid, edb::tid_t lid, edb::tid_t lwp);
++	std::shared_ptr<IDebugEvent> handle_crashed(edb::pid_t pid, edb::tid_t lid, siginfo_t *si);
++	std::shared_ptr<IDebugEvent> handle_stopped(edb::pid_t pid, edb::tid_t lid, siginfo_t *si);
++
 +	int attach_thread(edb::tid_t tid);
 +    void detectCPUMode();
 +    long ptraceOptions() const;
@@ -120,13 +137,11 @@ $NetBSD$
 +	edb::tid_t                active_thread_;
 +	std::shared_ptr<IProcess> process_;
 +	std::size_t               pointer_size_ = sizeof(void*);
-+#if defined(EDB_X86) || defined(EDB_X86_64)
 +	const bool                edbIsIn64BitSegment;
 +	const bool                osIs64Bit;
 +	const edb::seg_reg_t      USER_CS_32;
 +	const edb::seg_reg_t      USER_CS_64;
 +	const edb::seg_reg_t      USER_SS;
-+#endif
 +	CPUMode					  cpu_mode_              = CPUMode::Unknown;
 +	MeansOfCapture	          lastMeansOfCapture     = MeansOfCapture::NeverCaptured;
 +	bool                      proc_mem_write_broken_ = true;

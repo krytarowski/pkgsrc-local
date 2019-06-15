@@ -1,8 +1,8 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp.orig	2019-06-14 15:42:03.422152074 +0000
+--- plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp.orig	2019-06-15 15:00:37.849568641 +0000
 +++ plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp
-@@ -0,0 +1,918 @@
+@@ -0,0 +1,895 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -92,7 +92,7 @@ $NetBSD$
 +DebuggerCore::DebuggerCore()
 +    :
 +    edbIsIn64BitSegment(true),
-+    osIs64Bit(os64Bit(true),
++    osIs64Bit(true),
 +    USER_CS_32(0x23),
 +    USER_CS_64(0x33), // RPL 0 can't appear in user segment registers, so 0xfff8 is safe
 +    USER_SS(0x2b) {
@@ -167,34 +167,11 @@ $NetBSD$
 +}
 +
 +//------------------------------------------------------------------------------
-+// Name: ptrace_step
-+// Desc:
-+//------------------------------------------------------------------------------
-+Status DebuggerCore::ptrace_step(edb::tid_t tid, long status) {
-+	// TODO(eteran): perhaps address this at a higher layer?
-+	//               I would like to not have these events show up
-+	//               in the first place if we aren't stopped on this TID :-(
-+	if(util::contains(waited_threads_, tid)) {
-+		Q_ASSERT(tid != 0);
-+		if(ptrace(PTRACE_SINGLESTEP, tid, 0, status)==-1) {
-+			const char *const strError = strerror(errno);
-+			qWarning() << "Unable to step thread" << tid << ": PTRACE_SINGLESTEP failed:" << strError;
-+			return Status(strError);
-+		}
-+		waited_threads_.remove(tid);
-+		return Status::Ok;
-+	}
-+	return Status(tr("ptrace_step(): waited_threads_ doesn't contain tid %1").arg(tid));
-+}
-+
-+//------------------------------------------------------------------------------
 +// Name: ptrace_set_options
 +// Desc:
 +//------------------------------------------------------------------------------
 +Status DebuggerCore::ptrace_set_options(edb::pid_t pid) {
 +	ptrace_event_t pe;
-+
-+	Q_ASSERT(tid != 0);	
 +
 +	if (ptrace(PT_GET_EVENT_MASK, pid, &pe, sizeof(pe)) == -1)
 +		goto fail;
@@ -206,14 +183,14 @@ $NetBSD$
 +	pe.pe_set_event |= PTRACE_LWP_EXIT;
 +	pe.pe_set_event |= PTRACE_POSIX_SPAWN;
 +
-+	if (ptrace(PT_SET_EVENT_MASK, tid, &pe, sizeof(pe))==-1)
++	if (ptrace(PT_SET_EVENT_MASK, pid, &pe, sizeof(pe))==-1)
 +		goto fail;
 +
 +	return Status::Ok;
 +
 +fail:
 +	const char *const strError = strerror(errno);
-+	qWarning() << "Unable to set ptrace options " << tid << ": PT_SET_EVENT_MASK failed:" << strError;
++	qWarning() << "Unable to set ptrace options " << pid << ": PT_SET_EVENT_MASK failed:" << strError;
 +	return Status(strError);
 +}
 +
