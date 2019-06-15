@@ -1,8 +1,8 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp.orig	2019-06-15 22:53:53.693478898 +0000
+--- plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp.orig	2019-06-15 23:14:06.302755063 +0000
 +++ plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp
-@@ -0,0 +1,916 @@
+@@ -0,0 +1,930 @@
 +/*
 +Copyright (C) 2015 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -682,6 +682,20 @@ $NetBSD$
 +//------------------------------------------------------------------------------
 +Status PlatformProcess::pause() {
 +	return Status::Ok;
++}
++
++//------------------------------------------------------------------------------
++// Name: step
++// Desc: steps the currently active thread
++//------------------------------------------------------------------------------
++Status PlatformProcess::step(edb::EVENT_STATUS status) {
++}
++
++//------------------------------------------------------------------------------
++// Name: isPaused
++// Desc: returns true if ALL threads are currently in the debugger's wait list
++//------------------------------------------------------------------------------
++bool PlatformProcess::isPaused() const {
 +}
 +
 +//------------------------------------------------------------------------------
