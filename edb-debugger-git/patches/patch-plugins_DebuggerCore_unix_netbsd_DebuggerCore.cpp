@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp.orig	2019-06-14 15:42:03.422152074 +0000
 +++ plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp
-@@ -0,0 +1,952 @@
+@@ -0,0 +1,918 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -215,40 +215,6 @@ $NetBSD$
 +	const char *const strError = strerror(errno);
 +	qWarning() << "Unable to set ptrace options " << tid << ": PT_SET_EVENT_MASK failed:" << strError;
 +	return Status(strError);
-+}
-+
-+//------------------------------------------------------------------------------
-+// Name: ptrace_get_event_message
-+// Desc:
-+//------------------------------------------------------------------------------
-+Status DebuggerCore::ptrace_get_event_message(edb::tid_t tid, unsigned long *message) {
-+	Q_ASSERT(util::contains(waited_threads_, tid));
-+	Q_ASSERT(tid != 0);
-+	Q_ASSERT(message);
-+
-+	if(ptrace(PTRACE_GETEVENTMSG, tid, 0, message)==-1) {
-+		const char *const strError = strerror(errno);
-+		qWarning() << "Unable to get event message for thread" << tid << ": PTRACE_GETEVENTMSG failed:" << strError;
-+		return Status(strError);
-+	}
-+	return Status::Ok;
-+}
-+
-+//------------------------------------------------------------------------------
-+// Name: desired_ptrace_options
-+// Desc:
-+//------------------------------------------------------------------------------
-+ptrace_event_t DebuggerCore::ptraceOptions() const {
-+    ptrace_event_t pe = {};
-+
-+    pe.pe_set_event |= PTRACE_FORK;
-+    pe.pe_set_event |= PTRACE_VFORK;
-+    pe.pe_set_event |= PTRACE_VFORK_DONE;
-+    pe.pe_set_event |= PTRACE_LWP_CREATE;
-+    pe.pe_set_event |= PTRACE_LWP_EXIT;
-+    pe.pe_set_event |= PTRACE_POSIX_SPAWN;
-+
-+    return pe;
 +}
 +
 +//------------------------------------------------------------------------------

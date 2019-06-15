@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp.orig	2019-06-14 15:42:03.551837291 +0000
 +++ plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp
-@@ -0,0 +1,1122 @@
+@@ -0,0 +1,1015 @@
 +/*
 +Copyright (C) 2015 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -93,48 +93,6 @@ $NetBSD$
 +}
 +
 +//------------------------------------------------------------------------------
-+// Name: process_map_line
-+// Desc: parses the data from a line of a memory map file
-+//------------------------------------------------------------------------------
-+std::shared_ptr<IRegion> process_map_line(const QString &line) {
-+
-+	edb::address_t start;
-+	edb::address_t end;
-+	edb::address_t base;
-+	IRegion::permissions_t permissions;
-+	QString name;
-+
-+	const QStringList items = split_max(line, 6);
-+	if(items.size() >= 3) {
-+		bool ok;
-+		const QStringList bounds = items[0].split("-");
-+		if(bounds.size() == 2) {
-+			start = edb::address_t::fromHexString(bounds[0],&ok);
-+			if(ok) {
-+				end = edb::address_t::fromHexString(bounds[1],&ok);
-+				if(ok) {
-+					base = edb::address_t::fromHexString(items[2],&ok);
-+					if(ok) {
-+						const QString perms = items[1];
-+						permissions = 0;
-+						if(perms[0] == 'r') permissions |= PROT_READ;
-+						if(perms[1] == 'w') permissions |= PROT_WRITE;
-+						if(perms[2] == 'x') permissions |= PROT_EXEC;
-+
-+						if(items.size() >= 6) {
-+							name = items[5];
-+						}
-+
-+						return std::make_shared<PlatformRegion>(start, end, base, name, permissions);
-+					}
-+				}
-+			}
-+		}
-+	}
-+	return nullptr;;
-+}
-+
-+//------------------------------------------------------------------------------
 +// Name:
 +// Desc:
 +//------------------------------------------------------------------------------
@@ -207,20 +165,6 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +PlatformProcess::PlatformProcess(DebuggerCore *core, edb::pid_t pid) : core_(core), pid_(pid) {
-+	if (!core_->proc_mem_read_broken_) {
-+		auto memory_file = std::make_shared<QFile>(QString("/proc/%1/mem").arg(pid_));
-+
-+		auto flags = QIODevice::ReadOnly | QIODevice::Unbuffered;
-+		if (!core_->proc_mem_write_broken_) {
-+			flags |= QIODevice::WriteOnly;
-+		}
-+		if (memory_file->open(flags)) {
-+			ro_mem_file_ = memory_file;
-+			if (!core_->proc_mem_write_broken_) {
-+				rw_mem_file_ = memory_file;
-+			}
-+		}
-+	}
 +}
 +
 +//------------------------------------------------------------------------------
@@ -448,7 +392,16 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +QString PlatformProcess::current_working_directory() const {
-+	return edb::v1::symlink_target(QString("/proc/%1/cwd").arg(pid_));
++	int mib[] = { CTL_KERN, KERN_PROC_ARGS, pid_, KERN_PROC_CWD };
++	size_t len;
++
++	::sysctl(mib, __arraycount(mib), 0, &len, NULL, 0);
++	char *buf = (char *)::malloc(len);
++	::sysctl(mib, __arraycount(mib), buf, &len, NULL, 0);
++	QString str = buf;
++	free(buf);
++
++	return str;
 +}
 +
 +//------------------------------------------------------------------------------
@@ -456,7 +409,16 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +QString PlatformProcess::executable() const {
-+	return edb::v1::symlink_target(QString("/proc/%1/exe").arg(pid_));
++	int mib[] = { CTL_KERN, KERN_PROC_ARGS, pid_, KERN_PROC_PATHNAME };
++	size_t len;
++
++	::sysctl(mib, __arraycount(mib), 0, &len, NULL, 0);
++	char *buf = (char *)::malloc(len);
++	::sysctl(mib, __arraycount(mib), buf, &len, NULL, 0);
++	QString str = buf;
++	free(buf);
++
++	return str;
 +}
 +
 +//------------------------------------------------------------------------------
@@ -513,44 +475,32 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +QList<std::shared_ptr<IRegion>> PlatformProcess::regions() const {
-+
 +	static QList<std::shared_ptr<IRegion>> regions;
-+	const QString map_file(QString("/proc/%1/maps").arg(pid_));
++	const int mib[] = { CTL_VM, VM_PROC, VM_PROC_MAP, pid_, sizeof(struct kinfo_vmentry) };
++	::size_t len;
++	::sysctl(mib, __arraycount(mib), NULL, &len, NULL, 0);
++	len <<= 1;
++	struct ::kinfo_vmentry *ptr = (struct ::kinfo_vmentry *)::malloc(len);
++	::sysctl(mib, __arraycount(mib), ptr, &len, NULL, 0);
 +
-+	// hash the region file to see if it changed or not
-+	{
-+		static size_t totalHash = 0;
++	for (::size_t i = 0; i < len; i++) {
++		edb::address_t start = ptr[i].kve_start;
++		edb::address_t end = ptr[i].kve_end;
++		edb::address_t base = ptr[i].kve_offset;
++		IRegion::permissions_t permissions = 0;
++		if (ptr[i].kve_protection & KVME_PROT_READ)
++			permissions |= PROT_READ;
++		if (ptr[i].kve_protection & KVME_PROT_WRITE)
++			permissions |= PROT_WRITE;
++		if (ptr[i].kve_protection & KVME_PROT_EXEC)
++			permissions |= PROT_EXEC;
++		QString name = ptr[i].kve_path;
 +
-+		std::ifstream mf(map_file.toStdString());
-+		size_t newHash = 0;
-+		std::string line;
-+
-+		while(std::getline(mf,line)) {
-+			boost::hash_combine(newHash, line);
-+		}
-+
-+		if(totalHash == newHash) {
-+			return regions;
-+		}
-+
-+		totalHash = newHash;
-+		regions.clear();
++		auto region = std::make_shared<PlatformRegion>(start, end, base, name, permissions);
++		regions.push_back(region);
 +	}
 +
-+	// it changed, so let's process it
-+	QFile file(map_file);
-+    if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-+
-+		QTextStream in(&file);
-+		QString line = in.readLine();
-+
-+		while(!line.isNull()) {
-+			if(std::shared_ptr<IRegion> region = process_map_line(line)) {
-+				regions.push_back(region);
-+			}
-+			line = in.readLine();
-+		}
-+	}
++	free(ptr);
 +
 +	return regions;
 +}
@@ -842,20 +792,6 @@ $NetBSD$
 +}
 +
 +//------------------------------------------------------------------------------
-+// Name: isPaused
-+// Desc: returns true if ALL threads are currently in the debugger's wait list
-+//------------------------------------------------------------------------------
-+bool PlatformProcess::isPaused() const {
-+	for(auto &thread : threads()) {
-+		if(!thread->isPaused()) {
-+			return false;
-+		}
-+	}
-+
-+	return true;
-+}
-+
-+//------------------------------------------------------------------------------
 +// Name: patches
 +// Desc: returns any patches applied to this process
 +//------------------------------------------------------------------------------
@@ -868,28 +804,24 @@ $NetBSD$
 + * @return
 + */
 +edb::address_t PlatformProcess::entry_point() const  {
++	size_T len = 4096 * 10;
++	AuxInfo *ptr = malloc(len);
++	edb::address_t val;
 +
-+	QFile auxv(QString("/proc/%1/auxv").arg(pid_));
-+	if(auxv.open(QIODevice::ReadOnly)) {
++	struct ptrace_io_desc io = { PIOD_READ_AUXV, NULL, ptr, len };
 +
-+		if(edb::v1::debuggeeIs64Bit()) {
-+			elf64_auxv_t entry;
-+			while(auxv.read(reinterpret_cast<char *>(&entry), sizeof(entry))) {
-+				if(entry.a_type == AT_ENTRY) {
-+					return entry.a_un.a_val;
-+				}
-+			}
-+		} else if(edb::v1::debuggeeIs32Bit()) {
-+			elf32_auxv_t entry;
-+			while(auxv.read(reinterpret_cast<char *>(&entry), sizeof(entry))) {
-+				if(entry.a_type == AT_ENTRY) {
-+					return entry.a_un.a_val;
-+				}
-+			}
++	ptrace(PT_IO, pid_, &io, 0);
++
++	for (AuxInfo *aip = ptr; aip->a_type != AT_NULL; aip++) {
++		if (aip->a_type == AT_ENTRY) {
++			val = aip->a_v;
++			break;
 +		}
 +	}
 +
-+	return edb::address_t{};
++	free(ptr);
++
++	return val;
 +}
 +
 +/**
@@ -1021,12 +953,7 @@ $NetBSD$
 +		 * non-zero for PIE ones.  */
 +		edb::address_t relocation = -1;
 +		for (int i = 0; relocation == -1 && i < num_phdr; i++) {
-+
-+			if(edb::v1::debuggeeIs64Bit()) {
-+				relocation = get_relocation<elf_model<64>>(this, phdr_memaddr, i);
-+			} else if(edb::v1::debuggeeIs32Bit()) {
-+				relocation = get_relocation<elf_model<32>>(this, phdr_memaddr, i);
-+			}
++			relocation = get_relocation<elf_model<64>>(this, phdr_memaddr, i);
 +		}
 +
 +		if (relocation == -1) {
@@ -1043,18 +970,13 @@ $NetBSD$
 +			return 0;
 +		}
 +
-+		if(edb::v1::debuggeeIs64Bit()) {
 +			return get_debug_pointer<elf_model<64>>(this, phdr_memaddr, num_phdr, relocation);
-+		} else if(edb::v1::debuggeeIs32Bit()) {
-+			return get_debug_pointer<elf_model<32>>(this, phdr_memaddr, num_phdr, relocation);
-+		}
 +	}
 +
 +	return edb::address_t{};
 +}
 +
 +edb::address_t PlatformProcess::calculate_main() const {
-+	if(edb::v1::debuggeeIs64Bit()) {
 +		ByteShiftArray ba(14);
 +
 +		edb::address_t entry_point = this->entry_point();
@@ -1091,35 +1013,6 @@ $NetBSD$
 +				break;
 +			}
 +		}
-+	} else if(edb::v1::debuggeeIs32Bit()) {
-+		ByteShiftArray ba(11);
-+
-+
-+		edb::address_t entry_point = this->entry_point();
-+
-+		for(int i = 0; i < 50; ++i) {
-+			quint8 byte;
-+			if(read_bytes(entry_point + i, &byte, sizeof(byte))) {
-+				ba << byte;
-+
-+				if(ba.size() >= 11) {
-+					// beginning of a call preceeded by a push and followed by a hlt
-+					if(ba[0] == 0x68 && ba[5] == 0xe8 && ba[10] == 0xf4) {
-+						edb::address_t address(0);
-+
-+						auto to = reinterpret_cast<char *>(&address);
-+						std::memcpy(to, ba.data() + 1, sizeof(uint32_t));
-+
-+						// TODO: make sure that this address resides in an executable region
-+						qDebug() << "No main symbol found, calculated it to be " << edb::v1::format_pointer(address) << " using heuristic";
-+						return address;
-+					}
-+				}
-+			} else {
-+				break;
-+			}
-+		}
-+	}
 +
 +	return 0;
 +}
