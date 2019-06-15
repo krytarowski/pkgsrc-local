@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp.orig	2019-06-15 15:00:37.849568641 +0000
 +++ plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp
-@@ -0,0 +1,839 @@
+@@ -0,0 +1,841 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -312,7 +312,7 @@ $NetBSD$
 +// Name: monitor_sigtrap
 +// Desc:
 +//------------------------------------------------------------------------------
-+std::shared_ptr<IDebugEvent> DebuggerCore::monitor_signaled(edb::pid_t pid, int sig, int core) {
++std::shared_ptr<IDebugEvent> DebuggerCore::handle_signaled(edb::pid_t pid, int sig, int core) {
 +}
 +
 +//------------------------------------------------------------------------------
@@ -516,7 +516,7 @@ $NetBSD$
 +		return Status(std::strerror(errno));
 +	}
 +
-+	active_thread_ = threads_.begin();
++	active_thread_ = threads_.begin().key();
 +	detectCPUMode();
 +	return Status::Ok;
 +}
@@ -677,7 +677,7 @@ $NetBSD$
 +		return Status(std::strerror(errno));
 +	}
 +
-+	active_thread_ = threads_.begin();
++	active_thread_ = threads_.begin().key();
 +	detectCPUMode();
 +
 +	return Status::Ok;
@@ -733,8 +733,10 @@ $NetBSD$
 +	}
 +
 +	for (::size_t i = 0; i < len/sizeof(*kp); i++) {
-+		ret.insert(pid, std::make_shared<PlatformProcess>(const_cast<DebuggerCore*>(this), kp[i].p_pid));
++		ret.insert(kp[i].p_pid, std::make_shared<PlatformProcess>(const_cast<DebuggerCore*>(this), kp[i].p_pid));
 +	}
++
++	free(kp);
 +
 +	return ret;
 +}
@@ -746,7 +748,7 @@ $NetBSD$
 +//------------------------------------------------------------------------------
 +edb::pid_t DebuggerCore::parent_pid(edb::pid_t pid) const {
 +	struct ::kinfo_proc2 kp;
-+	::size_t len = sizeof(p);
++	::size_t len = sizeof(kp);
 +
 +	const int mib[] = { CTL_KERN, KERN_PROC2, KERN_PROC_PID, pid, sizeof(kp), 1 };
 +	if (::sysctl(mib, __arraycount(mib), &kp, &len, NULL, 0) == -1)

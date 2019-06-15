@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp.orig	2019-06-15 15:00:38.013675769 +0000
 +++ plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp
-@@ -0,0 +1,914 @@
+@@ -0,0 +1,916 @@
 +/*
 +Copyright (C) 2015 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -632,9 +632,9 @@ $NetBSD$
 +//------------------------------------------------------------------------------
 +edb::uid_t PlatformProcess::uid() const {
 +	struct ::kinfo_proc2 kp;
-+	::size_t len = sizeof(p);
++	::size_t len = sizeof(kp);
 +
-+	const int mib[] = { CTL_KERN, KERN_PROC2, KERN_PROC_PID, pid, sizeof(kp), 1 };
++	const int mib[] = { CTL_KERN, KERN_PROC2, KERN_PROC_PID, pid_, sizeof(kp), 1 };
 +	if (::sysctl(mib, __arraycount(mib), &kp, &len, NULL, 0) == -1)
 +		return 0;
 +
@@ -659,7 +659,7 @@ $NetBSD$
 +//------------------------------------------------------------------------------
 +QString PlatformProcess::name() const {
 +	struct ::kinfo_proc2 kp;
-+	::size_t len = sizeof(p);
++	::size_t len = sizeof(kp);
 +
 +	const int mib[] = { CTL_KERN, KERN_PROC2, KERN_PROC_PID, pid_, sizeof(kp), 1 };
 +	if (::sysctl(mib, __arraycount(mib), &kp, &len, NULL, 0) == -1)
@@ -714,11 +714,12 @@ $NetBSD$
 + */
 +edb::address_t PlatformProcess::entry_point() const  {
 +	::size_t len = 4096 * 10;
-+	AuxInfo *ptr = malloc(len);
++	AuxInfo *ptr = (AuxInfo *)::malloc(len);
 +	edb::address_t val;
 +
 +	struct ptrace_io_desc io = { PIOD_READ_AUXV, NULL, ptr, len };
 +
++	pid_t pid_ = 0;
 +	ptrace(PT_IO, pid_, &io, 0);
 +
 +	for (AuxInfo *aip = ptr; aip->a_type != AT_NULL; aip++) {
@@ -751,6 +752,7 @@ $NetBSD$
 +
 +	struct ptrace_io_desc io = { PIOD_READ_AUXV, NULL, ptr, len };
 +
++	pid_t pid_ = 0;
 +	ptrace(PT_IO, pid_, &io, 0);
 +
 +	for (AuxInfo *aip = ptr; aip->a_type != AT_NULL; aip++) {
