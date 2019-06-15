@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/PlatformEvent.cpp.orig	2019-06-15 22:53:53.669874212 +0000
 +++ plugins/DebuggerCore/unix/netbsd/PlatformEvent.cpp
-@@ -0,0 +1,361 @@
+@@ -0,0 +1,367 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -304,6 +304,12 @@ $NetBSD$
 +// Name:
 +//------------------------------------------------------------------------------
 +IDebugEvent::TRAP_REASON PlatformEvent::trap_reason() const {
++}
++
++//------------------------------------------------------------------------------
++// Name:
++//------------------------------------------------------------------------------
++bool PlatformEvent::exited() const {
 +}
 +
 +//------------------------------------------------------------------------------
