@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp.orig	2019-06-15 15:00:38.013675769 +0000
 +++ plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp
-@@ -0,0 +1,921 @@
+@@ -0,0 +1,923 @@
 +/*
 +Copyright (C) 2015 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -50,9 +50,11 @@ $NetBSD$
 +#include <boost/functional/hash.hpp>
 +#include <fstream>
 +
++#include <sys/param.h>
++#include <sys/types.h>
 +#include <sys/mman.h>
 +#include <sys/ptrace.h>
-+#include <sys/types.h>
++#include <sys/sysctl.h>
 +#include <unistd.h>
 +#include <pwd.h>
 +#include <elf.h>

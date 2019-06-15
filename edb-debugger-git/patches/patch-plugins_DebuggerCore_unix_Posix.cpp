@@ -23,7 +23,7 @@ $NetBSD$
  namespace DebuggerCorePlugin {
  
  #if !defined(USE_SIGTIMEDWAIT)
-@@ -121,9 +127,11 @@ ssize_t Posix::write(int fd, const void 
+@@ -121,10 +127,13 @@ ssize_t Posix::write(int fd, const void 
   * @return
   */
  int Posix::select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout) {
@@ -34,5 +34,7 @@ $NetBSD$
 -		ret = ::select(nfds, readfds, writefds, exceptfds, timeout);
 +		ret = ::select(nfds, readfds, writefds, exceptfds, &ts);
  	} while (ret == -1 && errno == EINTR);
++	TIMESPEC_TO_TIMEVAL(&s, timeout);
  	return ret;
  }
+ 
