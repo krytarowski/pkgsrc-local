@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp.orig	2019-06-15 15:00:38.013675769 +0000
 +++ plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp
-@@ -0,0 +1,1015 @@
+@@ -0,0 +1,921 @@
 +/*
 +Copyright (C) 2015 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -53,7 +53,6 @@ $NetBSD$
 +#include <sys/mman.h>
 +#include <sys/ptrace.h>
 +#include <sys/types.h>
-+#include <linux/limits.h>
 +#include <unistd.h>
 +#include <pwd.h>
 +#include <elf.h>
@@ -101,7 +100,7 @@ $NetBSD$
 +
 +	QList<Module> ret;
 +
-+	edb::linux_struct::r_debug<Addr> dynamic_info;
++	edb::netbsd_struct::r_debug<Addr> dynamic_info;
 +	if(process) {
 +		if(const edb::address_t debug_pointer = process->debug_pointer()) {
 +			if(process->read_bytes(debug_pointer, &dynamic_info, sizeof(dynamic_info))) {
@@ -111,7 +110,7 @@ $NetBSD$
 +
 +					while(link_address) {
 +
-+						edb::linux_struct::link_map<Addr> map;
++						edb::netbsd_struct::link_map<Addr> map;
 +						if(process->read_bytes(link_address, &map, sizeof(map))) {
 +							char path[PATH_MAX];
 +							if(!process->read_bytes(edb::address_t::fromZeroExtended(map.l_name), &path, sizeof(path))) {
@@ -583,26 +582,10 @@ $NetBSD$
 +//------------------------------------------------------------------------------
 +// Name: ptrace_peek
 +// Desc:
-+// Note: this will fail on newer versions of linux if called from a
++// Note: this will fail on newer versions of netbsd if called from a
 +//       different thread than the one which attached to process
 +//------------------------------------------------------------------------------
 +long PlatformProcess::ptrace_peek(edb::address_t address, bool *ok) const {
-+	Q_ASSERT(ok);
-+	Q_ASSERT(core_->process_.get() == this);
-+
-+	if (EDB_IS_32_BIT && address > 0xffffffffULL) {
-+		// 32 bit ptrace can't handle such long addresses
-+		*ok = false;
-+		return 0;
-+	}
-+
-+	errno = 0;
-+	// NOTE: on some Linux systems ptrace prototype has ellipsis instead of third and fourth arguments
-+	// Thus we can't just pass address as is on IA32 systems: it'd put 64 bit integer on stack and cause UB
-+	auto nativeAddress = reinterpret_cast<const void*>(address.toUint());
-+	const long v = ptrace(PTRACE_PEEKTEXT, pid_, nativeAddress, 0);
-+	set_ok(*ok, v);
-+	return v;
 +}
 +
 +//------------------------------------------------------------------------------
@@ -610,18 +593,6 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +bool PlatformProcess::ptrace_poke(edb::address_t address, long value) {
-+
-+	Q_ASSERT(core_->process_.get() == this);
-+
-+	if (EDB_IS_32_BIT && address > 0xffffffffULL) {
-+		// 32 bit ptrace can't handle such long addresses
-+		return 0;
-+	}
-+
-+	// NOTE: on some Linux systems ptrace prototype has ellipsis instead of third and fourth arguments
-+	// Thus we can't just pass address as is on IA32 systems: it'd put 64 bit integer on stack and cause UB
-+	auto nativeAddress = reinterpret_cast<const void*>(address.toUint());
-+	return ptrace(PTRACE_POKETEXT, pid_, nativeAddress, value) != -1;
 +}
 +
 +//------------------------------------------------------------------------------
@@ -667,9 +638,14 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +edb::uid_t PlatformProcess::uid() const {
++	struct ::kinfo_proc2 kp;
++	::size_t len = sizeof(p);
 +
-+	const QFileInfo info(QString("/proc/%1").arg(pid_));
-+	return info.ownerId();
++	const int mib[] = { CTL_KERN, KERN_PROC2, KERN_PROC_PID, pid, sizeof(kp), 1 };
++	if (::sysctl(mib, __arraycount(mib), &kp, &len, NULL, 0) == -1)
++		return 0;
++
++	return kp.p_uid;
 +}
 +
 +//------------------------------------------------------------------------------
@@ -689,13 +665,14 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +QString PlatformProcess::name() const {
-+	struct user_stat user_stat;
-+	const int n = get_user_stat(pid_, &user_stat);
-+	if(n >= 2) {
-+		return user_stat.comm;
-+	}
++	struct ::kinfo_proc2 kp;
++	::size_t len = sizeof(p);
 +
-+	return QString();
++	const int mib[] = { CTL_KERN, KERN_PROC2, KERN_PROC_PID, pid, sizeof(kp), 1 };
++	if (::sysctl(mib, __arraycount(mib), &kp, &len, NULL, 0) == -1)
++		return 0;
++
++	return QString(kp.p_comm);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -703,13 +680,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +QList<Module> PlatformProcess::loaded_modules() const {
-+	if(edb::v1::debuggeeIs64Bit()) {
-+		return get_loaded_modules<Elf64_Addr>(this);
-+	} else if(edb::v1::debuggeeIs32Bit()) {
-+		return get_loaded_modules<Elf32_Addr>(this);
-+	} else {
-+		return QList<Module>();
-+	}
++	return get_loaded_modules<Elf64_Addr>(this);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -717,17 +688,6 @@ $NetBSD$
 +// Desc: stops *all* threads of a process
 +//------------------------------------------------------------------------------
 +Status PlatformProcess::pause() {
-+	// belive it or not, I belive that this is sufficient for all threads
-+	// this is because in the debug event handler, a SIGSTOP is sent
-+	// to all threads when any event arrives, so no need to explicitly do
-+	// it here. We just need any thread to stop. So we'll just target the
-+	// pid_ which will send it to any one of the threads in the process.
-+	if(::kill(pid_, SIGSTOP) == -1) {
-+		const char *const strError = strerror(errno);
-+		qWarning() << "Unable to pause process" << pid_ << ": kill(SIGSTOP) failed:" << strError;
-+		return Status(strError);
-+	}
-+
 +	return Status::Ok;
 +}
 +
@@ -736,43 +696,7 @@ $NetBSD$
 +// Desc: resumes ALL threads
 +//------------------------------------------------------------------------------
 +Status PlatformProcess::resume(edb::EVENT_STATUS status) {
-+
-+	// NOTE(eteran): OK, this is very tricky. When the user wants to resume
-+	// while ignoring a signal (DEBUG_CONTINUE), we need to know which thread
-+	// needs to have the signal ignored, and which need to have their signals
-+	// passed during the resume
-+
-+	// TODO: assert that we are paused
-+	Q_ASSERT(core_->process_.get() == this);
-+
-+	QString errorMessage;
-+
-+	if(status != edb::DEBUG_STOP) {
-+
-+		if(std::shared_ptr<IThread> thread = current_thread()) {
-+			const auto resumeStatus = thread->resume(status);
-+			if(!resumeStatus) {
-+				errorMessage += tr("Failed to resume thread %1: %2\n").arg(thread->tid()).arg(resumeStatus.error());
-+			}
-+
-+			// resume the other threads passing the signal they originally reported had
-+			for(auto &other_thread : threads()) {
-+				if(util::contains(core_->waited_threads_, other_thread->tid())) {
-+					const auto resumeStatus = other_thread->resume();
-+					if(!resumeStatus) {
-+						errorMessage += tr("Failed to resume thread %1: %2\n").arg(thread->tid()).arg(resumeStatus.error());
-+					}
-+				}
-+			}
-+		}
-+	}
-+
-+	if(errorMessage.isEmpty()) {
-+		return Status::Ok;
-+	}
-+
-+	qWarning() << errorMessage.toStdString().c_str();
-+	return Status("\n" + errorMessage);
++	return Status::Ok;
 +}
 +
 +//------------------------------------------------------------------------------
@@ -780,14 +704,6 @@ $NetBSD$
 +// Desc: steps the currently active thread
 +//------------------------------------------------------------------------------
 +Status PlatformProcess::step(edb::EVENT_STATUS status) {
-+	// TODO: assert that we are paused
-+	Q_ASSERT(core_->process_.get() == this);
-+
-+	if(status != edb::DEBUG_STOP) {
-+		if(std::shared_ptr<IThread> thread = current_thread()) {
-+			return thread->step(status);
-+		}
-+	}
 +	return Status::Ok;
 +}
 +
@@ -836,35 +752,25 @@ $NetBSD$
 +	*phdr_memaddr = edb::address_t{};
 +	*num_phdr = 0;
 +
-+	QFile auxv(QString("/proc/%1/auxv").arg(process->pid()));
-+	if(auxv.open(QIODevice::ReadOnly)) {
++	size_T len = 4096 * 10;
++	AuxInfo *ptr = malloc(len);
++	edb::address_t val;
 +
-+		if(edb::v1::debuggeeIs64Bit()) {
-+			elf64_auxv_t entry;
-+			while(auxv.read(reinterpret_cast<char *>(&entry), sizeof(entry))) {
-+				switch(entry.a_type) {
-+				case AT_PHDR:
-+					*phdr_memaddr = entry.a_un.a_val;
-+					break;
-+				case AT_PHNUM:
-+					*num_phdr = entry.a_un.a_val;
-+					break;
-+				}
-+			}
-+		} else if(edb::v1::debuggeeIs32Bit()) {
-+			elf32_auxv_t entry;
-+			while(auxv.read(reinterpret_cast<char *>(&entry), sizeof(entry))) {
-+				switch(entry.a_type) {
-+				case AT_PHDR:
-+					*phdr_memaddr = entry.a_un.a_val;
-+					break;
-+				case AT_PHNUM:
-+					*num_phdr = entry.a_un.a_val;
-+					break;
-+				}
-+			}
++	struct ptrace_io_desc io = { PIOD_READ_AUXV, NULL, ptr, len };
++
++	ptrace(PT_IO, pid_, &io, 0);
++
++	for (AuxInfo *aip = ptr; aip->a_type != AT_NULL; aip++) {
++		if (aip->a_type == AT_PHDR) {
++			*phdr_memaddr = aip->a_v;
++			break;
++		} else if (aip->a_type == AT_PHNUM) {
++			*num_phdr = aip->a_v;
++			break;
 +		}
 +	}
++
++	free(ptr);
 +
 +	return (*phdr_memaddr != 0 && *num_phdr != 0);
 +}

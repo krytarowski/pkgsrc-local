@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/DebuggerCore.h.orig	2019-06-15 15:00:37.864964807 +0000
 +++ plugins/DebuggerCore/unix/netbsd/DebuggerCore.h
-@@ -0,0 +1,148 @@
+@@ -0,0 +1,149 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -95,7 +95,7 @@ $NetBSD$
 +	Status ptrace_getsiginfo(edb::tid_t tid, siginfo_t *siginfo);
 +	Status ptrace_continue(edb::tid_t tid, long status);
 +	Status ptrace_step(edb::tid_t tid, long status);
-+	Status ptrace_set_options(edb::tid_t tid, long options);
++	Status ptrace_set_options(edb::pid_t pid);
 +	Status ptrace_get_event_message(edb::tid_t tid, unsigned long *message);
 +	long ptrace_traceme();
 +
@@ -116,6 +116,7 @@ $NetBSD$
 +	std::shared_ptr<IDebugEvent> handle_syscallexit(edb::pid_t pid, edb::tid_t lid, siginfo_t *si);
 +	std::shared_ptr<IDebugEvent> handle_exec(edb::pid_t pid, edb::tid_t lid);
 +	std::shared_ptr<IDebugEvent> handle_forked(edb::pid_t pid, edb::tid_t lid, edb::pid_t child);
++	std::shared_ptr<IDebugEvent> handle_vforked(edb::pid_t pid, edb::tid_t lid, edb::pid_t child);
 +	std::shared_ptr<IDebugEvent> handle_vforkdone(edb::pid_t pid, edb::tid_t lid, edb::pid_t child);
 +	std::shared_ptr<IDebugEvent> handle_lwpcreated(edb::pid_t pid, edb::tid_t lid, edb::tid_t lwp);
 +	std::shared_ptr<IDebugEvent> handle_lwpexited(edb::pid_t pid, edb::tid_t lid, edb::tid_t lwp);

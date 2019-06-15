@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp.orig	2019-06-15 15:00:37.849568641 +0000
 +++ plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp
-@@ -0,0 +1,895 @@
+@@ -0,0 +1,837 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -459,64 +459,6 @@ $NetBSD$
 +	if (WIFEXITED(status)) {
 +		return handle_exited(pid, status);
 +	}
-+}
-+
-+	// normal event
-+	auto e = std::make_shared<PlatformEvent>();
-+
-+	e->pid_    = process_->pid();
-+	e->tid_    = tid;
-+	e->status_ = status;
-+	if(!ptrace_getsiginfo(tid, &e->siginfo_)) {
-+		// TODO: handle no info?
-+	}
-+
-+	// if necessary, just ignore this event
-+	if(util::contains(ignored_exceptions_, e->code())) {
-+		ptrace_continue(tid, resume_code(status));
-+	}
-+
-+	/* NOTE(eteran): OK, so when we get an event, we generally want to stop
-+	 * any other threads as well. So we will call stop_threads() below
-+	 * which sends a SIGSTOP.
-+	 *
-+	 * We need to be very careful to avoid those future events causing the
-+	 * active thread to be set, because we want it to remain set to the thread
-+	 * which recieved the initial signal. This is all so that later when the
-+	 * user clicks resume, that the correct active thread gets (or doesn't)
-+	 * get signals, and the rest get resumed properly.
-+	 *
-+	 * To do this, we simply only alter the active_thread_ variable if this
-+	 * event was the first we saw after a resume/run (phew!).*/
-+	if(waited_threads_.size() == 1) {
-+		active_thread_ = tid;
-+	}
-+
-+	auto it = threads_.find(tid);
-+	if(it != threads_.end()) {
-+		it.value()->status_ = status;
-+	}
-+
-+	stop_threads();
-+
-+	// Some breakpoint types result in SIGILL or SIGSEGV. We'll transform the
-+	// event into breakpoint event if such a breakpoint has triggered.
-+	if(it != threads_.end() && WIFSTOPPED(status)) {
-+		const auto signo = WSTOPSIG(status);
-+		if(signo == SIGILL || signo == SIGSEGV) {
-+			// no need to peekuser for SIGILL, but have to for SIGSEGV
-+			const auto address = signo == SIGILL ? edb::address_t::fromZeroExtended(e->siginfo_.si_addr)
-+											   : (*it)->instruction_pointer();
-+
-+			if(edb::v1::find_triggered_breakpoint(address)) {
-+				e->status_ = SIGTRAP << 8 | 0x7f;
-+				e->siginfo_.si_signo = SIGTRAP;
-+				e->siginfo_.si_code  = TRAP_BRKPT;
-+			}
-+		}
-+	}
-+
-+	return e;
 +}
 +
 +//------------------------------------------------------------------------------
