@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp.orig	2019-06-15 15:00:38.013675769 +0000
 +++ plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp
-@@ -0,0 +1,923 @@
+@@ -0,0 +1,914 @@
 +/*
 +Copyright (C) 2015 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -174,16 +174,7 @@ $NetBSD$
 +// address into account
 +//------------------------------------------------------------------------------
 +void seek_addr(QFile& file, edb::address_t address) {
-+	if(address <= UINT64_MAX/2) {
-+		file.seek(address);
-+	} else {
-+		const int fd=file.handle();
-+		// Seek in two parts to avoid specifying negative offset: off64_t is a signed type
-+		const off64_t halfAddressTruncated=address>>1;
-+		lseek64(fd,halfAddressTruncated,SEEK_SET);
-+		const off64_t secondHalfAddress=address-halfAddressTruncated;
-+		lseek64(fd,secondHalfAddress,SEEK_CUR);
-+	}
++	file.seek(address);
 +}
 +
 +
@@ -670,7 +661,7 @@ $NetBSD$
 +	struct ::kinfo_proc2 kp;
 +	::size_t len = sizeof(p);
 +
-+	const int mib[] = { CTL_KERN, KERN_PROC2, KERN_PROC_PID, pid, sizeof(kp), 1 };
++	const int mib[] = { CTL_KERN, KERN_PROC2, KERN_PROC_PID, pid_, sizeof(kp), 1 };
 +	if (::sysctl(mib, __arraycount(mib), &kp, &len, NULL, 0) == -1)
 +		return 0;
 +
@@ -722,7 +713,7 @@ $NetBSD$
 + * @return
 + */
 +edb::address_t PlatformProcess::entry_point() const  {
-+	size_T len = 4096 * 10;
++	::size_t len = 4096 * 10;
 +	AuxInfo *ptr = malloc(len);
 +	edb::address_t val;
 +
@@ -754,8 +745,8 @@ $NetBSD$
 +	*phdr_memaddr = edb::address_t{};
 +	*num_phdr = 0;
 +
-+	size_T len = 4096 * 10;
-+	AuxInfo *ptr = malloc(len);
++	::size_t len = 4096 * 10;
++	AuxInfo *ptr = (AuxInfo *)::malloc(len);
 +	edb::address_t val;
 +
 +	struct ptrace_io_desc io = { PIOD_READ_AUXV, NULL, ptr, len };

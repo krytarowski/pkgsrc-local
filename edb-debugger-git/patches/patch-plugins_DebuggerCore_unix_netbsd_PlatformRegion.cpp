@@ -32,8 +32,8 @@ $NetBSD$
 +
 +#include <QMessageBox>
 +
++#include <sys/types.h>
 +#include <sys/mman.h>
-+#include <asm/unistd.h>
 +
 +namespace DebuggerCorePlugin {
 +

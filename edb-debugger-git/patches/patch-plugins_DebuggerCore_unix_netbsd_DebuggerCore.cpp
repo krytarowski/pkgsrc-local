@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp.orig	2019-06-15 15:00:37.849568641 +0000
 +++ plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp
-@@ -0,0 +1,837 @@
+@@ -0,0 +1,839 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -50,6 +50,7 @@ $NetBSD$
 +
 +#include <sys/types.h>
 +#include <sys/ptrace.h>
++#include <sys/sysctl.h>
 +#include <sys/mman.h>
 +#include <sys/wait.h>
 +#include <sys/syscall.h>
@@ -485,21 +486,22 @@ $NetBSD$
 +//------------------------------------------------------------------------------
 +Status DebuggerCore::attach(edb::pid_t pid) {
 +	end_debug_session();
++	int status;
 +
 +	lastMeansOfCapture = MeansOfCapture::Attach;
 +
 +	// create this, so the threads created can refer to it
 +	process_ = std::make_shared<PlatformProcess>(this, pid);
 +
-+	if (ptrace(PTRACE_ATTACH, pid, 0, 0) == -1) {
++	if (ptrace(PT_ATTACH, pid, 0, 0) == -1) {
 +		process_ = nullptr;
-+		return Status(std::strerror(lastErr));
++		return Status(std::strerror(errno));
 +	}
 +
 +	const int ret = Posix::waitpid(pid, &status, 0);
 +	if (ret == -1) {
 +		process_ = nullptr;
-+		return Status(std::strerror(lastErr));
++		return Status(std::strerror(errno));
 +	}
 +
 +	struct ptrace_lwpinfo pl;
@@ -511,7 +513,7 @@ $NetBSD$
 +	}
 +	if (rv == -1) {
 +		process_ = nullptr;
-+		return Status(std::strerror(lastErr));
++		return Status(std::strerror(errno));
 +	}
 +
 +	active_thread_ = threads_.begin();
@@ -672,7 +674,7 @@ $NetBSD$
 +	}
 +	if (rv == -1) {
 +		process_ = nullptr;
-+		return Status(std::strerror(lastErr));
++		return Status(std::strerror(errno));
 +	}
 +
 +	active_thread_ = threads_.begin();
