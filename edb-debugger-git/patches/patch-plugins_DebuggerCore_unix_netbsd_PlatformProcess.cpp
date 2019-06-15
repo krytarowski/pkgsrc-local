@@ -1,8 +1,8 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp.orig	2019-06-15 23:14:06.302755063 +0000
+--- plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp.orig	2019-06-15 23:22:18.548807014 +0000
 +++ plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp
-@@ -0,0 +1,930 @@
+@@ -0,0 +1,922 @@
 +/*
 +Copyright (C) 2015 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -703,14 +703,6 @@ $NetBSD$
 +// Desc: resumes ALL threads
 +//------------------------------------------------------------------------------
 +Status PlatformProcess::resume(edb::EVENT_STATUS status) {
-+	return Status::Ok;
-+}
-+
-+//------------------------------------------------------------------------------
-+// Name: step
-+// Desc: steps the currently active thread
-+//------------------------------------------------------------------------------
-+Status PlatformProcess::step(edb::EVENT_STATUS status) {
 +	return Status::Ok;
 +}
 +

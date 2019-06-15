@@ -1,6 +1,6 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformThread.cpp.orig	2019-06-15 23:14:06.443411664 +0000
+--- plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformThread.cpp.orig	2019-06-15 23:22:18.689764509 +0000
 +++ plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformThread.cpp
 @@ -0,0 +1,100 @@
 +/*
