@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformState.cpp.orig	2019-06-16 13:41:55.426462779 +0000
 +++ plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformState.cpp
-@@ -0,0 +1,414 @@
+@@ -0,0 +1,418 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -394,6 +394,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +Register PlatformState::arch_register(uint64_t type, size_t n) const {
++	return Register();
 +}
 +
 +//------------------------------------------------------------------------------
@@ -401,6 +402,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +Register PlatformState::mmx_register(size_t n) const {
++	return Register();
 +}
 +
 +//------------------------------------------------------------------------------
@@ -408,6 +410,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +Register PlatformState::xmm_register(size_t n) const {
++	return Register();
 +}
 +
 +//------------------------------------------------------------------------------
@@ -415,5 +418,6 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +Register PlatformState::ymm_register(size_t n) const {
++	return Register();
 +}
 +}
