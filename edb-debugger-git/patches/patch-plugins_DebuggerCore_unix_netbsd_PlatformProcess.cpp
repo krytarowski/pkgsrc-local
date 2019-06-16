@@ -1,8 +1,8 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp.orig	2019-06-16 13:41:55.264460373 +0000
+--- plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp.orig	2019-06-16 14:39:59.671726251 +0000
 +++ plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp
-@@ -0,0 +1,890 @@
+@@ -0,0 +1,888 @@
 +/*
 +Copyright (C) 2015 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -693,7 +693,6 @@ $NetBSD$
 +
 +	struct ptrace_io_desc io = { PIOD_READ_AUXV, NULL, ptr, len };
 +
-+	pid_t pid_ = 0;
 +	ptrace(PT_IO, pid_, &io, 0);
 +
 +	for (AuxInfo *aip = ptr; aip->a_type != AT_NULL; aip++) {
@@ -726,8 +725,7 @@ $NetBSD$
 +
 +	struct ptrace_io_desc io = { PIOD_READ_AUXV, NULL, ptr, len };
 +
-+	pid_t pid_ = 0;
-+	ptrace(PT_IO, pid_, &io, 0);
++	ptrace(PT_IO, process->pid(), &io, 0);
 +
 +	for (AuxInfo *aip = ptr; aip->a_type != AT_NULL; aip++) {
 +		if (aip->a_type == AT_PHDR) {
