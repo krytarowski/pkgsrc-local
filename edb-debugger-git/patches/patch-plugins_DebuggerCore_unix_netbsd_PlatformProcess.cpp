@@ -1,6 +1,6 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp.orig	2019-06-16 00:11:36.369701566 +0000
+--- plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp.orig	2019-06-16 01:25:12.514579410 +0000
 +++ plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp
 @@ -0,0 +1,922 @@
 +/*
@@ -475,7 +475,7 @@ $NetBSD$
 +	struct ::kinfo_vmentry *ptr = (struct ::kinfo_vmentry *)::malloc(len);
 +	::sysctl(mib, __arraycount(mib), ptr, &len, NULL, 0);
 +
-+	for (::size_t i = 0; i < len; i++) {
++	for (::size_t i = 0; i < len/sizeof(struct ::kinfo_vmentry); i++) {
 +		edb::address_t start = ptr[i].kve_start;
 +		edb::address_t end = ptr[i].kve_end;
 +		edb::address_t base = ptr[i].kve_offset;
