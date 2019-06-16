@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformState.cpp.orig	2019-06-16 13:41:55.426462779 +0000
 +++ plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformState.cpp
-@@ -0,0 +1,400 @@
+@@ -0,0 +1,403 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -199,6 +199,9 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +edb::value80 PlatformState::fpu_register(size_t n) const {
++	edb::value80 val;
++	memset(&val, 0, sizeof(val));
++	return val;
 +}
 +
 +//------------------------------------------------------------------------------
