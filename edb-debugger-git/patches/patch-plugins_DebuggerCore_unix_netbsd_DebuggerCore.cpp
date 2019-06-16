@@ -1,6 +1,6 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp.orig	2019-06-15 23:26:47.595122030 +0000
+--- plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp.orig	2019-06-16 00:11:36.243243225 +0000
 +++ plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp
 @@ -0,0 +1,848 @@
 +/*
@@ -724,7 +724,7 @@ $NetBSD$
 +	struct ::kinfo_proc2 *kp = NULL;
 +	::size_t len = 0;
 +
-+	const int mib[] = { CTL_KERN, KERN_PROC2, KERN_PROC_ALL, 0, sizeof(*kp), 0 };
++	int mib[] = { CTL_KERN, KERN_PROC2, KERN_PROC_ALL, 0, sizeof(*kp), 0 };
 +
 +	if (::sysctl(mib, __arraycount(mib), NULL, &len, NULL, 0) == -1)
 +		return ret;
