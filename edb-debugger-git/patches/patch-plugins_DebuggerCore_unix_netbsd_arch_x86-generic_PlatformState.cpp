@@ -1,8 +1,8 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformState.cpp.orig	2019-06-16 03:14:54.093295975 +0000
+--- plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformState.cpp.orig	2019-06-16 13:41:55.426462779 +0000
 +++ plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformState.cpp
-@@ -0,0 +1,344 @@
+@@ -0,0 +1,400 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -71,6 +71,62 @@ $NetBSD$
 +//       supplied
 +//------------------------------------------------------------------------------
 +Register PlatformState::value(const QString &reg) const {
++	const QString regName = reg.toLower();
++
++	if (regName == "rdi")
++		return make_Register("rdi", regs_.regs[_REG_RDI], Register::TYPE_GPR);
++	if (regName == "rsi")
++		return make_Register("rsi", regs_.regs[_REG_RSI], Register::TYPE_GPR);
++	if (regName == "rdx")
++		return make_Register("rdx", regs_.regs[_REG_RDX], Register::TYPE_GPR);
++	if (regName == "rcx")
++		return make_Register("rcx", regs_.regs[_REG_RCX], Register::TYPE_GPR);
++	if (regName == "r8")
++		return make_Register("r8", regs_.regs[_REG_R8], Register::TYPE_GPR);
++	if (regName == "r9")
++		return make_Register("r9", regs_.regs[_REG_R9], Register::TYPE_GPR);
++	if (regName == "r10")
++		return make_Register("r10", regs_.regs[_REG_R10], Register::TYPE_GPR);
++	if (regName == "r11")
++		return make_Register("r11", regs_.regs[_REG_R11], Register::TYPE_GPR);
++	if (regName == "r12")
++		return make_Register("r12", regs_.regs[_REG_R12], Register::TYPE_GPR);
++	if (regName == "r13")
++		return make_Register("r13", regs_.regs[_REG_R13], Register::TYPE_GPR);
++	if (regName == "r14")
++		return make_Register("r14", regs_.regs[_REG_R14], Register::TYPE_GPR);
++	if (regName == "r15")
++		return make_Register("r15", regs_.regs[_REG_R15], Register::TYPE_GPR);
++	if (regName == "rbp")
++		return make_Register("rbp", regs_.regs[_REG_RBP], Register::TYPE_GPR);
++	if (regName == "rbx")
++		return make_Register("rbx", regs_.regs[_REG_RBX], Register::TYPE_GPR);
++	if (regName == "rax")
++		return make_Register("rax", regs_.regs[_REG_RAX], Register::TYPE_GPR);
++	if (regName == "gs")
++		return make_Register("gs", regs_.regs[_REG_GS], Register::TYPE_GPR);
++	if (regName == "fs")
++		return make_Register("fs", regs_.regs[_REG_FS], Register::TYPE_GPR);
++	if (regName == "es")
++		return make_Register("es", regs_.regs[_REG_ES], Register::TYPE_GPR);
++	if (regName == "ds")
++		return make_Register("ds", regs_.regs[_REG_DS], Register::TYPE_GPR);
++	if (regName == "trapno")
++		return make_Register("trapno", regs_.regs[_REG_TRAPNO], Register::TYPE_GPR);
++	if (regName == "err")
++		return make_Register("err", regs_.regs[_REG_ERR], Register::TYPE_GPR);
++	if (regName == "rip")
++		return make_Register("rip", regs_.regs[_REG_RIP], Register::TYPE_GPR);
++	if (regName == "cs")
++		return make_Register("cs", regs_.regs[_REG_CS], Register::TYPE_GPR);
++	if (regName == "rflags")
++		return make_Register("rflags", regs_.regs[_REG_RFLAGS], Register::TYPE_GPR);
++	if (regName == "rsp")
++		return make_Register("rsp", regs_.regs[_REG_RSP], Register::TYPE_GPR);
++	if (regName == "ss")
++		return make_Register("ss", regs_.regs[_REG_SS], Register::TYPE_GPR);
++	
++	return Register();
 +}
 +
 +//------------------------------------------------------------------------------

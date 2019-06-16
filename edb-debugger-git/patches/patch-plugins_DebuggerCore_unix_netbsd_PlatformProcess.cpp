@@ -1,8 +1,8 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp.orig	2019-06-16 03:14:53.977524615 +0000
+--- plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp.orig	2019-06-16 13:41:55.264460373 +0000
 +++ plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp
-@@ -0,0 +1,942 @@
+@@ -0,0 +1,890 @@
 +/*
 +Copyright (C) 2015 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -20,10 +20,6 @@ $NetBSD$
 +You should have received a copy of the GNU General Public License
 +along with this program.  If not, see <http://www.gnu.org/licenses/>.
 +*/
-+
-+#ifndef _LARGEFILE64_SOURCE
-+#define _LARGEFILE64_SOURCE
-+#endif
 +
 +#include "PlatformProcess.h"
 +#include "DebuggerCore.h"
@@ -527,32 +523,16 @@ $NetBSD$
 +	Q_ASSERT(ok);
 +	Q_ASSERT(core_->process_.get() == this);
 +
-+	*ok = false;
++	char byte;
 +
-+	// if this spot is unreadable, then just return 0xff, otherwise
-+	// continue as normal.
-+
-+	// core_->page_size() - 1 will always be 0xf* because pagesizes
-+	// are always 0x10*, so the masking works
-+	// range of nBytesToNextPage is [1..n] where n=pagesize, and we have to adjust
-+	// if nByteToNextPage < wordsize
-+	const size_t nBytesToNextPage = core_->page_size() - (address & (core_->page_size() - 1));
-+
-+	// Avoid crossing page boundary, since next page may be unreadable
-+	const size_t addressShift = nBytesToNextPage < EDB_WORDSIZE ? EDB_WORDSIZE - nBytesToNextPage : 0;
-+	address -= addressShift;
-+
-+	const long value = ptrace_peek(address, ok);
-+
-+	if(*ok) {
-+		quint8 result;
-+		// We aren't interested in `value` as in number, it's just a buffer, so no endianness magic.
-+		// Just have to compensate for `addressShift` when reading it.
-+		std::memcpy(&result, reinterpret_cast<const char*>(&value) + addressShift, sizeof(result));
-+		return result;
++	struct ptrace_io_desc pio = {PIOD_READ_D, address, &byte, 1};
++	if (ptrace(PT_IO, pid_, &pio, 0) == -1) {
++		*ok = false;
++		return 0xff;
 +	}
 +
-+	return 0xff;
++	*ok = true;
++	return byte;
 +}
 +
 +
@@ -568,44 +548,12 @@ $NetBSD$
 +	Q_ASSERT(ok);
 +	Q_ASSERT(core_->process_.get() == this);
 +
-+	*ok = false;
-+
-+	// core_->page_size() - 1 will always be 0xf* because pagesizes
-+	// are always 0x10*, so the masking works
-+	// range of nBytesToNextPage is [1..n] where n=pagesize, and we have to adjust
-+	// if nBytesToNextPage < wordsize
-+	const size_t nBytesToNextPage = core_->page_size() - (address & (core_->page_size() - 1));
-+
-+	// Avoid crossing page boundary, since next page may be inaccessible
-+	const size_t addressShift = nBytesToNextPage < EDB_WORDSIZE ? EDB_WORDSIZE - nBytesToNextPage : 0;
-+	address -= addressShift;
-+
-+	long word = ptrace_peek(address, ok);
-+	if(!*ok) {
-+		return;
++	struct ptrace_io_desc pio = {PIOD_WRITE_D, address, &value, 1};
++	if (ptrace(PT_IO, pid_, &pio, 0) == -1) {
++		*ok = false;
++	} else {
++		*ok = true;
 +	}
-+
-+	// We aren't interested in `value` as in number, it's just a buffer, so no endianness magic.
-+	// Just have to compensate for `addressShift` when writing it.
-+	std::memcpy(reinterpret_cast<char*>(&word) + addressShift, &value, sizeof(value));
-+
-+	*ok = ptrace_poke(address, word);
-+}
-+
-+//------------------------------------------------------------------------------
-+// Name: ptrace_peek
-+// Desc:
-+// Note: this will fail on newer versions of netbsd if called from a
-+//       different thread than the one which attached to process
-+//------------------------------------------------------------------------------
-+long PlatformProcess::ptrace_peek(edb::address_t address, bool *ok) const {
-+}
-+
-+//------------------------------------------------------------------------------
-+// Name: ptrace_poke
-+// Desc:
-+//------------------------------------------------------------------------------
-+bool PlatformProcess::ptrace_poke(edb::address_t address, long value) {
 +}
 +
 +//------------------------------------------------------------------------------
