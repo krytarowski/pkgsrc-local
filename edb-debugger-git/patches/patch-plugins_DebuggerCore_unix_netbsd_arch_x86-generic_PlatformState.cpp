@@ -1,8 +1,8 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformState.cpp.orig	2019-06-16 16:31:33.774922073 +0000
+--- plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformState.cpp.orig	2019-06-16 23:21:29.961093575 +0000
 +++ plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformState.cpp
-@@ -0,0 +1,418 @@
+@@ -0,0 +1,478 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -36,6 +36,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +PlatformState::PlatformState() {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +    this->clear();
 +}
 +
@@ -44,6 +46,8 @@ $NetBSD$
 +// Desc: makes a copy of the state object
 +//------------------------------------------------------------------------------
 +std::unique_ptr<IState> PlatformState::clone() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return std::make_unique<PlatformState>(*this);
 +}
 +
@@ -52,6 +56,7 @@ $NetBSD$
 +// Desc: returns the flags in a string form appropriate for this platform
 +//------------------------------------------------------------------------------
 +QString PlatformState::flags_to_string(edb::reg_t flags) const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -59,10 +64,12 @@ $NetBSD$
 +// Desc: returns the flags in a string form appropriate for this platform
 +//------------------------------------------------------------------------------
 +QString PlatformState::flags_to_string() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +template <size_t BitSize = 0, class Names, class Regs>
 +Register findRegisterValue(const Names &names, const Regs &regs, const QString &regName, Register::Type type, size_t maxNames, int shift = 0) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -71,6 +78,8 @@ $NetBSD$
 +//       supplied
 +//------------------------------------------------------------------------------
 +Register PlatformState::value(const QString &reg) const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	const QString regName = reg.toLower();
 +
 +	if (regName == "rdi")
@@ -134,6 +143,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +Register PlatformState::instruction_pointer_register() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return make_Register("rip", PTRACE_REG_PC(&regs_), Register::TYPE_IP);
 +}
 +
@@ -142,6 +153,8 @@ $NetBSD$
 +// Desc: returns what is conceptually the frame pointer for this platform
 +//------------------------------------------------------------------------------
 +edb::address_t PlatformState::frame_pointer() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +#ifndef PTRACE_REG_FP
 +#define PTRACE_REG_FP(r) (r)->regs[_REG_RBP]
 +#endif
@@ -153,6 +166,8 @@ $NetBSD$
 +// Desc: returns the instruction pointer for this platform
 +//------------------------------------------------------------------------------
 +edb::address_t PlatformState::instruction_pointer() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return PTRACE_REG_PC(&regs_);
 +}
 +
@@ -161,6 +176,8 @@ $NetBSD$
 +// Desc: returns the stack pointer for this platform
 +//------------------------------------------------------------------------------
 +edb::address_t PlatformState::stack_pointer() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return PTRACE_REG_SP(&regs_);
 +}
 +
@@ -169,6 +186,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +edb::reg_t PlatformState::debug_register(size_t n) const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return dr_.dr[n];
 +}
 +
@@ -177,6 +196,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +Register PlatformState::flags_register() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return make_Register("rflags", regs_.regs[_REG_RFLAGS], Register::TYPE_GPR);
 +}
 +
@@ -185,6 +206,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +edb::reg_t PlatformState::flags() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -192,6 +214,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +int PlatformState::fpu_stack_pointer() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return 0;
 +}
 +
@@ -200,6 +224,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +edb::value80 PlatformState::fpu_register(size_t n) const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	edb::value80 val;
 +	memset(&val, 0, sizeof(val));
 +	return val;
@@ -210,6 +236,8 @@ $NetBSD$
 +// Desc: Returns true if Rn register is empty when treated in terms of FPU stack
 +//------------------------------------------------------------------------------
 +bool PlatformState::fpu_register_is_empty(size_t n) const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return true;
 +}
 +
@@ -218,21 +246,28 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +QString PlatformState::fpu_register_tag_string(size_t n) const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +edb::value16 PlatformState::fpu_control_word() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	edb::value16 val;
 +	memset(&val, 0, sizeof(val));
 +	return val;
 +}
 +
 +edb::value16 PlatformState::fpu_status_word() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	edb::value16 val;
 +	memset(&val, 0, sizeof(val));
 +	return val;
 +}
 +
 +edb::value16 PlatformState::fpu_tag_word() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	edb::value16 val;
 +	memset(&val, 0, sizeof(val));
 +	return val;
@@ -243,6 +278,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +void PlatformState::adjust_stack(int bytes) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	regs_.regs[_REG_RSP] += bytes;
 +}
 +
@@ -251,6 +288,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +void PlatformState::clear() {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	memset(&regs_, 0, sizeof(regs_));
 +	memset(&fpreg_, 0, sizeof(fpreg_));
 +	memset(&dr_, 0, sizeof(dr_));
@@ -261,6 +300,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +bool PlatformState::empty() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +}
 +
 +//------------------------------------------------------------------------------
@@ -268,6 +309,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +void PlatformState::set_debug_register(size_t n, edb::reg_t value) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	dr_.dr[n] = value;
 +}
 +
@@ -276,6 +319,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +void PlatformState::set_flags(edb::reg_t flags) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	regs_.regs[_REG_RFLAGS] = flags;
 +}
 +
@@ -284,6 +329,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +void PlatformState::set_instruction_pointer(edb::address_t value) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	regs_.regs[_REG_RIP] = value;
 +}
 +
@@ -292,6 +339,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +Register PlatformState::gp_register(size_t n) const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	switch (n) {
 +	case 0:
 +		return make_Register("rdi", regs_.regs[_REG_RDI], Register::TYPE_GPR);
@@ -355,6 +404,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +void PlatformState::set_register(const Register &reg) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -362,6 +412,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +void PlatformState::set_register(const QString &name, edb::reg_t value) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	const QString lreg = name.toLower();
 +	if(lreg == "rax") { regs_.regs[_REG_RAX] = value; }
 +        else if(lreg == "rbx") { regs_.regs[_REG_RBX] = value; }
@@ -394,6 +446,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +Register PlatformState::arch_register(uint64_t type, size_t n) const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return Register();
 +}
 +
@@ -402,6 +456,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +Register PlatformState::mmx_register(size_t n) const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return Register();
 +}
 +
@@ -410,6 +466,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +Register PlatformState::xmm_register(size_t n) const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return Register();
 +}
 +
@@ -418,6 +476,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +Register PlatformState::ymm_register(size_t n) const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return Register();
 +}
 +}

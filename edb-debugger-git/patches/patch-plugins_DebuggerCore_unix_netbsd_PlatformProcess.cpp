@@ -1,8 +1,8 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp.orig	2019-06-16 16:31:33.655069289 +0000
+--- plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp.orig	2019-06-16 23:21:29.846787276 +0000
 +++ plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp
-@@ -0,0 +1,888 @@
+@@ -0,0 +1,952 @@
 +/*
 +Copyright (C) 2015 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -62,10 +62,14 @@ $NetBSD$
 +constexpr size_t EDB_WORDSIZE = sizeof(long);
 +
 +void set_ok(bool &ok, long value) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	ok = (value != -1) || (errno == 0);
 +}
 +
 +QStringList split_max(const QString &str, int maxparts) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	int prev_idx = 0;
 +	int idx = 0;
 +	QStringList items;
@@ -95,6 +99,7 @@ $NetBSD$
 +//------------------------------------------------------------------------------
 +template<class Addr>
 +QList<Module> get_loaded_modules(const IProcess* process) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +
 +	QList<Module> ret;
 +
@@ -162,6 +167,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +PlatformProcess::PlatformProcess(DebuggerCore *core, edb::pid_t pid) : core_(core), pid_(pid) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -170,6 +176,8 @@ $NetBSD$
 +// address into account
 +//------------------------------------------------------------------------------
 +void seek_addr(QFile& file, edb::address_t address) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	file.seek(address);
 +}
 +
@@ -181,6 +189,8 @@ $NetBSD$
 +// Note: if the read is short, only the first <N> bytes are defined
 +//------------------------------------------------------------------------------
 +std::size_t PlatformProcess::read_bytes(edb::address_t address, void* buf, std::size_t len) const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	quint64 read = 0;
 +
 +	Q_ASSERT(buf);
@@ -267,6 +277,8 @@ $NetBSD$
 +//       bytes of patch data.
 +//------------------------------------------------------------------------------
 +std::size_t PlatformProcess::patch_bytes(edb::address_t address, const void *buf, size_t len) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	Q_ASSERT(buf);
 +	Q_ASSERT(core_->process_.get() == this);
 +
@@ -290,6 +302,8 @@ $NetBSD$
 +// Desc: writes <len> bytes from <buf> starting at <address>
 +//------------------------------------------------------------------------------
 +std::size_t PlatformProcess::write_bytes(edb::address_t address, const void *buf, std::size_t len) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	quint64 written = 0;
 +
 +	Q_ASSERT(buf);
@@ -324,6 +338,8 @@ $NetBSD$
 +// Note: address should be page aligned.
 +//------------------------------------------------------------------------------
 +std::size_t PlatformProcess::read_pages(edb::address_t address, void *buf, std::size_t count) const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	Q_ASSERT(buf);
 +	Q_ASSERT(core_->process_.get() == this);
 +	return read_bytes(address, buf, count * core_->page_size()) / core_->page_size();
@@ -334,6 +350,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +QDateTime PlatformProcess::start_time() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	QDateTime time;
 +
 +	struct ::kinfo_proc2 kp;
@@ -354,6 +372,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +QList<QByteArray> PlatformProcess::arguments() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	QList<QByteArray> ret;
 +
 +    int mib[4];
@@ -410,6 +430,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +QString PlatformProcess::current_working_directory() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	int mib[] = { CTL_KERN, KERN_PROC_ARGS, pid_, KERN_PROC_CWD };
 +	size_t len;
 +
@@ -427,6 +449,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +QString PlatformProcess::executable() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	int mib[] = { CTL_KERN, KERN_PROC_ARGS, pid_, KERN_PROC_PATHNAME };
 +	size_t len;
 +
@@ -444,6 +468,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +edb::pid_t PlatformProcess::pid() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return pid_;
 +}
 +
@@ -452,6 +478,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IProcess> PlatformProcess::parent() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	struct ::kinfo_proc2 kp;
 +	::size_t len = sizeof(kp);
 +
@@ -467,6 +495,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +edb::address_t PlatformProcess::code_address() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return 4096;
 +}
 +
@@ -475,6 +505,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +edb::address_t PlatformProcess::data_address() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return 4096;
 +}
 +
@@ -483,6 +515,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +QList<std::shared_ptr<IRegion>> PlatformProcess::regions() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	static QList<std::shared_ptr<IRegion>> regions;
 +	const int mib[] = { CTL_VM, VM_PROC, VM_PROC_MAP, pid_, sizeof(struct kinfo_vmentry) };
 +	::size_t len;
@@ -518,6 +552,8 @@ $NetBSD$
 +// Desc: the base implementation of reading a byte
 +//------------------------------------------------------------------------------
 +quint8 PlatformProcess::read_byte_via_ptrace(edb::address_t address, bool *ok) const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	// TODO(eteran): assert that we are paused
 +
 +	Q_ASSERT(ok);
@@ -543,6 +579,8 @@ $NetBSD$
 +//       in calling code!
 +//------------------------------------------------------------------------------
 +void PlatformProcess::write_byte_via_ptrace(edb::address_t address, quint8 value, bool *ok) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	// TODO(eteran): assert that we are paused
 +
 +	Q_ASSERT(ok);
@@ -561,6 +599,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +QList<std::shared_ptr<IThread>> PlatformProcess::threads() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +
 +	Q_ASSERT(core_->process_.get() == this);
 +
@@ -575,6 +614,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IThread> PlatformProcess::current_thread() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +
 +	Q_ASSERT(core_->process_.get() == this);
 +
@@ -590,6 +630,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +void PlatformProcess::set_current_thread(IThread& thread) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	core_->active_thread_ = static_cast<PlatformThread*>(&thread)->tid();
 +	edb::v1::update_ui();
 +}
@@ -599,6 +641,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +edb::uid_t PlatformProcess::uid() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	struct ::kinfo_proc2 kp;
 +	::size_t len = sizeof(kp);
 +
@@ -614,6 +658,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +QString PlatformProcess::user() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	if(const struct passwd *const pwd = ::getpwuid(uid())) {
 +		return pwd->pw_name;
 +	}
@@ -626,6 +672,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +QString PlatformProcess::name() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	struct ::kinfo_proc2 kp;
 +	::size_t len = sizeof(kp);
 +
@@ -641,6 +689,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +QList<Module> PlatformProcess::loaded_modules() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return get_loaded_modules<Elf64_Addr>(this);
 +}
 +
@@ -649,6 +699,8 @@ $NetBSD$
 +// Desc: stops *all* threads of a process
 +//------------------------------------------------------------------------------
 +Status PlatformProcess::pause() {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return Status::Ok;
 +}
 +
@@ -657,6 +709,7 @@ $NetBSD$
 +// Desc: steps the currently active thread
 +//------------------------------------------------------------------------------
 +Status PlatformProcess::step(edb::EVENT_STATUS status) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -664,6 +717,7 @@ $NetBSD$
 +// Desc: returns true if ALL threads are currently in the debugger's wait list
 +//------------------------------------------------------------------------------
 +bool PlatformProcess::isPaused() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -671,6 +725,7 @@ $NetBSD$
 +// Desc: resumes ALL threads
 +//------------------------------------------------------------------------------
 +Status PlatformProcess::resume(edb::EVENT_STATUS status) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +	return Status::Ok;
 +}
 +
@@ -679,6 +734,7 @@ $NetBSD$
 +// Desc: returns any patches applied to this process
 +//------------------------------------------------------------------------------
 +QMap<edb::address_t, Patch> PlatformProcess::patches() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +	return patches_;
 +}
 +
@@ -687,6 +743,8 @@ $NetBSD$
 + * @return
 + */
 +edb::address_t PlatformProcess::entry_point() const  {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	::size_t len = 4096 * 10;
 +	AuxInfo *ptr = (AuxInfo *)::malloc(len);
 +	edb::address_t val;
@@ -715,6 +773,7 @@ $NetBSD$
 + * @return
 + */
 +bool get_program_headers(const IProcess *process, edb::address_t *phdr_memaddr, int *num_phdr) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +
 +	*phdr_memaddr = edb::address_t{};
 +	*num_phdr = 0;
@@ -752,6 +811,7 @@ $NetBSD$
 + */
 +template <class Model>
 +edb::address_t get_debug_pointer(const IProcess *process, edb::address_t phdr_memaddr, int count, edb::address_t relocation) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +
 +	using elf_phdr = typename Model::elf_phdr;
 +
@@ -792,6 +852,7 @@ $NetBSD$
 + */
 +template <class Model>
 +edb::address_t get_relocation(const IProcess *process, edb::address_t phdr_memaddr, int i) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +
 +	using elf_phdr = typename Model::elf_phdr;
 +
@@ -813,6 +874,7 @@ $NetBSD$
 + * @return
 + */
 +edb::address_t PlatformProcess::debug_pointer() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +
 +	// NOTE(eteran): some of this code is from or inspired by code in
 +	// gdb/gdbserver/linux-low.c
@@ -850,6 +912,8 @@ $NetBSD$
 +}
 +
 +edb::address_t PlatformProcess::calculate_main() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +		ByteShiftArray ba(14);
 +
 +		edb::address_t entry_point = this->entry_point();

@@ -1,8 +1,8 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/PlatformRegion.cpp.orig	2019-06-16 16:31:33.678534785 +0000
+--- plugins/DebuggerCore/unix/netbsd/PlatformRegion.cpp.orig	2019-06-16 23:21:29.869701883 +0000
 +++ plugins/DebuggerCore/unix/netbsd/PlatformRegion.cpp
-@@ -0,0 +1,387 @@
+@@ -0,0 +1,425 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -44,6 +44,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +IRegion::permissions_t permissions_value(bool read, bool write, bool execute) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	IRegion::permissions_t perms = 0;
 +	if(read)    perms |= PROT_READ;
 +	if(write)   perms |= PROT_WRITE;
@@ -88,6 +90,8 @@ $NetBSD$
 +//------------------------------------------------------------------------------
 +template <size_t N>
 +BackupInfo<N>::BackupInfo(edb::address_t address, IRegion::permissions_t perms, PlatformRegion *region) : address_(address), premissions_(perms), region_(region) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	edb::v1::add_debug_event_handler(this);
 +}
 +
@@ -97,6 +101,8 @@ $NetBSD$
 +//------------------------------------------------------------------------------
 +template <size_t N>
 +BackupInfo<N>::~BackupInfo() {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	edb::v1::remove_debug_event_handler(this);
 +}
 +
@@ -106,6 +112,7 @@ $NetBSD$
 +//------------------------------------------------------------------------------
 +template <size_t N>
 +bool BackupInfo<N>::backup() {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +
 +	if(IProcess *process = edb::v1::debugger_core->process()) {
 +		if(std::shared_ptr<IThread> thread = process->current_thread()) {
@@ -123,6 +130,7 @@ $NetBSD$
 +//------------------------------------------------------------------------------
 +template <size_t N>
 +bool BackupInfo<N>::restore() {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +
 +	if(IProcess *process = edb::v1::debugger_core->process()) {
 +		if(std::shared_ptr<IThread> thread = process->current_thread()) {
@@ -141,6 +149,8 @@ $NetBSD$
 +//------------------------------------------------------------------------------
 +template <size_t N>
 +edb::EVENT_STATUS BackupInfo<N>::handle_event(const std::shared_ptr<IDebugEvent> &event) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	Q_UNUSED(event)
 +
 +	lock_.testAndSetRelease(1, 0);
@@ -161,6 +171,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +PlatformRegion::PlatformRegion(edb::address_t start, edb::address_t end, edb::address_t base, const QString &name, permissions_t permissions) : start_(start), end_(end), base_(base), name_(name), permissions_(permissions) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -168,6 +179,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +IRegion *PlatformRegion::clone() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +	return new PlatformRegion(start_, end_, base_, name_, permissions_);
 +}
 +
@@ -176,6 +188,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +bool PlatformRegion::accessible() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return readable() || writable() || executable();
 +}
 +
@@ -184,6 +198,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +bool PlatformRegion::readable() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return (permissions_ & PROT_READ) != 0;
 +}
 +
@@ -192,6 +208,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +bool PlatformRegion::writable() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return (permissions_ & PROT_WRITE) != 0;
 +}
 +
@@ -200,6 +218,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +bool PlatformRegion::executable() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return (permissions_ & PROT_EXEC) != 0;
 +}
 +
@@ -208,6 +228,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +size_t PlatformRegion::size() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return end_ - start_;
 +}
 +
@@ -216,6 +238,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +void PlatformRegion::set_permissions(bool read, bool write, bool execute) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	edb::address_t temp_address        = 0;
 +	int count                          = 0;
 +	int ret                            = QMessageBox::Yes;
@@ -262,6 +286,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +edb::address_t PlatformRegion::start() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return start_;
 +}
 +
@@ -270,6 +296,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +edb::address_t PlatformRegion::end() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return end_;
 +}
 +
@@ -278,6 +306,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +edb::address_t PlatformRegion::base() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return base_;
 +}
 +
@@ -286,6 +316,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +QString PlatformRegion::name() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return name_;
 +}
 +
@@ -302,6 +334,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +void PlatformRegion::set_permissions(bool read, bool write, bool execute, edb::address_t temp_address) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	const permissions_t perms       = permissions_value(read, write, execute);
 +	const edb::address_t len        = size();
 +	const edb::address_t addr       = start();
@@ -382,10 +416,14 @@ $NetBSD$
 +}
 +
 +void PlatformRegion::set_start(edb::address_t address) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	start_ = address;
 +}
 +
 +void PlatformRegion::set_end(edb::address_t address) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	end_ = address;
 +}
 +

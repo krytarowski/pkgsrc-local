@@ -1,8 +1,8 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/PlatformEvent.cpp.orig	2019-06-16 16:31:33.631750425 +0000
+--- plugins/DebuggerCore/unix/netbsd/PlatformEvent.cpp.orig	2019-06-16 23:21:29.823973098 +0000
 +++ plugins/DebuggerCore/unix/netbsd/PlatformEvent.cpp
-@@ -0,0 +1,367 @@
+@@ -0,0 +1,387 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -30,6 +30,8 @@ $NetBSD$
 +// Name:
 +//------------------------------------------------------------------------------
 +IDebugEvent *PlatformEvent::clone() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return new PlatformEvent(*this);
 +}
 +
@@ -37,6 +39,8 @@ $NetBSD$
 +// Name:
 +//------------------------------------------------------------------------------
 +IDebugEvent::Message PlatformEvent::createUnexpectedSignalMessage(const QString &name, int number) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return Message(
 +		tr("Unexpected Signal Encountered"),
 +		tr("<p>The debugged application encountered a %1 (%2).</p>").arg(name).arg(number),
@@ -48,6 +52,8 @@ $NetBSD$
 +// Name:
 +//------------------------------------------------------------------------------
 +IDebugEvent::Message PlatformEvent::error_description() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	Q_ASSERT(is_error());
 +
 +	auto fault_address = edb::address_t::fromZeroExtended(siginfo_.si_addr);
@@ -298,60 +304,71 @@ $NetBSD$
 +// Name:
 +//------------------------------------------------------------------------------
 +IDebugEvent::REASON PlatformEvent::reason() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
 +// Name:
 +//------------------------------------------------------------------------------
 +IDebugEvent::TRAP_REASON PlatformEvent::trap_reason() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
 +// Name:
 +//------------------------------------------------------------------------------
 +bool PlatformEvent::exited() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
 +// Name:
 +//------------------------------------------------------------------------------
 +bool PlatformEvent::is_error() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
 +// Name:
 +//------------------------------------------------------------------------------
 +bool PlatformEvent::is_kill() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
 +// Name:
 +//------------------------------------------------------------------------------
 +bool PlatformEvent::is_stop() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
 +// Name:
 +//------------------------------------------------------------------------------
 +bool PlatformEvent::is_trap() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
 +// Name:
 +//------------------------------------------------------------------------------
 +bool PlatformEvent::terminated() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
 +// Name:
 +//------------------------------------------------------------------------------
 +bool PlatformEvent::stopped() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
 +// Name:
 +//------------------------------------------------------------------------------
 +edb::pid_t PlatformEvent::process() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +        return pid_;
 +}
 +
@@ -359,6 +376,8 @@ $NetBSD$
 +// Name:
 +//------------------------------------------------------------------------------
 +edb::tid_t PlatformEvent::thread() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +        return tid_;
 +}
 +
@@ -366,6 +385,7 @@ $NetBSD$
 +// Name:
 +//------------------------------------------------------------------------------
 +int PlatformEvent::code() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +

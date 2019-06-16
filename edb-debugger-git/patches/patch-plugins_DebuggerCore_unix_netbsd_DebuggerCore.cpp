@@ -1,8 +1,8 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp.orig	2019-06-16 16:31:33.527998398 +0000
+--- plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp.orig	2019-06-16 23:21:29.722489241 +0000
 +++ plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp
-@@ -0,0 +1,843 @@
+@@ -0,0 +1,925 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -65,6 +65,8 @@ $NetBSD$
 + * @brief disable_lazy_binding
 + */
 +void disable_lazy_binding() {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	if(setenv("LD_BIND_NOW", "1", true) == -1) {
 +		perror("Failed to disable lazy binding");
 +	}
@@ -75,6 +77,8 @@ $NetBSD$
 +// Desc: returns true if the string only contains decimal digits
 +//------------------------------------------------------------------------------
 +bool is_numeric(const QString &s) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	for(QChar ch: s) {
 +		if(!ch.isDigit()) {
 +			return false;
@@ -105,6 +109,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +bool DebuggerCore::has_extension(quint64 ext) const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	Q_UNUSED(ext)
 +
 +	static constexpr auto mmxHash = edb::string_hash("MMX");
@@ -152,10 +158,14 @@ $NetBSD$
 +// Desc: returns the size of a page on this system
 +//------------------------------------------------------------------------------
 +size_t DebuggerCore::page_size() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return sysconf(_SC_PAGESIZE);
 +}
 +
 +std::size_t DebuggerCore::pointer_size() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return pointer_size_;
 +}
 +
@@ -172,6 +182,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +Status DebuggerCore::ptrace_set_options(edb::pid_t pid) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	ptrace_event_t pe;
 +
 +	if (ptrace(PT_GET_EVENT_MASK, pid, &pe, sizeof(pe)) == -1)
@@ -200,6 +212,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IDebugEvent> DebuggerCore::monitor_sigtrap(edb::pid_t pid) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	ptrace_state_t pst;
 +	ptrace_siginfo_t psi;
 +	lwpid_t lid;
@@ -270,6 +284,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IDebugEvent> DebuggerCore::monitor_crash(edb::pid_t pid) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	ptrace_siginfo_t psi;
 +	lwpid_t lid;
 +
@@ -290,6 +306,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IDebugEvent> DebuggerCore::monitor_signal(edb::pid_t pid) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	ptrace_siginfo_t psi;
 +	lwpid_t lid;
 +
@@ -305,7 +323,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IDebugEvent> DebuggerCore::handle_continued(edb::pid_t pid) {
-+
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -313,6 +331,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IDebugEvent> DebuggerCore::handle_signaled(edb::pid_t pid, int sig, int core) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -320,6 +339,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IDebugEvent> DebuggerCore::handle_exited(edb::pid_t pid, int status) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -327,6 +347,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IDebugEvent> DebuggerCore::handle_debugregister(edb::pid_t pid, edb::tid_t lid) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -334,6 +355,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IDebugEvent> DebuggerCore::handle_singlestep(edb::pid_t pid, edb::tid_t lid) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -341,6 +363,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IDebugEvent> DebuggerCore::handle_breakpoint(edb::pid_t pid, edb::tid_t lid) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -348,6 +371,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IDebugEvent> DebuggerCore::handle_syscallentry(edb::pid_t pid, edb::tid_t lid, siginfo_t *si) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -355,6 +379,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IDebugEvent> DebuggerCore::handle_syscallexit(edb::pid_t pid, edb::tid_t lid, siginfo_t *si) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -362,6 +387,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IDebugEvent> DebuggerCore::handle_exec(edb::pid_t pid, edb::tid_t lid) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -369,6 +395,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IDebugEvent> DebuggerCore::handle_forked(edb::pid_t pid, edb::tid_t lid, edb::pid_t child) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -376,6 +403,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IDebugEvent> DebuggerCore::handle_vforked(edb::pid_t pid, edb::tid_t lid, edb::pid_t child) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -383,6 +411,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IDebugEvent> DebuggerCore::handle_vforkdone(edb::pid_t pid, edb::tid_t lid, edb::pid_t child) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -390,6 +419,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IDebugEvent> DebuggerCore::handle_lwpcreated(edb::pid_t pid, edb::tid_t lid, edb::tid_t lwp) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	auto newThread = std::make_shared<PlatformThread>(this, process_, lwp);
 +
 +	threads_.insert(lwp, newThread);
@@ -407,6 +438,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IDebugEvent> DebuggerCore::handle_lwpexited(edb::pid_t pid, edb::tid_t lid, edb::tid_t lwp) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	threads_.remove(lwp);
 +
 +	ptrace(PT_CONTINUE, pid, (void *)1, 0);
@@ -417,6 +450,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IDebugEvent> DebuggerCore::handle_crashed(edb::pid_t pid, edb::tid_t lid, siginfo_t *si) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +}
 +
 +//------------------------------------------------------------------------------
@@ -424,6 +459,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IDebugEvent> DebuggerCore::handle_stopped(edb::pid_t pid, edb::tid_t lid, siginfo_t *si) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -431,6 +467,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IDebugEvent> DebuggerCore::handle_event(edb::pid_t pid, int status) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	if (WIFSTOPPED(status)) {
 +		switch (WSTOPSIG(status)) {
 +		case SIGTRAP:
@@ -468,6 +506,8 @@ $NetBSD$
 +//       it will return nullptr if an error or timeout occurs
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IDebugEvent> DebuggerCore::wait_debug_event(int msecs) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	if (process_) {
 +		if (!Posix::wait_for_sigchld(msecs)) {
 +			int status;
@@ -485,6 +525,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +Status DebuggerCore::attach(edb::pid_t pid) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	end_debug_session();
 +	int status;
 +
@@ -526,6 +568,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +Status DebuggerCore::detach() {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	QString errorMessage;
 +
 +	if (process_) {
@@ -553,6 +597,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +void DebuggerCore::kill() {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	if (attached()) {
 +		clear_breakpoints();
 +
@@ -567,6 +613,8 @@ $NetBSD$
 +}
 +
 +void DebuggerCore::detectCPUMode() {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	cpu_mode_ = CPUMode::x86_64;
 +	CapstoneEDB::init(CapstoneEDB::Architecture::ARCH_AMD64);
 +	pointer_size_ = sizeof(quint64);
@@ -577,6 +625,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +Status DebuggerCore::open(const QString &path, const QString &cwd, const QList<QByteArray> &args, const QString &tty) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	end_debug_session();
 +
 +	lastMeansOfCapture = MeansOfCapture::Launch;
@@ -689,6 +739,8 @@ $NetBSD$
 +// Desc: Returns how the last process was captured to debug
 +//------------------------------------------------------------------------------
 +DebuggerCore::MeansOfCapture DebuggerCore::last_means_of_capture() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return lastMeansOfCapture;
 +}
 +
@@ -697,6 +749,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +void DebuggerCore::reset() {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	threads_.clear();
 +	active_thread_ = 0;
 +}
@@ -706,6 +760,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +std::unique_ptr<IState> DebuggerCore::create_state() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return std::make_unique<PlatformState>();
 +}
 +
@@ -714,6 +770,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +QMap<edb::pid_t, std::shared_ptr<IProcess>> DebuggerCore::enumerate_processes() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	QMap<edb::pid_t, std::shared_ptr<IProcess>> ret;
 +
 +	struct ::kinfo_proc2 *kp = NULL;
@@ -749,6 +807,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +edb::pid_t DebuggerCore::parent_pid(edb::pid_t pid) const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	struct ::kinfo_proc2 kp;
 +	::size_t len = sizeof(kp);
 +
@@ -764,6 +824,8 @@ $NetBSD$
 +// Desc: Returns EDB's native CPU type
 +//------------------------------------------------------------------------------
 +quint64 DebuggerCore::cpu_type() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return edb::string_hash("x86-64");
 +}
 +
@@ -772,6 +834,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +QString DebuggerCore::stack_pointer() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return "rsp";
 +}
 +
@@ -780,6 +844,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +QString DebuggerCore::frame_pointer() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return "rbp";
 +}
 +
@@ -788,6 +854,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +QString DebuggerCore::instruction_pointer() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return "rip";
 +}
 +
@@ -796,6 +864,8 @@ $NetBSD$
 +// Desc: Returns the name of the flag register as a QString.
 +//------------------------------------------------------------------------------
 +QString DebuggerCore::flag_register() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return "rflags";
 +}
 +
@@ -804,6 +874,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +IProcess *DebuggerCore::process() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return process_.get();
 +}
 +
@@ -812,6 +884,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +void DebuggerCore::set_ignored_exceptions(const QList<qlonglong> &exceptions) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	ignored_exceptions_ = exceptions;
 +}
 +
@@ -820,6 +894,8 @@ $NetBSD$
 + * @return
 + */
 +QMap<qlonglong, QString> DebuggerCore::exceptions() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return Unix::exceptions();
 +}
 +
@@ -829,6 +905,8 @@ $NetBSD$
 + * @return
 + */
 +QString DebuggerCore::exceptionName(qlonglong value) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return Unix::exceptionName(value);
 +}
 +
@@ -838,10 +916,14 @@ $NetBSD$
 + * @return
 + */
 +qlonglong DebuggerCore::exceptionValue(const QString &name) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return Unix::exceptionValue(name);
 +}
 +
 +uint8_t DebuggerCore::nopFillByte() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return 0x90;
 +}
 +

@@ -1,8 +1,8 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/PlatformThread.cpp.orig	2019-06-16 16:31:33.701745296 +0000
+--- plugins/DebuggerCore/unix/netbsd/PlatformThread.cpp.orig	2019-06-16 23:21:29.892325807 +0000
 +++ plugins/DebuggerCore/unix/netbsd/PlatformThread.cpp
-@@ -0,0 +1,158 @@
+@@ -0,0 +1,174 @@
 +/*
 +Copyright (C) 2015 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -49,6 +49,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +edb::tid_t PlatformThread::tid() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return tid_;
 +}
 +
@@ -57,6 +59,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +QString PlatformThread::name() const  {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	struct user_stat thread_stat;
 +	int n = get_user_task_stat(process_->pid(), tid_, &thread_stat);
 +	if(n >= 2) {
@@ -71,6 +75,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +int PlatformThread::priority() const  {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	struct user_stat thread_stat;
 +	int n = get_user_task_stat(process_->pid(), tid_, &thread_stat);
 +	if(n >= 18) {
@@ -85,6 +91,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +edb::address_t PlatformThread::instruction_pointer() const  {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	// FIXME(ARM): doesn't work at least on ARM32
 +	struct user_stat thread_stat;
 +	int n = get_user_task_stat(process_->pid(), tid_, &thread_stat);
@@ -100,6 +108,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +QString PlatformThread::runState() const  {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	struct user_stat thread_stat;
 +	int n = get_user_task_stat(process_->pid(), tid_, &thread_stat);
 +	if(n >= 3) {
@@ -139,6 +149,8 @@ $NetBSD$
 +//       (unless the signal was SIGSTOP)
 +//------------------------------------------------------------------------------
 +Status PlatformThread::resume() {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return core_->ptrace_continue(tid_, resume_code(status_));
 +}
 +
@@ -148,6 +160,8 @@ $NetBSD$
 +//       (unless the signal was SIGSTOP, or the passed status != DEBUG_EXCEPTION_NOT_HANDLED)
 +//------------------------------------------------------------------------------
 +Status PlatformThread::resume(edb::EVENT_STATUS status) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	const int code = (status == edb::DEBUG_EXCEPTION_NOT_HANDLED) ? resume_code(status_) : 0;
 +	return core_->ptrace_continue(tid_, code);
 +}
@@ -157,6 +171,8 @@ $NetBSD$
 +// Desc: returns true if this thread is currently in the debugger's wait list
 +//------------------------------------------------------------------------------
 +bool PlatformThread::isPaused() const {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	return util::contains(core_->waited_threads_, tid_);
 +}
 +

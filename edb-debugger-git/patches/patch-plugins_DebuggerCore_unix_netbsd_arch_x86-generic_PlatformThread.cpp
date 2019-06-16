@@ -1,8 +1,8 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformThread.cpp.orig	2019-06-16 16:31:33.798661523 +0000
+--- plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformThread.cpp.orig	2019-06-16 23:21:29.984368447 +0000
 +++ plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformThread.cpp
-@@ -0,0 +1,103 @@
+@@ -0,0 +1,113 @@
 +/*
 +Copyright (C) 2015 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -42,6 +42,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +void PlatformThread::fillSegmentBases(PlatformState* state) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -49,6 +50,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +bool PlatformThread::fillStateFromPrStatus(PlatformState* state) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -56,6 +58,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +bool PlatformThread::fillStateFromSimpleRegs(PlatformState* state) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -63,6 +66,8 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +void PlatformThread::get_state(State *state) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
++
 +	auto state_impl = static_cast<PlatformState *>(state->impl_.get());
 +
 +	ptrace(PT_GETREGS, process_->pid(), &state_impl->regs_, tid_);
@@ -73,6 +78,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +void PlatformThread::set_state(const State &state) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -80,6 +86,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +unsigned long PlatformThread::get_debug_register(std::size_t n) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -87,6 +94,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +long PlatformThread::set_debug_register(std::size_t n, long value) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -95,6 +103,7 @@ $NetBSD$
 +//       (unless the signal was SIGSTOP)
 +//------------------------------------------------------------------------------
 +Status PlatformThread::step() {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -103,6 +112,7 @@ $NetBSD$
 +//       (unless the signal was SIGSTOP, or the passed status != DEBUG_EXCEPTION_NOT_HANDLED)
 +//------------------------------------------------------------------------------
 +Status PlatformThread::step(edb::EVENT_STATUS status) {
++	printf("%s(): %s:%d\n", __func__, __FILE__, __LINE__);
 +}
 +
 +}
