@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp.orig	2019-06-15 23:26:47.595122030 +0000
 +++ plugins/DebuggerCore/unix/netbsd/DebuggerCore.cpp
-@@ -0,0 +1,841 @@
+@@ -0,0 +1,848 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -713,6 +713,11 @@ $NetBSD$
 +// Name: enumerate_processes
 +// Desc:
 +//------------------------------------------------------------------------------
++#ifdef __clang__
++__attribute__((__optnone__))
++#else
++__attribute__((__optimize__("O0")))
++#endif
 +QMap<edb::pid_t, std::shared_ptr<IProcess>> DebuggerCore::enumerate_processes() const {
 +	QMap<edb::pid_t, std::shared_ptr<IProcess>> ret;
 +
@@ -726,6 +731,8 @@ $NetBSD$
 +
 +	if (::reallocarr(&kp, len, sizeof(*kp)) != 0)
 +		return ret;
++
++	mib[5] = len;
 +
 +	if (::sysctl(mib, __arraycount(mib), kp, &len, NULL, 0) == -1) {
 +		::reallocarr(&kp, 0, 0);
