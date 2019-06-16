@@ -1,8 +1,8 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp.orig	2019-06-16 01:25:12.514579410 +0000
+--- plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp.orig	2019-06-16 02:47:39.656743901 +0000
 +++ plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp
-@@ -0,0 +1,952 @@
+@@ -0,0 +1,942 @@
 +/*
 +Copyright (C) 2015 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -471,12 +471,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +edb::address_t PlatformProcess::code_address() const {
-+	struct user_stat user_stat;
-+	int n = get_user_stat(pid_, &user_stat);
-+	if(n >= 26) {
-+		return user_stat.startcode;
-+	}
-+	return 0;
++	return 4096;
 +}
 +
 +//------------------------------------------------------------------------------
@@ -484,12 +479,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +edb::address_t PlatformProcess::data_address() const {
-+	struct user_stat user_stat;
-+	int n = get_user_stat(pid_, &user_stat);
-+	if(n >= 27) {
-+		return user_stat.endcode + 1; // endcode == startdata ?
-+	}
-+	return 0;
++	return 4096;
 +}
 +
 +//------------------------------------------------------------------------------

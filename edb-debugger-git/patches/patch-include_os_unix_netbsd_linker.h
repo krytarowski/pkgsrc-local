@@ -1,6 +1,6 @@
 $NetBSD$
 
---- include/os/unix/netbsd/linker.h.orig	2019-06-16 01:25:12.338845711 +0000
+--- include/os/unix/netbsd/linker.h.orig	2019-06-16 02:47:39.473826970 +0000
 +++ include/os/unix/netbsd/linker.h
 @@ -0,0 +1,52 @@
 +/*
