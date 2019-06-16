@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/arch/arm-generic/PlatformThread.cpp.orig	2019-06-16 13:41:55.405306298 +0000
 +++ plugins/DebuggerCore/unix/netbsd/arch/arm-generic/PlatformThread.cpp
-@@ -0,0 +1,376 @@
+@@ -0,0 +1,345 @@
 +/*
 +Copyright (C) 2015 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -88,43 +88,6 @@ $NetBSD$
 +}
 +
 +//------------------------------------------------------------------------------
-+// Name: fillStateFromSimpleRegs
-+// Desc:
-+//------------------------------------------------------------------------------
-+bool PlatformThread::fillStateFromSimpleRegs(PlatformState* state) {
-+
-+	user_regs regs;
-+	if(ptrace(PTRACE_GETREGS, tid_, 0, &regs) != -1) {
-+
-+		state->fillFrom(regs);
-+		return true;
-+	}
-+	else {
-+		perror("PTRACE_GETREGS failed");
-+		return false;
-+	}
-+}
-+
-+//------------------------------------------------------------------------------
-+// Name: fillStateFromVFPRegs
-+// Desc:
-+//------------------------------------------------------------------------------
-+bool PlatformThread::fillStateFromVFPRegs(PlatformState* state) {
-+
-+	user_vfp fpr;
-+	if(ptrace(PTRACE_GETVFPREGS, tid_, 0, &fpr) != -1) {
-+		for(unsigned i=0;i<sizeof fpr.fpregs/sizeof*fpr.fpregs;++i)
-+			state->fillFrom(fpr);
-+		return true;
-+	}
-+	else {
-+		perror("PTRACE_GETVFPREGS failed");
-+		return false;
-+	}
-+
-+}
-+
-+//------------------------------------------------------------------------------
 +// Name: get_state
 +// Desc:
 +//------------------------------------------------------------------------------
@@ -133,11 +96,23 @@ $NetBSD$
 +
 +	core_->detectCPUMode();
 +
-+	if(auto state_impl = static_cast<PlatformState *>(state->impl_.get())) {
++	auto state_impl = static_cast<PlatformState *>(state->impl_);
 +
-+		fillStateFromSimpleRegs(state_impl);
-+		fillStateFromVFPRegs(state_impl);
-+	}
++	if(attached()) {
++                if(ptrace(PT_GETREGS, active_thread(), reinterpret_cast<char*>(&state_impl->regs_), 0) != -1) {
++                        // TODO
++                        state_impl->gs_base = 0;
++                        state_impl->fs_base = 0;
++                }
++
++                if(ptrace(PT_GETFPREGS, active_thread(), reinterpret_cast<char*>(&state_impl->fpregs_), 0) != -1) {
++                }
++
++                // TODO: Debug Registers
++
++        } else {
++                state->clear();
++        }
 +}
 +
 +//------------------------------------------------------------------------------
@@ -154,12 +129,6 @@ $NetBSD$
 +		state_impl->fillStruct(regs);
 +		if(ptrace(PTRACE_SETREGS, tid_, 0, &regs) == -1) {
 +			perror("PTRACE_SETREGS failed");
-+		}
-+
-+		user_vfp fpr;
-+		state_impl->fillStruct(fpr);
-+		if(ptrace(PTRACE_SETVFPREGS, tid_, 0, &fpr) == -1) {
-+			perror("PTRACE_SETVFPREGS failed");
 +		}
 +	}
 +}
