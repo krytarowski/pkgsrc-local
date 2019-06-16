@@ -1,6 +1,6 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp.orig	2019-06-16 02:47:39.656743901 +0000
+--- plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp.orig	2019-06-16 03:14:53.977524615 +0000
 +++ plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp
 @@ -0,0 +1,942 @@
 +/*
@@ -343,7 +343,7 @@ $NetBSD$
 +	struct ::kinfo_proc2 kp;
 +	::size_t len = sizeof(kp);
 +
-+	const int mib[] = { CTL_KERN, KERN_PROC2, KERN_PROC_PID, pid, sizeof(kp), 1 };
++	const int mib[] = { CTL_KERN, KERN_PROC2, KERN_PROC_PID, pid_, sizeof(kp), 1 };
 +	if (::sysctl(mib, __arraycount(mib), &kp, &len, NULL, 0) == -1)
 +		return time;
 +
@@ -390,7 +390,7 @@ $NetBSD$
 +    QChar ch;
 +
 +    for (size_t i = 0; i < len; i++) {
-+	procargs[i] >> ch;
++	ch = procargs[i];
 +        if(ch.isNull()) {
 +            if(!s.isEmpty()) {
 +                ret << s;
@@ -459,9 +459,9 @@ $NetBSD$
 +	struct ::kinfo_proc2 kp;
 +	::size_t len = sizeof(kp);
 +
-+	const int mib[] = { CTL_KERN, KERN_PROC2, KERN_PROC_PID, pid, sizeof(kp), 1 };
++	const int mib[] = { CTL_KERN, KERN_PROC2, KERN_PROC_PID, pid_, sizeof(kp), 1 };
 +	if (::sysctl(mib, __arraycount(mib), &kp, &len, NULL, 0) == -1)
-+		return nulptr;
++		return 0;
 +
 +	return std::make_shared<PlatformProcess>(core_, kp.p_ppid);
 +}
