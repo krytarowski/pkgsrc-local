@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformState.h.orig	2019-06-16 03:14:54.105183882 +0000
 +++ plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformState.h
-@@ -0,0 +1,562 @@
+@@ -0,0 +1,287 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -30,6 +30,10 @@ $NetBSD$
 +#include "edb.h"
 +#include <cstddef>
 +
++#include <sys/types.h>
++#include <sys/ptrace.h>
++#include <machine/reg.h>
++
 +namespace DebuggerCorePlugin {
 +
 +using std::size_t;
@@ -54,96 +58,6 @@ $NetBSD$
 +static constexpr size_t MAX_XMM_REG_COUNT               = AMD64_XMM_REG_COUNT;
 +static constexpr size_t MAX_YMM_REG_COUNT               = AMD64_YMM_REG_COUNT;
 +static constexpr size_t MAX_ZMM_REG_COUNT               = AMD64_ZMM_REG_COUNT;
-+
-+#ifdef EDB_X86
-+struct user_regs_struct {
-+	unsigned long long int rdi;
-+	unsigned long long int rsi;
-+	unsigned long long int rdx;
-+	unsigned long long int rcx;
-+	unsigned long long int r8;
-+	unsigned long long int r9;
-+	unsigned long long int r10;
-+	unsigned long long int r11;
-+	unsigned long long int r12;
-+	unsigned long long int r13;
-+	unsigned long long int r14;
-+	unsigned long long int r15;
-+	unsigned long long int rbp;
-+	unsigned long long int rbx;
-+	unsigned long long int rax;
-+	unsigned long long int gs;
-+	unsigned long long int fs;
-+	unsigned long long int es;
-+	unsigned long long int ds;
-+	unsigned long long int trapno;
-+	unsigned long long int err;
-+	unsigned long long int rip;
-+	unsigned long long int cs;
-+	unsigned long long int rflags;
-+	unsigned long long int rsp;
-+	unsigned long long int ss;
-+};
-+
-+using UserRegsStructX86    = struct user_regs_struct;
-+#if 0
-+using UserFPRegsStructX86  = struct user_fpregs_struct;
-+using UserFPXRegsStructX86 = struct user_fpxregs_struct;
-+#endif
-+
-+// Dummies to avoid missing compile-time checks for conversion code.
-+// Actual layout is irrelevant since the code is not going to be executed
-+struct UserFPRegsStructX86_64 {
-+	uint16_t cwd;
-+	uint16_t swd;
-+	uint16_t ftw;
-+	uint16_t fop; // last instruction opcode
-+	uint64_t rip; // last instruction EIP
-+	uint64_t rdp; // last operand pointer
-+	uint32_t mxcsr;
-+	uint32_t mxcr_mask;
-+	uint32_t st_space[32];
-+	uint32_t xmm_space[64];
-+	uint32_t padding[24];
-+};
-+
-+struct UserRegsStructX86_64 {
-+	uint64_t r15;
-+	uint64_t r14;
-+	uint64_t r13;
-+	uint64_t r12;
-+	uint64_t rbp;
-+	uint64_t rbx;
-+	uint64_t r11;
-+	uint64_t r10;
-+	uint64_t r9;
-+	uint64_t r8;
-+	uint64_t rax;
-+	uint64_t rcx;
-+	uint64_t rdx;
-+	uint64_t rsi;
-+	uint64_t rdi;
-+	uint64_t orig_rax;
-+	uint64_t rip;
-+	uint64_t cs;
-+	uint64_t eflags;
-+	uint64_t rsp;
-+	uint64_t ss;
-+	uint64_t fs_base;
-+	uint64_t gs_base;
-+	uint64_t ds;
-+	uint64_t es;
-+	uint64_t fs;
-+	uint64_t gs;
-+};
-+
-+#elif defined EDB_X86_64
-+struct user_regs_struct {
-+};
-+using UserRegsStructX86_64   = user_regs_struct;
-+#if 0
-+using UserFPRegsStructX86_64 = user_fpregs_struct;
-+#endif
 +
 +// Dummies to avoid missing compile-time checks for conversion code
 +// Actual layout is irrelevant since the code is not going to be executed
@@ -193,8 +107,6 @@ $NetBSD$
 +	uint32_t fos; // last operand selector
 +	uint32_t st_space[20];
 +};
-+#endif
-+
 +
 +
 +// Masks for XCR0 feature enabled bits
@@ -370,196 +282,9 @@ $NetBSD$
 +	Register ymm_register(size_t n) const ;
 +
 +private:
-+	// The whole AVX* state. XMM and YMM registers are lower parts of ZMM ones.
-+	struct AVX {
-+	public:
-+		static constexpr const char *mxcsrName = "mxcsr";
-+	public:
-+		std::array<edb::value512, MAX_ZMM_REG_COUNT> zmmStorage;
-+
-+		edb::value32 mxcsr;
-+		edb::value32 mxcsrMask;
-+		edb::value64 xcr0;
-+		bool         xmmFilledIA32   = false;
-+		bool         xmmFilledAMD64  = false; // This can be false when filled from e.g. FPXregs
-+		bool         ymmFilled       = false;
-+		bool         zmmFilled       = false;
-+		bool         mxcsrMaskFilled = false;
-+
-+	public:
-+		void clear();
-+		bool empty() const;
-+		edb::value128 xmm(size_t index) const;
-+		void setXMM(size_t index, edb::value128);
-+		edb::value256 ymm(size_t index) const;
-+		void setYMM(size_t index, edb::value256);
-+		void setYMM(size_t index, edb::value128 low, edb::value128 high);
-+		edb::value512 zmm(size_t index) const;
-+		void setZMM(size_t index, edb::value512);
-+	} avx;
-+
-+	// x87 state
-+	struct X87 {
-+	public:
-+		enum Tag {
-+			TAG_VALID   = 0,
-+			TAG_ZERO    = 1,
-+			TAG_SPECIAL = 2,
-+			TAG_EMPTY   = 3
-+		};
-+
-+	public:
-+		std::array<edb::value80, MAX_FPU_REG_COUNT> R; // Rx registers
-+		edb::address_t instPtrOffset;
-+		edb::address_t dataPtrOffset;
-+		edb::value16   instPtrSelector;
-+		edb::value16   dataPtrSelector;
-+		edb::value16   controlWord;
-+		edb::value16   statusWord;
-+		edb::value16   tagWord;
-+		edb::value16   opCode;
-+		bool           filled       = false;
-+		bool           opCodeFilled = false;
-+
-+	public:
-+		void clear();
-+		bool empty() const;
-+		size_t stackPointer() const;
-+		// Convert from ST(n) index n to Rx index x
-+		size_t RIndexToSTIndex(size_t index) const;
-+		size_t STIndexToRIndex(size_t index) const;
-+		// Restore the full FPU Tag Word from the ptrace-filtered version
-+		edb::value16 restoreTagWord(uint16_t twd) const;
-+		std::uint16_t reducedTagWord() const;
-+		int tag(size_t n) const;
-+		edb::value80 st(size_t n) const;
-+		edb::value80 &st(size_t n);
-+
-+	private:
-+		int recreateTag(const edb::value80 value) const;
-+		int makeTag(size_t n, uint16_t twd) const;
-+	} x87;
-+
-+	// i386-inherited (and expanded on x86_64) state
-+	struct X86 {
-+	public:
-+		enum GPRIndex : size_t {
-+			EAX,
-+			RAX = EAX,
-+			ECX,
-+			RCX = ECX,
-+			EDX,
-+			RDX = EDX,
-+			EBX,
-+			RBX = EBX,
-+			ESP,
-+			RSP = ESP,
-+			EBP,
-+			RBP = EBP,
-+			ESI,
-+			RSI = ESI,
-+			EDI,
-+			RDI = EDI,
-+			R8,
-+			R9,
-+			R10,
-+			R11,
-+			R12,
-+			R13,
-+			R14,
-+			R15
-+		};
-+
-+		enum SegRegIndex : size_t {
-+			ES,
-+			CS,
-+			SS,
-+			DS,
-+			FS,
-+			GS
-+		};
-+
-+		static constexpr const char *origEAXName = "orig_eax";
-+		static constexpr const char *origRAXName = "orig_rax";
-+		static constexpr const char *IP64Name    = "rip";
-+		static constexpr const char *IP32Name    = "eip";
-+		static constexpr const char *IP16Name    = "ip";
-+		static constexpr const char *flags64Name = "rflags";
-+		static constexpr const char *flags32Name = "eflags";
-+		static constexpr const char *flags16Name = "flags";
-+
-+		// gcc 4.8 fails to understand inline initialization of std::array, so define these the old way
-+		static const std::array<const char *, MAX_GPR_COUNT>                  GPReg64Names;
-+		static const std::array<const char *, MAX_GPR_COUNT>                  GPReg32Names;
-+		static const std::array<const char *, MAX_GPR_COUNT>                  GPReg16Names;
-+		static const std::array<const char *, MAX_GPR_LOW_ADDRESSABLE_COUNT>  GPReg8LNames;
-+		static const std::array<const char *, MAX_GPR_HIGH_ADDRESSABLE_COUNT> GPReg8HNames;
-+		static const std::array<const char *, MAX_SEG_REG_COUNT>              segRegNames;
-+	public:
-+		std::array<edb::reg_t, MAX_GPR_COUNT>         GPRegs;
-+		std::array<edb::reg_t, MAX_DBG_REG_COUNT>     dbgRegs;
-+		edb::reg_t                                    orig_ax;
-+		edb::reg_t                                    flags; // whole flags register: EFLAGS/RFLAGS
-+		edb::address_t                                IP;	 // program counter: EIP/RIP
-+		std::array<edb::seg_reg_t, MAX_SEG_REG_COUNT> segRegs;
-+		std::array<edb::address_t, MAX_SEG_REG_COUNT> segRegBases;
-+		std::array<bool, MAX_SEG_REG_COUNT>           segRegBasesFilled = {{false}};
-+		bool                                          gpr64Filled = false;
-+		bool                                          gpr32Filled = false;
-+
-+	public:
-+		void clear();
-+		bool empty() const;
-+	} x86;
-+
-+	bool dbgIndexValid(size_t n) const {
-+		return n < dbg_reg_count();
-+	}
-+
-+	bool gprIndexValid(size_t n) const {
-+		return n < gpr_count();
-+	}
-+
-+	bool fpuIndexValid(size_t n) const {
-+		return n < fpu_reg_count();
-+	}
-+
-+	bool mmxIndexValid(size_t n) const {
-+		return n < mmx_reg_count();
-+	}
-+
-+	bool xmmIndexValid(size_t n) const {
-+		return n < xmm_reg_count();
-+	}
-+
-+	bool ymmIndexValid(size_t n) const {
-+		return n < ymm_reg_count();
-+	}
-+
-+	bool zmmIndexValid(size_t n) const {
-+		return n < zmm_reg_count();
-+	}
-+
-+	void fillFrom(const UserRegsStructX86 &regs);
-+	void fillFrom(const UserRegsStructX86_64 &regs);
-+	void fillFrom(const PrStatus_X86 &regs);
-+	void fillFrom(const PrStatus_X86_64 &regs);
-+	void fillFrom(const UserFPRegsStructX86 &regs);
-+#if 0
-+	void fillFrom(const UserFPRegsStructX86_64 &regs);
-+	void fillFrom(const UserFPXRegsStructX86 &regs);
-+#endif
-+	bool fillFrom(const X86XState &regs, size_t sizeFromKernel);
-+
-+	void fillStruct(UserRegsStructX86 &regs) const;
-+	void fillStruct(UserRegsStructX86_64 &regs) const;
-+	void fillStruct(PrStatus_X86_64 &regs) const;
-+	void fillStruct(UserFPRegsStructX86 &regs) const;
-+#if 0
-+	void fillStruct(UserFPRegsStructX86_64 &regs) const;
-+	void fillStruct(UserFPXRegsStructX86 &regs) const;
-+#endif
-+	size_t fillStruct(X86XState &regs) const;
++	struct reg regs_;
++	struct fpreg fpreg_;
++	struct dbreg dbreg_;
 +};
 +
 +}
