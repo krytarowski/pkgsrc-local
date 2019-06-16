@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformState.cpp.orig	2019-06-16 13:41:55.426462779 +0000
 +++ plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformState.cpp
-@@ -0,0 +1,403 @@
+@@ -0,0 +1,414 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -192,6 +192,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +int PlatformState::fpu_stack_pointer() const {
++	return 0;
 +}
 +
 +//------------------------------------------------------------------------------
@@ -209,6 +210,7 @@ $NetBSD$
 +// Desc: Returns true if Rn register is empty when treated in terms of FPU stack
 +//------------------------------------------------------------------------------
 +bool PlatformState::fpu_register_is_empty(size_t n) const {
++	return true;
 +}
 +
 +//------------------------------------------------------------------------------
@@ -219,12 +221,21 @@ $NetBSD$
 +}
 +
 +edb::value16 PlatformState::fpu_control_word() const {
++	edb::value16 val;
++	memset(&val, 0, sizeof(val));
++	return val;
 +}
 +
 +edb::value16 PlatformState::fpu_status_word() const {
++	edb::value16 val;
++	memset(&val, 0, sizeof(val));
++	return val;
 +}
 +
 +edb::value16 PlatformState::fpu_tag_word() const {
++	edb::value16 val;
++	memset(&val, 0, sizeof(val));
++	return val;
 +}
 +
 +//------------------------------------------------------------------------------
