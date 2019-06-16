@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/PlatformCommon.h.orig	2019-06-16 01:25:12.479020073 +0000
 +++ plugins/DebuggerCore/unix/netbsd/PlatformCommon.h
-@@ -0,0 +1,99 @@
+@@ -0,0 +1,97 @@
 +/*
 +Copyright (C) 2015 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -94,8 +94,6 @@ $NetBSD$
 +/* 52 */ int exit_code;
 +};
 +
-+int get_user_stat(const char *path, struct user_stat *user_stat);
-+int get_user_stat(edb::pid_t pid, struct user_stat *user_stat);
 +int get_user_task_stat(edb::pid_t pid, edb::tid_t tid, struct user_stat *user_stat);
 +int resume_code(int status);
 +

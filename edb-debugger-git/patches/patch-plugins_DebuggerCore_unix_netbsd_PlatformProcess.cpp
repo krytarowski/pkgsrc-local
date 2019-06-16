@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp.orig	2019-06-16 01:25:12.514579410 +0000
 +++ plugins/DebuggerCore/unix/netbsd/PlatformProcess.cpp
-@@ -0,0 +1,922 @@
+@@ -0,0 +1,952 @@
 +/*
 +Copyright (C) 2015 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -338,8 +338,19 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +QDateTime PlatformProcess::start_time() const {
-+	QFileInfo info(QString("/proc/%1/stat").arg(pid_));
-+	return info.created();
++	QDateTime time;
++
++	struct ::kinfo_proc2 kp;
++	::size_t len = sizeof(kp);
++
++	const int mib[] = { CTL_KERN, KERN_PROC2, KERN_PROC_PID, pid, sizeof(kp), 1 };
++	if (::sysctl(mib, __arraycount(mib), &kp, &len, NULL, 0) == -1)
++		return time;
++
++	time.setTime_t(kp.p_ustart_sec);
++	time.setTime(time.time().addMSecs((int)(kp.p_ustart_usec / 1000.0)));
++
++	return time;
 +}
 +
 +//------------------------------------------------------------------------------
@@ -349,34 +360,53 @@ $NetBSD$
 +QList<QByteArray> PlatformProcess::arguments() const {
 +	QList<QByteArray> ret;
 +
-+	if(pid_ != 0) {
-+		const QString command_line_file(QString("/proc/%1/cmdline").arg(pid_));
-+		QFile file(command_line_file);
++    int mib[4];
++    int st;
++    size_t len;
++    char *procargs;
 +
-+		if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-+			QTextStream in(&file);
++    mib[0] = CTL_KERN;
++    mib[1] = KERN_PROC_ARGS;
++    mib[2] = pid_;
++    mib[3] = KERN_PROC_ARGV;
++    len = 0;
 +
-+			QByteArray s;
-+			QChar ch;
++    st = ::sysctl(mib, __arraycount(mib), NULL, &len, NULL, 0);
++    if (st == -1) {
++        return ret;
++    }
 +
-+			while(in.status() == QTextStream::Ok) {
-+				in >> ch;
-+				if(ch.isNull()) {
-+					if(!s.isEmpty()) {
-+						ret << s;
-+					}
-+					s.clear();
-+				} else {
-+					s += ch;
-+				}
-+			}
++    procargs = (char *)::malloc(len);
++    if (procargs == NULL) {
++        return ret;
++    }
++    st = ::sysctl(mib, __arraycount(mib), procargs, &len, NULL, 0);
++    if (st == -1) {
++        ::free(procargs);
++        return ret;
++    }
 +
-+			if(!s.isEmpty()) {
-+				ret << s;
-+			}
-+		}
-+	}
-+	return ret;
++    QByteArray s;
++    QChar ch;
++
++    for (size_t i = 0; i < len; i++) {
++	procargs[i] >> ch;
++        if(ch.isNull()) {
++            if(!s.isEmpty()) {
++                ret << s;
++            }
++            s.clear();
++	} else {
++            s += ch;
++        }
++    }
++    if(!s.isEmpty()) {
++        ret << s;
++    }
++
++    free(procargs);
++
++    return ret;
 +}
 +
 +//------------------------------------------------------------------------------
@@ -426,14 +456,14 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +std::shared_ptr<IProcess> PlatformProcess::parent() const {
++	struct ::kinfo_proc2 kp;
++	::size_t len = sizeof(kp);
 +
-+	struct user_stat user_stat;
-+	int n = get_user_stat(pid_, &user_stat);
-+	if(n >= 4) {
-+		return std::make_shared<PlatformProcess>(core_, user_stat.ppid);
-+	}
++	const int mib[] = { CTL_KERN, KERN_PROC2, KERN_PROC_PID, pid, sizeof(kp), 1 };
++	if (::sysctl(mib, __arraycount(mib), &kp, &len, NULL, 0) == -1)
++		return nulptr;
 +
-+	return nullptr;
++	return std::make_shared<PlatformProcess>(core_, kp.p_ppid);
 +}
 +
 +//------------------------------------------------------------------------------
