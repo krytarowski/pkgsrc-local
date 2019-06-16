@@ -1,6 +1,6 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/arch/arm-generic/PlatformState.h.orig	2019-06-16 14:39:59.764797846 +0000
+--- plugins/DebuggerCore/unix/netbsd/arch/arm-generic/PlatformState.h.orig	2019-06-16 16:31:33.748898728 +0000
 +++ plugins/DebuggerCore/unix/netbsd/arch/arm-generic/PlatformState.h
 @@ -0,0 +1,113 @@
 +/*

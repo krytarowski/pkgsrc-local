@@ -1,8 +1,8 @@
 $NetBSD$
 
---- plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformThread.cpp.orig	2019-06-16 14:39:59.812314726 +0000
+--- plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformThread.cpp.orig	2019-06-16 16:31:33.798661523 +0000
 +++ plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformThread.cpp
-@@ -0,0 +1,100 @@
+@@ -0,0 +1,103 @@
 +/*
 +Copyright (C) 2015 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -63,6 +63,9 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +void PlatformThread::get_state(State *state) {
++	auto state_impl = static_cast<PlatformState *>(state->impl_.get());
++
++	ptrace(PT_GETREGS, process_->pid(), &state_impl->regs_, tid_);
 +}
 +
 +//------------------------------------------------------------------------------
