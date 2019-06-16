@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformState.cpp.orig	2019-06-16 03:14:54.093295975 +0000
 +++ plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformState.cpp
-@@ -0,0 +1,401 @@
+@@ -0,0 +1,288 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -30,119 +30,6 @@ $NetBSD$
 +#include <unordered_map>
 +
 +namespace DebuggerCorePlugin {
-+
-+constexpr const char *PlatformState::X86::IP64Name;
-+constexpr const char *PlatformState::X86::IP32Name;
-+constexpr const char *PlatformState::X86::IP16Name;
-+constexpr const char *PlatformState::X86::origEAXName;
-+constexpr const char *PlatformState::X86::origRAXName;
-+constexpr const char *PlatformState::X86::flags64Name;
-+constexpr const char *PlatformState::X86::flags32Name;
-+constexpr const char *PlatformState::X86::flags16Name;
-+
-+const std::array<const char *, MAX_GPR_COUNT> PlatformState::X86::GPReg64Names = {
-+	"rax",
-+	"rcx",
-+	"rdx",
-+	"rbx",
-+	"rsp",
-+	"rbp",
-+	"rsi",
-+	"rdi",
-+	"r8",
-+	"r9",
-+	"r10",
-+	"r11",
-+	"r12",
-+	"r13",
-+	"r14",
-+	"r15"
-+};
-+
-+const std::array<const char *, MAX_GPR_COUNT> PlatformState::X86::GPReg32Names = {
-+	"eax",
-+	"ecx",
-+	"edx",
-+	"ebx",
-+	"esp",
-+	"ebp",
-+	"esi",
-+	"edi",
-+	"r8d",
-+	"r9d",
-+	"r10d",
-+	"r11d",
-+	"r12d",
-+	"r13d",
-+	"r14d",
-+	"r15d"
-+};
-+
-+const std::array<const char *, MAX_GPR_COUNT> PlatformState::X86::GPReg16Names = {
-+	"ax",
-+	"cx",
-+	"dx",
-+	"bx",
-+	"sp",
-+	"bp",
-+	"si",
-+	"di",
-+	"r8w",
-+	"r9w",
-+	"r10w",
-+	"r11w",
-+	"r12w",
-+	"r13w",
-+	"r14w",
-+	"r15w"
-+};
-+
-+const std::array<const char *, MAX_GPR_LOW_ADDRESSABLE_COUNT> PlatformState::X86::GPReg8LNames = {
-+	"al",
-+	"cl",
-+	"dl",
-+	"bl",
-+	"spl",
-+	"bpl",
-+	"sil",
-+	"dil",
-+	"r8b",
-+	"r9b",
-+	"r10b",
-+	"r11b",
-+	"r12b",
-+	"r13b",
-+	"r14b",
-+	"r15b"
-+};
-+
-+const std::array<const char *, MAX_GPR_HIGH_ADDRESSABLE_COUNT> PlatformState::X86::GPReg8HNames = {
-+	"ah",
-+	"ch",
-+	"dh",
-+	"bh"
-+};
-+
-+const std::array<const char *, MAX_SEG_REG_COUNT> PlatformState::X86::segRegNames  = {
-+	"es",
-+	"cs",
-+	"ss",
-+	"ds",
-+	"fs",
-+	"gs"
-+};
-+
-+void PlatformState::fillFrom(const UserRegsStructX86_64 &regs) {
-+}
-+
-+void PlatformState::fillStruct(UserRegsStructX86_64 &regs) const {
-+}
-+
-+void PlatformState::X86::clear() {
-+}
-+
-+bool PlatformState::X86::empty() const {
-+}
 +
 +//------------------------------------------------------------------------------
 +// Name: PlatformState
@@ -191,7 +78,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +Register PlatformState::instruction_pointer_register() const {
-+	return PTRACE_REG_PC(&regs_);
++	return make_Register("rip", PTRACE_REG_PC(&regs_), Register::TYPE_IP);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -202,7 +89,7 @@ $NetBSD$
 +#ifndef PTRACE_REG_FP
 +#define PTRACE_REG_FP(r) (r)->regs[_REG_RBP]
 +#endif
-+	return PTRACE_REG_BC(&regs_);
++	return PTRACE_REG_FP(&regs_);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -226,7 +113,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +edb::reg_t PlatformState::debug_register(size_t n) const {
-+	return dr_[n];
++	return dr_.dr[n];
 +}
 +
 +//------------------------------------------------------------------------------
@@ -234,7 +121,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +Register PlatformState::flags_register() const {
-+	return regs_.regs[_REG_RFLAGS];
++	return make_Register("rflags", regs_.regs[_REG_RFLAGS], Register::TYPE_GPR);
 +}
 +
 +//------------------------------------------------------------------------------
@@ -295,7 +182,7 @@ $NetBSD$
 +//------------------------------------------------------------------------------
 +void PlatformState::clear() {
 +	memset(&regs_, 0, sizeof(regs_));
-+	memset(&fpregs_, 0, sizeof(fpregs_));
++	memset(&fpreg_, 0, sizeof(fpreg_));
 +	memset(&dr_, 0, sizeof(dr_));
 +}
 +
@@ -311,7 +198,7 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +void PlatformState::set_debug_register(size_t n, edb::reg_t value) {
-+	dr_[n] = value;
++	dr_.dr[n] = value;
 +}
 +
 +//------------------------------------------------------------------------------

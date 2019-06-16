@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformState.h.orig	2019-06-16 03:14:54.105183882 +0000
 +++ plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformState.h
-@@ -0,0 +1,287 @@
+@@ -0,0 +1,243 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -216,44 +216,12 @@ $NetBSD$
 +		return edb::v1::debuggeeIs64Bit();
 +	}
 +
-+	bool is32Bit() const {
-+		return edb::v1::debuggeeIs32Bit();
-+	}
-+
 +	size_t dbg_reg_count() const {
 +		return MAX_DBG_REG_COUNT;
 +	}
 +
 +	size_t seg_reg_count() const {
 +		return MAX_SEG_REG_COUNT;
-+	}
-+
-+	size_t fpu_reg_count() const {
-+		return MAX_FPU_REG_COUNT;
-+	}
-+
-+	size_t mmx_reg_count() const {
-+		return MAX_MMX_REG_COUNT;
-+	}
-+
-+	size_t xmm_reg_count() const {
-+		return is64Bit() ? AMD64_XMM_REG_COUNT : IA32_XMM_REG_COUNT;
-+	}
-+
-+	size_t ymm_reg_count() const {
-+		return is64Bit() ? AMD64_YMM_REG_COUNT : IA32_YMM_REG_COUNT;
-+	}
-+
-+	size_t zmm_reg_count() const {
-+		return is64Bit() ? AMD64_ZMM_REG_COUNT : IA32_ZMM_REG_COUNT;
-+	}
-+
-+	size_t gpr64_count() const {
-+		return is64Bit() ? AMD64_GPR_COUNT : 0;
-+	}
-+
-+	size_t gpr_count() const {
-+		return is64Bit() ? AMD64_GPR_COUNT : IA32_GPR_COUNT;
 +	}
 +
 +	size_t gpr_low_addressable_count() const {
@@ -264,18 +232,6 @@ $NetBSD$
 +		return MAX_GPR_HIGH_ADDRESSABLE_COUNT;
 +	}
 +
-+	const char *IPName() const {
-+		return is64Bit() ? x86.IP64Name : x86.IP32Name;
-+	}
-+
-+	const char *flagsName() const {
-+		return is64Bit() ? x86.flags64Name : x86.flags32Name;
-+	}
-+
-+	const std::array<const char *, MAX_GPR_COUNT> &GPRegNames() const {
-+		return is64Bit() ? x86.GPReg64Names : x86.GPReg32Names;
-+	}
-+
 +private:
 +	Register mmx_register(size_t n) const ;
 +	Register xmm_register(size_t n) const ;
@@ -284,7 +240,7 @@ $NetBSD$
 +private:
 +	struct reg regs_;
 +	struct fpreg fpreg_;
-+	struct dbreg dbreg_;
++	struct dbreg dr_;
 +};
 +
 +}
