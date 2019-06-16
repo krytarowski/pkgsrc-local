@@ -2,7 +2,7 @@ $NetBSD$
 
 --- plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformState.cpp.orig	2019-06-16 03:14:54.093295975 +0000
 +++ plugins/DebuggerCore/unix/netbsd/arch/x86-generic/PlatformState.cpp
-@@ -0,0 +1,288 @@
+@@ -0,0 +1,344 @@
 +/*
 +Copyright (C) 2006 - 2015 Evan Teran
 +                          evan.teran@gmail.com
@@ -222,6 +222,62 @@ $NetBSD$
 +// Desc:
 +//------------------------------------------------------------------------------
 +Register PlatformState::gp_register(size_t n) const {
++	switch (n) {
++	case 0:
++		return make_Register("rdi", regs_.regs[_REG_RDI], Register::TYPE_GPR);
++	case 1:
++		return make_Register("rsi", regs_.regs[_REG_RSI], Register::TYPE_GPR);
++	case 2:
++		return make_Register("rdx", regs_.regs[_REG_RDX], Register::TYPE_GPR);
++	case 3:
++		return make_Register("rcx", regs_.regs[_REG_RCX], Register::TYPE_GPR);
++	case 4:
++		return make_Register("r8", regs_.regs[_REG_R8], Register::TYPE_GPR);
++	case 5:
++		return make_Register("r9", regs_.regs[_REG_R9], Register::TYPE_GPR);
++	case 6:
++		return make_Register("r10", regs_.regs[_REG_R10], Register::TYPE_GPR);
++	case 7:
++		return make_Register("r11", regs_.regs[_REG_R11], Register::TYPE_GPR);
++	case 8:
++		return make_Register("r12", regs_.regs[_REG_R12], Register::TYPE_GPR);
++	case 9:
++		return make_Register("r13", regs_.regs[_REG_R13], Register::TYPE_GPR);
++	case 10:
++		return make_Register("r14", regs_.regs[_REG_R14], Register::TYPE_GPR);
++	case 11:
++		return make_Register("r15", regs_.regs[_REG_R15], Register::TYPE_GPR);
++	case 12:
++		return make_Register("rbp", regs_.regs[_REG_RBP], Register::TYPE_GPR);
++	case 13:
++		return make_Register("rbx", regs_.regs[_REG_RBX], Register::TYPE_GPR);
++	case 14:
++		return make_Register("rax", regs_.regs[_REG_RAX], Register::TYPE_GPR);
++	case 15:
++		return make_Register("gs", regs_.regs[_REG_GS], Register::TYPE_GPR);
++	case 16:
++		return make_Register("fs", regs_.regs[_REG_FS], Register::TYPE_GPR);
++	case 17:
++		return make_Register("es", regs_.regs[_REG_ES], Register::TYPE_GPR);
++	case 18:
++		return make_Register("ds", regs_.regs[_REG_DS], Register::TYPE_GPR);
++	case 19:
++		return make_Register("trapno", regs_.regs[_REG_TRAPNO], Register::TYPE_GPR);
++	case 20:
++		return make_Register("err", regs_.regs[_REG_ERR], Register::TYPE_GPR);
++	case 21:
++		return make_Register("rip", regs_.regs[_REG_RIP], Register::TYPE_GPR);
++	case 22:
++		return make_Register("cs", regs_.regs[_REG_CS], Register::TYPE_GPR);
++	case 23:
++		return make_Register("rflags", regs_.regs[_REG_RFLAGS], Register::TYPE_GPR);
++	case 24:
++		return make_Register("rsp", regs_.regs[_REG_RSP], Register::TYPE_GPR);
++	case 25:
++		return make_Register("ss", regs_.regs[_REG_SS], Register::TYPE_GPR);
++	default:
++		return Register();
++	}
 +}
 +
 +//------------------------------------------------------------------------------
