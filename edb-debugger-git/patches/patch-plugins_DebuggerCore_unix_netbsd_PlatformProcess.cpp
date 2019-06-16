@@ -525,7 +525,7 @@ $NetBSD$
 +
 +	char byte;
 +
-+	struct ptrace_io_desc pio = {PIOD_READ_D, address, &byte, 1};
++	struct ptrace_io_desc pio = {PIOD_READ_D, (void *)(intptr_t)address, &byte, 1};
 +	if (ptrace(PT_IO, pid_, &pio, 0) == -1) {
 +		*ok = false;
 +		return 0xff;
@@ -548,7 +548,7 @@ $NetBSD$
 +	Q_ASSERT(ok);
 +	Q_ASSERT(core_->process_.get() == this);
 +
-+	struct ptrace_io_desc pio = {PIOD_WRITE_D, address, &value, 1};
++	struct ptrace_io_desc pio = {PIOD_WRITE_D, (void *)(intptr_t)address, &value, 1};
 +	if (ptrace(PT_IO, pid_, &pio, 0) == -1) {
 +		*ok = false;
 +	} else {
