@@ -1,0 +1,10 @@
+$NetBSD$
+
+SHA1 (kwin-5.16.4.tar.xz) = 794170e8b155d834863cb4aae85d3943c280edc8
+RMD160 (kwin-5.16.4.tar.xz) = 0cb5eebfc2cacb8327e1a04826e0e79fa8e24938
+SHA512 (kwin-5.16.4.tar.xz) = da008c2fb31e0aab23dcefbdc53d9d53b53ee0aed3546585a93e87e1857fc929be3d013c7e75b8aee5651c54249a798afb1612535d03c189aeed9ad3c6b528e5
+Size (kwin-5.16.4.tar.xz) = 6262844 bytes
+SHA1 (patch-CMakeLists.txt) = 3a795b9ce83d5084329c2c1b2cbdf5633bc05029
+SHA1 (patch-libinput_device.h) = af662636749b8cddbd5be64fe7a7bfcf328a9eb5
+SHA1 (patch-pointer__input.cpp) = b4fb49943c5188ecd8fbaddc10030f9132642ca5
+SHA1 (patch-tests_CMakeLists.txt) = 270394e5ebc8aa3899d79785b0778fd2a6b81768
