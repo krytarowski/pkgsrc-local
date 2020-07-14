@@ -6,7 +6,7 @@ $NetBSD$
      )
  endif()
  
-+if (SSL_SYSTEM)
++if (NOT SSL_SYSTEM)
  if(UNIX AND NOT APPLE)
      if(NOT OpenSSL_DIR)
          if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/openssl/lib/cmake/OpenSSL/OpenSSLConfig.cmake)
