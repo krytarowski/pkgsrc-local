@@ -11,7 +11,6 @@ HOMEPAGE=	https://github.com/taocpp/PEGTL/
 COMMENT=	Parsing Expression Grammar Template Library
 LICENSE=	mit
 
-#WRKSRC=		${WRKDIR}/PEGTL-2.8.3
 USE_CMAKE=	yes
 USE_LANGUAGES=	c++
 USE_TOOLS+=	gmake
