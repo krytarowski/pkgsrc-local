@@ -1,0 +1,23 @@
+TODO: Adjust the following lines from README.md
+
+# Welcome to the PEGTL
+
+[![Release](https://img.shields.io/github/release/taocpp/PEGTL.svg)](https://github.com/taocpp/PEGTL/releases/latest)
+[![Download](https://api.bintray.com/packages/conan/conan-center/taocpp-pegtl%3A_/images/download.svg)](https://bintray.com/conan/conan-center/taocpp-pegtl%3A_/_latestVersion)
+[![TravisCI](https://travis-ci.org/taocpp/PEGTL.svg?branch=2.x)](https://travis-ci.org/taocpp/PEGTL)
+[![AppVeyor](https://ci.appveyor.com/api/projects/status/pa5sbnw68tu650aq/branch/2.x?svg=true)](https://ci.appveyor.com/project/taocpp/PEGTL)
+[![Coverage](https://coveralls.io/repos/github/taocpp/PEGTL/badge.svg?branch=2.x)](https://coveralls.io/github/taocpp/PEGTL)
+[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/taocpp/PEGTL.svg)](https://lgtm.com/projects/g/taocpp/PEGTL/context:cpp)
+
+The Parsing Expression Grammar Template Library (PEGTL) is a zero-dependency C++ header-only parser combinator library for creating parsers according to a [Parsing Expression Grammar](http://en.wikipedia.org/wiki/Parsing_expression_grammar) (PEG).
+
+## Documentation
+
+* [Version 2.x Documentation](doc/README.md)
+* [Version 1.x Documentation](https://github.com/taocpp/PEGTL/blob/1.x/doc/README.md)
+
+## Introduction
+
+Grammars are written as regular C++ code, created with template programming (not template meta programming), i.e. nested template instantiations that naturally correspond to the inductive definition of PEGs (and other parser-combinator approaches).
+
+...
