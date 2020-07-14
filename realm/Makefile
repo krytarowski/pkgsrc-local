@@ -25,4 +25,5 @@ post-extract:
 	${MKDIR} ${WRKDIR}/build
 
 .include "../../security/openssl/buildlink3.mk"
+.include "../../wip/pegtl/buildlink3.mk"
 .include "../../mk/bsd.pkg.mk"
