@@ -17,6 +17,7 @@ WRKSRC=		${WRKDIR}/realm-core-6.0.8
 USE_CMAKE=	yes
 USE_LANGUAGES=	c c++
 CMAKE_ARGS+=	-DPEGTL_SYSTEM=1
+CMAKE_ARGS+=	-DSSL_SYSTEM=1
 
 CONFIGURE_DIRS=	${WRKDIR}/build                                                                
 CMAKE_ARG_PATH=	${WRKSRC}
