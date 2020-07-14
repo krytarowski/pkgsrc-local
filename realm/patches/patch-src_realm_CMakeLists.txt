@@ -17,7 +17,7 @@ $NetBSD$
 +else()
 +find_package(OpenSSL REQUIRED)
 +target_include_directories(CoreObjects SYSTEM PUBLIC ${OPENSSL_INCLUDE_DIR})
-+target_link_libraries(CoreObjects SYSTEM PUBLIC OpenSSL::Crypto)
++target_link_libraries(Storage PUBLIC OpenSSL::Crypto)
 +if(NOT REALM_SKIP_SHARED_LIB)
 +    target_link_libraries(StorageShared PUBLIC OpenSSL::Crypto)
 +endif()
