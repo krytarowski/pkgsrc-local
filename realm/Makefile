@@ -16,6 +16,7 @@ COMMENT=	TODO: Short description of the package
 WRKSRC=		${WRKDIR}/realm-core-6.0.8
 USE_CMAKE=	yes
 USE_LANGUAGES=	c c++
+#CMAKE_ARGS+=	-DOpenSSL_DIR=
 
 CONFIGURE_DIRS=	${WRKDIR}/build                                                                
 CMAKE_ARG_PATH=	${WRKSRC}
@@ -23,4 +24,5 @@ CMAKE_ARG_PATH=	${WRKSRC}
 post-extract:
 	${MKDIR} ${WRKDIR}/build
 
+.include "../../security/openssl/buildlink3.mk"
 .include "../../mk/bsd.pkg.mk"

@@ -1,0 +1,13 @@
+$NetBSD$
+
+--- src/realm/CMakeLists.txt.orig	2020-06-30 08:11:11.000000000 +0000
++++ src/realm/CMakeLists.txt
+@@ -326,7 +326,7 @@ if(NOT REALM_SKIP_SHARED_LIB)
+     )
+ endif()
+ 
+-if(UNIX AND NOT APPLE)
++if(UNIX AND NOT APPLE AND NOT CMAKE_SYSTEM_NAME MATCHES "NetBSD")
+     if(NOT OpenSSL_DIR)
+         if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/openssl/lib/cmake/OpenSSL/OpenSSLConfig.cmake)
+             if(ANDROID)
